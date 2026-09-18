@@ -200,6 +200,23 @@ export interface PlanningTask {
   priority: 'high' | 'medium' | 'low';
 }
 
+export interface RunOfShowItem {
+  id: string;
+  occasionId: string;
+  time: string; // e.g., "16:00" or "04:00 م"
+  titleAr: string;
+  descriptionAr: string;
+  responsibleRole: 'coordinator' | 'family' | 'photographer' | 'catering' | 'music' | 'hall_manager' | 'other';
+  responsibleRoleAr: string;
+  responsiblePerson?: string;
+  responsiblePhone?: string;
+  status: 'pending' | 'in_progress' | 'completed' | 'delayed';
+  durationMinutes: number;
+  notes?: string;
+  iconName?: string;
+}
+
+
 export interface WishlistGift {
   id: string;
   occasionId: string;
@@ -299,6 +316,9 @@ export interface Booking {
   cancellationPolicyAr: string;
   createdAt: string;
   deliverablesAr: string[];
+  payoutReleased?: boolean;
+  payoutRef?: string;
+  commissionAmount?: number;
 }
 
 export interface Review {
@@ -318,6 +338,9 @@ export interface Review {
   commentAr: string;
   isVerifiedBooking: boolean;
   vendorReplyAr?: string;
+  featured?: boolean;
+  status?: 'approved' | 'pending' | 'rejected';
+  avatarUrl?: string;
 }
 
 export interface PaymentRecord {
@@ -350,4 +373,8 @@ export interface AdminPlatformConfig {
   totalBookings: number;
   totalUsers: number;
   totalVendors: number;
+  announcementText?: string;
+  isMaintenanceMode?: boolean;
+  defaultEscrowDays?: number;
+  autoApproveReviews?: boolean;
 }

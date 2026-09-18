@@ -32,6 +32,7 @@ import TableSeatingPlanner from '@/components/occasion/TableSeatingPlanner';
 import DigitalInviteGenerator from '@/components/occasion/DigitalInviteGenerator';
 import TasksTimeline from '@/components/occasion/TasksTimeline';
 import WishlistManager from '@/components/occasion/WishlistManager';
+import { RunOfShowPlanner } from '@/components/occasion/RunOfShowPlanner';
 
 type TabType =
   | 'overview'
@@ -40,6 +41,7 @@ type TabType =
   | 'tables'
   | 'invitations'
   | 'tasks'
+  | 'runofshow'
   | 'wishlist'
   | 'bookings';
 
@@ -249,6 +251,18 @@ export default function OccasionWorkspacePage() {
         </button>
 
         <button
+          onClick={() => setActiveTab('runofshow')}
+          className={`px-4 py-3 border-b-2 transition whitespace-nowrap flex items-center gap-1.5 ${
+            activeTab === 'runofshow'
+              ? 'border-saudi-green-800 text-saudi-green-950 font-black'
+              : 'border-transparent text-gray-500 hover:text-gray-900'
+          }`}
+        >
+          <Sparkles className="w-4 h-4 text-saudi-gold-600" />
+          <span>سير الفعالية (ساعة الصفر)</span>
+        </button>
+
+        <button
           onClick={() => setActiveTab('wishlist')}
           className={`px-4 py-3 border-b-2 transition whitespace-nowrap flex items-center gap-1.5 ${
             activeTab === 'wishlist'
@@ -438,6 +452,7 @@ export default function OccasionWorkspacePage() {
         {activeTab === 'tables' && <TableSeatingPlanner />}
         {activeTab === 'invitations' && <DigitalInviteGenerator />}
         {activeTab === 'tasks' && <TasksTimeline />}
+        {activeTab === 'runofshow' && <RunOfShowPlanner occasion={currentOccasion} />}
         {activeTab === 'wishlist' && <WishlistManager />}
 
         {activeTab === 'bookings' && (

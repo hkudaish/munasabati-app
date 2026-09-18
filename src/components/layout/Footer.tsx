@@ -109,9 +109,12 @@ export default function Footer() {
 
           {/* Col 4: Portals */}
           <div>
-            <h4 className="text-sm font-bold text-saudi-gold-400 mb-3">المنصة والشركاء</h4>
+            <h4 className="text-sm font-bold text-saudi-gold-400 mb-3">المنصة والخدمات</h4>
             <ul className="space-y-2 text-xs text-gray-300">
-              <li><Link href="/vendor" className="hover:text-saudi-gold-300 font-bold text-saudi-gold-200">💼 بوابة مزودي الخدمات</Link></li>
+              <li><Link href="/calculator" className="hover:text-saudi-gold-300 font-bold text-saudi-gold-200">🧮 حاسبة ميزانية المناسبات</Link></li>
+              <li><Link href="/zaffah" className="hover:text-saudi-gold-300 font-bold text-saudi-gold-200">🎵 الزفات والفنون الشعبية</Link></li>
+              <li><Link href="/bookings" className="hover:text-saudi-gold-300">🧾 حجوزاتي وفواتيري ZATCA</Link></li>
+              <li><Link href="/vendor" className="hover:text-saudi-gold-300">💼 بوابة مزودي الخدمات</Link></li>
               <li><Link href="/admin" className="hover:text-saudi-gold-300">⚙️ لوحة الإدارة العامة</Link></li>
               <li><Link href="/rfq" className="hover:text-saudi-gold-300">طلب عروض أسعار (RFQ)</Link></li>
               <li><Link href="/inspiration" className="hover:text-saudi-gold-300">معرض الإلهام</Link></li>

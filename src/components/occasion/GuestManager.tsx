@@ -15,6 +15,12 @@ import {
   Phone,
   MessageSquare,
   Sparkles,
+  FileSpreadsheet,
+  Download,
+  Upload,
+  Send,
+  Copy,
+  Check,
 } from 'lucide-react';
 import { useApp } from '@/lib/store';
 import { Guest } from '@/lib/types';
@@ -27,7 +33,13 @@ export default function GuestManager() {
   const [filterStatus, setFilterStatus] = useState<string>('all');
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isImportExportOpen, setIsImportExportOpen] = useState(false);
+  const [isWhatsAppDispatcherOpen, setIsWhatsAppDispatcherOpen] = useState(false);
   const [activeQRModalGuest, setActiveQRModalGuest] = useState<Guest | null>(null);
+
+  // Import/Export States
+  const [importText, setImportText] = useState('');
+  const [copiedBatchIndex, setCopiedBatchIndex] = useState<number | null>(null);
 
   // Form states
   const [name, setName] = useState('');
@@ -160,8 +172,26 @@ export default function GuestManager() {
           </select>
 
           <button
+            onClick={() => setIsWhatsAppDispatcherOpen(true)}
+            className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 shadow-sm transition"
+            title="إرسال رسائل دعوة واتساب مجمعة"
+          >
+            <MessageSquare className="w-3.5 h-3.5" />
+            <span>إرسال واتساب</span>
+          </button>
+
+          <button
+            onClick={() => setIsImportExportOpen(true)}
+            className="flex items-center gap-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition"
+            title="استيراد وتصدير قائمة المدعوين"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+            <span>استيراد / تصدير</span>
+          </button>
+
+          <button
             onClick={() => setIsAddModalOpen(true)}
-            className="flex items-center gap-1.5 bg-saudi-green-800 hover:bg-saudi-green-900 text-white px-4 py-2 rounded-xl text-xs font-bold shrink-0 shadow-sm transition"
+            className="flex items-center gap-1.5 bg-saudi-green-800 hover:bg-saudi-green-900 text-white px-4 py-1.5 rounded-xl text-xs font-bold shrink-0 shadow-sm transition"
           >
             <UserPlus className="w-4 h-4 text-saudi-gold-400" />
             <span>+ إضافة مدعو</span>
@@ -432,6 +462,191 @@ export default function GuestManager() {
             >
               إغلاق المعاينة
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Import / Export Modal */}
+      {isImportExportOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5 border border-saudi-sand-300">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+              <div className="flex items-center gap-2">
+                <FileSpreadsheet className="w-5 h-5 text-emerald-600" />
+                <h4 className="text-base font-bold text-gray-900 font-cairo">
+                  استيراد وتصدير قائمة المدعوين (Excel / CSV)
+                </h4>
+              </div>
+              <button
+                onClick={() => setIsImportExportOpen(false)}
+                className="text-gray-400 hover:text-gray-600 text-sm font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Export Section */}
+            <div className="p-4 rounded-2xl bg-saudi-sand-50 border border-saudi-sand-200 space-y-2">
+              <span className="font-bold text-xs text-gray-800 block">
+                تصدير القائمة الحالية ({occasionGuests.length} مدعو)
+              </span>
+              <p className="text-[11px] text-gray-500">
+                تحميل ملف CSV يتضمن الأسماء، أرقام الجوال، حالة الـ RSVP، ورقم الطاولة.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  const headers = 'الاسم,رقم الجوال,الفئة,المرافقين,حالة الحضور,الطاولة\n';
+                  const rows = occasionGuests
+                    .map(
+                      (g) =>
+                        `"${g.name}","${g.phone}","${g.category}","${g.companionCount}","${g.status}","${g.tableName || 'غير محدد'}"`
+                    )
+                    .join('\n');
+                  const blob = new Blob(['\uFEFF' + headers + rows], { type: 'text/csv;charset=utf-8;' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `guests_${activeOccasion.title}.csv`;
+                  a.click();
+                }}
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-sm transition"
+              >
+                <Download className="w-4 h-4" />
+                <span>تحميل ملف Excel / CSV</span>
+              </button>
+            </div>
+
+            {/* Import Section */}
+            <div className="space-y-3">
+              <span className="font-bold text-xs text-gray-800 block">
+                استيراد سريع باللصق (اسم، جوال، عدد المرافقين):
+              </span>
+              <textarea
+                rows={4}
+                value={importText}
+                onChange={(e) => setImportText(e.target.value)}
+                placeholder="أدخل كل ضيف في سطر جديد. مثال:&#10;محمد القحطاني, 0501112233, 2&#10;نورة السبيعي, 0555554433, 0&#10;سلطان الدوسري, 0509998877, 1"
+                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-2xl text-xs focus:outline-none focus:border-saudi-green-700 font-mono"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  if (!importText.trim()) return;
+                  const lines = importText.split('\n');
+                  let count = 0;
+                  lines.forEach((line) => {
+                    const parts = line.split(',').map((p) => p.trim());
+                    if (parts[0]) {
+                      addGuest({
+                        occasionId: activeOccasion.id,
+                        name: parts[0],
+                        phone: parts[1] || '+966500000000',
+                        category: 'family',
+                        companionCount: Number(parts[2]) || 0,
+                        familyGroup: 'استيراد مجمع',
+                        status: 'invited',
+                        invitedVia: 'whatsapp',
+                      });
+                      count++;
+                    }
+                  });
+                  setImportText('');
+                  setIsImportExportOpen(false);
+                  alert(`تم استيراد ${count} ضيف بنجاح!`);
+                }}
+                className="w-full py-2.5 bg-saudi-green-800 hover:bg-saudi-green-900 text-white rounded-xl text-xs font-bold transition shadow-sm"
+              >
+                + استيراد وإضافة إلى قائمة المدعوين
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Smart WhatsApp Batch Dispatcher Modal */}
+      {isWhatsAppDispatcherOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-5 border border-saudi-sand-300 max-h-[85vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-emerald-600" />
+                <h4 className="text-base font-bold text-gray-900 font-cairo">
+                  مُرسل رسائل الواتساب الذكية للمدعوين
+                </h4>
+              </div>
+              <button
+                onClick={() => setIsWhatsAppDispatcherOpen(false)}
+                className="text-gray-400 hover:text-gray-600 text-sm font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            <p className="text-xs text-gray-500">
+              إرسال رسائل الدعوة وبطاقات الـ QR المخصصة لكل ضيف عبر تطبيق واتساب بنقرة واحدة.
+            </p>
+
+            {/* List of Guests to dispatch to */}
+            <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+              {occasionGuests.map((guest, idx) => {
+                const rsvpLink = typeof window !== 'undefined' ? `${window.location.origin}/invite/${guest.qrCode}` : `https://munasabati.sa/invite/${guest.qrCode}`;
+                const personalizedMsg = `السلام عليكم ورحمة الله وبركاته،\nنتشرف بدعوة الكريم/ة *${guest.name}* لحضور "${activeOccasion.title}"\nالموعد: ${activeOccasion.date}\nرابط بطاقة الدخول المخصصة وتأكيد الحضور:\n${rsvpLink}\n\nحضوركم يشرفنا ويسعدنا! ✨`;
+                const cleanPhone = guest.phone.replace(/[^0-9]/g, '');
+
+                return (
+                  <div
+                    key={guest.id}
+                    className="flex items-center justify-between p-3 rounded-2xl bg-saudi-sand-50/70 border border-saudi-sand-200 text-xs"
+                  >
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-gray-900">{guest.name}</span>
+                        <span className="text-[10px] text-gray-500 dir-ltr font-mono">{guest.phone}</span>
+                      </div>
+                      <span className="text-[10px] text-emerald-700 font-medium mt-0.5 block">
+                        كود: {guest.qrCode} • {guest.status === 'confirmed' ? '✓ مؤكد الحضور' : 'بانتظار الرد'}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(personalizedMsg);
+                          setCopiedBatchIndex(idx);
+                          setTimeout(() => setCopiedBatchIndex(null), 2000);
+                        }}
+                        className="px-2.5 py-1.5 rounded-xl bg-white border border-gray-200 text-gray-700 hover:bg-gray-100 text-[11px] font-semibold transition flex items-center gap-1"
+                      >
+                        {copiedBatchIndex === idx ? <Check className="w-3 h-3 text-green-600" /> : <Copy className="w-3 h-3" />}
+                        <span>{copiedBatchIndex === idx ? 'تم النسخ' : 'نسخ النص'}</span>
+                      </button>
+
+                      <a
+                        href={`https://wa.me/${cleanPhone}?text=${encodeURIComponent(personalizedMsg)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold shadow-sm transition flex items-center gap-1"
+                      >
+                        <Send className="w-3 h-3" />
+                        <span>إرسال واتساب</span>
+                      </a>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="pt-3 border-t border-gray-100 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setIsWhatsAppDispatcherOpen(false)}
+                className="px-5 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 font-bold text-xs rounded-xl transition"
+              >
+                إغلاق
+              </button>
+            </div>
           </div>
         </div>
       )}

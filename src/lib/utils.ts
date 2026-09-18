@@ -14,6 +14,8 @@ export function formatSAR(amount: number, includeCurrency = true): string {
   return includeCurrency ? `${formatted} ر.س` : formatted;
 }
 
+export const formatSaudiRiyal = formatSAR;
+
 export function formatSAR_EN(amount: number, includeCurrency = true): string {
   const formatted = new Intl.NumberFormat('en-US', {
     maximumFractionDigits: 0,

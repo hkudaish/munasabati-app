@@ -14,17 +14,37 @@ import {
   Plus,
   Send,
   Upload,
+  Wallet,
+  CalendarOff,
+  ExternalLink,
+  Package,
+  Trash2,
+  Users,
+  Eye,
 } from 'lucide-react';
+import Link from 'next/link';
 import { useApp } from '@/lib/store';
 import { formatSAR } from '@/lib/utils';
 import { Booking, RFQRequest } from '@/lib/types';
+import { AddServiceModal } from '@/components/vendor/AddServiceModal';
+import { VendorWalletModal } from '@/components/vendor/VendorWalletModal';
 
 export default function VendorPortalPage() {
-  const { vendors, bookings, rfqRequests, updateBookingStatus } = useApp();
+  const { vendors, bookings, rfqRequests, services, updateBookingStatus } = useApp();
 
   const currentVendor = vendors[0]; // Active demo vendor (ضيافة نجد الأصيلة)
 
-  const [activeTab, setActiveTab] = useState<'bookings' | 'rfqs' | 'services' | 'verification'>('bookings');
+  const [activeTab, setActiveTab] = useState<'bookings' | 'rfqs' | 'services' | 'availability' | 'verification'>('bookings');
+  const [isAddServiceOpen, setIsAddServiceOpen] = useState(false);
+  const [isWalletOpen, setIsWalletOpen] = useState(false);
+
+  // Blackout dates state
+  const [blackoutDates, setBlackoutDates] = useState<string[]>([
+    '2026-09-23', // Saudi National Day
+    '2026-10-15',
+    '2026-10-16',
+  ]);
+  const [newBlackoutDate, setNewBlackoutDate] = useState('');
 
   // Verification document submission simulation state
   const [crInput, setCrInput] = useState(currentVendor.crNumber || '1010784920');
@@ -40,6 +60,7 @@ export default function VendorPortalPage() {
 
   const vendorBookings = bookings.filter((b) => b.vendorId === currentVendor.id || b.vendorName.includes('ضيافة'));
   const totalRevenue = vendorBookings.reduce((acc, b) => acc + b.totalAmount, 0);
+  const vendorServices = services.filter((s) => s.vendorId === currentVendor.id || s.vendorName.includes('ضيافة'));
 
   const handleSendQuote = (e: React.FormEvent, rfq: RFQRequest) => {
     e.preventDefault();
@@ -50,6 +71,18 @@ export default function VendorPortalPage() {
       setQuoteBasePrice('');
       setQuoteNotes('');
     }, 1500);
+  };
+
+  const handleAddBlackoutDate = (dateToAdd?: string) => {
+    const d = dateToAdd || newBlackoutDate;
+    if (d && !blackoutDates.includes(d)) {
+      setBlackoutDates([...blackoutDates, d].sort());
+      setNewBlackoutDate('');
+    }
+  };
+
+  const handleRemoveBlackoutDate = (dateToRemove: string) => {
+    setBlackoutDates(blackoutDates.filter((d) => d !== dateToRemove));
   };
 
   return (
@@ -63,7 +96,7 @@ export default function VendorPortalPage() {
             className="w-16 h-16 rounded-2xl object-cover border border-gray-200 shadow-sm"
           />
           <div className="space-y-1">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-xl sm:text-2xl font-black font-cairo text-saudi-green-950">
                 {currentVendor.businessName}
               </h1>
@@ -80,22 +113,31 @@ export default function VendorPortalPage() {
           </div>
         </div>
 
-        {/* Performance metrics */}
-        <div className="flex items-center gap-4 self-start md:self-auto text-xs">
-          <div className="bg-saudi-sand-50 p-3 rounded-2xl border border-saudi-sand-300 text-center">
-            <span className="text-[10px] text-gray-400 block">التقييم العام</span>
-            <span className="text-base font-bold text-saudi-gold-700 flex items-center justify-center gap-1 font-cairo">
-              <Star className="w-4 h-4 fill-saudi-gold-500 text-saudi-gold-500" />
-              {currentVendor.rating} ({currentVendor.reviewsCount})
-            </span>
-          </div>
+        {/* Quick action buttons & Performance metrics */}
+        <div className="flex flex-wrap items-center gap-3 self-stretch sm:self-auto justify-end">
+          <Link
+            href={`/vendor/${currentVendor.id}`}
+            className="px-3.5 py-2 rounded-xl text-xs font-bold bg-saudi-sand-100 hover:bg-saudi-sand-200 text-saudi-green-900 border border-saudi-sand-300 flex items-center gap-1.5 transition"
+          >
+            <Eye className="w-3.5 h-3.5 text-saudi-gold-600" />
+            <span>معاينة الملف العام</span>
+          </Link>
 
-          <div className="bg-saudi-sand-50 p-3 rounded-2xl border border-saudi-sand-300 text-center">
-            <span className="text-[10px] text-gray-400 block">معدل الاستجابة</span>
-            <span className="text-base font-bold text-saudi-green-900 font-cairo">
-              {currentVendor.responseTimeMinutes} دقائق ⚡
-            </span>
-          </div>
+          <button
+            onClick={() => setIsWalletOpen(true)}
+            className="px-3.5 py-2 rounded-xl text-xs font-bold bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 shadow-sm flex items-center gap-1.5 transition"
+          >
+            <Wallet className="w-3.5 h-3.5" />
+            <span>محفظة المستحقات</span>
+          </button>
+
+          <button
+            onClick={() => setIsAddServiceOpen(true)}
+            className="px-3.5 py-2 rounded-xl text-xs font-bold bg-saudi-green-800 hover:bg-saudi-green-900 text-white shadow-sm flex items-center gap-1.5 transition"
+          >
+            <Plus className="w-3.5 h-3.5 text-saudi-gold-300" />
+            <span>إضافة خدمة جديدة</span>
+          </button>
         </div>
       </div>
 
@@ -136,13 +178,15 @@ export default function VendorPortalPage() {
 
         <div className="bg-white p-5 rounded-2xl border border-saudi-sand-300 shadow-sm">
           <div className="flex items-center justify-between text-xs text-gray-500 font-bold">
-            <span>حالة توثيق المتجر</span>
-            <ShieldCheck className="w-4 h-4 text-saudi-green-700" />
+            <span>التقييم وسرعة الرد</span>
+            <Star className="w-4 h-4 text-saudi-gold-500 fill-saudi-gold-500" />
           </div>
-          <span className="text-lg font-bold text-saudi-green-800 block mt-2">
-            معتمد ونشط 100%
+          <span className="text-2xl font-black font-cairo text-saudi-gold-700 block mt-2">
+            ★ {currentVendor.rating}
           </span>
-          <span className="text-[11px] text-gray-400 block mt-1">مؤهل للحجز الفوري</span>
+          <span className="text-[11px] text-saudi-green-800 font-semibold block mt-1">
+            رد فوري خلال {currentVendor.responseTimeMinutes} دقيقة ⚡
+          </span>
         </div>
       </div>
 
@@ -170,6 +214,30 @@ export default function VendorPortalPage() {
         >
           <FileText className="w-4 h-4 text-saudi-gold-600" />
           <span>طلبات عروض الأسعار الواردة ({rfqRequests.length})</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('services')}
+          className={`px-4 py-3 border-b-2 transition whitespace-nowrap flex items-center gap-1.5 ${
+            activeTab === 'services'
+              ? 'border-saudi-green-800 text-saudi-green-950 font-black'
+              : 'border-transparent text-gray-500 hover:text-gray-900'
+          }`}
+        >
+          <Package className="w-4 h-4 text-saudi-gold-600" />
+          <span>خدماتي وباقاتي ({vendorServices.length})</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('availability')}
+          className={`px-4 py-3 border-b-2 transition whitespace-nowrap flex items-center gap-1.5 ${
+            activeTab === 'availability'
+              ? 'border-saudi-green-800 text-saudi-green-950 font-black'
+              : 'border-transparent text-gray-500 hover:text-gray-900'
+          }`}
+        >
+          <CalendarOff className="w-4 h-4 text-saudi-gold-600" />
+          <span>جدول الإتاحة وأيام الإغلاق ({blackoutDates.length})</span>
         </button>
 
         <button
@@ -349,6 +417,193 @@ export default function VendorPortalPage() {
           </div>
         )}
 
+        {/* Services & Packages Tab */}
+        {activeTab === 'services' && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h3 className="text-base font-bold text-gray-900 font-cairo">
+                  الباقات والخدمات المعروضة في المنصة ({vendorServices.length})
+                </h3>
+                <p className="text-xs text-gray-500">
+                  يمكنك إدارة وتحديث أسعار وتفاصيل خدماتك لتظهر للعملاء في سوق المناسبات.
+                </p>
+              </div>
+
+              <button
+                onClick={() => setIsAddServiceOpen(true)}
+                className="px-4 py-2.5 bg-saudi-green-800 hover:bg-saudi-green-900 text-white text-xs font-bold rounded-xl flex items-center gap-2 shadow-sm transition"
+              >
+                <Plus className="w-4 h-4 text-saudi-gold-300" />
+                <span>إضافة خدمة جديدة</span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {vendorServices.map((srv) => (
+                <div
+                  key={srv.id}
+                  className="bg-white rounded-2xl border border-saudi-sand-300 shadow-sm overflow-hidden flex flex-col justify-between hover:border-saudi-gold-400 transition"
+                >
+                  <div>
+                    <div className="relative h-44 w-full bg-saudi-sand-100">
+                      <img
+                        src={(srv.images && srv.images.length > 0) ? srv.images[0] : currentVendor.logo}
+                        alt={srv.titleAr}
+                        className="w-full h-full object-cover"
+                      />
+                      <span className="absolute top-3 right-3 bg-saudi-green-900/90 backdrop-blur-sm text-white text-[10px] font-bold px-2.5 py-1 rounded-lg">
+                        {srv.categoryNameAr}
+                      </span>
+                    </div>
+
+                    <div className="p-5 space-y-3">
+                      <h4 className="text-sm font-bold text-saudi-green-950 font-cairo leading-snug">
+                        {srv.titleAr}
+                      </h4>
+                      <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
+                        {srv.descriptionAr}
+                      </p>
+
+                      <div className="flex items-center gap-3 text-xs text-gray-500 pt-1">
+                        {srv.capacityMax && (
+                          <div className="flex items-center gap-1">
+                            <Users className="w-3.5 h-3.5 text-saudi-gold-600" />
+                            <span>حتى {srv.capacityMax} ضيف</span>
+                          </div>
+                        )}
+                        <div className="flex items-center gap-1">
+                          <Star className="w-3.5 h-3.5 text-saudi-gold-500 fill-saudi-gold-500" />
+                          <span>{srv.vendorRating || currentVendor.rating} ({currentVendor.reviewsCount})</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-5 pt-0 border-t border-gray-100 mt-2 flex items-center justify-between">
+                    <div>
+                      <span className="text-[10px] text-gray-400 block">السعر الأساسي</span>
+                      <strong className="text-base font-black font-cairo text-saudi-green-950">
+                        {formatSAR(srv.price)}
+                      </strong>
+                    </div>
+
+                    <Link
+                      href={`/vendor/${currentVendor.id}`}
+                      className="text-xs font-bold text-saudi-green-800 hover:text-saudi-green-950 flex items-center gap-1"
+                    >
+                      <span>عرض في السوق</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Availability & Blackout Dates Tab */}
+        {activeTab === 'availability' && (
+          <div className="space-y-6 max-w-3xl">
+            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-saudi-sand-300 shadow-sm space-y-6">
+              <div className="space-y-1">
+                <h3 className="text-base font-bold text-gray-900 font-cairo flex items-center gap-2">
+                  <CalendarOff className="w-5 h-5 text-saudi-gold-600" />
+                  <span>جدول الإتاحة وحظر المواعيد غير المتاحة (Blackout Dates)</span>
+                </h3>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  حدد الأيام التي تكون فيها خدماتك محجوزة بالكامل أو في عطلة لتفادي استقبال حجوزات جديدة في هذه الأيام.
+                </p>
+              </div>
+
+              {/* Add Blackout Date Form */}
+              <div className="bg-saudi-sand-50 p-5 rounded-2xl border border-saudi-sand-300 space-y-4">
+                <h4 className="text-xs font-bold text-gray-800">إضافة تاريخ غير متاح جديد:</h4>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <input
+                    type="date"
+                    value={newBlackoutDate}
+                    onChange={(e) => setNewBlackoutDate(e.target.value)}
+                    className="flex-1 px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-xs font-bold focus:outline-none focus:border-saudi-gold-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleAddBlackoutDate()}
+                    disabled={!newBlackoutDate}
+                    className="px-5 py-2.5 bg-saudi-green-800 disabled:opacity-50 hover:bg-saudi-green-900 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition"
+                  >
+                    <Plus className="w-4 h-4 text-saudi-gold-300" />
+                    <span>حظر هذا التاريخ</span>
+                  </button>
+                </div>
+
+                {/* Quick Saudi Season Presets */}
+                <div className="space-y-2 pt-2">
+                  <span className="text-[11px] font-bold text-gray-500 block">اختصارات سريعة للمناسبات الوطنية الكبرى:</span>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleAddBlackoutDate('2026-09-23')}
+                      className="text-[11px] font-semibold bg-white border border-saudi-sand-300 hover:border-saudi-gold-400 px-3 py-1.5 rounded-lg text-saudi-green-900 transition"
+                    >
+                      🇸🇦 اليوم الوطني (23 سبتمبر)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleAddBlackoutDate('2027-02-22')}
+                      className="text-[11px] font-semibold bg-white border border-saudi-sand-300 hover:border-saudi-gold-400 px-3 py-1.5 rounded-lg text-saudi-green-900 transition"
+                    >
+                      🦅 يوم التأسيس (22 فبراير)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleAddBlackoutDate('2027-03-20')}
+                      className="text-[11px] font-semibold bg-white border border-saudi-sand-300 hover:border-saudi-gold-400 px-3 py-1.5 rounded-lg text-saudi-green-900 transition"
+                    >
+                      🌙 عطلة عيد الفطر
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* List of currently blacked out dates */}
+              <div className="space-y-3">
+                <h4 className="text-xs font-bold text-gray-700">التواريخ المغلقة حالياً ({blackoutDates.length}):</h4>
+                {blackoutDates.length === 0 ? (
+                  <p className="text-xs text-gray-400 italic">لا توجد تواريخ محظورة حالياً، متجرك متاح للحجز في جميع الأيام.</p>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {blackoutDates.map((date) => (
+                      <div
+                        key={date}
+                        className="flex items-center justify-between p-3.5 bg-red-50/50 border border-red-100 rounded-xl text-xs"
+                      >
+                        <div className="flex items-center gap-2">
+                          <CalendarOff className="w-4 h-4 text-red-500" />
+                          <span className="font-mono font-bold text-gray-800">{date}</span>
+                          {date === '2026-09-23' && (
+                            <span className="text-[10px] bg-red-100 text-red-700 font-bold px-1.5 py-0.5 rounded">
+                              اليوم الوطني
+                            </span>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveBlackoutDate(date)}
+                          className="text-gray-400 hover:text-red-600 transition p-1"
+                          title="إلغاء الحظر وإتاحة اليوم"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Verification Tab */}
         {activeTab === 'verification' && (
           <div className="bg-white rounded-3xl p-6 sm:p-8 border border-saudi-sand-300 shadow-sm space-y-6 max-w-2xl">
@@ -429,6 +684,17 @@ export default function VendorPortalPage() {
           </div>
         )}
       </div>
+
+      {/* Modals */}
+      <AddServiceModal
+        isOpen={isAddServiceOpen}
+        onClose={() => setIsAddServiceOpen(false)}
+      />
+
+      <VendorWalletModal
+        isOpen={isWalletOpen}
+        onClose={() => setIsWalletOpen(false)}
+      />
     </div>
   );
 }

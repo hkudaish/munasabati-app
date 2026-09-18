@@ -14,6 +14,7 @@ import {
 import { useApp } from '@/lib/store';
 import ServiceCard from '@/components/marketplace/ServiceCard';
 import SaudiPaymentModal from '@/components/payments/SaudiPaymentModal';
+import CustomerReviewsShowcase from '@/components/common/CustomerReviewsShowcase';
 import { ServiceItem } from '@/lib/types';
 
 export default function MarketplacePage() {
@@ -162,6 +163,11 @@ export default function MarketplacePage() {
           ))}
         </div>
       )}
+
+      {/* Customer Satisfaction & Reviews */}
+      <div className="pt-8">
+        <CustomerReviewsShowcase limit={4} />
+      </div>
 
       {/* Booking / Payment Modal */}
       {bookingModalItem && (

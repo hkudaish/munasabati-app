@@ -5,6 +5,7 @@ import { Layers, Sparkles, Filter, Search, CheckCircle2 } from 'lucide-react';
 import { useApp } from '@/lib/store';
 import PackageCard from '@/components/marketplace/PackageCard';
 import SaudiPaymentModal from '@/components/payments/SaudiPaymentModal';
+import CustomerReviewsShowcase from '@/components/common/CustomerReviewsShowcase';
 import { SmartPackage } from '@/lib/types';
 
 export default function PackagesPage() {
@@ -70,6 +71,11 @@ export default function PackagesPage() {
             onBookPackage={(selectedPkg) => setBookingModalPkg(selectedPkg)}
           />
         ))}
+      </div>
+
+      {/* Social proof & customer experiences */}
+      <div className="pt-8">
+        <CustomerReviewsShowcase limit={3} />
       </div>
 
       {/* Payment Modal */}

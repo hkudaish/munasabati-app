@@ -32,6 +32,7 @@ import { formatSAR } from '@/lib/utils';
 import ServiceCard from '@/components/marketplace/ServiceCard';
 import PackageCard from '@/components/marketplace/PackageCard';
 import SaudiPaymentModal from '@/components/payments/SaudiPaymentModal';
+import CustomerReviewsShowcase from '@/components/common/CustomerReviewsShowcase';
 import { ServiceItem, SmartPackage } from '@/lib/types';
 
 export default function HomePage() {
@@ -292,9 +293,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 6. Inspiration Section ("إلهام - احجز هذا التصميم") */}
+      {/* 5. Satisfied Customers Testimonials & Reviews Showcase */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <CustomerReviewsShowcase featuredOnly={true} limit={6} />
+      </section>
+
+      {/* 6. Inspiration Feed Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
             <span className="text-xs font-bold text-saudi-gold-600 block uppercase tracking-wider">
               أفكار وتصاميم واقعية

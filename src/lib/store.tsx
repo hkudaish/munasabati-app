@@ -20,6 +20,7 @@ import {
   SmartPackage,
   InspirationPost,
   PaymentMethod,
+  RunOfShowItem,
 } from './types';
 import {
   INITIAL_OCCASIONS,
@@ -32,6 +33,7 @@ import {
   INITIAL_BOOKINGS,
   INITIAL_REVIEWS,
   INITIAL_ADMIN_CONFIG,
+  INITIAL_RUN_OF_SHOW_ITEMS,
   OCCASION_TYPES,
   SERVICE_CATEGORIES,
   SAUDI_CITIES,
@@ -88,6 +90,12 @@ interface AppContextType {
   toggleTaskCompleted: (taskId: string) => void;
   addTask: (task: Omit<PlanningTask, 'id'>) => void;
 
+  // Run of Show (Day-of Schedule)
+  runOfShowItems: RunOfShowItem[];
+  addRunOfShowItem: (item: Omit<RunOfShowItem, 'id'>) => void;
+  updateRunOfShowItem: (id: string, data: Partial<RunOfShowItem>) => void;
+  deleteRunOfShowItem: (id: string) => void;
+
   wishlistGifts: WishlistGift[];
   addWishlistGift: (gift: Omit<WishlistGift, 'id'>) => void;
   contributeToGift: (giftId: string, amount: number, contributorName: string) => void;
@@ -101,14 +109,36 @@ interface AppContextType {
   createBooking: (bookingData: Omit<Booking, 'id' | 'bookingNumber' | 'createdAt'>) => string;
   updateBookingStatus: (bookingId: string, status: Booking['status']) => void;
   payBookingDeposit: (bookingId: string, method: PaymentMethod) => void;
+  payRemainingBooking: (bookingId: string, method: PaymentMethod) => void;
 
   reviews: Review[];
   addReview: (review: Omit<Review, 'id' | 'date'>) => void;
+  toggleReviewFeatured: (reviewId: string) => void;
+  updateReviewStatus: (reviewId: string, status: Review['status']) => void;
+  deleteReview: (reviewId: string) => void;
+  replyToReview: (reviewId: string, reply: string) => void;
+
+  // Full Admin & Catalog Management Actions
+  addVendor: (vendor: Omit<Vendor, 'id'>) => string;
+  updateVendor: (id: string, data: Partial<Vendor>) => void;
+  deleteVendor: (id: string) => void;
+  updateVendorStatus: (vendorId: string, status: Vendor['status'], verified: boolean) => void;
+
+  addService: (service: Omit<ServiceItem, 'id'>) => string;
+  updateService: (id: string, data: Partial<ServiceItem>) => void;
+  deleteService: (id: string) => void;
+
+  addPackage: (pkg: Omit<SmartPackage, 'id'>) => string;
+  updatePackage: (id: string, data: Partial<SmartPackage>) => void;
+  deletePackage: (id: string) => void;
+
+  releaseEscrowPayout: (bookingId: string) => void;
+  refundBooking: (bookingId: string) => void;
+  toggleCityAvailability: (cityId: string) => void;
 
   // Admin Config
   adminConfig: AdminPlatformConfig;
   updateAdminConfig: (config: Partial<AdminPlatformConfig>) => void;
-  updateVendorStatus: (vendorId: string, status: Vendor['status'], verified: boolean) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -135,6 +165,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [tables, setTables] = useState<SeatingTable[]>(INITIAL_TABLES);
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>(INITIAL_BUDGET_ITEMS);
   const [tasks, setTasks] = useState<PlanningTask[]>(INITIAL_TASKS);
+  const [runOfShowItems, setRunOfShowItems] = useState<RunOfShowItem[]>(INITIAL_RUN_OF_SHOW_ITEMS);
   const [wishlistGifts, setWishlistGifts] = useState<WishlistGift[]>(INITIAL_WISHLIST);
   const [rfqRequests, setRfqRequests] = useState<RFQRequest[]>(INITIAL_RFQS);
   const [bookings, setBookings] = useState<Booking[]>(INITIAL_BOOKINGS);
@@ -152,10 +183,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         if (parsed.guests) setGuests(parsed.guests);
         if (parsed.budgetItems) setBudgetItems(parsed.budgetItems);
         if (parsed.tasks) setTasks(parsed.tasks);
+        if (parsed.runOfShowItems) setRunOfShowItems(parsed.runOfShowItems);
         if (parsed.bookings) setBookings(parsed.bookings);
         if (parsed.rfqRequests) setRfqRequests(parsed.rfqRequests);
         if (parsed.adminConfig) setAdminConfig(parsed.adminConfig);
         if (parsed.vendors) setVendors(parsed.vendors);
+        if (parsed.services) setServices(parsed.services);
+        if (parsed.packages) setPackages(parsed.packages);
+        if (parsed.reviews) setReviews(parsed.reviews);
+        if (parsed.cities) setCities(parsed.cities);
       }
     } catch (e) {
       console.warn('Failed to parse local storage', e);
@@ -173,16 +209,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           guests,
           budgetItems,
           tasks,
+          runOfShowItems,
           bookings,
           rfqRequests,
           adminConfig,
           vendors,
+          services,
+          packages,
+          reviews,
+          cities,
         })
       );
     } catch (e) {
       console.warn('Failed to save to local storage', e);
     }
-  }, [occasions, activeOccasionId, guests, budgetItems, tasks, bookings, rfqRequests, adminConfig, vendors]);
+  }, [occasions, activeOccasionId, guests, budgetItems, tasks, runOfShowItems, bookings, rfqRequests, adminConfig, vendors, services, packages, reviews, cities]);
 
   const activeOccasion = occasions.find((o) => o.id === activeOccasionId) || occasions[0];
 
@@ -513,18 +554,96 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
+  const addRunOfShowItem = (itemData: Omit<RunOfShowItem, 'id'>) => {
+    const id = `ros-${Date.now().toString().slice(-4)}`;
+    const newItem: RunOfShowItem = {
+      ...itemData,
+      id,
+    };
+    setRunOfShowItems((prev) => [...prev, newItem].sort((a, b) => a.time.localeCompare(b.time)));
+  };
+
+  const updateRunOfShowItem = (id: string, data: Partial<RunOfShowItem>) => {
+    setRunOfShowItems((prev) =>
+      prev
+        .map((item) => (item.id === id ? { ...item, ...data } : item))
+        .sort((a, b) => a.time.localeCompare(b.time))
+    );
+  };
+
+  const deleteRunOfShowItem = (id: string) => {
+    setRunOfShowItems((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const payRemainingBooking = (bookingId: string, method: PaymentMethod) => {
+    setBookings((prev) =>
+      prev.map((b) => {
+        if (b.id === bookingId) {
+          return {
+            ...b,
+            isFullyPaid: true,
+            remainingAmount: 0,
+            paymentMethod: method,
+            status: 'completed',
+          };
+        }
+        return b;
+      })
+    );
+  };
+
   const addReview = (reviewData: Omit<Review, 'id' | 'date'>) => {
     const id = `rev-${Date.now().toString().slice(-4)}`;
     const newReview: Review = {
       ...reviewData,
       id,
       date: new Date().toISOString().split('T')[0],
+      status: reviewData.status || 'approved',
     };
     setReviews((prev) => [newReview, ...prev]);
   };
 
-  const updateAdminConfig = (configData: Partial<AdminPlatformConfig>) => {
-    setAdminConfig((prev) => ({ ...prev, ...configData }));
+  const toggleReviewFeatured = (reviewId: string) => {
+    setReviews((prev) =>
+      prev.map((r) => (r.id === reviewId ? { ...r, featured: !r.featured } : r))
+    );
+  };
+
+  const updateReviewStatus = (reviewId: string, status: Review['status']) => {
+    setReviews((prev) =>
+      prev.map((r) => (r.id === reviewId ? { ...r, status } : r))
+    );
+  };
+
+  const deleteReview = (reviewId: string) => {
+    setReviews((prev) => prev.filter((r) => r.id !== reviewId));
+  };
+
+  const replyToReview = (reviewId: string, reply: string) => {
+    setReviews((prev) =>
+      prev.map((r) => (r.id === reviewId ? { ...r, vendorReplyAr: reply } : r))
+    );
+  };
+
+  // Vendor management actions
+  const addVendor = (vendorData: Omit<Vendor, 'id'>): string => {
+    const id = `vendor-${Date.now().toString().slice(-4)}`;
+    const newVendor: Vendor = {
+      ...vendorData,
+      id,
+    };
+    setVendors((prev) => [newVendor, ...prev]);
+    return id;
+  };
+
+  const updateVendor = (id: string, data: Partial<Vendor>) => {
+    setVendors((prev) =>
+      prev.map((v) => (v.id === id ? { ...v, ...data } : v))
+    );
+  };
+
+  const deleteVendor = (id: string) => {
+    setVendors((prev) => prev.filter((v) => v.id !== id));
   };
 
   const updateVendorStatus = (vendorId: string, status: Vendor['status'], verified: boolean) => {
@@ -536,6 +655,90 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         return v;
       })
     );
+  };
+
+  // Service management actions
+  const addService = (serviceData: Omit<ServiceItem, 'id'>): string => {
+    const id = `srv-${Date.now().toString().slice(-4)}`;
+    const newService: ServiceItem = {
+      ...serviceData,
+      id,
+    };
+    setServices((prev) => [newService, ...prev]);
+    return id;
+  };
+
+  const updateService = (id: string, data: Partial<ServiceItem>) => {
+    setServices((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, ...data } : s))
+    );
+  };
+
+  const deleteService = (id: string) => {
+    setServices((prev) => prev.filter((s) => s.id !== id));
+  };
+
+  // Package management actions
+  const addPackage = (pkgData: Omit<SmartPackage, 'id'>): string => {
+    const id = `pkg-${Date.now().toString().slice(-4)}`;
+    const newPkg: SmartPackage = {
+      ...pkgData,
+      id,
+    };
+    setPackages((prev) => [newPkg, ...prev]);
+    return id;
+  };
+
+  const updatePackage = (id: string, data: Partial<SmartPackage>) => {
+    setPackages((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, ...data } : p))
+    );
+  };
+
+  const deletePackage = (id: string) => {
+    setPackages((prev) => prev.filter((p) => p.id !== id));
+  };
+
+  // Escrow and bookings actions
+  const releaseEscrowPayout = (bookingId: string) => {
+    setBookings((prev) =>
+      prev.map((b) => {
+        if (b.id === bookingId) {
+          return {
+            ...b,
+            payoutReleased: true,
+            payoutRef: `SARIE-${Date.now().toString().slice(-6)}`,
+            status: 'completed',
+          };
+        }
+        return b;
+      })
+    );
+  };
+
+  const refundBooking = (bookingId: string) => {
+    setBookings((prev) =>
+      prev.map((b) => {
+        if (b.id === bookingId) {
+          return {
+            ...b,
+            status: 'cancelled',
+          };
+        }
+        return b;
+      })
+    );
+  };
+
+  // City management actions
+  const toggleCityAvailability = (cityId: string) => {
+    setCities((prev) =>
+      prev.map((c) => (c.id === cityId ? { ...c, isAvailable: !c.isAvailable } : c))
+    );
+  };
+
+  const updateAdminConfig = (configData: Partial<AdminPlatformConfig>) => {
+    setAdminConfig((prev) => ({ ...prev, ...configData }));
   };
 
   return (
@@ -582,6 +785,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         toggleTaskCompleted,
         addTask,
 
+        runOfShowItems,
+        addRunOfShowItem,
+        updateRunOfShowItem,
+        deleteRunOfShowItem,
+
         wishlistGifts,
         addWishlistGift,
         contributeToGift,
@@ -594,13 +802,34 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         createBooking,
         updateBookingStatus,
         payBookingDeposit,
+        payRemainingBooking,
 
         reviews,
         addReview,
+        toggleReviewFeatured,
+        updateReviewStatus,
+        deleteReview,
+        replyToReview,
+
+        addVendor,
+        updateVendor,
+        deleteVendor,
+        updateVendorStatus,
+
+        addService,
+        updateService,
+        deleteService,
+
+        addPackage,
+        updatePackage,
+        deletePackage,
+
+        releaseEscrowPayout,
+        refundBooking,
+        toggleCityAvailability,
 
         adminConfig,
         updateAdminConfig,
-        updateVendorStatus,
       }}
     >
       {children}

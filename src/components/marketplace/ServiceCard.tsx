@@ -54,17 +54,20 @@ export default function ServiceCard({ service, onBookNow }: ServiceCardProps) {
         <div className="space-y-2">
           {/* Vendor Row */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+            <Link
+              href={`/vendor/${service.vendorId}`}
+              className="flex items-center gap-2 group/vendor hover:opacity-80 transition"
+            >
               <img
                 src={service.vendorLogo}
                 alt={service.vendorName}
                 className="w-6 h-6 rounded-full object-cover border border-gray-200"
               />
-              <span className="text-xs font-bold text-gray-700 flex items-center gap-1">
+              <span className="text-xs font-bold text-gray-700 group-hover/vendor:text-saudi-green-800 flex items-center gap-1 transition">
                 {service.vendorName}
                 <ShieldCheck className="w-3.5 h-3.5 text-saudi-green-700 inline" />
               </span>
-            </div>
+            </Link>
 
             <div className="flex items-center gap-1 bg-saudi-gold-50 px-2 py-0.5 rounded-md border border-saudi-gold-200 text-saudi-gold-800 text-xs font-bold">
               <Star className="w-3.5 h-3.5 fill-saudi-gold-500 text-saudi-gold-500" />

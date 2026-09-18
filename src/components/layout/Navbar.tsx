@@ -19,6 +19,7 @@ import {
   X,
   FileText,
   Lightbulb,
+  Music,
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -179,13 +180,40 @@ export default function Navbar() {
                 <span>الباقات الذكية</span>
               </Link>
               <Link
+                href="/calculator"
+                className={`px-3 py-2 rounded-lg transition flex items-center gap-1 ${
+                  pathname.startsWith('/calculator') ? 'text-saudi-green-800 font-bold bg-saudi-green-50' : 'hover:text-saudi-green-800 hover:bg-gray-50'
+                }`}
+              >
+                <Sparkles className="w-4 h-4 text-saudi-gold-600" />
+                <span>حاسبة التكاليف</span>
+              </Link>
+              <Link
                 href="/rfq"
                 className={`px-3 py-2 rounded-lg transition flex items-center gap-1 ${
                   pathname.startsWith('/rfq') ? 'text-saudi-green-800 font-bold bg-saudi-green-50' : 'hover:text-saudi-green-800 hover:bg-gray-50'
                 }`}
               >
                 <FileText className="w-4 h-4 text-saudi-gold-600" />
-                <span>عروض الأسعار (RFQ)</span>
+                <span>عروض الأسعار</span>
+              </Link>
+              <Link
+                href="/bookings"
+                className={`px-3 py-2 rounded-lg transition flex items-center gap-1 ${
+                  pathname.startsWith('/bookings') ? 'text-saudi-green-800 font-bold bg-saudi-green-50' : 'hover:text-saudi-green-800 hover:bg-gray-50'
+                }`}
+              >
+                <ShieldCheck className="w-4 h-4 text-saudi-green-700" />
+                <span>حجوزاتي وفواتيري</span>
+              </Link>
+              <Link
+                href="/zaffah"
+                className={`px-3 py-2 rounded-lg transition flex items-center gap-1 ${
+                  pathname.startsWith('/zaffah') ? 'text-saudi-green-800 font-bold bg-saudi-green-50' : 'hover:text-saudi-green-800 hover:bg-gray-50'
+                }`}
+              >
+                <Music className="w-4 h-4 text-saudi-gold-600" />
+                <span>الزفات والفنون</span>
               </Link>
               <Link
                 href="/inspiration"
@@ -327,11 +355,32 @@ export default function Navbar() {
             الباقات الذكية الجاهزة
           </Link>
           <Link
+            href="/calculator"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="block py-2 text-sm font-bold text-gray-800 hover:text-saudi-green-800"
+          >
+            حاسبة تكاليف وميزانية المناسبات
+          </Link>
+          <Link
+            href="/bookings"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="block py-2 text-sm font-bold text-gray-800 hover:text-saudi-green-800"
+          >
+            حجوزاتي وفواتيري الضريبية
+          </Link>
+          <Link
             href="/rfq"
             onClick={() => setIsMobileMenuOpen(false)}
             className="block py-2 text-sm font-bold text-gray-800 hover:text-saudi-green-800"
           >
             طلب ومقارنة عروض الأسعار (RFQ)
+          </Link>
+          <Link
+            href="/zaffah"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="block py-2 text-sm font-bold text-gray-800 hover:text-saudi-green-800"
+          >
+            الزفات والشيلات والفنون الشعبية 🎵
           </Link>
           <Link
             href="/inspiration"

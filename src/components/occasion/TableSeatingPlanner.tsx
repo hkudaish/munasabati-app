@@ -5,9 +5,12 @@ import { Armchair, Plus, Users, UserCheck, X, Sparkles } from 'lucide-react';
 import { useApp } from '@/lib/store';
 import { SeatingTable } from '@/lib/types';
 
+import { VisualFloorPlan } from './VisualFloorPlan';
+
 export default function TableSeatingPlanner() {
   const { activeOccasion, tables, addTable, guests, assignGuestToTable } = useApp();
 
+  const [viewMode, setViewMode] = useState<'canvas' | 'grid'>('canvas');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [tableName, setTableName] = useState('');
   const [capacity, setCapacity] = useState('10');
@@ -40,7 +43,7 @@ export default function TableSeatingPlanner() {
 
   return (
     <div className="space-y-6">
-      {/* Top Header */}
+      {/* Top Header & View Switcher */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-5 rounded-2xl border border-saudi-sand-300 shadow-sm">
         <div>
           <h4 className="text-base font-bold text-gray-900 font-cairo flex items-center gap-2">
@@ -52,17 +55,51 @@ export default function TableSeatingPlanner() {
           </p>
         </div>
 
-        <button
-          onClick={() => setIsAddModalOpen(true)}
-          className="flex items-center gap-1.5 bg-saudi-green-800 hover:bg-saudi-green-900 text-white px-4 py-2 rounded-xl text-xs font-bold shrink-0 shadow-sm transition"
-        >
-          <Plus className="w-4 h-4 text-saudi-gold-400" />
-          <span>+ إضافة طاولة جديدة</span>
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Mode Switcher */}
+          <div className="flex items-center p-1 bg-saudi-sand-100 rounded-xl border border-saudi-sand-300 text-xs font-bold">
+            <button
+              onClick={() => setViewMode('canvas')}
+              className={`px-3 py-1.5 rounded-lg transition ${
+                viewMode === 'canvas'
+                  ? 'bg-saudi-green-800 text-white shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              المخطط البصري (2D)
+            </button>
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`px-3 py-1.5 rounded-lg transition ${
+                viewMode === 'grid'
+                  ? 'bg-saudi-green-800 text-white shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              العرض المجدول
+            </button>
+          </div>
+
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="flex items-center gap-1.5 bg-saudi-green-800 hover:bg-saudi-green-900 text-white px-4 py-2 rounded-xl text-xs font-bold shrink-0 shadow-sm transition"
+          >
+            <Plus className="w-4 h-4 text-saudi-gold-400" />
+            <span>+ إضافة طاولة</span>
+          </button>
+        </div>
       </div>
 
-      {/* Tables Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {viewMode === 'canvas' ? (
+        <VisualFloorPlan
+          tables={occasionTables}
+          guests={occasionGuests}
+          onAssignGuest={(guestId, tableId) => assignGuestToTable(guestId, tableId)}
+          onAddTable={(newT) => addTable(newT)}
+        />
+      ) : (
+        /* Tables Grid */
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {occasionTables.map((table) => {
           const assignedGuestsList = occasionGuests.filter((g) => g.tableId === table.id);
           const isFull = assignedGuestsList.length >= table.capacity;
@@ -161,6 +198,7 @@ export default function TableSeatingPlanner() {
           );
         })}
       </div>
+      )}
 
       {/* Add Table Modal */}
       {isAddModalOpen && (
