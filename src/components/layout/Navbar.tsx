@@ -20,6 +20,7 @@ import {
   FileText,
   Lightbulb,
   Music,
+  ArrowLeftRight,
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -36,6 +37,8 @@ export default function Navbar() {
     activeOccasion,
     setActiveOccasionId,
     setIsAIOpen,
+    cart,
+    comparisonVendorIds,
   } = useApp();
 
   const [isOccasionDropdownOpen, setIsOccasionDropdownOpen] = useState(false);
@@ -233,6 +236,16 @@ export default function Navbar() {
                 <QrCode className="w-4 h-4 text-saudi-green-700" />
                 <span>ماسح الدخول</span>
               </Link>
+              <Link
+                href="/reception-screen"
+                target="_blank"
+                className={`px-3 py-2 rounded-lg transition flex items-center gap-1 ${
+                  pathname.startsWith('/reception-screen') ? 'text-saudi-green-800 font-bold bg-saudi-green-50' : 'hover:text-saudi-green-800 hover:bg-gray-50'
+                }`}
+              >
+                <Sparkles className="w-4 h-4 text-saudi-gold-600" />
+                <span>شاشة الترحيب 📺</span>
+              </Link>
             </nav>
           </div>
 
@@ -301,6 +314,36 @@ export default function Navbar() {
               </div>
             )}
 
+            {/* Compare Bar Button if active */}
+            {comparisonVendorIds.length > 0 && (
+              <Link
+                href="/compare"
+                className="flex items-center gap-1.5 bg-saudi-sand-100 hover:bg-saudi-sand-200 text-saudi-green-950 px-2.5 sm:px-3 py-2 rounded-xl text-xs font-bold border border-saudi-sand-300 transition"
+                title="مقارنة الموردين"
+              >
+                <ArrowLeftRight className="w-3.5 h-3.5 text-saudi-gold-600" />
+                <span className="hidden sm:inline">مقارنة</span>
+                <span className="bg-saudi-gold-500 text-saudi-green-950 text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center">
+                  {comparisonVendorIds.length}
+                </span>
+              </Link>
+            )}
+
+            {/* Shopping Cart Button */}
+            <Link
+              href="/cart"
+              className="relative flex items-center gap-1.5 bg-saudi-sand-100 hover:bg-saudi-sand-200 text-saudi-green-950 px-2.5 sm:px-3 py-2 rounded-xl text-xs font-bold border border-saudi-sand-300 transition"
+              title="سلة الحجوزات"
+            >
+              <ShoppingBag className="w-4 h-4 text-saudi-green-800" />
+              <span className="hidden sm:inline">السلة</span>
+              {cart.length > 0 && (
+                <span className="bg-saudi-green-800 text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
+                  {cart.reduce((sum, item) => sum + item.quantity, 0)}
+                </span>
+              )}
+            </Link>
+
             {/* AI Assistant Button (لُـمى) */}
             <button
               onClick={() => setIsAIOpen(true)}
@@ -347,6 +390,36 @@ export default function Navbar() {
           >
             سوق الخدمات والتجهيزات
           </Link>
+          <Link
+            href="/cart"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="flex items-center justify-between py-2 text-sm font-bold text-saudi-green-900"
+          >
+            <span className="flex items-center gap-2">
+              <ShoppingBag className="w-4 h-4 text-saudi-gold-600" />
+              <span>سلة الحجوزات</span>
+            </span>
+            {cart.length > 0 && (
+              <span className="bg-saudi-green-800 text-white text-xs px-2 py-0.5 rounded-full font-mono">
+                {cart.reduce((s, i) => s + i.quantity, 0)}
+              </span>
+            )}
+          </Link>
+          {comparisonVendorIds.length > 0 && (
+            <Link
+              href="/compare"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="flex items-center justify-between py-2 text-sm font-bold text-saudi-gold-700"
+            >
+              <span className="flex items-center gap-2">
+                <ArrowLeftRight className="w-4 h-4 text-saudi-gold-600" />
+                <span>مقارنة الموردين</span>
+              </span>
+              <span className="bg-saudi-gold-500 text-saudi-green-950 text-xs px-2 py-0.5 rounded-full font-mono font-bold">
+                {comparisonVendorIds.length}
+              </span>
+            </Link>
+          )}
           <Link
             href="/packages"
             onClick={() => setIsMobileMenuOpen(false)}

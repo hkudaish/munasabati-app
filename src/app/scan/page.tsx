@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { QrCode, CheckCircle2, AlertCircle, Users, Search, Scan, Sparkles } from 'lucide-react';
+import Link from 'next/link';
+import { QrCode, CheckCircle2, AlertCircle, Users, Search, Scan, Sparkles, Monitor } from 'lucide-react';
 import { useApp } from '@/lib/store';
 import confetti from 'canvas-confetti';
 
@@ -74,6 +75,17 @@ export default function GateScannerPage() {
         <p className="text-xs text-gray-500">
           مسح بطاقات الـ QR لتسجيل حضور الضيوف فوراً وتوجيههم إلى طاولاتهم المخصصة.
         </p>
+
+        <div className="pt-2">
+          <Link
+            href={`/reception-screen?occasionId=${activeOccasion.id}`}
+            target="_blank"
+            className="inline-flex items-center gap-2 py-2 px-4 bg-saudi-green-900 hover:bg-saudi-green-950 text-saudi-gold-300 font-bold rounded-2xl text-xs border border-saudi-gold-400/40 shadow-sm transition"
+          >
+            <Monitor className="w-3.5 h-3.5 text-saudi-gold-400" />
+            <span>عرض شاشة الترحيب بالقاعة (TV Reception Screen) 📺</span>
+          </Link>
+        </div>
       </div>
 
       {/* Live Entrance Counter */}

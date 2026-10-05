@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   Search,
   Filter,
@@ -10,53 +12,213 @@ import {
   Zap,
   ShieldCheck,
   Sparkles,
+  LayoutGrid,
+  List,
+  ArrowUpDown,
+  ArrowLeftRight,
+  Store,
+  Layers,
+  CheckCircle2,
+  Trash2,
+  ArrowRight,
+  ChevronDown,
 } from 'lucide-react';
 import { useApp } from '@/lib/store';
 import ServiceCard from '@/components/marketplace/ServiceCard';
+import VendorCard from '@/components/marketplace/VendorCard';
 import SaudiPaymentModal from '@/components/payments/SaudiPaymentModal';
 import CustomerReviewsShowcase from '@/components/common/CustomerReviewsShowcase';
 import { ServiceItem } from '@/lib/types';
+import { formatSaudiRiyal, calculateCartTotals } from '@/lib/utils';
+import { rankVendors } from '@/lib/ranking-engine';
 
 export default function MarketplacePage() {
-  const { serviceCategories, services, cities, selectedCity, setSelectedCity, createBooking, activeOccasion } = useApp();
+  const router = useRouter();
+  const {
+    serviceCategories,
+    services,
+    vendors,
+    cities,
+    selectedCity,
+    setSelectedCity,
+    createBooking,
+    activeOccasion,
+    cart,
+    appliedCoupon,
+    comparisonVendorIds,
+    clearComparison,
+    setIsAIOpen,
+    rankingWeights,
+  } = useApp();
 
+  const [activeTab, setActiveTab] = useState<'services' | 'vendors'>('services');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [instantBookingOnly, setInstantBookingOnly] = useState(false);
   const [genderFilter, setGenderFilter] = useState<'all' | 'women' | 'men'>('all');
+  const [sortOption, setSortOption] = useState<
+    'recommended' | 'rating' | 'price_low' | 'price_high' | 'fastest' | 'orders'
+  >('recommended');
 
   const [bookingModalItem, setBookingModalItem] = useState<ServiceItem | null>(null);
 
-  // Filter services
-  const filteredServices = services.filter((srv) => {
-    const matchesCategory = selectedCategory === 'all' || srv.categoryId === selectedCategory;
-    const matchesSearch =
-      srv.titleAr.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      srv.vendorName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      srv.descriptionAr.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCity = !selectedCity || srv.cityId === selectedCity;
-    const matchesInstant = !instantBookingOnly || srv.instantBooking;
-    const matchesGender =
-      genderFilter === 'all' || srv.genderPreference === genderFilter || srv.genderPreference === 'unisex';
+  // Filter & Sort Services
+  const filteredServices = services
+    .filter((srv) => {
+      const matchesCategory = selectedCategory === 'all' || srv.categoryId === selectedCategory;
+      const matchesSearch =
+        srv.titleAr.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        srv.vendorName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        srv.descriptionAr.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCity = !selectedCity || srv.cityId === selectedCity;
+      const matchesInstant = !instantBookingOnly || srv.instantBooking;
+      const matchesGender =
+        genderFilter === 'all' || srv.genderPreference === genderFilter || srv.genderPreference === 'unisex';
+      const matchesVerified = !verifiedOnly || srv.vendorRating >= 4.7;
 
-    return matchesCategory && matchesSearch && matchesCity && matchesInstant && matchesGender;
-  });
+      return (
+        matchesCategory &&
+        matchesSearch &&
+        matchesCity &&
+        matchesInstant &&
+        matchesGender &&
+        matchesVerified
+      );
+    })
+    .sort((a, b) => {
+      if (sortOption === 'rating') return b.vendorRating - a.vendorRating;
+      if (sortOption === 'price_low') return a.price - b.price;
+      if (sortOption === 'price_high') return b.price - a.price;
+      if (sortOption === 'orders') return (b.price || 0) - (a.price || 0);
+      return 0; // recommended default
+    });
+
+  // Filter & Sort Vendors
+  const filteredVendors = vendors
+    .filter((v) => {
+      const matchesCategory = selectedCategory === 'all' || v.categoryId === selectedCategory;
+      const matchesSearch =
+        v.businessName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        v.bioAr.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        v.cityNameAr.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCity = !selectedCity || v.cityId === selectedCity;
+      const matchesVerified = !verifiedOnly || v.verified;
+
+      return matchesCategory && matchesSearch && matchesCity && matchesVerified;
+    })
+    .sort((a, b) => {
+      if (sortOption === 'rating') return b.rating - a.rating;
+      if (sortOption === 'fastest') return a.responseTimeMinutes - b.responseTimeMinutes;
+      if (sortOption === 'orders') return (b.completedBookingsCount || 0) - (a.completedBookingsCount || 0);
+      return 0;
+    });
+
+  const cartTotals = calculateCartTotals(cart, appliedCoupon);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn pb-24">
       {/* Page Header */}
-      <div className="space-y-2">
-        <div className="inline-flex items-center gap-2 text-xs font-bold text-saudi-gold-600">
-          <ShoppingBag className="w-4 h-4" />
-          <span>سوق الخدمات والتجهيزات المعتمدة بالمملكة</span>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-saudi-sand-200 pb-5">
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-2 text-xs font-bold text-saudi-gold-600">
+            <ShoppingBag className="w-4 h-4" />
+            <span>سوق الخدمات والتجهيزات المعتمدة بالمملكة</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black font-cairo text-saudi-green-950">
+            سوق الخدمات والموردين 🇸🇦
+          </h1>
+          <p className="text-xs text-gray-500 max-w-2xl font-tajawal">
+            احجز مباشرة من نخبة الموردين الموثقين مع ضمان منصة مناسبتي، عقود إلكترونية موحدة، وسلة
+            شاملة لكافة تجهيزات مناسبتك.
+          </p>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-black font-cairo text-saudi-green-950">
-          سوق الخدمات والموردين 🇸🇦
-        </h1>
-        <p className="text-xs text-gray-500 max-w-2xl font-tajawal">
-          احجز مباشرة من نخبة الموردين الموثقين: كوش وديكور، ضيافة سعودية، مصورين، فرق شعبية، ومستلزمات الحفلات مع حماية كاملة لحقوقك.
-        </p>
+
+        {/* AI Assistant Quick Trigger */}
+        <button
+          onClick={() => setIsAIOpen(true)}
+          className="self-start md:self-center px-5 py-3 rounded-2xl bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-black text-xs shadow-md shadow-saudi-gold-500/20 hover:scale-[1.02] active:scale-[0.98] transition flex items-center gap-2"
+        >
+          <Sparkles className="w-4 h-4 animate-spin-slow" />
+          <span>اطلب ترشيح ومقارنة من لُـمى (AI)</span>
+        </button>
+      </div>
+
+      {/* Main Tabs (Services vs Vendors) & Layout Toggle */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        {/* Dual Tab Buttons */}
+        <div className="bg-saudi-sand-100 p-1 rounded-2xl flex items-center gap-1 border border-saudi-sand-300">
+          <button
+            onClick={() => setActiveTab('services')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+              activeTab === 'services'
+                ? 'bg-saudi-green-800 text-white shadow-md'
+                : 'text-gray-700 hover:text-saudi-green-900'
+            }`}
+          >
+            <ShoppingBag className="w-3.5 h-3.5" />
+            <span>استعراض الخدمات ({services.length})</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('vendors')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+              activeTab === 'vendors'
+                ? 'bg-saudi-green-800 text-white shadow-md'
+                : 'text-gray-700 hover:text-saudi-green-900'
+            }`}
+          >
+            <Store className="w-3.5 h-3.5" />
+            <span>دليل الموردين المعتمدين ({vendors.length})</span>
+          </button>
+        </div>
+
+        {/* Layout & Sort Controls */}
+        <div className="flex items-center gap-2 self-end sm:self-center">
+          {/* Sorting Dropdown */}
+          <div className="flex items-center gap-1.5 bg-white border border-saudi-sand-300 px-3 py-1.5 rounded-xl text-xs">
+            <ArrowUpDown className="w-3.5 h-3.5 text-saudi-green-800" />
+            <select
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value as any)}
+              className="bg-transparent font-bold text-gray-700 focus:outline-none cursor-pointer"
+            >
+              <option value="recommended">الأعلى ملاءمة (توصية لُـمى)</option>
+              <option value="rating">الأعلى تقييماً ★</option>
+              <option value="price_low">الأقل سعراً</option>
+              <option value="price_high">الأعلى سعراً (فاخر)</option>
+              <option value="fastest">الأسرع تجاوباً ⚡</option>
+              <option value="orders">الأكثر حجوزات مكتملة</option>
+            </select>
+          </div>
+
+          {/* View Mode Toggle */}
+          <div className="bg-white border border-saudi-sand-300 p-1 rounded-xl flex items-center gap-1">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`p-1.5 rounded-lg transition ${
+                viewMode === 'grid'
+                  ? 'bg-saudi-green-800 text-white'
+                  : 'text-gray-500 hover:bg-gray-100'
+              }`}
+              title="عرض شبكي"
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`p-1.5 rounded-lg transition ${
+                viewMode === 'list'
+                  ? 'bg-saudi-green-800 text-white'
+                  : 'text-gray-500 hover:bg-gray-100'
+              }`}
+              title="عرض قائمة"
+            >
+              <List className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Categories Pills Carousel */}
@@ -69,7 +231,7 @@ export default function MarketplacePage() {
               : 'bg-white border border-saudi-sand-300 text-gray-700 hover:bg-saudi-sand-50'
           }`}
         >
-          كافة التصنيفات ({services.length})
+          كافة التصنيفات ({activeTab === 'services' ? services.length : vendors.length})
         </button>
 
         {serviceCategories.map((cat) => (
@@ -116,68 +278,192 @@ export default function MarketplacePage() {
             ))}
           </select>
 
-          {/* Gender Filter */}
-          <select
-            value={genderFilter}
-            onChange={(e) => setGenderFilter(e.target.value as any)}
-            className="px-3 py-2 bg-saudi-sand-50 border border-gray-200 rounded-xl font-bold text-gray-700"
-          >
-            <option value="all">كل الأقسام</option>
-            <option value="women">طاقم نسائي</option>
-            <option value="men">طاقم رجالي</option>
-          </select>
+          {/* Gender Filter (Services only) */}
+          {activeTab === 'services' && (
+            <select
+              value={genderFilter}
+              onChange={(e) => setGenderFilter(e.target.value as any)}
+              className="px-3 py-2 bg-saudi-sand-50 border border-gray-200 rounded-xl font-bold text-gray-700"
+            >
+              <option value="all">كل الأقسام</option>
+              <option value="women">طاقم نسائي</option>
+              <option value="men">طاقم رجالي</option>
+            </select>
+          )}
 
-          {/* Instant Booking Toggle */}
+          {/* Verified Only Toggle */}
           <label className="flex items-center gap-1.5 cursor-pointer bg-saudi-sand-50 px-3 py-2 rounded-xl border border-gray-200">
             <input
               type="checkbox"
-              checked={instantBookingOnly}
-              onChange={(e) => setInstantBookingOnly(e.target.checked)}
+              checked={verifiedOnly}
+              onChange={(e) => setVerifiedOnly(e.target.checked)}
               className="rounded text-saudi-green-800"
             />
-            <Zap className="w-3.5 h-3.5 text-emerald-600" />
-            <span className="font-bold text-gray-700">حجز فوري</span>
+            <ShieldCheck className="w-3.5 h-3.5 text-saudi-green-700" />
+            <span className="font-bold text-gray-700">الموثقون فقط</span>
           </label>
+
+          {/* Instant Booking Toggle */}
+          {activeTab === 'services' && (
+            <label className="flex items-center gap-1.5 cursor-pointer bg-saudi-sand-50 px-3 py-2 rounded-xl border border-gray-200">
+              <input
+                type="checkbox"
+                checked={instantBookingOnly}
+                onChange={(e) => setInstantBookingOnly(e.target.checked)}
+                className="rounded text-saudi-green-800"
+              />
+              <Zap className="w-3.5 h-3.5 text-emerald-600" />
+              <span className="font-bold text-gray-700">حجز فوري</span>
+            </label>
+          )}
         </div>
       </div>
 
-      {/* Services Grid */}
-      {filteredServices.length === 0 ? (
-        <div className="bg-white p-12 rounded-3xl border border-saudi-sand-300 text-center space-y-3">
-          <ShoppingBag className="w-10 h-10 text-gray-300 mx-auto" />
-          <h4 className="text-base font-bold text-gray-800 font-cairo">
-            لم نجد خدمات مطابقة لبحثك
-          </h4>
-          <p className="text-xs text-gray-500">
-            جرّب تغيير كلمات البحث أو استعراض تصنيف آخر.
-          </p>
-        </div>
+      {/* Main Content Area */}
+      {activeTab === 'services' ? (
+        /* SERVICES VIEW */
+        filteredServices.length === 0 ? (
+          <div className="bg-white p-12 rounded-3xl border border-saudi-sand-300 text-center space-y-3">
+            <ShoppingBag className="w-10 h-10 text-gray-300 mx-auto" />
+            <h4 className="text-base font-bold text-gray-800 font-cairo">
+              لم نجد خدمات مطابقة لبحثك
+            </h4>
+            <p className="text-xs text-gray-500">
+              جرب تغيير معايير البحث، أو اطلب من لُـمى اقتراح بدائل مناسبة.
+            </p>
+          </div>
+        ) : (
+          <div
+            className={
+              viewMode === 'grid'
+                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
+                : 'space-y-4'
+            }
+          >
+            {filteredServices.map((service) => (
+              <ServiceCard
+                key={service.id}
+                service={service}
+                onBookNow={(srv) => setBookingModalItem(srv)}
+              />
+            ))}
+          </div>
+        )
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredServices.map((srv) => (
-            <ServiceCard
-              key={srv.id}
-              service={srv}
-              onBookNow={(selectedSrv) => setBookingModalItem(selectedSrv)}
-            />
-          ))}
+        /* VENDORS VIEW */
+        filteredVendors.length === 0 ? (
+          <div className="bg-white p-12 rounded-3xl border border-saudi-sand-300 text-center space-y-3">
+            <Store className="w-10 h-10 text-gray-300 mx-auto" />
+            <h4 className="text-base font-bold text-gray-800 font-cairo">
+              لم نجد موردين مطابقين لبحثك
+            </h4>
+            <p className="text-xs text-gray-500">
+              جرب البحث في مدينة أخرى أو إزالة فلتر التوثيق.
+            </p>
+          </div>
+        ) : (
+          <div
+            className={
+              viewMode === 'grid'
+                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
+                : 'space-y-4'
+            }
+          >
+            {filteredVendors.map((vendor) => {
+              const primaryService = services.find((s) => s.vendorId === vendor.id);
+              return (
+                <VendorCard
+                  key={vendor.id}
+                  vendor={vendor}
+                  primaryService={primaryService}
+                  viewMode={viewMode}
+                />
+              );
+            })}
+          </div>
+        )
+      )}
+
+      {/* Customer Reviews Showcase */}
+      <CustomerReviewsShowcase />
+
+      {/* FLOATING COMPARE DOCK */}
+      {comparisonVendorIds.length > 0 && (
+        <div className="fixed bottom-6 left-6 z-40 bg-saudi-green-950 text-white p-3.5 sm:p-4 rounded-3xl shadow-2xl border border-saudi-gold-400 flex items-center gap-3 animate-slideUp">
+          <div className="flex items-center -space-x-2 space-x-reverse">
+            {comparisonVendorIds.slice(0, 3).map((vId) => {
+              const v = vendors.find((vend) => vend.id === vId);
+              return v?.logo ? (
+                <img
+                  key={vId}
+                  src={v.logo}
+                  alt={v.businessName}
+                  className="w-8 h-8 rounded-full border-2 border-white object-cover"
+                />
+              ) : null;
+            })}
+          </div>
+
+          <div className="text-xs">
+            <span className="font-bold block">مقارنة الموردين</span>
+            <span className="text-[10px] text-gray-300">
+              {comparisonVendorIds.length} موردين محددين
+            </span>
+          </div>
+
+          <Link
+            href="/compare"
+            className="px-3.5 py-1.5 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-bold rounded-xl text-xs transition flex items-center gap-1 shadow"
+          >
+            <ArrowLeftRight className="w-3.5 h-3.5" />
+            <span>عرض المقارنة</span>
+          </Link>
+
+          <button
+            onClick={clearComparison}
+            className="text-gray-400 hover:text-white p-1"
+            title="مسح المقارنة"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
         </div>
       )}
 
-      {/* Customer Satisfaction & Reviews */}
-      <div className="pt-8">
-        <CustomerReviewsShowcase limit={4} />
-      </div>
+      {/* FLOATING CART BAR */}
+      {cart.length > 0 && (
+        <div className="fixed bottom-6 right-6 z-40 bg-gradient-to-r from-saudi-green-900 to-saudi-green-950 text-white p-3.5 sm:p-4 rounded-3xl shadow-2xl border border-saudi-gold-400 flex items-center gap-4 animate-slideUp">
+          <div className="w-10 h-10 rounded-2xl bg-saudi-gold-500 text-saudi-green-950 flex items-center justify-center font-bold">
+            <ShoppingBag className="w-5 h-5" />
+          </div>
 
-      {/* Booking / Payment Modal */}
+          <div className="text-xs">
+            <span className="font-bold block text-sm font-cairo">
+              {cart.reduce((s, i) => s + i.quantity, 0)} خدمات في السلة
+            </span>
+            <span className="text-saudi-gold-300 font-bold">
+              {formatSaudiRiyal(cartTotals.finalTotal)}
+            </span>
+          </div>
+
+          <Link
+            href="/cart"
+            className="px-4 py-2 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-black rounded-xl text-xs transition flex items-center gap-1 shadow"
+          >
+            <span>إتمام الحجز</span>
+            <ArrowRight className="w-3.5 h-3.5 rotate-180" />
+          </Link>
+        </div>
+      )}
+
+      {/* Instant Payment Modal */}
       {bookingModalItem && (
         <SaudiPaymentModal
           bookingTitle={bookingModalItem.titleAr}
           vendorName={bookingModalItem.vendorName}
-          date="2026-11-25"
+          date="2026-10-09"
           totalAmount={bookingModalItem.price}
           onClose={() => setBookingModalItem(null)}
-          onPaymentSuccess={(method, isDeposit, ref) => {
+          onPaymentSuccess={(method, isDeposit) => {
             createBooking({
               occasionId: activeOccasion?.id,
               occasionTitle: activeOccasion?.title || bookingModalItem.titleAr,
@@ -186,7 +472,7 @@ export default function MarketplacePage() {
               vendorLogo: bookingModalItem.vendorLogo,
               serviceId: bookingModalItem.id,
               serviceTitleAr: bookingModalItem.titleAr,
-              date: '2026-11-25',
+              date: '2026-10-09',
               cityAr: bookingModalItem.cityNameAr,
               customerName: 'سارة العتيبي',
               customerPhone: '+966501234567',
@@ -200,6 +486,8 @@ export default function MarketplacePage() {
               cancellationPolicyAr: 'إلغاء مجاني حتى 5 أيام قبل موعد المناسبة.',
               deliverablesAr: bookingModalItem.featuresAr,
             });
+            setBookingModalItem(null);
+            router.push('/bookings');
           }}
         />
       )}

@@ -33,6 +33,7 @@ import DigitalInviteGenerator from '@/components/occasion/DigitalInviteGenerator
 import TasksTimeline from '@/components/occasion/TasksTimeline';
 import WishlistManager from '@/components/occasion/WishlistManager';
 import { RunOfShowPlanner } from '@/components/occasion/RunOfShowPlanner';
+import EaniyahManager from '@/components/occasion/EaniyahManager';
 
 type TabType =
   | 'overview'
@@ -42,6 +43,7 @@ type TabType =
   | 'invitations'
   | 'tasks'
   | 'runofshow'
+  | 'eaniyah'
   | 'wishlist'
   | 'bookings';
 
@@ -173,6 +175,15 @@ export default function OccasionWorkspacePage() {
             <MailCheck className="w-3.5 h-3.5 text-saudi-gold-300" />
             <span>إرسال وتخصيص الدعوات</span>
           </button>
+
+          <Link
+            href={`/reception-screen?occasionId=${currentOccasion.id}`}
+            target="_blank"
+            className="bg-saudi-green-900/90 hover:bg-saudi-green-950 text-saudi-gold-300 border border-saudi-gold-400/40 px-4 py-2 rounded-xl font-bold flex items-center gap-1.5 transition shadow-sm mr-auto"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-saudi-gold-400" />
+            <span>شاشة استقبال الضيوف (TV Screen) 📺</span>
+          </Link>
         </div>
       </div>
 
@@ -260,6 +271,18 @@ export default function OccasionWorkspacePage() {
         >
           <Sparkles className="w-4 h-4 text-saudi-gold-600" />
           <span>سير الفعالية (ساعة الصفر)</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('eaniyah')}
+          className={`px-4 py-3 border-b-2 transition whitespace-nowrap flex items-center gap-1.5 ${
+            activeTab === 'eaniyah'
+              ? 'border-saudi-green-800 text-saudi-green-950 font-black'
+              : 'border-transparent text-gray-500 hover:text-gray-900'
+          }`}
+        >
+          <Gift className="w-4 h-4 text-saudi-gold-600" />
+          <span>العانية والرفد 🎁</span>
         </button>
 
         <button
@@ -453,6 +476,7 @@ export default function OccasionWorkspacePage() {
         {activeTab === 'invitations' && <DigitalInviteGenerator />}
         {activeTab === 'tasks' && <TasksTimeline />}
         {activeTab === 'runofshow' && <RunOfShowPlanner occasion={currentOccasion} />}
+        {activeTab === 'eaniyah' && <EaniyahManager occasionId={currentOccasion.id} />}
         {activeTab === 'wishlist' && <WishlistManager />}
 
         {activeTab === 'bookings' && (

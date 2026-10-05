@@ -73,6 +73,8 @@ export default function AdminDashboardPage() {
     replyToReview,
     cities,
     toggleCityAvailability,
+    rankingWeights,
+    updateRankingWeights,
   } = useApp();
 
   const [activeTab, setActiveTab] = useState<
@@ -1286,6 +1288,170 @@ export default function AdminDashboardPage() {
                 </button>
               </div>
             </form>
+
+            {/* Vendor Ranking Configuration Engine */}
+            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-saudi-sand-300 shadow-sm space-y-6 mt-6">
+              <div className="flex items-center justify-between border-b border-saudi-sand-200 pb-3 flex-wrap gap-2">
+                <div>
+                  <h3 className="font-bold text-base text-saudi-green-950 font-cairo flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-saudi-gold-600" />
+                    <span>خوارزمية وأوزان تصنيف وترشيح الموردين (Vendor Ranking Engine)</span>
+                  </h3>
+                  <p className="text-xs text-gray-500 font-tajawal mt-0.5">
+                    تحكم في المعايير والأوزان الرقمية التي تستخدمها منصة مناسبتي والمساعد الذكي "لُـمى" لترتيب الموردين.
+                  </p>
+                </div>
+                <span className="bg-saudi-gold-100 text-saudi-gold-900 text-xs font-bold px-3 py-1 rounded-full border border-saudi-gold-300">
+                  خوارزمية ذكية ديناميكية 🇸🇦
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                {/* Rating weight */}
+                <div className="bg-saudi-sand-50 p-4 rounded-2xl border border-saudi-sand-200 space-y-2">
+                  <div className="flex justify-between font-bold">
+                    <span className="text-gray-700">وزن التقييم والمراجعات</span>
+                    <span className="text-saudi-green-900 font-mono">%{rankingWeights.ratingWeight}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="50"
+                    step="5"
+                    value={rankingWeights.ratingWeight}
+                    onChange={(e) => updateRankingWeights({ ratingWeight: parseInt(e.target.value, 10) })}
+                    className="w-full accent-saudi-green-800 cursor-pointer"
+                  />
+                  <span className="text-[10px] text-gray-400 block">أهمية النجوم والمراجعات الموثقة</span>
+                </div>
+
+                {/* Price weight */}
+                <div className="bg-saudi-sand-50 p-4 rounded-2xl border border-saudi-sand-200 space-y-2">
+                  <div className="flex justify-between font-bold">
+                    <span className="text-gray-700">وزن السعر والتنافسية</span>
+                    <span className="text-saudi-green-900 font-mono">%{rankingWeights.priceWeight}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="50"
+                    step="5"
+                    value={rankingWeights.priceWeight}
+                    onChange={(e) => updateRankingWeights({ priceWeight: parseInt(e.target.value, 10) })}
+                    className="w-full accent-saudi-green-800 cursor-pointer"
+                  />
+                  <span className="text-[10px] text-gray-400 block">أفضلية الأسعار المناسبة للميزانية</span>
+                </div>
+
+                {/* Availability weight */}
+                <div className="bg-saudi-sand-50 p-4 rounded-2xl border border-saudi-sand-200 space-y-2">
+                  <div className="flex justify-between font-bold">
+                    <span className="text-gray-700">وزن التوفر الفوري</span>
+                    <span className="text-saudi-green-900 font-mono">%{rankingWeights.availabilityWeight}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="50"
+                    step="5"
+                    value={rankingWeights.availabilityWeight}
+                    onChange={(e) => updateRankingWeights({ availabilityWeight: parseInt(e.target.value, 10) })}
+                    className="w-full accent-saudi-green-800 cursor-pointer"
+                  />
+                  <span className="text-[10px] text-gray-400 block">التوفر في تاريخ ووقت المناسبة</span>
+                </div>
+
+                {/* Completed orders weight */}
+                <div className="bg-saudi-sand-50 p-4 rounded-2xl border border-saudi-sand-200 space-y-2">
+                  <div className="flex justify-between font-bold">
+                    <span className="text-gray-700">وزن الحجوزات المكتملة</span>
+                    <span className="text-saudi-green-900 font-mono">%{rankingWeights.ordersWeight}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="50"
+                    step="5"
+                    value={rankingWeights.ordersWeight}
+                    onChange={(e) => updateRankingWeights({ ordersWeight: parseInt(e.target.value, 10) })}
+                    className="w-full accent-saudi-green-800 cursor-pointer"
+                  />
+                  <span className="text-[10px] text-gray-400 block">عدد المناسبات المنجزة بنجاح</span>
+                </div>
+
+                {/* Distance weight */}
+                <div className="bg-saudi-sand-50 p-4 rounded-2xl border border-saudi-sand-200 space-y-2">
+                  <div className="flex justify-between font-bold">
+                    <span className="text-gray-700">وزن القرب الجغرافي</span>
+                    <span className="text-saudi-green-900 font-mono">%{rankingWeights.distanceWeight}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="50"
+                    step="5"
+                    value={rankingWeights.distanceWeight}
+                    onChange={(e) => updateRankingWeights({ distanceWeight: parseInt(e.target.value, 10) })}
+                    className="w-full accent-saudi-green-800 cursor-pointer"
+                  />
+                  <span className="text-[10px] text-gray-400 block">موقع المورد ونطاق التغطية بالحي</span>
+                </div>
+
+                {/* Response speed weight */}
+                <div className="bg-saudi-sand-50 p-4 rounded-2xl border border-saudi-sand-200 space-y-2">
+                  <div className="flex justify-between font-bold">
+                    <span className="text-gray-700">وزن سرعة الرد والتجاوب</span>
+                    <span className="text-saudi-green-900 font-mono">%{rankingWeights.responseSpeedWeight}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="50"
+                    step="5"
+                    value={rankingWeights.responseSpeedWeight}
+                    onChange={(e) => updateRankingWeights({ responseSpeedWeight: parseInt(e.target.value, 10) })}
+                    className="w-full accent-saudi-green-800 cursor-pointer"
+                  />
+                  <span className="text-[10px] text-gray-400 block">الرد بالدقائق على رسائل العملاء</span>
+                </div>
+
+                {/* Verification weight */}
+                <div className="bg-saudi-sand-50 p-4 rounded-2xl border border-saudi-sand-200 space-y-2">
+                  <div className="flex justify-between font-bold">
+                    <span className="text-gray-700">وزن التوثيق الرسمي</span>
+                    <span className="text-saudi-green-900 font-mono">%{rankingWeights.verificationWeight}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="50"
+                    step="5"
+                    value={rankingWeights.verificationWeight}
+                    onChange={(e) => updateRankingWeights({ verificationWeight: parseInt(e.target.value, 10) })}
+                    className="w-full accent-saudi-green-800 cursor-pointer"
+                  />
+                  <span className="text-[10px] text-gray-400 block">سجل تجاري / وثيقة عمل حر معتمدة</span>
+                </div>
+
+                {/* On-time rate weight */}
+                <div className="bg-saudi-sand-50 p-4 rounded-2xl border border-saudi-sand-200 space-y-2">
+                  <div className="flex justify-between font-bold">
+                    <span className="text-gray-700">وزن الالتزام بالمواعيد</span>
+                    <span className="text-saudi-green-900 font-mono">%{rankingWeights.onTimeWeight}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="50"
+                    step="5"
+                    value={rankingWeights.onTimeWeight}
+                    onChange={(e) => updateRankingWeights({ onTimeWeight: parseInt(e.target.value, 10) })}
+                    className="w-full accent-saudi-green-800 cursor-pointer"
+                  />
+                  <span className="text-[10px] text-gray-400 block">نسبة الحضور والتجهيز بالوقت المحدد</span>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>

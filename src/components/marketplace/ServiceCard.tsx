@@ -1,10 +1,23 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { Star, ShieldCheck, Zap, Clock, MapPin, Sparkles, CheckCircle2 } from 'lucide-react';
+import {
+  Star,
+  ShieldCheck,
+  Zap,
+  Clock,
+  MapPin,
+  Sparkles,
+  CheckCircle2,
+  ShoppingBag,
+  Heart,
+  Check,
+} from 'lucide-react';
 import { ServiceItem } from '@/lib/types';
-import { formatSAR } from '@/lib/utils';
+import { formatSaudiRiyal, ensureServiceDetails } from '@/lib/utils';
+import { useApp } from '@/lib/store';
+import confetti from 'canvas-confetti';
 
 interface ServiceCardProps {
   service: ServiceItem;
@@ -12,6 +25,36 @@ interface ServiceCardProps {
 }
 
 export default function ServiceCard({ service, onBookNow }: ServiceCardProps) {
+  const { addToCart, favoriteServiceIds, toggleFavoriteService } = useApp();
+  const [isAdded, setIsAdded] = useState(false);
+
+  const isFavorite = favoriteServiceIds.includes(service.id);
+
+  const handleQuickAdd = () => {
+    const details = ensureServiceDetails(service);
+    const pkg = details.packages[0] || {
+      id: 'basic',
+      nameAr: 'الباقة الأساسية',
+      price: service.price,
+      featuresAr: service.featuresAr,
+      durationHours: 4,
+    };
+
+    addToCart(service, pkg, [], {
+      date: '2026-10-09',
+      time: '18:00',
+      locationCity: service.cityNameAr,
+      notes: 'أضيف من بطاقة الخدمة',
+    });
+
+    setIsAdded(true);
+    setTimeout(() => setIsAdded(false), 2000);
+
+    try {
+      confetti({ particleCount: 40, spread: 50, origin: { y: 0.7 } });
+    } catch {}
+  };
+
   return (
     <div className="bg-white rounded-3xl border border-saudi-sand-300 overflow-hidden shadow-card hover:shadow-xl hover:border-saudi-gold-400/80 transition-all duration-300 flex flex-col justify-between group">
       {/* Image Banner */}
@@ -19,8 +62,23 @@ export default function ServiceCard({ service, onBookNow }: ServiceCardProps) {
         <img
           src={service.images[0] || 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800&auto=format&fit=crop&q=80'}
           alt={service.titleAr}
+          loading="lazy"
+          decoding="async"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
+
+        {/* Favorite toggle button */}
+        <button
+          onClick={() => toggleFavoriteService(service.id)}
+          className={`absolute top-3 left-3 p-2 rounded-xl backdrop-blur-md transition z-10 ${
+            isFavorite
+              ? 'bg-rose-600 text-white shadow'
+              : 'bg-black/40 hover:bg-black/60 text-white'
+          }`}
+          title="إضافة إلى المفضلة"
+        >
+          <Heart className={`w-3.5 h-3.5 ${isFavorite ? 'fill-current' : ''}`} />
+        </button>
 
         {/* Badges */}
         <div className="absolute top-3 right-3 flex flex-col gap-1.5 items-end">
@@ -61,6 +119,8 @@ export default function ServiceCard({ service, onBookNow }: ServiceCardProps) {
               <img
                 src={service.vendorLogo}
                 alt={service.vendorName}
+                loading="lazy"
+                decoding="async"
                 className="w-6 h-6 rounded-full object-cover border border-gray-200"
               />
               <span className="text-xs font-bold text-gray-700 group-hover/vendor:text-saudi-green-800 flex items-center gap-1 transition">
@@ -76,9 +136,12 @@ export default function ServiceCard({ service, onBookNow }: ServiceCardProps) {
           </div>
 
           {/* Title */}
-          <h4 className="text-sm font-bold text-gray-900 font-cairo leading-snug line-clamp-2">
+          <Link
+            href={`/service/${service.id}`}
+            className="text-sm font-bold text-gray-900 hover:text-saudi-gold-700 font-cairo leading-snug line-clamp-2 transition block"
+          >
             {service.titleAr}
-          </h4>
+          </Link>
 
           {/* Features Highlights */}
           <div className="space-y-1 pt-1">
@@ -91,30 +154,38 @@ export default function ServiceCard({ service, onBookNow }: ServiceCardProps) {
           </div>
         </div>
 
-        {/* Price & Book Button */}
+        {/* Price & Action Buttons */}
         <div className="pt-3 border-t border-saudi-sand-200 flex items-center justify-between">
           <div>
             <span className="text-[10px] text-gray-400 block">السعر شامل الضريبة</span>
             <span className="text-base font-black font-cairo text-saudi-green-950">
-              {formatSAR(service.price)}
+              {formatSaudiRiyal(service.price)}
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={handleQuickAdd}
+              className={`p-2 rounded-xl text-xs font-bold transition flex items-center gap-1 ${
+                isAdded
+                  ? 'bg-emerald-700 text-white'
+                  : 'bg-saudi-sand-100 hover:bg-saudi-green-100 text-saudi-green-900'
+              }`}
+              title="أضف للسلة"
+            >
+              {isAdded ? (
+                <Check className="w-4 h-4 text-white" />
+              ) : (
+                <ShoppingBag className="w-4 h-4 text-saudi-green-900" />
+              )}
+            </button>
+
             <Link
               href={`/service/${service.id}`}
-              className="px-3 py-2 bg-saudi-sand-100 hover:bg-saudi-sand-200 text-gray-800 rounded-xl text-xs font-bold transition"
+              className="px-3 py-2 bg-saudi-green-800 hover:bg-saudi-green-900 text-white rounded-xl text-xs font-bold shadow-sm transition"
             >
               التفاصيل
             </Link>
-            {onBookNow && (
-              <button
-                onClick={() => onBookNow(service)}
-                className="px-4 py-2 bg-saudi-green-800 hover:bg-saudi-green-900 text-white rounded-xl text-xs font-bold shadow-sm transition"
-              >
-                احجز الآن
-              </button>
-            )}
           </div>
         </div>
       </div>

@@ -16,7 +16,9 @@ import {
   Booking, 
   Review, 
   AdminPlatformConfig,
-  RunOfShowItem
+  RunOfShowItem,
+  EaniyahGift,
+  Coupon
 } from './types';
 
 export const SAUDI_CITIES: SaudiCity[] = [
@@ -2291,4 +2293,97 @@ export const INITIAL_RUN_OF_SHOW_ITEMS: RunOfShowItem[] = [
     notes: 'تجهيز المباخر الفاخرة وتوزيع الهدايا التذكارية.'
   }
 ];
+
+export const INITIAL_EANIYAH_GIFTS: EaniyahGift[] = [
+  {
+    id: 'eaniyah-1',
+    occasionId: 'occ-101',
+    senderName: 'العم إبراهيم بن عبدالعزيز العتيبي',
+    senderPhone: '+966505123456',
+    amount: 3000,
+    blessingMessage: 'ألف مبروك للدكتورة سارة ومنها للأعلى إن شاء الله فخورين بإنجازك المشرف، جعلها الله بداية التوفيق والدرجات العلا 🤍',
+    recipientTitle: 'للدكتورة سارة العتيبي',
+    paymentMethod: 'apple_pay',
+    isPrivateAmount: false,
+    cardStyle: 'royal_gold',
+    status: 'completed',
+    createdAt: '2026-10-04T19:30:00Z',
+    transactionRef: 'EAN-SA-994821',
+  },
+  {
+    id: 'eaniyah-2',
+    occasionId: 'occ-101',
+    senderName: 'خالتك أم فيصل وأولادها',
+    senderPhone: '+966504987654',
+    amount: 1500,
+    blessingMessage: 'مبارك التخرج يا قرّة عين أمك وأبيك، عقبال أعلى المناصب الطبية يا رب 🌸✨',
+    recipientTitle: 'للدكتورة سارة العتيبي',
+    paymentMethod: 'mada',
+    isPrivateAmount: false,
+    cardStyle: 'emerald_luxury',
+    status: 'completed',
+    createdAt: '2026-10-05T14:15:00Z',
+    transactionRef: 'EAN-SA-382910',
+  },
+  {
+    id: 'eaniyah-3',
+    occasionId: 'occ-101',
+    senderName: 'زميلات دفعة كلية الطب 2026',
+    senderPhone: '+966551122334',
+    amount: 2000,
+    blessingMessage: 'ألف مبروك التخرج لأجمل دكتورة سارة، رفعتِ راسنا وفرحتنا فيك ما توصف! تستاهلين كل خير 🎓🩺',
+    recipientTitle: 'للدكتورة سارة العتيبي',
+    paymentMethod: 'stc_pay',
+    isPrivateAmount: false,
+    cardStyle: 'saudi_violet',
+    status: 'completed',
+    createdAt: '2026-10-05T17:40:00Z',
+    transactionRef: 'EAN-SA-771203',
+  },
+  {
+    id: 'eaniyah-4',
+    occasionId: 'occ-101',
+    senderName: 'فاعل خير من الأقارب',
+    amount: 1000,
+    blessingMessage: 'بالبركة والتوفيق الدائم إن شاء الله 🤍',
+    recipientTitle: 'للدكتورة سارة العتيبي',
+    paymentMethod: 'apple_pay',
+    isPrivateAmount: true,
+    cardStyle: 'traditional_sadu',
+    status: 'completed',
+    createdAt: '2026-10-05T18:10:00Z',
+    transactionRef: 'EAN-SA-882199',
+  }
+];
+
+export const INITIAL_COUPONS: Coupon[] = [
+  {
+    code: 'MUNASABATI10',
+    discountType: 'percentage',
+    discountValue: 10,
+    minOrderAmount: 1000,
+    maxDiscountAmount: 1000,
+    descriptionAr: 'خصم 10% بمناسبة التدشين لجميع الخدمات وسوق الموردين',
+    expiryDate: '2026-12-31',
+  },
+  {
+    code: 'WELCOME500',
+    discountType: 'fixed',
+    discountValue: 500,
+    minOrderAmount: 3500,
+    descriptionAr: 'خصم 500 ريال فوري للطلبات فوق 3,500 ريال',
+    expiryDate: '2026-12-31',
+  },
+  {
+    code: 'VIP20',
+    discountType: 'percentage',
+    discountValue: 20,
+    minOrderAmount: 5000,
+    maxDiscountAmount: 2500,
+    descriptionAr: 'خصم 20% لكبار العملاء وحجوزات الباقات الملكية',
+    expiryDate: '2026-12-31',
+  },
+];
+
+
 

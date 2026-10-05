@@ -67,6 +67,55 @@ export interface Vendor {
   genderSpecialty?: 'men_specialist' | 'women_specialist' | 'both';
   cancellationPolicyAr: string;
   status: 'active' | 'under_review' | 'suspended';
+  metrics?: VendorMetrics;
+  featured?: boolean;
+  specialtiesAr?: string[];
+  availability?: ServiceAvailability;
+}
+
+export interface VendorMetrics {
+  averageRating: number;
+  reviewsCount: number;
+  completedOrders: number;
+  cancelledOrders: number;
+  repeatCustomerRate: number;
+  responseTimeMinutes: number;
+  acceptanceRate: number;
+  onTimeRate: number;
+  satisfactionRate: number;
+  yearsOfExperience: number;
+}
+
+export interface ServicePackage {
+  id: string;
+  nameAr: string;
+  nameEn?: string;
+  tier?: 'basic' | 'standard' | 'premium' | 'vip';
+  price: number;
+  descriptionAr?: string;
+  durationHours?: number;
+  featuresAr: string[];
+  isPopular?: boolean;
+}
+
+export interface ServiceAddon {
+  id: string;
+  titleAr: string;
+  nameAr?: string; // alias
+  descriptionAr?: string;
+  price: number;
+  pricingType: 'fixed' | 'per_unit' | 'per_hour' | 'per_person';
+  isAvailable: boolean;
+  maxQuantity?: number;
+}
+
+export interface ServiceAvailability {
+  workingDays: number[];
+  timeSlots: string[];
+  capacityPerSlot: number;
+  blackoutDates: string[];
+  minNoticeDays: number;
+  maxAdvanceDays: number;
 }
 
 export interface ServiceItem {
@@ -90,6 +139,12 @@ export interface ServiceItem {
   genderPreference?: 'men' | 'women' | 'unisex';
   badge?: string;
   isPopular?: boolean;
+  packages?: ServicePackage[];
+  addons?: ServiceAddon[];
+  availability?: ServiceAvailability;
+  discountPercent?: number;
+  originalPrice?: number;
+  executionDurationHours?: number;
 }
 
 export interface PackageItem {
@@ -377,4 +432,159 @@ export interface AdminPlatformConfig {
   isMaintenanceMode?: boolean;
   defaultEscrowDays?: number;
   autoApproveReviews?: boolean;
+  rankingWeights?: RankingWeights;
 }
+
+export interface EaniyahGift {
+  id: string;
+  occasionId: string;
+  senderName: string;
+  senderPhone?: string;
+  amount: number;
+  blessingMessage: string;
+  recipientTitle: string;
+  paymentMethod: 'apple_pay' | 'mada' | 'stc_pay';
+  isPrivateAmount: boolean;
+  cardStyle: 'royal_gold' | 'emerald_luxury' | 'saudi_violet' | 'traditional_sadu';
+  status: 'completed' | 'transferred';
+  createdAt: string;
+  transactionRef: string;
+}
+
+export interface CartItemAddon {
+  addonId: string;
+  titleAr: string;
+  price: number;
+  quantity: number;
+}
+
+export interface CartItem {
+  id: string;
+  vendorId: string;
+  vendorName: string;
+  vendorLogo: string;
+  serviceId: string;
+  serviceTitleAr: string;
+  serviceImage: string;
+  packageId?: string;
+  packageNameAr?: string;
+  selectedPackage: ServicePackage;
+  packagePrice: number;
+  addons: CartItemAddon[];
+  selectedAddons?: (ServiceAddon | CartItemAddon)[];
+  quantity: number;
+  scheduledDate: string;
+  scheduleDate?: string;
+  scheduledTime?: string;
+  scheduleTime?: string;
+  cityId: string;
+  cityNameAr: string;
+  locationCity?: string;
+  venueAddress?: string;
+  notes?: string;
+  basePrice: number;
+  addonsTotal: number;
+  subtotal: number;
+  taxAmount: number;
+  totalAmount: number;
+  totalPrice: number;
+}
+
+export interface VendorCartGroup {
+  vendorId: string;
+  vendorName: string;
+  vendorLogo: string;
+  cityId: string;
+  cityNameAr: string;
+  items: CartItem[];
+  subtotal: number;
+  taxAmount: number;
+  totalAmount: number;
+}
+
+export interface Coupon {
+  code: string;
+  discountType: 'percentage' | 'fixed';
+  discountValue: number;
+  minOrderAmount: number;
+  maxDiscountAmount?: number;
+  descriptionAr: string;
+  expiryDate: string;
+  applicableVendorId?: string;
+}
+
+export interface MultiVendorOrder {
+  id: string;
+  orderNumber: string;
+  customerId: string;
+  customerName: string;
+  customerPhone: string;
+  customerEmail?: string;
+  eventDate: string;
+  eventTime?: string;
+  cityId: string;
+  cityNameAr: string;
+  venueName?: string;
+  suborders: {
+    suborderId: string;
+    vendorId: string;
+    vendorName: string;
+    vendorLogo: string;
+    items: CartItem[];
+    subtotal: number;
+    taxAmount: number;
+    totalAmount: number;
+    depositAmount: number;
+    remainingAmount: number;
+    status: BookingStatus;
+    bookingNumber: string;
+  }[];
+  totalSubtotal: number;
+  totalTax: number;
+  couponDiscount: number;
+  couponCode?: string;
+  finalTotal: number;
+  totalDeposit: number;
+  paymentMethod: PaymentMethod;
+  isDepositOnly: boolean;
+  createdAt: string;
+  status: 'confirmed' | 'in_preparation' | 'completed' | 'cancelled';
+}
+
+export interface RankingWeights {
+  ratingWeight: number; // e.g. 25
+  priceWeight: number; // e.g. 20
+  availabilityWeight: number; // e.g. 15
+  ordersWeight: number; // e.g. 15
+  onTimeWeight: number; // e.g. 10
+  responseSpeedWeight: number; // e.g. 5
+  verificationWeight: number; // e.g. 5
+  distanceWeight: number; // e.g. 5
+}
+
+export interface VendorRecommendationResult {
+  vendor: Vendor;
+  matchedService?: ServiceItem;
+  primaryService?: ServiceItem;
+  compositeScore: number;
+  priceScore: number;
+  ratingScore: number;
+  reliabilityScore: number;
+  availabilityScore: number;
+  bestValueScore: number;
+  badges: ('الأفضل تقييماً' | 'أفضل قيمة' | 'الأقل سعراً' | 'الأسرع تجاوباً' | 'الأقرب' | 'اختيار لُـمى')[];
+  reasonsAr: string[];
+}
+
+export interface VendorRecommendationCriteria {
+  categoryId?: string;
+  cityId?: string;
+  maxPrice?: number;
+  minRating?: number;
+  verifiedOnly?: boolean;
+  date?: string;
+  sortPreference?: 'recommended' | 'cheapest' | 'best_rated' | 'fastest' | 'nearest' | 'best_value';
+  occasionTypeId?: string;
+}
+
+

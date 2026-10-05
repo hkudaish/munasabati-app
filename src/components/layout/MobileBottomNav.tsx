@@ -8,7 +8,7 @@ import { useApp } from '@/lib/store';
 
 export default function MobileBottomNav() {
   const pathname = usePathname();
-  const { activeOccasion, setIsAIOpen } = useApp();
+  const { activeOccasion, setIsAIOpen, cart } = useApp();
 
   return (
     <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-saudi-sand-200 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] px-2 py-1.5">
@@ -24,15 +24,22 @@ export default function MobileBottomNav() {
           <span className="text-[10px]">الرئيسية</span>
         </Link>
 
-        {/* Marketplace */}
+        {/* Marketplace / Cart */}
         <Link
-          href="/marketplace"
-          className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-lg transition ${
-            pathname.startsWith('/marketplace') ? 'text-saudi-green-800 font-bold' : 'text-gray-500 hover:text-saudi-green-800'
+          href={cart.length > 0 ? '/cart' : '/marketplace'}
+          className={`relative flex flex-col items-center gap-1 py-1 px-2.5 rounded-lg transition ${
+            pathname.startsWith('/marketplace') || pathname.startsWith('/cart')
+              ? 'text-saudi-green-800 font-bold'
+              : 'text-gray-500 hover:text-saudi-green-800'
           }`}
         >
           <ShoppingBag className="w-5 h-5" />
-          <span className="text-[10px]">استكشف</span>
+          {cart.length > 0 && (
+            <span className="absolute top-0 right-2 bg-saudi-green-800 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
+              {cart.reduce((s, i) => s + i.quantity, 0)}
+            </span>
+          )}
+          <span className="text-[10px]">{cart.length > 0 ? 'السلة' : 'استكشف'}</span>
         </Link>
 
         {/* Central Prominent CTA: + مناسبتي */}

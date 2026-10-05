@@ -1,0 +1,494 @@
+// Prisma schema for Munasabati Saudi Events & Marketplace Platform
+// Production-grade PostgreSQL schema with multi-vendor commerce, Luma AI metadata, and audit logs.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CLIENT
+  VENDOR
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum VendorStatus {
+  ACTIVE
+  UNDER_REVIEW
+  SUSPENDED
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  IN_PREPARATION
+  COMPLETED
+  CANCELLED
+  DISPUTED
+}
+
+enum PaymentMethod {
+  MADA
+  APPLE_PAY
+  STC_PAY
+  TAMARA
+  CREDIT_CARD
+  BANK_TRANSFER
+}
+
+enum PriceType {
+  FIXED
+  PER_PERSON
+  STARTING_AT
+}
+
+enum PackageTier {
+  BASIC
+  STANDARD
+  PREMIUM
+  VIP
+}
+
+enum AddonPricingType {
+  FIXED
+  PER_UNIT
+  PER_HOUR
+  PER_PERSON
+}
+
+// -------------------------------------------------------------
+// 1. Users & Authentication
+// -------------------------------------------------------------
+model User {
+  id            String    @id @default(uuid())
+  email         String?   @unique
+  phone         String    @unique
+  name          String
+  role          UserRole  @default(CLIENT)
+  avatar        String?
+  cityId        String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  occasions     Occasion[]
+  orders        MultiVendorOrder[]
+  reviews       Review[]
+  vendorProfile Vendor?
+
+  @@index([phone])
+  @@index([role])
+}
+
+// -------------------------------------------------------------
+// 2. Geography & Master Categories
+// -------------------------------------------------------------
+model SaudiCity {
+  id          String   @id // e.g. 'riyadh', 'jeddah'
+  nameAr      String
+  nameEn      String
+  regionAr    String
+  isAvailable Boolean  @default(true)
+  sortOrder   Int      @default(0)
+
+  vendors     Vendor[]
+  occasions   Occasion[]
+  orders      MultiVendorOrder[]
+
+  @@index([isAvailable])
+}
+
+model ServiceCategory {
+  id            String   @id // e.g. 'photography', 'decor'
+  nameAr        String
+  nameEn        String
+  iconName      String
+  descriptionAr String
+  color         String
+  itemCount     Int      @default(0)
+  sortOrder     Int      @default(0)
+
+  vendors       Vendor[]
+  services      ServiceItem[]
+}
+
+// -------------------------------------------------------------
+// 3. Vendors & Vendor Intelligence Metrics
+// -------------------------------------------------------------
+model Vendor {
+  id                     String         @id @default(uuid())
+  userId                 String?        @unique
+  user                   User?          @relation(fields: [userId], references: [id])
+  businessName           String
+  businessNameEn         String
+  categoryId             String
+  category               ServiceCategory @relation(fields: [categoryId], references: [id])
+  logo                   String
+  bannerImage            String
+  rating                 Float          @default(5.0)
+  reviewsCount           Int            @default(0)
+  completedBookingsCount Int            @default(0)
+  verified               Boolean        @default(false)
+  crNumber               String?
+  freelanceLicense       String?
+  vatNumber              String?
+  cityId                 String
+  city                   SaudiCity      @relation(fields: [cityId], references: [id])
+  neighborhood           String
+  serviceAreas           String[]       @default([])
+  startingPrice          Int            @default(0)
+  instantBooking         Boolean        @default(true)
+  responseTimeMinutes    Int            @default(15)
+  badges                 String[]       @default([])
+  bioAr                  String         @db.Text
+  portfolio              String[]       @default([])
+  contactPhone           String
+  whatsappNumber         String
+  genderSpecialty        String?
+  cancellationPolicyAr   String         @db.Text
+  status                 VendorStatus   @default(ACTIVE)
+  featured               Boolean        @default(false)
+  specialtiesAr          String[]       @default([])
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+
+  metrics                VendorMetrics?
+  availability           ServiceAvailability?
+  services               ServiceItem[]
+  suborders              Suborder[]
+  reviews                Review[]
+
+  @@index([categoryId])
+  @@index([cityId])
+  @@index([status])
+  @@index([rating])
+  @@index([featured])
+}
+
+model VendorMetrics {
+  id                  String   @id @default(uuid())
+  vendorId            String   @unique
+  vendor              Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  averageRating       Float    @default(5.0)
+  reviewsCount        Int      @default(0)
+  completedOrders     Int      @default(0)
+  cancelledOrders     Int      @default(0)
+  repeatCustomerRate  Int      @default(0)
+  responseTimeMinutes Int      @default(15)
+  acceptanceRate      Int      @default(100)
+  onTimeRate          Int      @default(100)
+  satisfactionRate    Int      @default(100)
+  yearsOfExperience   Int      @default(1)
+  updatedAt           DateTime @updatedAt
+}
+
+// -------------------------------------------------------------
+// 4. Services, Packages & Add-ons
+// -------------------------------------------------------------
+model ServiceItem {
+  id                     String          @id @default(uuid())
+  vendorId               String
+  vendor                 Vendor          @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  categoryId             String
+  category               ServiceCategory @relation(fields: [categoryId], references: [id])
+  cityId                 String
+  titleAr                String
+  descriptionAr          String          @db.Text
+  price                  Int
+  priceType              PriceType       @default(FIXED)
+  images                 String[]        @default([])
+  featuresAr             String[]        @default([])
+  capacityMax            Int?
+  instantBooking         Boolean         @default(true)
+  genderPreference       String?
+  badge                  String?
+  isPopular              Boolean         @default(false)
+  discountPercent        Int?
+  originalPrice          Int?
+  executionDurationHours Int             @default(4)
+  createdAt              DateTime        @default(now())
+  updatedAt              DateTime        @updatedAt
+
+  packages               ServicePackage[]
+  addons                 ServiceAddon[]
+  availability           ServiceAvailability?
+  orderItems             OrderItem[]
+  reviews                Review[]
+
+  @@index([vendorId])
+  @@index([categoryId])
+  @@index([price])
+}
+
+model ServicePackage {
+  id            String      @id @default(uuid())
+  serviceId     String
+  service       ServiceItem @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  nameAr        String
+  nameEn        String?
+  tier          PackageTier @default(STANDARD)
+  price         Int
+  descriptionAr String?     @db.Text
+  durationHours Int?        @default(4)
+  featuresAr    String[]    @default([])
+  isPopular     Boolean     @default(false)
+
+  @@index([serviceId])
+  @@index([price])
+}
+
+model ServiceAddon {
+  id            String           @id @default(uuid())
+  serviceId     String
+  service       ServiceItem      @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  titleAr       String
+  nameAr        String?
+  descriptionAr String?          @db.Text
+  price         Int
+  pricingType   AddonPricingType @default(FIXED)
+  isAvailable   Boolean          @default(true)
+  maxQuantity   Int?             @default(10)
+
+  @@index([serviceId])
+}
+
+model ServiceAvailability {
+  id              String       @id @default(uuid())
+  serviceId       String?      @unique
+  service         ServiceItem? @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  vendorId        String?      @unique
+  vendor          Vendor?      @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  workingDays     Int[]        @default([0, 1, 2, 3, 4, 5, 6])
+  timeSlots       String[]     @default(["04:00 م - 07:00 م", "07:00 م - 10:00 م", "10:00 م - 01:00 ص"])
+  capacityPerSlot Int          @default(2)
+  blackoutDates   String[]     @default([])
+  minNoticeDays   Int          @default(2)
+  maxAdvanceDays  Int          @default(180)
+}
+
+// -------------------------------------------------------------
+// 5. Occasion Planning Hub
+// -------------------------------------------------------------
+model Occasion {
+  id                  String     @id @default(uuid())
+  userId              String?
+  user                User?      @relation(fields: [userId], references: [id])
+  title               String
+  occasionTypeId      String
+  occasionTypeNameAr  String
+  cityId              String
+  city                SaudiCity  @relation(fields: [cityId], references: [id])
+  neighborhood        String?
+  date                String
+  time                String?
+  isApproximateDate   Boolean    @default(false)
+  guestCount          Int        @default(50)
+  guestsSection       String     @default("women")
+  venueType           String     @default("home")
+  venueName           String?
+  budget              Int        @default(15000)
+  spent               Int        @default(0)
+  tier                String     @default("medium")
+  readinessPercentage Int        @default(20)
+  status              String     @default("planning")
+  notes               String?    @db.Text
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  guests              Guest[]
+  orders              MultiVendorOrder[]
+
+  @@index([cityId])
+  @@index([date])
+}
+
+model Guest {
+  id               String    @id @default(uuid())
+  occasionId       String
+  occasion         Occasion  @relation(fields: [occasionId], references: [id], onDelete: Cascade)
+  name             String
+  phone            String
+  category         String    @default("family")
+  familyGroup      String?
+  companionCount   Int       @default(0)
+  status           String    @default("invited")
+  qrCode           String    @unique
+  tableId          String?
+  tableName        String?
+  invitedVia       String    @default("whatsapp")
+  invitationSentAt DateTime?
+  rsvpTime         DateTime?
+  notes            String?   @db.Text
+  createdAt        DateTime  @default(now())
+
+  @@index([occasionId])
+  @@index([phone])
+}
+
+// -------------------------------------------------------------
+// 6. Multi-Vendor Orders & Suborders
+// -------------------------------------------------------------
+model MultiVendorOrder {
+  id             String        @id @default(uuid())
+  orderNumber    String        @unique
+  customerId     String?
+  customer       User?         @relation(fields: [customerId], references: [id])
+  occasionId     String?
+  occasion       Occasion?     @relation(fields: [occasionId], references: [id])
+  customerName   String
+  customerPhone  String
+  customerEmail  String?
+  eventDate      String
+  eventTime      String?
+  cityId         String
+  city           SaudiCity     @relation(fields: [cityId], references: [id])
+  venueName      String?
+  totalSubtotal  Int
+  totalTax       Int
+  couponDiscount Int           @default(0)
+  couponCode     String?
+  finalTotal     Int
+  totalDeposit   Int
+  paymentMethod  PaymentMethod @default(MADA)
+  isDepositOnly  Boolean       @default(true)
+  status         String        @default("confirmed")
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  suborders      Suborder[]
+
+  @@index([orderNumber])
+  @@index([customerPhone])
+  @@index([createdAt])
+}
+
+model Suborder {
+  id              String        @id @default(uuid())
+  orderId         String
+  order           MultiVendorOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  vendorId        String
+  vendor          Vendor        @relation(fields: [vendorId], references: [id])
+  vendorName      String
+  vendorLogo      String
+  subtotal        Int
+  taxAmount       Int
+  totalAmount     Int
+  depositAmount   Int
+  remainingAmount Int
+  status          BookingStatus @default(CONFIRMED)
+  bookingNumber   String        @unique
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  items           OrderItem[]
+
+  @@index([orderId])
+  @@index([vendorId])
+  @@index([bookingNumber])
+}
+
+model OrderItem {
+  id              String        @id @default(uuid())
+  suborderId      String
+  suborder        Suborder      @relation(fields: [suborderId], references: [id], onDelete: Cascade)
+  serviceId       String
+  service         ServiceItem   @relation(fields: [serviceId], references: [id])
+  serviceTitleAr  String
+  serviceImage    String
+  packageId       String?
+  packageNameAr   String?
+  packagePrice    Int
+  addons          Json?         // Structured array of selected addons with quantities
+  quantity        Int           @default(1)
+  scheduledDate   String
+  scheduledTime   String?
+  cityId          String
+  cityNameAr      String
+  venueAddress    String?
+  notes           String?       @db.Text
+  basePrice       Int
+  addonsTotal     Int           @default(0)
+  subtotal        Int
+  taxAmount       Int
+  totalAmount     Int
+
+  @@index([suborderId])
+  @@index([serviceId])
+}
+
+// -------------------------------------------------------------
+// 7. Verified Reviews
+// -------------------------------------------------------------
+model Review {
+  id                  String       @id @default(uuid())
+  vendorId            String
+  vendor              Vendor       @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  serviceId           String?
+  service             ServiceItem? @relation(fields: [serviceId], references: [id])
+  userId              String?
+  user                User?        @relation(fields: [userId], references: [id])
+  bookingId           String?
+  reviewerName        String
+  rating              Float
+  qualityRating       Float?       @default(5.0)
+  communicationRating Float?       @default(5.0)
+  timelinessRating    Float?       @default(5.0)
+  valueRating         Float?       @default(5.0)
+  commentAr           String       @db.Text
+  images              String[]     @default([])
+  date                String
+  status              String       @default("approved")
+  featured            Boolean      @default(false)
+  replyAr             String?      @db.Text
+  createdAt           DateTime     @default(now())
+
+  @@index([vendorId])
+  @@index([rating])
+  @@index([featured])
+}
+
+// -------------------------------------------------------------
+// 8. Coupons & Promotions
+// -------------------------------------------------------------
+model Coupon {
+  id                 String   @id @default(uuid())
+  code               String   @unique
+  discountType       String   @default("percentage") // 'percentage' | 'fixed'
+  discountValue      Int
+  minOrderAmount     Int      @default(0)
+  maxDiscountAmount  Int?
+  descriptionAr      String
+  expiryDate         String
+  applicableVendorId String?
+  usageLimit         Int?
+  timesUsed          Int      @default(0)
+  isActive           Boolean  @default(true)
+  createdAt          DateTime @default(now())
+
+  @@index([code])
+  @@index([isActive])
+}
+
+// -------------------------------------------------------------
+// 9. Enterprise Audit Logs (Security & Compliance)
+// -------------------------------------------------------------
+model AuditLog {
+  id         String   @id @default(uuid())
+  actorId    String?
+  actorRole  String?
+  action     String   // e.g. 'VENDOR_VERIFIED', 'PRICE_CHANGED', 'ESCROW_RELEASED'
+  entity     String   // e.g. 'Vendor', 'Booking', 'ServicePackage'
+  entityId   String
+  beforeData Json?
+  afterData  Json?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  @@index([entity, entityId])
+  @@index([action])
+  @@index([createdAt])
+}
