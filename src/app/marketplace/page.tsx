@@ -22,6 +22,7 @@ import {
   Trash2,
   ArrowRight,
   ChevronDown,
+  ChevronLeft,
 } from 'lucide-react';
 import { useApp } from '@/lib/store';
 import ServiceCard from '@/components/marketplace/ServiceCard';
@@ -47,6 +48,10 @@ export default function MarketplacePage() {
     appliedCoupon,
     comparisonVendorIds,
     clearComparison,
+    currentRole,
+    currentUser,
+    switchRole,
+    openOnboarding,
     setIsAIOpen,
     rankingWeights,
   } = useApp();
@@ -58,6 +63,7 @@ export default function MarketplacePage() {
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [instantBookingOnly, setInstantBookingOnly] = useState(false);
   const [genderFilter, setGenderFilter] = useState<'all' | 'women' | 'men'>('all');
+  const [vendorScopeFilter, setVendorScopeFilter] = useState<'all' | 'my_services'>('all');
   const [sortOption, setSortOption] = useState<
     'recommended' | 'rating' | 'price_low' | 'price_high' | 'fastest' | 'orders'
   >('recommended');
@@ -78,13 +84,22 @@ export default function MarketplacePage() {
         genderFilter === 'all' || srv.genderPreference === genderFilter || srv.genderPreference === 'unisex';
       const matchesVerified = !verifiedOnly || srv.vendorRating >= 4.7;
 
+      // Filter by vendor scope if active role is vendor
+      const isMyService =
+        (currentUser?.vendorId && srv.vendorId === currentUser.vendorId) ||
+        (currentUser?.businessName && srv.vendorName === currentUser.businessName) ||
+        (currentUser?.role === 'vendor' && srv.vendorId === 'vendor-1');
+      const matchesVendorScope =
+        currentRole !== 'vendor' || vendorScopeFilter === 'all' || isMyService;
+
       return (
         matchesCategory &&
         matchesSearch &&
         matchesCity &&
         matchesInstant &&
         matchesGender &&
-        matchesVerified
+        matchesVerified &&
+        matchesVendorScope
       );
     })
     .sort((a, b) => {
@@ -145,7 +160,75 @@ export default function MarketplacePage() {
         </button>
       </div>
 
-      {/* Main Tabs (Services vs Vendors) & Layout Toggle */}
+      {/* Role-Aware Banner & Scope Controls */}
+      <div className="bg-gradient-to-r from-saudi-green-950 via-saudi-green-900 to-saudi-green-950 rounded-2xl p-4 text-white border border-saudi-gold-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-md">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-saudi-gold-500/20 border border-saudi-gold-400/40 flex items-center justify-center shrink-0">
+            {currentRole === 'client' && <Sparkles className="w-4 h-4 text-saudi-gold-300" />}
+            {currentRole === 'vendor' && <Store className="w-4 h-4 text-saudi-gold-300" />}
+            {currentRole === 'admin' && <ShieldCheck className="w-4 h-4 text-saudi-gold-300" />}
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-saudi-gold-300">
+                {currentRole === 'client' && 'تصفح بصفتك: صاحب المناسبة (حجز مباشر مضمون)'}
+                {currentRole === 'vendor' && `تصفح بصفتك: مورد معتمد (${currentUser?.businessName || currentUser?.name || 'منشأتك'})`}
+                {currentRole === 'admin' && 'تصفح بصفتك: مدير المنصة (وضع الإشراف والرقابة)'}
+              </span>
+            </div>
+            <p className="text-[11px] text-gray-300 font-tajawal">
+              {currentRole === 'client' && 'جميع الخدمات خاضعة لضمان منصة مناسبتي مع إمكانية دفع عربون 30% والمتبقي عند التنفيذ.'}
+              {currentRole === 'vendor' && 'يمكنك فحص ظهور خدماتك، مراقبة أسعار المنافسين في منطقتك، أو تصفية خدماتك المسجلة فقط.'}
+              {currentRole === 'admin' && 'يمكنك تدقيق أسعار الخدمات، فحص شارات الموردين المعتمدين، ونسب العمولة المقررة.'}
+            </p>
+          </div>
+        </div>
+
+        {/* Vendor Specific Scope Buttons */}
+        {currentRole === 'vendor' && (
+          <div className="flex items-center gap-2 self-end md:self-center shrink-0">
+            <div className="bg-white/10 p-1 rounded-xl flex items-center gap-1 border border-white/10">
+              <button
+                onClick={() => setVendorScopeFilter('all')}
+                className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
+                  vendorScopeFilter === 'all'
+                    ? 'bg-saudi-gold-500 text-saudi-green-950 shadow-sm'
+                    : 'text-gray-300 hover:text-white'
+                }`}
+              >
+                جميع الخدمات (المنافسين)
+              </button>
+              <button
+                onClick={() => setVendorScopeFilter('my_services')}
+                className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
+                  vendorScopeFilter === 'my_services'
+                    ? 'bg-saudi-gold-500 text-saudi-green-950 shadow-sm'
+                    : 'text-gray-300 hover:text-white'
+                }`}
+              >
+                خدماتي المسجلة فقط
+              </button>
+            </div>
+            <Link
+              href="/vendor?tab=services"
+              className="px-3 py-1.5 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 text-xs font-bold rounded-xl transition flex items-center gap-1"
+            >
+              <span>+ إضافة خدمة</span>
+            </Link>
+          </div>
+        )}
+
+        {/* Admin Specific Action */}
+        {currentRole === 'admin' && (
+          <Link
+            href="/admin?tab=vendors"
+            className="self-end md:self-center px-3.5 py-1.5 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 text-xs font-bold rounded-xl transition flex items-center gap-1 shrink-0"
+          >
+            <span>لوحة تدقيق الموردين والخدمات</span>
+            <ChevronLeft className="w-3.5 h-3.5" />
+          </Link>
+        )}
+      </div>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         {/* Dual Tab Buttons */}
         <div className="bg-saudi-sand-100 p-1 rounded-2xl flex items-center gap-1 border border-saudi-sand-300">

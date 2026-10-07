@@ -6,6 +6,7 @@ import Navbar from '@/components/layout/Navbar';
 import MobileBottomNav from '@/components/layout/MobileBottomNav';
 import Footer from '@/components/layout/Footer';
 import LumaAIDrawer from '@/components/ai/LumaAIDrawer';
+import UserOnboardingModal from '@/components/common/UserOnboardingModal';
 
 const tajawal = Tajawal({
   subsets: ['arabic'],
@@ -41,6 +42,7 @@ export default function RootLayout({
             {children}
           </main>
           <LumaAIDrawer />
+          <UserOnboardingModal />
           <MobileBottomNav />
           <Footer />
         </AppProvider>

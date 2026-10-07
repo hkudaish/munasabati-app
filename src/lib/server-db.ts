@@ -161,3 +161,143 @@ export async function getVendorByIdFromDB(id: string): Promise<Vendor | null> {
   const found = VENDORS.find((v) => v.id === id);
   return found ? ensureVendorDetails(found) : null;
 }
+
+// -------------------------------------------------------------
+// User & Authentication Persistence
+// -------------------------------------------------------------
+
+export async function findUserInDB(identifier: string): Promise<any | null> {
+  try {
+    if (process.env.DATABASE_URL) {
+      const user = await prisma.user.findFirst({
+        where: {
+          OR: [{ phone: identifier }, { email: identifier }],
+        },
+        include: {
+          vendorProfile: true,
+        },
+      });
+      return user;
+    }
+  } catch (e) {
+    console.warn('PostgreSQL findUser fallback:', e);
+  }
+  return null;
+}
+
+export async function createUserInDB(data: {
+  name: string;
+  phone: string;
+  email?: string;
+  role: 'CLIENT' | 'VENDOR' | 'ADMIN';
+  cityId?: string;
+  avatar?: string;
+}): Promise<any> {
+  try {
+    if (process.env.DATABASE_URL) {
+      const user = await prisma.user.upsert({
+        where: { phone: data.phone },
+        update: {
+          name: data.name,
+          email: data.email || null,
+          role: data.role,
+          cityId: data.cityId || null,
+        },
+        create: {
+          name: data.name,
+          phone: data.phone,
+          email: data.email || null,
+          role: data.role,
+          cityId: data.cityId || null,
+          avatar: data.avatar || `https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80`,
+        },
+        include: {
+          vendorProfile: true,
+        },
+      });
+      return user;
+    }
+  } catch (e) {
+    console.warn('PostgreSQL createUser fallback:', e);
+  }
+
+  // Resilient memory mock user
+  return {
+    id: 'user-' + Date.now(),
+    name: data.name,
+    phone: data.phone,
+    email: data.email,
+    role: data.role,
+    cityId: data.cityId,
+    avatar: data.avatar || `https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80`,
+    createdAt: new Date().toISOString(),
+  };
+}
+
+export async function createVendorInDB(vendorData: {
+  userId?: string;
+  businessName: string;
+  businessNameEn?: string;
+  categoryId: string;
+  cityId: string;
+  neighborhood: string;
+  crNumber?: string;
+  freelanceLicense?: string;
+  vatNumber?: string;
+  startingPrice: number;
+  contactPhone: string;
+  whatsappNumber: string;
+  bioAr: string;
+  specialtiesAr?: string[];
+}): Promise<any> {
+  try {
+    if (process.env.DATABASE_URL) {
+      const vendor = await prisma.vendor.create({
+        data: {
+          userId: vendorData.userId || null,
+          businessName: vendorData.businessName,
+          businessNameEn: vendorData.businessNameEn || vendorData.businessName,
+          categoryId: vendorData.categoryId,
+          cityId: vendorData.cityId,
+          neighborhood: vendorData.neighborhood,
+          crNumber: vendorData.crNumber || null,
+          freelanceLicense: vendorData.freelanceLicense || null,
+          vatNumber: vendorData.vatNumber || null,
+          startingPrice: vendorData.startingPrice,
+          contactPhone: vendorData.contactPhone,
+          whatsappNumber: vendorData.whatsappNumber,
+          bioAr: vendorData.bioAr,
+          specialtiesAr: vendorData.specialtiesAr || [],
+          cancellationPolicyAr: 'استرجاع كامل للعربون قبل 14 يوماً من موعد المناسبة.',
+          logo: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=200&auto=format&fit=crop&q=80',
+          bannerImage: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=1200&auto=format&fit=crop&q=80',
+          verified: Boolean(vendorData.crNumber || vendorData.freelanceLicense),
+          badges: vendorData.crNumber ? ['سجل تجاري موثق'] : ['وثيقة عمل حر معتمدة'],
+          status: 'ACTIVE',
+        },
+      });
+
+      // Also create default metrics
+      await prisma.vendorMetrics.create({
+        data: {
+          vendorId: vendor.id,
+          averageRating: 5.0,
+          reviewsCount: 0,
+          completedOrders: 0,
+          yearsOfExperience: 2,
+        },
+      });
+
+      return vendor;
+    }
+  } catch (e) {
+    console.warn('PostgreSQL createVendor fallback:', e);
+  }
+
+  return {
+    id: 'vendor-' + Date.now(),
+    ...vendorData,
+    verified: Boolean(vendorData.crNumber || vendorData.freelanceLicense),
+    status: 'ACTIVE',
+  };
+}

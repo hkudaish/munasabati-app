@@ -46,6 +46,10 @@ import { Vendor, ServiceItem, SmartPackage, Review, Booking } from '@/lib/types'
 export default function AdminDashboardPage() {
   const {
     adminConfig,
+    currentRole,
+    currentUser,
+    switchRole,
+    loginUser,
     updateAdminConfig,
     occasionTypes,
     serviceCategories,
@@ -253,6 +257,61 @@ export default function AdminDashboardPage() {
     setReplyingReviewId(null);
     setReplyText('');
   };
+
+  if (currentRole !== 'admin') {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-20 text-center space-y-6 animate-fadeIn">
+        <div className="w-20 h-20 rounded-3xl bg-amber-100 text-amber-700 mx-auto flex items-center justify-center shadow-lg border-2 border-amber-300">
+          <ShieldCheck className="w-10 h-10 text-amber-600" />
+        </div>
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-2 bg-amber-50 text-amber-900 border border-amber-200 px-3.5 py-1 rounded-full text-xs font-bold">
+            <span>منطقة محظورة — لوحة المشرفين المركزية</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black font-cairo text-gray-900">
+            تتطلب هذه الصفحة صلاحيات إدارة المنصة
+          </h1>
+          <p className="text-xs sm:text-sm text-gray-600 max-w-lg mx-auto leading-relaxed">
+            أنت مسجل حالياً بصفتك{' '}
+            <strong className="text-saudi-green-900 font-black">
+              {currentRole === 'vendor' ? 'مورد معتمد' : 'صاحب مناسبة'}
+            </strong>{' '}
+            ({currentUser?.name || 'مستخدم'}). لوحة الإدارة مخصصة للمشرفين والمسؤولين المصرح لهم فقط.
+          </p>
+        </div>
+
+        <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm max-w-md mx-auto space-y-3">
+          <button
+            onClick={() => {
+              loginUser('0599999999', 'admin');
+            }}
+            className="w-full py-3 px-4 bg-saudi-green-800 hover:bg-saudi-green-900 text-white font-bold rounded-xl text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2"
+          >
+            <ShieldCheck className="w-4 h-4 text-saudi-gold-400" />
+            <span>تسجيل الدخول كمدير المنصة (حساب المشرف التجريبي)</span>
+          </button>
+
+          <div className="flex items-center justify-center gap-4 pt-2 text-xs">
+            {currentRole === 'vendor' ? (
+              <Link
+                href="/vendor"
+                className="text-saudi-green-800 font-bold hover:underline"
+              >
+                العودة لبوابة الموردين ←
+              </Link>
+            ) : (
+              <Link
+                href="/"
+                className="text-saudi-green-800 font-bold hover:underline"
+              >
+                العودة للصفحة الرئيسية ←
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">

@@ -587,4 +587,55 @@ export interface VendorRecommendationCriteria {
   occasionTypeId?: string;
 }
 
+// -------------------------------------------------------------
+// User & Authentication / Onboarding Types
+// -------------------------------------------------------------
+export type UserRole = 'client' | 'vendor' | 'admin';
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  phone: string;
+  email?: string;
+  role: UserRole;
+  avatar?: string;
+  cityId?: string;
+  cityNameAr?: string;
+  vendorId?: string;
+  businessName?: string;
+  crNumber?: string;
+  freelanceLicense?: string;
+  isVerified?: boolean;
+  createdAt?: string;
+  hasAdminAccess?: boolean;
+}
+
+export interface CustomerRegistrationPayload {
+  name: string;
+  phone: string;
+  email?: string;
+  cityId: string;
+  upcomingOccasionType?: string;
+  occasionDate?: string;
+  password?: string;
+}
+
+export interface VendorRegistrationPayload {
+  businessName: string;
+  businessNameEn?: string;
+  categoryId: string;
+  cityId: string;
+  neighborhood: string;
+  crNumber?: string;
+  freelanceLicense?: string;
+  vatNumber?: string;
+  contactName: string;
+  contactPhone: string;
+  whatsappNumber: string;
+  startingPrice: number;
+  bioAr: string;
+  specialtiesAr?: string[];
+  password?: string;
+}
+
 

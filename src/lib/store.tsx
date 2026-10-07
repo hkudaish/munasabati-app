@@ -30,6 +30,10 @@ import {
   VendorRecommendationResult,
   ServicePackage,
   CartItemAddon,
+  UserProfile,
+  UserRole,
+  CustomerRegistrationPayload,
+  VendorRegistrationPayload,
 } from './types';
 import {
   INITIAL_OCCASIONS,
@@ -71,6 +75,23 @@ interface AppContextType {
   setSelectedCity: (cityId: string) => void;
   isAIOpen: boolean;
   setIsAIOpen: (open: boolean) => void;
+
+  // User Profile & Authentication & Onboarding
+  currentUser: UserProfile | null;
+  setCurrentUser: (user: UserProfile | null) => void;
+  isAuthenticated: boolean;
+  isOnboardingOpen: boolean;
+  setIsOnboardingOpen: (open: boolean) => void;
+  onboardingInitialRole: 'client' | 'vendor' | null;
+  setOnboardingInitialRole: (role: 'client' | 'vendor' | null) => void;
+  openOnboarding: (role?: 'client' | 'vendor') => void;
+  registerCustomer: (payload: CustomerRegistrationPayload) => Promise<{ success: boolean; user?: UserProfile; error?: string }>;
+  registerVendor: (payload: VendorRegistrationPayload) => Promise<{ success: boolean; user?: UserProfile; error?: string }>;
+  loginUser: (identifier: string, requestedRole?: UserRole) => Promise<{ success: boolean; user?: UserProfile; error?: string }>;
+  logoutUser: () => void;
+  switchRole: (role: UserRole) => { allowed: boolean; messageAr?: string };
+  permissionNotice: { open: boolean; targetRole: UserRole | null; messageAr: string } | null;
+  clearPermissionNotice: () => void;
 
   // Occasions
   occasions: Occasion[];
@@ -237,6 +258,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [selectedCity, setSelectedCity] = useState<string>('riyadh');
   const [isAIOpen, setIsAIOpen] = useState<boolean>(false);
 
+  // User Profile & Onboarding State
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => ({
+    id: 'client-sara-1',
+    name: 'سارة العتيبي',
+    phone: '0501234567',
+    email: 'sara.otb@gmail.com',
+    role: 'client',
+    cityId: 'riyadh',
+    cityNameAr: 'الرياض',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
+    createdAt: '2026-01-15T10:00:00Z',
+  }));
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(false);
+  const [onboardingInitialRole, setOnboardingInitialRole] = useState<'client' | 'vendor' | null>(null);
+  const [permissionNotice, setPermissionNotice] = useState<{ open: boolean; targetRole: UserRole | null; messageAr: string } | null>(null);
+
   const [occasions, setOccasions] = useState<Occasion[]>(INITIAL_OCCASIONS);
   const [activeOccasionId, setActiveOccasionId] = useState<string>('occ-101');
 
@@ -367,6 +404,194 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     comparisonVendorIds,
     rankingWeights,
   ]);
+
+  // Load User & Role from LocalStorage
+  useEffect(() => {
+    try {
+      const savedUser = localStorage.getItem('munasabati_user_profile_v2');
+      const savedRole = localStorage.getItem('munasabati_active_role_v2') as UserRole | null;
+      if (savedUser) {
+        const parsed = JSON.parse(savedUser);
+        setCurrentUser(parsed);
+        if (savedRole && ['client', 'vendor', 'admin'].includes(savedRole)) {
+          setCurrentRole(savedRole);
+        } else if (parsed.role) {
+          setCurrentRole(parsed.role);
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to load user profile from localStorage:', e);
+    }
+  }, []);
+
+  const openOnboarding = (role?: 'client' | 'vendor') => {
+    setOnboardingInitialRole(role || null);
+    setIsOnboardingOpen(true);
+  };
+
+  const clearPermissionNotice = () => {
+    setPermissionNotice(null);
+  };
+
+  const switchRole = (newRole: UserRole): { allowed: boolean; messageAr?: string } => {
+    if (newRole === 'admin') {
+      if (!currentUser?.hasAdminAccess && currentUser?.role !== 'admin') {
+        const msg = 'لوحة الإدارة تتطلب صلاحيات المشرف أو مدير المنصة.';
+        setPermissionNotice({
+          open: true,
+          targetRole: 'admin',
+          messageAr: msg,
+        });
+        return { allowed: false, messageAr: msg };
+      }
+    }
+
+    if (newRole === 'vendor') {
+      if (currentUser?.role === 'client' && !currentUser?.vendorId) {
+        openOnboarding('vendor');
+        const msg = 'ليس لديك حساب مورد مسجل بعد. يمكنك تسجيل منشأتك الآن للانضمام لبوابة الموردين.';
+        setPermissionNotice({
+          open: true,
+          targetRole: 'vendor',
+          messageAr: msg,
+        });
+        return { allowed: false, messageAr: msg };
+      }
+    }
+
+    setCurrentRole(newRole);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('munasabati_active_role_v2', newRole);
+    }
+    return { allowed: true };
+  };
+
+  const registerCustomer = async (payload: CustomerRegistrationPayload) => {
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userType: 'client', customerData: payload }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'فشل التسجيل');
+      }
+
+      const cityObj = cities.find((c) => c.id === payload.cityId);
+      const userProfile: UserProfile = {
+        ...data.user,
+        cityNameAr: cityObj?.nameAr || 'الرياض',
+      };
+
+      setCurrentUser(userProfile);
+      setCurrentRole('client');
+      if (payload.cityId) setSelectedCity(payload.cityId);
+
+      if (payload.upcomingOccasionType) {
+        createOccasion({
+          title: `مناسبة ${userProfile.name}`,
+          occasionTypeId: payload.upcomingOccasionType,
+          cityId: payload.cityId,
+          date: payload.occasionDate || '2026-11-20',
+        });
+      }
+
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('munasabati_user_profile_v2', JSON.stringify(userProfile));
+        localStorage.setItem('munasabati_active_role_v2', 'client');
+      }
+
+      return { success: true, user: userProfile };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'حدث خطأ أثناء التسجيل' };
+    }
+  };
+
+  const registerVendor = async (payload: VendorRegistrationPayload) => {
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userType: 'vendor', vendorData: payload }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'فشل تسجيل المورد');
+      }
+
+      const cityObj = cities.find((c) => c.id === payload.cityId);
+      const userProfile: UserProfile = {
+        ...data.user,
+        cityNameAr: cityObj?.nameAr || 'الرياض',
+      };
+
+      if (data.vendor) {
+        const newVendorObj: Vendor = ensureVendorDetails({
+          ...data.vendor,
+          categoryNameAr: serviceCategories.find((c) => c.id === payload.categoryId)?.nameAr || 'خدمة مناسبات',
+          cityNameAr: cityObj?.nameAr || 'الرياض',
+          status: 'active',
+        });
+        setVendors((prev) => [newVendorObj, ...prev]);
+      }
+
+      setCurrentUser(userProfile);
+      setCurrentRole('vendor');
+      if (payload.cityId) setSelectedCity(payload.cityId);
+
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('munasabati_user_profile_v2', JSON.stringify(userProfile));
+        localStorage.setItem('munasabati_active_role_v2', 'vendor');
+      }
+
+      return { success: true, user: userProfile };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'حدث خطأ أثناء تسجيل المورد' };
+    }
+  };
+
+  const loginUser = async (identifier: string, requestedRole?: UserRole) => {
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier, requestedRole }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'فشل تسجيل الدخول');
+      }
+
+      const cityObj = cities.find((c) => c.id === data.user.cityId);
+      const userProfile: UserProfile = {
+        ...data.user,
+        cityNameAr: cityObj?.nameAr || 'الرياض',
+      };
+
+      setCurrentUser(userProfile);
+      setCurrentRole(userProfile.role);
+      if (userProfile.cityId) setSelectedCity(userProfile.cityId);
+
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('munasabati_user_profile_v2', JSON.stringify(userProfile));
+        localStorage.setItem('munasabati_active_role_v2', userProfile.role);
+      }
+
+      return { success: true, user: userProfile };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'حدث خطأ أثناء تسجيل الدخول' };
+    }
+  };
+
+  const logoutUser = () => {
+    setCurrentUser(null);
+    setCurrentRole('client');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('munasabati_user_profile_v2');
+      localStorage.setItem('munasabati_active_role_v2', 'client');
+    }
+  };
 
   const activeOccasion = occasions.find((o) => o.id === activeOccasionId) || occasions[0];
 
@@ -1289,6 +1514,23 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setSelectedCity,
         isAIOpen,
         setIsAIOpen,
+
+        // User Auth & Onboarding
+        currentUser,
+        setCurrentUser,
+        isAuthenticated: !!currentUser,
+        isOnboardingOpen,
+        setIsOnboardingOpen,
+        onboardingInitialRole,
+        setOnboardingInitialRole,
+        openOnboarding,
+        registerCustomer,
+        registerVendor,
+        loginUser,
+        logoutUser,
+        switchRole,
+        permissionNotice,
+        clearPermissionNotice,
 
         occasions,
         activeOccasionId,

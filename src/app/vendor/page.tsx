@@ -30,9 +30,24 @@ import { AddServiceModal } from '@/components/vendor/AddServiceModal';
 import { VendorWalletModal } from '@/components/vendor/VendorWalletModal';
 
 export default function VendorPortalPage() {
-  const { vendors, bookings, rfqRequests, services, updateBookingStatus } = useApp();
+  const {
+    vendors,
+    bookings,
+    rfqRequests,
+    services,
+    updateBookingStatus,
+    currentRole,
+    currentUser,
+    openOnboarding,
+    loginUser,
+    switchRole,
+  } = useApp();
 
-  const currentVendor = vendors[0]; // Active demo vendor (ضيافة نجد الأصيلة)
+  // If user has specific vendorId or is logged in as vendor
+  const matchedVendor = currentUser?.vendorId
+    ? vendors.find((v) => v.id === currentUser.vendorId)
+    : null;
+  const currentVendor = matchedVendor || vendors[0]; // Active vendor
 
   const [activeTab, setActiveTab] = useState<'bookings' | 'rfqs' | 'services' | 'availability' | 'verification'>('bookings');
   const [isAddServiceOpen, setIsAddServiceOpen] = useState(false);
@@ -84,6 +99,55 @@ export default function VendorPortalPage() {
   const handleRemoveBlackoutDate = (dateToRemove: string) => {
     setBlackoutDates(blackoutDates.filter((d) => d !== dateToRemove));
   };
+
+  // If current role is client and user has no registered vendor profile
+  if (currentRole === 'client' && !currentUser?.vendorId) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-16 text-center space-y-6 animate-fadeIn">
+        <div className="w-20 h-20 rounded-3xl bg-amber-100 text-amber-700 mx-auto flex items-center justify-center shadow-lg border-2 border-amber-300">
+          <Store className="w-10 h-10 text-amber-700" />
+        </div>
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-2 bg-amber-50 text-amber-900 border border-amber-200 px-3.5 py-1 rounded-full text-xs font-bold">
+            <span>بوابة الموردين وشركاء النجاح 🇸🇦</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black font-cairo text-gray-900">
+            هذه البوابة مخصصة للموردين ومزودي الخدمات
+          </h1>
+          <p className="text-xs sm:text-sm text-gray-600 max-w-lg mx-auto leading-relaxed">
+            أنت تتصفح المنصة حالياً بصفتك <strong className="text-saudi-green-900 font-bold">صاحب مناسبة</strong>. إذا كنت تملك منشأة أو تقدم خدمات احتفالية، يمكنك تسجيل منشأتك الآن للانضمام لنخبة موردي المملكة واستقبال طلبات الحجز وعروض الأسعار.
+          </p>
+        </div>
+
+        <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm max-w-md mx-auto space-y-3">
+          <button
+            onClick={() => openOnboarding('vendor')}
+            className="w-full py-3.5 px-4 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-black rounded-xl text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2"
+          >
+            <Store className="w-4 h-4" />
+            <span>سجّل منشأتك الآن كمورد معتمد 🏪</span>
+          </button>
+
+          <button
+            onClick={() => loginUser('0551234567', 'vendor')}
+            className="w-full py-2.5 px-4 bg-saudi-sand-50 hover:bg-saudi-sand-100 border border-saudi-sand-300 text-gray-800 font-bold rounded-xl text-xs transition flex items-center justify-center gap-1.5"
+          >
+            <ShieldCheck className="w-4 h-4 text-saudi-green-800" />
+            <span>تجربة الدخول كمورد معتمد (حساب تجريبي: عدسة الفخامة)</span>
+          </button>
+
+          <div className="pt-2">
+            <Link
+              href="/marketplace"
+              className="text-xs text-saudi-green-800 font-bold hover:underline"
+            >
+              العودة لتصفح سوق الخدمات كصاحب مناسبة ←
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
