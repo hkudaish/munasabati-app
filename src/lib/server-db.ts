@@ -7,11 +7,33 @@ import { VENDORS, SERVICE_ITEMS, SAUDI_CITIES, SERVICE_CATEGORIES } from './seed
 import { ensureVendorDetails, ensureServiceDetails } from './utils';
 import type { Vendor, ServiceItem, MultiVendorOrder } from './types';
 
+export function isDatabaseConfigured(): boolean {
+  const url = process.env.DATABASE_URL;
+  if (!url) return false;
+  const isServerless = Boolean(
+    process.env.NETLIFY ||
+    process.env.VERCEL ||
+    process.env.AWS_LAMBDA_FUNCTION_NAME ||
+    (process.env.NODE_ENV === 'production' && !process.env.IS_LOCAL_DOCKER)
+  );
+  if (isServerless && (url.includes('localhost') || url.includes('127.0.0.1') || url.includes('::1'))) {
+    return false;
+  }
+  return true;
+}
+
 export async function checkDatabaseHealth(): Promise<{ isConnected: boolean; message: string; latencyMs?: number }> {
   const start = Date.now();
   try {
-    if (!process.env.DATABASE_URL) {
-      return { isConnected: false, message: 'DATABASE_URL not configured. Running on resilient Seed/Local store.' };
+    if (!isDatabaseConfigured()) {
+      const url = process.env.DATABASE_URL;
+      const isLocalhostInCloud = url && (url.includes('localhost') || url.includes('127.0.0.1'));
+      return {
+        isConnected: false,
+        message: isLocalhostInCloud
+          ? 'Localhost database unreachable from cloud deployment. Running on resilient Seed/Local store.'
+          : 'DATABASE_URL not configured. Running on resilient Seed/Local store.',
+      };
     }
     // Ping PostgreSQL
     await prisma.$queryRaw`SELECT 1`;
@@ -35,7 +57,7 @@ export async function getVendorsFromDB(options?: {
   featuredOnly?: boolean;
 }): Promise<Vendor[]> {
   try {
-    if (process.env.DATABASE_URL) {
+    if (isDatabaseConfigured()) {
       const where: any = { status: 'ACTIVE' };
       if (options?.categoryId) where.categoryId = options.categoryId;
       if (options?.cityId) where.cityId = options.cityId;
@@ -123,7 +145,7 @@ export async function getVendorsFromDB(options?: {
 
 export async function getVendorByIdFromDB(id: string): Promise<Vendor | null> {
   try {
-    if (process.env.DATABASE_URL) {
+    if (isDatabaseConfigured()) {
       const v = await prisma.vendor.findUnique({
         where: { id },
         include: {
@@ -168,7 +190,7 @@ export async function getVendorByIdFromDB(id: string): Promise<Vendor | null> {
 
 export async function findUserInDB(identifier: string): Promise<any | null> {
   try {
-    if (process.env.DATABASE_URL) {
+    if (isDatabaseConfigured()) {
       const user = await prisma.user.findFirst({
         where: {
           OR: [{ phone: identifier }, { email: identifier }],
@@ -194,7 +216,7 @@ export async function createUserInDB(data: {
   avatar?: string;
 }): Promise<any> {
   try {
-    if (process.env.DATABASE_URL) {
+    if (isDatabaseConfigured()) {
       const user = await prisma.user.upsert({
         where: { phone: data.phone },
         update: {
@@ -251,7 +273,7 @@ export async function createVendorInDB(vendorData: {
   specialtiesAr?: string[];
 }): Promise<any> {
   try {
-    if (process.env.DATABASE_URL) {
+    if (isDatabaseConfigured()) {
       const vendor = await prisma.vendor.create({
         data: {
           userId: vendorData.userId || null,
