@@ -332,6 +332,63 @@ model Guest {
 // -------------------------------------------------------------
 // 6. Multi-Vendor Orders & Suborders
 // -------------------------------------------------------------
+enum OMSOrderStatus {
+  CREATED
+  PENDING_PAYMENT
+  PAYMENT_CONFIRMED
+  ROUTING_TO_SUPPLIER
+  AWAITING_ACCEPTANCE
+  ACCEPTED
+  IN_PROGRESS
+  READY_FOR_DELIVERY
+  DELIVERED
+  CUSTOMER_REVIEW
+  COMPLETED
+  CLOSED
+  REJECTED
+  UNRESPONSIVE_VENDOR
+  ASSIGNMENT_FAILED
+  AWAITING_CUSTOMER_INFO
+  EXTENSION_REQUESTED
+  AT_RISK
+  DELAYED
+  PAUSED
+  REASSIGNMENT_REQUESTED
+  MODIFICATION_REQUESTED
+  DISPUTED
+  CANCEL_REQUESTED
+  CANCELLED
+  PENDING_REFUND
+  REFUNDED
+  UNFULFILLABLE
+}
+
+enum PaymentStatus {
+  UNPAID
+  PENDING_PAYMENT
+  PROCESSING
+  PAID
+  PAYMENT_FAILED
+  PARTIALLY_REFUNDED
+  FULLY_REFUNDED
+  DISPUTED
+}
+
+enum ExceptionSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ExceptionStatus {
+  OPEN
+  IN_REVIEW
+  ACTION_TAKEN
+  RESOLVED
+  CLOSED
+}
+
 model MultiVendorOrder {
   id             String        @id @default(uuid())
   orderNumber    String        @unique
@@ -354,41 +411,77 @@ model MultiVendorOrder {
   finalTotal     Int
   totalDeposit   Int
   paymentMethod  PaymentMethod @default(MADA)
+  paymentStatus  PaymentStatus @default(PAID)
   isDepositOnly  Boolean       @default(true)
   status         String        @default("confirmed")
+  omsStatus      OMSOrderStatus @default(PAYMENT_CONFIRMED)
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
   suborders      Suborder[]
+  events         OMSOrderEvent[]
+  exceptions     OMSException[]
+  notifications  OMSNotificationLog[]
 
   @@index([orderNumber])
   @@index([customerPhone])
   @@index([createdAt])
+  @@index([omsStatus])
 }
 
 model Suborder {
-  id              String        @id @default(uuid())
-  orderId         String
-  order           MultiVendorOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  vendorId        String
-  vendor          Vendor        @relation(fields: [vendorId], references: [id])
-  vendorName      String
-  vendorLogo      String
-  subtotal        Int
-  taxAmount       Int
-  totalAmount     Int
-  depositAmount   Int
-  remainingAmount Int
-  status          BookingStatus @default(CONFIRMED)
-  bookingNumber   String        @unique
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  id                    String        @id @default(uuid())
+  orderId               String
+  order                 MultiVendorOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  vendorId              String
+  vendor                Vendor        @relation(fields: [vendorId], references: [id])
+  vendorName            String
+  vendorLogo            String
+  subtotal              Int
+  taxAmount             Int
+  totalAmount           Int
+  depositAmount         Int
+  remainingAmount       Int
+  status                BookingStatus @default(CONFIRMED)
+  omsStatus             OMSOrderStatus @default(AWAITING_ACCEPTANCE)
+  bookingNumber         String        @unique
 
-  items           OrderItem[]
+  // Responsibility & SLA Fields
+  assignedRole          String        @default("vendor") // 'vendor' | 'operations' | 'admin' | 'customer'
+  assignedUserId        String?
+  nextAction            String        @default("VENDOR_ACCEPTANCE")
+  nextActionDeadline    DateTime?
+  acceptanceDeadline    DateTime?
+  fulfillmentDeadline   DateTime?
+  deliveryDeadline      DateTime?
+  customerReviewDeadline DateTime?
+  
+  // Exception & Delay Indicators
+  isAtRisk              Boolean       @default(false)
+  isDelayed             Boolean       @default(false)
+  delayReasonAr         String?       @db.Text
+  cancellationReasonAr   String?       @db.Text
+  disputeReasonAr       String?       @db.Text
+  deliverablesUrl       String?
+  proofOfDelivery       String?       @db.Text
+  slaExtensionDays      Int           @default(0)
+  slaOriginalDeadline   DateTime?
+  lastActivityAt        DateTime      @default(now())
+
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  items                 OrderItem[]
+  events                OMSOrderEvent[]
+  exceptions            OMSException[]
+  notifications         OMSNotificationLog[]
 
   @@index([orderId])
   @@index([vendorId])
   @@index([bookingNumber])
+  @@index([omsStatus])
+  @@index([isAtRisk])
+  @@index([isDelayed])
 }
 
 model OrderItem {
@@ -421,7 +514,108 @@ model OrderItem {
 }
 
 // -------------------------------------------------------------
-// 7. Verified Reviews
+// 7. Intelligent OMS Engine Models
+// -------------------------------------------------------------
+model OMSOrderEvent {
+  id          String         @id @default(uuid())
+  orderId     String?
+  order       MultiVendorOrder? @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  suborderId  String?
+  suborder    Suborder?      @relation(fields: [suborderId], references: [id], onDelete: Cascade)
+  fromState   OMSOrderStatus
+  toState     OMSOrderStatus
+  action      String         // e.g. 'CREATED', 'ACCEPT', 'REJECT', 'DELAY_DETECTED', 'REASSIGN'
+  actorId     String?
+  actorRole   String         @default("SYSTEM") // 'CUSTOMER' | 'VENDOR' | 'OPERATIONS' | 'ADMIN' | 'SYSTEM'
+  noteAr      String?        @db.Text
+  metadata    Json?
+  createdAt   DateTime       @default(now())
+
+  @@index([orderId])
+  @@index([suborderId])
+  @@index([createdAt])
+}
+
+model OMSException {
+  id                 String            @id @default(uuid())
+  orderId            String?
+  order              MultiVendorOrder? @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  suborderId         String?
+  suborder           Suborder?         @relation(fields: [suborderId], references: [id], onDelete: Cascade)
+  issueType          String            // 'UNASSIGNED', 'ACCEPTANCE_TIMED_OUT', 'INACTIVE_TOO_LONG', 'DELAYED', 'PAYMENT_MISMATCH', 'DISPUTED'
+  severity           ExceptionSeverity @default(MEDIUM)
+  assignedRole       String            @default("OPERATIONS")
+  assignedUserId     String?
+  detectedAt         DateTime          @default(now())
+  correctiveActionAr String            @db.Text
+  resolutionDeadline DateTime?
+  status             ExceptionStatus   @default(OPEN)
+  resolvedAt         DateTime?
+  resolutionNotesAr  String?           @db.Text
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  @@index([orderId])
+  @@index([suborderId])
+  @@index([status])
+  @@index([severity])
+}
+
+model OMSAutomationConfig {
+  id                          String   @id @default("default")
+  acceptanceDeadlineMinutes   Int      @default(120)
+  executionNoticeDays         Int      @default(2)
+  customerReviewDeadlineHours Int      @default(48)
+  alert50PercentEnabled       Boolean  @default(true)
+  alert75PercentEnabled       Boolean  @default(true)
+  alert90PercentEnabled       Boolean  @default(true)
+  alert100PercentEnabled      Boolean  @default(true)
+  autoReassignOnTimeout       Boolean  @default(true)
+  maxInactivityHours          Int      @default(24)
+  routingWeights              Json?
+  escalationPolicy            Json?
+  businessHoursConfig         Json?
+  deliveryProofRequired       Boolean  @default(true)
+  autoClosePeriodDays         Int      @default(3)
+  maxRetryAttempts            Int      @default(3)
+  updatedBy                   String?
+  updatedAt                   DateTime @updatedAt
+}
+
+model IdempotencyRecord {
+  id           String   @id @default(uuid())
+  key          String   @unique
+  endpoint     String
+  requestHash  String
+  responseData Json
+  statusCode   Int      @default(200)
+  createdAt    DateTime @default(now())
+
+  @@index([key])
+}
+
+model OMSNotificationLog {
+  id             String            @id @default(uuid())
+  orderId        String?
+  order          MultiVendorOrder? @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  suborderId     String?
+  suborder       Suborder?         @relation(fields: [suborderId], references: [id], onDelete: Cascade)
+  recipientPhone String
+  recipientEmail String?
+  channel        String            @default("IN_APP") // 'IN_APP' | 'EMAIL' | 'SMS' | 'WHATSAPP'
+  event          String
+  status         String            @default("SENT")   // 'SENT' | 'FAILED' | 'RETRYING'
+  attempts       Int               @default(1)
+  lastAttemptAt  DateTime          @default(now())
+  errorDetails   String?           @db.Text
+  createdAt      DateTime          @default(now())
+
+  @@index([suborderId])
+  @@index([status])
+}
+
+// -------------------------------------------------------------
+// 8. Verified Reviews
 // -------------------------------------------------------------
 model Review {
   id                  String       @id @default(uuid())
@@ -452,7 +646,7 @@ model Review {
 }
 
 // -------------------------------------------------------------
-// 8. Coupons & Promotions
+// 9. Coupons & Promotions
 // -------------------------------------------------------------
 model Coupon {
   id                 String   @id @default(uuid())
@@ -474,7 +668,7 @@ model Coupon {
 }
 
 // -------------------------------------------------------------
-// 9. Enterprise Audit Logs (Security & Compliance)
+// 10. Enterprise Audit Logs (Security & Compliance)
 // -------------------------------------------------------------
 model AuditLog {
   id         String   @id @default(uuid())
@@ -492,3 +686,4 @@ model AuditLog {
   @@index([action])
   @@index([createdAt])
 }
+
