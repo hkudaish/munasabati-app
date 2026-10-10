@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useApp } from '@/lib/store';
 import {
   Sparkles,
@@ -33,9 +33,11 @@ import {
   CreditCard,
 } from 'lucide-react';
 
-export default function Navbar() {
+function NavbarContent() {
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentTab = searchParams.get('tab');
   const {
     adminConfig,
     currentRole,
@@ -432,7 +434,9 @@ export default function Navbar() {
                   <Link
                     href="/admin"
                     className={`px-3 py-2 rounded-lg transition flex items-center gap-1.5 ${
-                      pathname === '/admin' ? 'text-saudi-green-800 font-bold bg-saudi-green-50' : 'hover:text-saudi-green-800 hover:bg-gray-50'
+                      pathname === '/admin' && (!currentTab || currentTab === 'overview')
+                        ? 'text-saudi-green-800 font-bold bg-saudi-green-50'
+                        : 'hover:text-saudi-green-800 hover:bg-gray-50'
                     }`}
                   >
                     <ShieldCheck className="w-4 h-4 text-saudi-gold-600" />
@@ -441,7 +445,9 @@ export default function Navbar() {
                   <Link
                     href="/admin/oms"
                     className={`px-3 py-2 rounded-lg transition flex items-center gap-1.5 ${
-                      pathname === '/admin/oms' ? 'text-saudi-green-800 font-bold bg-saudi-green-50' : 'hover:text-saudi-green-800 hover:bg-gray-50'
+                      pathname === '/admin/oms'
+                        ? 'text-saudi-green-800 font-bold bg-saudi-green-50'
+                        : 'hover:text-saudi-green-800 hover:bg-gray-50'
                     }`}
                   >
                     <TrendingUp className="w-4 h-4 text-saudi-gold-600" />
@@ -449,21 +455,33 @@ export default function Navbar() {
                   </Link>
                   <Link
                     href="/admin?tab=vendors"
-                    className="px-3 py-2 rounded-lg hover:text-saudi-green-800 hover:bg-gray-50 transition flex items-center gap-1"
+                    className={`px-3 py-2 rounded-lg transition flex items-center gap-1 ${
+                      pathname === '/admin' && currentTab === 'vendors'
+                        ? 'text-saudi-green-800 font-bold bg-saudi-green-50'
+                        : 'hover:text-saudi-green-800 hover:bg-gray-50'
+                    }`}
                   >
                     <Store className="w-4 h-4 text-saudi-gold-600" />
                     <span>الموردين والاعتماد</span>
                   </Link>
                   <Link
                     href="/admin?tab=bookings"
-                    className="px-3 py-2 rounded-lg hover:text-saudi-green-800 hover:bg-gray-50 transition flex items-center gap-1"
+                    className={`px-3 py-2 rounded-lg transition flex items-center gap-1 ${
+                      pathname === '/admin' && currentTab === 'bookings'
+                        ? 'text-saudi-green-800 font-bold bg-saudi-green-50'
+                        : 'hover:text-saudi-green-800 hover:bg-gray-50'
+                    }`}
                   >
                     <CreditCard className="w-4 h-4 text-saudi-gold-600" />
                     <span>الحجوزات والمالية</span>
                   </Link>
                   <Link
                     href="/admin?tab=services"
-                    className="px-3 py-2 rounded-lg hover:text-saudi-green-800 hover:bg-gray-50 transition flex items-center gap-1"
+                    className={`px-3 py-2 rounded-lg transition flex items-center gap-1 ${
+                      pathname === '/admin' && currentTab === 'services'
+                        ? 'text-saudi-green-800 font-bold bg-saudi-green-50'
+                        : 'hover:text-saudi-green-800 hover:bg-gray-50'
+                    }`}
                   >
                     <Settings className="w-4 h-4 text-saudi-gold-600" />
                     <span>إعدادات الكتالوج</span>
@@ -775,14 +793,54 @@ export default function Navbar() {
               <Link
                 href="/admin"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block py-2 text-sm font-bold text-saudi-green-800"
+                className={`block py-2 text-sm font-bold ${
+                  pathname === '/admin' && (!currentTab || currentTab === 'overview')
+                    ? 'text-saudi-green-800'
+                    : 'text-gray-700'
+                }`}
               >
                 لوحة الإدارة المركزية
               </Link>
               <Link
+                href="/admin/oms"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`block py-2 text-sm font-bold ${
+                  pathname === '/admin/oms' ? 'text-saudi-green-800' : 'text-gray-700'
+                }`}
+              >
+                إدارة الطلبات (OMS)
+              </Link>
+              <Link
+                href="/admin?tab=vendors"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`block py-2 text-sm font-bold ${
+                  pathname === '/admin' && currentTab === 'vendors' ? 'text-saudi-green-800' : 'text-gray-700'
+                }`}
+              >
+                الموردين والاعتماد
+              </Link>
+              <Link
+                href="/admin?tab=bookings"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`block py-2 text-sm font-bold ${
+                  pathname === '/admin' && currentTab === 'bookings' ? 'text-saudi-green-800' : 'text-gray-700'
+                }`}
+              >
+                الحجوزات والمالية
+              </Link>
+              <Link
+                href="/admin?tab=services"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`block py-2 text-sm font-bold ${
+                  pathname === '/admin' && currentTab === 'services' ? 'text-saudi-green-800' : 'text-gray-700'
+                }`}
+              >
+                إعدادات الكتالوج
+              </Link>
+              <Link
                 href="/"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block py-2 text-sm font-bold text-gray-700"
+                className="block py-2 text-sm font-bold text-gray-500"
               >
                 معاينة الواجهة كعميل
               </Link>
@@ -791,5 +849,13 @@ export default function Navbar() {
         </div>
       )}
     </header>
+  );
+}
+
+export default function Navbar() {
+  return (
+    <Suspense fallback={<header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-saudi-sand-200 h-16" />}>
+      <NavbarContent />
+    </Suspense>
   );
 }

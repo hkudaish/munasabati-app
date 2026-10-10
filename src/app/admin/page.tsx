@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import {
   ShieldCheck,
   TrendingUp,
@@ -43,7 +44,11 @@ import { useApp } from '@/lib/store';
 import { formatSAR } from '@/lib/utils';
 import { Vendor, ServiceItem, SmartPackage, Review, Booking } from '@/lib/types';
 
-export default function AdminDashboardPage() {
+function AdminDashboardContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const tabParam = searchParams.get('tab');
+
   const {
     adminConfig,
     currentRole,
@@ -86,19 +91,28 @@ export default function AdminDashboardPage() {
   >('overview');
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const tabParam = params.get('tab');
-      if (
-        tabParam &&
-        ['overview', 'vendors', 'services', 'packages', 'bookings', 'occasions', 'reviews', 'cities', 'settings'].includes(
-          tabParam
-        )
-      ) {
-        setActiveTab(tabParam as any);
-      }
+    if (
+      tabParam &&
+      ['overview', 'vendors', 'services', 'packages', 'bookings', 'occasions', 'reviews', 'cities', 'settings'].includes(
+        tabParam
+      )
+    ) {
+      setActiveTab(tabParam as any);
+    } else if (!tabParam) {
+      setActiveTab('overview');
     }
-  }, []);
+  }, [tabParam]);
+
+  const handleTabChange = (
+    tab: 'overview' | 'vendors' | 'services' | 'packages' | 'bookings' | 'occasions' | 'reviews' | 'cities' | 'settings'
+  ) => {
+    setActiveTab(tab);
+    if (tab === 'overview') {
+      router.push('/admin', { scroll: false });
+    } else {
+      router.push(`/admin?tab=${tab}`, { scroll: false });
+    }
+  };
 
   // Search and filters
   const [vendorSearch, setVendorSearch] = useState('');
@@ -429,7 +443,7 @@ export default function AdminDashboardPage() {
       {/* Tabs Bar for All Sections */}
       <div className="border-b border-saudi-sand-300 flex items-center gap-2 overflow-x-auto pb-1 text-xs sm:text-sm font-bold scrollbar-none">
         <button
-          onClick={() => setActiveTab('overview')}
+          onClick={() => handleTabChange('overview')}
           className={`px-4 py-3 border-b-2 transition whitespace-nowrap flex items-center gap-1.5 ${
             activeTab === 'overview'
               ? 'border-saudi-green-800 text-saudi-green-950 font-black'
@@ -441,7 +455,7 @@ export default function AdminDashboardPage() {
         </button>
 
         <button
-          onClick={() => setActiveTab('vendors')}
+          onClick={() => handleTabChange('vendors')}
           className={`px-4 py-3 border-b-2 transition whitespace-nowrap flex items-center gap-1.5 ${
             activeTab === 'vendors'
               ? 'border-saudi-green-800 text-saudi-green-950 font-black'
@@ -453,7 +467,7 @@ export default function AdminDashboardPage() {
         </button>
 
         <button
-          onClick={() => setActiveTab('services')}
+          onClick={() => handleTabChange('services')}
           className={`px-4 py-3 border-b-2 transition whitespace-nowrap flex items-center gap-1.5 ${
             activeTab === 'services'
               ? 'border-saudi-green-800 text-saudi-green-950 font-black'
@@ -465,7 +479,7 @@ export default function AdminDashboardPage() {
         </button>
 
         <button
-          onClick={() => setActiveTab('packages')}
+          onClick={() => handleTabChange('packages')}
           className={`px-4 py-3 border-b-2 transition whitespace-nowrap flex items-center gap-1.5 ${
             activeTab === 'packages'
               ? 'border-saudi-green-800 text-saudi-green-950 font-black'
@@ -477,7 +491,7 @@ export default function AdminDashboardPage() {
         </button>
 
         <button
-          onClick={() => setActiveTab('bookings')}
+          onClick={() => handleTabChange('bookings')}
           className={`px-4 py-3 border-b-2 transition whitespace-nowrap flex items-center gap-1.5 ${
             activeTab === 'bookings'
               ? 'border-saudi-green-800 text-saudi-green-950 font-black'
@@ -489,7 +503,7 @@ export default function AdminDashboardPage() {
         </button>
 
         <button
-          onClick={() => setActiveTab('occasions')}
+          onClick={() => handleTabChange('occasions')}
           className={`px-4 py-3 border-b-2 transition whitespace-nowrap flex items-center gap-1.5 ${
             activeTab === 'occasions'
               ? 'border-saudi-green-800 text-saudi-green-950 font-black'
@@ -501,7 +515,7 @@ export default function AdminDashboardPage() {
         </button>
 
         <button
-          onClick={() => setActiveTab('reviews')}
+          onClick={() => handleTabChange('reviews')}
           className={`px-4 py-3 border-b-2 transition whitespace-nowrap flex items-center gap-1.5 ${
             activeTab === 'reviews'
               ? 'border-saudi-green-800 text-saudi-green-950 font-black'
@@ -513,7 +527,7 @@ export default function AdminDashboardPage() {
         </button>
 
         <button
-          onClick={() => setActiveTab('cities')}
+          onClick={() => handleTabChange('cities')}
           className={`px-4 py-3 border-b-2 transition whitespace-nowrap flex items-center gap-1.5 ${
             activeTab === 'cities'
               ? 'border-saudi-green-800 text-saudi-green-950 font-black'
@@ -525,7 +539,7 @@ export default function AdminDashboardPage() {
         </button>
 
         <button
-          onClick={() => setActiveTab('settings')}
+          onClick={() => handleTabChange('settings')}
           className={`px-4 py-3 border-b-2 transition whitespace-nowrap flex items-center gap-1.5 ${
             activeTab === 'settings'
               ? 'border-saudi-green-800 text-saudi-green-950 font-black'
@@ -1730,5 +1744,19 @@ export default function AdminDashboardPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function AdminDashboardPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="max-w-7xl mx-auto px-4 py-20 text-center text-gray-500 font-bold">
+          جاري تحميل لوحة التحكم...
+        </div>
+      }
+    >
+      <AdminDashboardContent />
+    </Suspense>
   );
 }
