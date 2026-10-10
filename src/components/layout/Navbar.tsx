@@ -30,6 +30,7 @@ import {
   CheckCircle2,
   TrendingUp,
   Settings,
+  CreditCard,
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -438,21 +439,30 @@ export default function Navbar() {
                     <span>لوحة الإدارة المركزية</span>
                   </Link>
                   <Link
-                    href="/admin"
+                    href="/admin/oms"
+                    className={`px-3 py-2 rounded-lg transition flex items-center gap-1.5 ${
+                      pathname === '/admin/oms' ? 'text-saudi-green-800 font-bold bg-saudi-green-50' : 'hover:text-saudi-green-800 hover:bg-gray-50'
+                    }`}
+                  >
+                    <TrendingUp className="w-4 h-4 text-saudi-gold-600" />
+                    <span>إدارة الطلبات (OMS)</span>
+                  </Link>
+                  <Link
+                    href="/admin?tab=vendors"
                     className="px-3 py-2 rounded-lg hover:text-saudi-green-800 hover:bg-gray-50 transition flex items-center gap-1"
                   >
                     <Store className="w-4 h-4 text-saudi-gold-600" />
                     <span>الموردين والاعتماد</span>
                   </Link>
                   <Link
-                    href="/admin"
+                    href="/admin?tab=bookings"
                     className="px-3 py-2 rounded-lg hover:text-saudi-green-800 hover:bg-gray-50 transition flex items-center gap-1"
                   >
-                    <TrendingUp className="w-4 h-4 text-saudi-gold-600" />
+                    <CreditCard className="w-4 h-4 text-saudi-gold-600" />
                     <span>الحجوزات والمالية</span>
                   </Link>
                   <Link
-                    href="/admin"
+                    href="/admin?tab=services"
                     className="px-3 py-2 rounded-lg hover:text-saudi-green-800 hover:bg-gray-50 transition flex items-center gap-1"
                   >
                     <Settings className="w-4 h-4 text-saudi-gold-600" />

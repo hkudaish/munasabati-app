@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ShieldCheck,
   TrendingUp,
@@ -84,6 +84,21 @@ export default function AdminDashboardPage() {
   const [activeTab, setActiveTab] = useState<
     'overview' | 'vendors' | 'services' | 'packages' | 'bookings' | 'occasions' | 'reviews' | 'cities' | 'settings'
   >('overview');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get('tab');
+      if (
+        tabParam &&
+        ['overview', 'vendors', 'services', 'packages', 'bookings', 'occasions', 'reviews', 'cities', 'settings'].includes(
+          tabParam
+        )
+      ) {
+        setActiveTab(tabParam as any);
+      }
+    }
+  }, []);
 
   // Search and filters
   const [vendorSearch, setVendorSearch] = useState('');
