@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { QrCode, CheckCircle2, AlertCircle, Users, Search, Scan, Sparkles, Monitor } from 'lucide-react';
 import { useApp } from '@/lib/store';
+import { codeFromScan } from '@/lib/invitations/link';
 import confetti from 'canvas-confetti';
 
 export default function GateScannerPage() {
@@ -27,10 +28,16 @@ export default function GateScannerPage() {
   const handleScanCode = (codeToScan: string) => {
     if (!codeToScan.trim()) return;
 
+    const decodedCode = codeFromScan(codeToScan);
     const matchedGuest = occasionGuests.find(
-      (g) => g.qrCode.toLowerCase() === codeToScan.trim().toLowerCase()
+      (g) => g.qrCode.toLowerCase() === decodedCode.toLowerCase()
     );
 
+    if (matchedGuest?.status === 'attended') {
+      setScanResult({ success: false, guestName: matchedGuest.name, message: 'تم تسجيل دخول هذا الضيف مسبقاً.' });
+      setInputCode('');
+      return;
+    }
     if (matchedGuest) {
       updateGuestStatus(matchedGuest.id, 'attended');
       setScanResult({
@@ -110,7 +117,7 @@ export default function GateScannerPage() {
           <div className="absolute inset-x-4 top-1/2 h-0.5 bg-gradient-to-r from-transparent via-saudi-gold-400 to-transparent animate-pulse" />
           <QrCode className="w-24 h-24 text-saudi-gold-300/80" />
           <span className="text-[11px] text-gray-300 mt-3 font-medium">
-            وجّه الكاميرا نحو باركود بطاقة الضيف
+            امسح الرمز بقارئ هاتفك ثم الصق الرابط أدناه
           </span>
         </div>
 
@@ -127,7 +134,7 @@ export default function GateScannerPage() {
               type="text"
               value={inputCode}
               onChange={(e) => setInputCode(e.target.value)}
-              placeholder="أدخل رمز QR يدوياً (مثال: MUN-GST-101-01)"
+              placeholder="الصق رابط QR أو رمز الضيف"
               className="flex-1 px-4 py-2.5 bg-white/10 border border-white/20 rounded-xl text-xs text-white placeholder-gray-400 focus:outline-none focus:border-saudi-gold-400 text-center font-mono font-bold"
             />
             <button

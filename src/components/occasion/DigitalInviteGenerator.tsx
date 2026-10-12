@@ -1,280 +1,243 @@
 'use client';
 
-import React, { useState } from 'react';
-import {
-  Sparkles,
-  QrCode,
-  Share2,
-  Copy,
-  Check,
-  MapPin,
-  Calendar,
-  Clock,
-  Palette,
-  MessageSquare,
-  Printer,
-  ExternalLink,
-} from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Heart, Search, Sparkles, Download, Copy, Save, Upload, Share2, Palette, Printer, Archive, Check, X } from 'lucide-react';
 import { useApp } from '@/lib/store';
+import { BUILTIN_TEMPLATES, CardDesign, InviteTemplate, MOTIFS, OCCASIONS, OccasionKind, SIZES, STYLES, contrastRatio, occasionKind, validateDesign, validateTemplate } from '@/lib/invitations/catalog';
+import InvitationQRCode from '@/components/common/InvitationQRCode';
+import { createInvitationLink, getInvitationOrigin, INVITATION_ORIGIN_KEY, normalizeInvitationOrigin } from '@/lib/invitations/link';
+import { qrSvg } from '@/lib/invitations/qr';
+import { cardSvg, downloadFile, pngBlob, printCard } from '@/lib/invitations/render';
 
+const LIBRARY_KEY = 'munasabati_invitation_library_v1';
+const statusNames = { private: 'خاص', pending: 'بانتظار المراجعة', published: 'منشور', rejected: 'يحتاج تعديلاً', archived: 'مؤرشف' };
+const fieldClass = 'w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-saudi-green-700';
+function Preview({ design, small = false, qrValue = '' }: { design: CardDesign; small?: boolean; qrValue?: string }) {
+  return <div className={small ? 'h-40 overflow-hidden rounded-xl [&_svg]:h-full [&_svg]:w-full' : 'overflow-hidden rounded-2xl shadow-xl [&_svg]:h-auto [&_svg]:w-full'} dangerouslySetInnerHTML={{ __html: cardSvg(design, qrValue) }} />;
+}
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return <label className="block space-y-1 text-xs font-bold text-gray-700"><span>{label}</span>{children}</label>;
+}
 export default function DigitalInviteGenerator() {
-  const { activeOccasion } = useApp();
-
-  const [theme, setTheme] = useState<'emerald' | 'gold' | 'maroon' | 'navy'>('emerald');
-  const [openingPhrase, setOpeningPhrase] = useState(
-    'بأسمى آيات الفرح والسرور، نتشرف بدعوتكم لمشاركتنا أجمل اللحظات في'
-  );
-  const [celebrantName, setCelebrantName] = useState(
-    activeOccasion?.title || 'حفلنا المبارك'
-  );
-  const [venueNote, setVenueNote] = useState(
-    activeOccasion?.venueName || 'الرياض - قاعة الاحتفالات الكبرى'
-  );
-  const [copied, setCopied] = useState(false);
-
+  const { activeOccasion, currentUser } = useApp();
   if (!activeOccasion) return null;
-
-  const publicInviteUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}/invite/MUN-DEMO-${activeOccasion.id}`
-    : `https://munasabati.sa/invite/MUN-DEMO-${activeOccasion.id}`;
-
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(publicInviteUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  return <InvitationStudio key={`${activeOccasion.id}:${currentUser?.id || 'guest'}`} />;
+}
+function InvitationStudio() {
+  const { activeOccasion, currentUser, currentRole } = useApp();
+  const occasion = activeOccasion!;
+  const userId = currentUser?.id || 'guest';
+  const isAdmin = currentRole === 'admin' && !!(currentUser?.hasAdminAccess || currentUser?.role === 'admin');
+  const canEdit = !!currentUser;
+  const personalKey = `munasabati_invitation_personal_v1_${userId}_${occasion.id}`;
+  const favoritesKey = `munasabati_invitation_favorites_v1_${userId}`;
+  const initialKind = occasionKind(occasion.occasionTypeId);
+  const initialTemplate = BUILTIN_TEMPLATES.find(t => t.occasion === initialKind)!;
+  const [design, setDesign] = useState<CardDesign>({ ...initialTemplate.design, title: occasion.title, date: occasion.date, time: occasion.time || '', venue: occasion.venueName || occasion.cityNameAr });
+  const [records, setRecords] = useState<InviteTemplate[]>([]);
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [ready, setReady] = useState(false);
+  const [tab, setTab] = useState<'library' | 'mine' | 'favorites' | 'manage'>('library');
+  const [kind, setKind] = useState<OccasionKind | ''>(initialKind);
+  const [style, setStyle] = useState('');
+  const [color, setColor] = useState('');
+  const [search, setSearch] = useState('');
+  const [name, setName] = useState('تصميمي الخاص');
+  const [templateKind, setTemplateKind] = useState<OccasionKind>(initialKind);
+  const [templateStyle, setTemplateStyle] = useState<InviteTemplate['style']>(initialTemplate.style);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [notice, setNotice] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [shareOrigin, setShareOrigin] = useState('');
+  const [originInput, setOriginInput] = useState('');
+  const [includeQr, setIncludeQr] = useState(true);
+  useEffect(() => { const origin = getInvitationOrigin(); setShareOrigin(origin); setOriginInput(origin); }, []);
+  const [reviewNotes, setReviewNotes] = useState<Record<string, string>>({});
+  useEffect(() => {
+    setReady(false);
+    try {
+      const stored = JSON.parse(localStorage.getItem(LIBRARY_KEY) || '[]');
+      if (!Array.isArray(stored) || stored.length > 100) throw new Error('مكتبة محلية غير صالحة');
+      setRecords(stored.map(validateTemplate));
+      const personal = JSON.parse(localStorage.getItem(personalKey) || 'null');
+      const storedFavorites = JSON.parse(localStorage.getItem(favoritesKey) || '[]');
+      setFavorites(Array.isArray(storedFavorites) ? storedFavorites.filter((x: unknown) => typeof x === 'string') : []);
+      if (personal?.draft) setDesign(validateDesign(personal.draft));
+      else setDesign({ ...initialTemplate.design, title: occasion.title, date: occasion.date, time: occasion.time || '', venue: occasion.venueName || occasion.cityNameAr });
+      setEditingId(null);
+    } catch { setNotice('تعذر قراءة بعض البيانات المحفوظة. يمكنك استيراد نسخة احتياطية.'); }
+    setReady(true);
+    // Each account and occasion has a separate draft.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [personalKey]);
+  useEffect(() => {
+    if (!ready) return;
+    try { localStorage.setItem(personalKey, JSON.stringify({ draft: design })); localStorage.setItem(favoritesKey, JSON.stringify(favorites)); }
+    catch { setNotice('تعذر الحفظ التلقائي: مساحة المتصفح ممتلئة أو التخزين معطل. صدّر ملف القالب للاحتفاظ به.'); }
+  }, [design, favorites, personalKey, favoritesKey, ready]);
+  useEffect(() => {
+    const sync = (event: StorageEvent) => {
+      if (event.key !== LIBRARY_KEY) return;
+      try { const list = JSON.parse(event.newValue || '[]'); if (Array.isArray(list)) setRecords(list.map(validateTemplate)); }
+      catch { setNotice('تعذر تحديث المكتبة من النافذة الأخرى.'); }
+    };
+    window.addEventListener('storage', sync);
+    return () => window.removeEventListener('storage', sync);
+  }, []);
+  const patch = (value: Partial<CardDesign>) => { if (canEdit) setDesign(d => ({ ...d, ...value })); };
+  const commit = (next: InviteTemplate[]) => {
+    if (next.length > 100) throw new Error('بلغت المكتبة حد 100 تصميم محلي. صدّر نسخة احتياطية؛ الأرشفة لا تقلل عدد القوالب المخزنة.');
+    localStorage.setItem(LIBRARY_KEY, JSON.stringify(next)); setRecords(next);
   };
-
-  const handleWhatsAppShare = () => {
-    const text = `${openingPhrase}\n✨ *${celebrantName}*\n📅 الموعد: ${activeOccasion.date}\n📍 الموقع: ${venueNote}\n\nنرجو تأكيد حضوركم عبر الرابط المخصص مع رمز الدخول:\n${publicInviteUrl}\n\nحياكم الله وبحضوركم تكتمل فرحتنا! 🤍`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  const run = async (action: () => void | Promise<void>) => {
+    setBusy(true); setNotice('');
+    try { await action(); } catch (error) { setNotice(error instanceof Error ? error.message : 'تعذر إتمام العملية'); }
+    finally { setBusy(false); }
   };
-
-  const themeStyles = {
-    emerald: {
-      bg: 'bg-gradient-to-b from-[#00332A] via-[#004D3F] to-[#001F19]',
-      border: 'border-saudi-gold-400/50',
-      textAccent: 'text-saudi-gold-300',
-      tagBg: 'bg-saudi-gold-500/20 text-saudi-gold-300 border-saudi-gold-400/30',
-      cardGlow: 'shadow-[0_0_50px_rgba(0,77,63,0.4)]',
-    },
-    gold: {
-      bg: 'bg-gradient-to-b from-[#2A200B] via-[#453412] to-[#1A1406]',
-      border: 'border-saudi-gold-400',
-      textAccent: 'text-saudi-gold-300',
-      tagBg: 'bg-saudi-gold-500/30 text-saudi-gold-200 border-saudi-gold-400/40',
-      cardGlow: 'shadow-[0_0_50px_rgba(197,155,39,0.3)]',
-    },
-    maroon: {
-      bg: 'bg-gradient-to-b from-[#4A0E17] via-[#631420] to-[#2B070D]',
-      border: 'border-rose-400/40',
-      textAccent: 'text-rose-200',
-      tagBg: 'bg-rose-500/20 text-rose-200 border-rose-400/30',
-      cardGlow: 'shadow-[0_0_50px_rgba(114,28,36,0.3)]',
-    },
-    navy: {
-      bg: 'bg-gradient-to-b from-[#0A192F] via-[#172A45] to-[#050C1A]',
-      border: 'border-blue-400/40',
-      textAccent: 'text-blue-200',
-      tagBg: 'bg-blue-500/20 text-blue-200 border-blue-400/30',
-      cardGlow: 'shadow-[0_0_50px_rgba(26,54,93,0.4)]',
-    },
+  const selectTemplate = (t: InviteTemplate) => {
+    if (!canEdit) { setNotice('سجّل الدخول لتخصيص القوالب وحفظها.'); return; }
+    const own = t.ownerId === userId && t.status !== 'published' && t.status !== 'pending' && t.status !== 'archived';
+    setDesign({ ...t.design, ...(t.ownerId === 'system' ? { title: occasion.title, date: occasion.date, time: occasion.time || '', venue: occasion.venueName || occasion.cityNameAr } : {}) });
+    setName(own ? t.name : `نسخة من ${t.name}`); setEditingId(own ? t.id : null); setTemplateKind(t.occasion); setTemplateStyle(t.style);
+    setNotice(own ? 'فتحت تصميمك للتعديل.' : 'نسخة مستقلة جاهزة للتخصيص.');
   };
-
-  const currentTheme = themeStyles[theme];
-
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-      {/* Settings & Customization Panel */}
-      <div className="lg:col-span-5 bg-white p-6 rounded-3xl border border-saudi-sand-300 shadow-sm space-y-5">
-        <div>
-          <h4 className="text-base font-bold text-gray-900 font-cairo flex items-center gap-2">
-            <Palette className="w-5 h-5 text-saudi-gold-600" />
-            <span>تخصيص بطاقة الدعوة الرقمية</span>
-          </h4>
-          <p className="text-xs text-gray-500 mt-1">
-            صمم بطاقة تفاعلية مميزة يمكنك إرسالها لضيوفك عبر الواتساب مع كود QR لتأكيد الحضور (RSVP).
-          </p>
-        </div>
-
-        {/* Theme Selector */}
-        <div>
-          <label className="block text-xs font-bold text-gray-700 mb-2">اختر الثيم اللوني:</label>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              onClick={() => setTheme('emerald')}
-              className={`p-2.5 rounded-xl border text-xs font-bold flex items-center gap-2 transition ${
-                theme === 'emerald'
-                  ? 'border-saudi-green-800 bg-saudi-green-50 text-saudi-green-900'
-                  : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              <div className="w-4 h-4 rounded-full bg-saudi-green-800" />
-              <span>الزمردي الملكي</span>
-            </button>
-
-            <button
-              onClick={() => setTheme('gold')}
-              className={`p-2.5 rounded-xl border text-xs font-bold flex items-center gap-2 transition ${
-                theme === 'gold'
-                  ? 'border-saudi-gold-600 bg-saudi-gold-50 text-saudi-gold-900'
-                  : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              <div className="w-4 h-4 rounded-full bg-saudi-gold-500" />
-              <span>الذهب الفاخر</span>
-            </button>
-
-            <button
-              onClick={() => setTheme('maroon')}
-              className={`p-2.5 rounded-xl border text-xs font-bold flex items-center gap-2 transition ${
-                theme === 'maroon'
-                  ? 'border-rose-700 bg-rose-50 text-rose-900'
-                  : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              <div className="w-4 h-4 rounded-full bg-saudi-maroon" />
-              <span>العنابي التراثي</span>
-            </button>
-
-            <button
-              onClick={() => setTheme('navy')}
-              className={`p-2.5 rounded-xl border text-xs font-bold flex items-center gap-2 transition ${
-                theme === 'navy'
-                  ? 'border-blue-900 bg-blue-50 text-blue-950'
-                  : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              <div className="w-4 h-4 rounded-full bg-slate-900" />
-              <span>الكحلي الليلي</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Inputs */}
-        <div className="space-y-3">
-          <div>
-            <label className="block text-xs font-bold text-gray-700 mb-1">عبارة الترحيب والدعوة</label>
-            <input
-              type="text"
-              value={openingPhrase}
-              onChange={(e) => setOpeningPhrase(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-xl text-xs focus:outline-none focus:border-saudi-gold-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-gray-700 mb-1">عنوان المناسبة / أسماء المحتفى بهم</label>
-            <input
-              type="text"
-              value={celebrantName}
-              onChange={(e) => setCelebrantName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-xl text-xs focus:outline-none focus:border-saudi-gold-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-gray-700 mb-1">الموقع والقاعة</label>
-            <input
-              type="text"
-              value={venueNote}
-              onChange={(e) => setVenueNote(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-xl text-xs focus:outline-none focus:border-saudi-gold-500"
-            />
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="pt-3 border-t border-gray-100 space-y-2">
-          <button
-            onClick={handleWhatsAppShare}
-            className="w-full py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition"
-          >
-            <MessageSquare className="w-4 h-4" />
-            <span>مشاركة الدعوة عبر الواتساب للجميع</span>
-          </button>
-
-          <button
-            onClick={handleCopyLink}
-            className="w-full py-2.5 bg-saudi-sand-100 hover:bg-saudi-sand-200 text-gray-800 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition"
-          >
-            {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
-            <span>{copied ? 'تم نسخ رابط الدعوة بنجاح!' : 'نسخ رابط RSVP المباشر'}</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Live Preview Card */}
-      <div className="lg:col-span-7 flex justify-center">
-        <div
-          className={`w-full max-w-md ${currentTheme.bg} ${currentTheme.cardGlow} rounded-3xl p-8 text-white border ${currentTheme.border} relative overflow-hidden text-center space-y-6 animate-fadeIn`}
-        >
-          {/* Top Decorative Border */}
-          <div className="flex items-center justify-center gap-3">
-            <div className="h-[1px] w-12 bg-saudi-gold-400/40" />
-            <Sparkles className="w-5 h-5 text-saudi-gold-400" />
-            <div className="h-[1px] w-12 bg-saudi-gold-400/40" />
-          </div>
-
-          {/* Invitation Text */}
-          <div className="space-y-2">
-            <span className={`text-[11px] font-bold px-3 py-1 rounded-full border ${currentTheme.tagBg} inline-block`}>
-              دعوة خاصة
-            </span>
-            <p className="text-xs text-gray-200 leading-relaxed font-tajawal pt-2">
-              {openingPhrase}
-            </p>
-            <h3 className={`text-2xl font-black font-cairo ${currentTheme.textAccent} pt-1`}>
-              {celebrantName}
-            </h3>
-          </div>
-
-          {/* Event Details Grid */}
-          <div className="bg-black/30 backdrop-blur-md rounded-2xl p-4 border border-white/10 grid grid-cols-2 gap-3 text-right text-xs">
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-saudi-gold-400 shrink-0" />
-              <div>
-                <span className="text-[10px] text-gray-400 block">التاريخ</span>
-                <span className="font-bold text-white">{activeOccasion.date}</span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-saudi-gold-400 shrink-0" />
-              <div>
-                <span className="text-[10px] text-gray-400 block">الوقت</span>
-                <span className="font-bold text-white">{activeOccasion.time || '08:00 مساءً'}</span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 col-span-2 pt-1 border-t border-white/10">
-              <MapPin className="w-4 h-4 text-saudi-gold-400 shrink-0" />
-              <div>
-                <span className="text-[10px] text-gray-400 block">الموقع</span>
-                <span className="font-bold text-white line-clamp-1">{venueNote}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Simulated QR Code for RSVP */}
-          <div className="bg-white p-3.5 rounded-2xl inline-block shadow-lg mx-auto">
-            <div className="w-32 h-32 bg-saudi-sand-50 border border-gray-200 rounded-xl flex flex-col items-center justify-center p-2">
-              <QrCode className="w-20 h-20 text-saudi-green-950" />
-              <span className="text-[9px] font-mono font-bold text-gray-600 mt-1">
-                SCAN TO RSVP
-              </span>
-            </div>
-          </div>
-
-          {/* Footer note */}
-          <p className="text-[11px] text-saudi-sand-300 font-medium">
-            يرجى إبراز كود الـ QR عند بوابة الدخول لتسهيل الترحيب بكم
-          </p>
-
-          <div className="pt-2 text-[10px] text-gray-400 border-t border-white/10">
-            تم تصميم وتنظيم هذه المناسبة عبر منصة مناسبتـي 🇸🇦
-          </div>
-        </div>
-      </div>
+  const save = (duplicate = false) => run(() => {
+    if (!canEdit) throw new Error('سجّل الدخول لحفظ التصميم');
+    if (!name.trim() || name.length > 80) throw new Error('أدخل اسم تصميم من 1 إلى 80 حرفاً');
+    const existing = records.find(t => t.id === editingId && t.ownerId === userId && (t.status === 'private' || t.status === 'rejected'));
+    const id = !duplicate && existing ? existing.id : crypto.randomUUID();
+    const record: InviteTemplate = { id, name: name.trim(), occasion: templateKind, style: templateStyle, color: contrastRatio(design.background, '#ffffff') > 5 ? 'داكن' : 'فاتح', design: validateDesign(design), ownerId: userId, status: 'private', version: existing && !duplicate ? existing.version + 1 : 1, updatedAt: new Date().toISOString() };
+    commit([...records.filter(t => t.id !== id), record]); setEditingId(id); setNotice('تم حفظ التصميم في «تصاميمي» على هذا المتصفح.');
+  });
+  const transition = (t: InviteTemplate, status: InviteTemplate['status']) => run(() => {
+    const own = t.ownerId === userId;
+    if (status === 'pending' && (!own || !['private', 'rejected'].includes(t.status))) throw new Error('يمكن إرسال تصميمك الخاص فقط للمراجعة');
+    if (['published', 'rejected'].includes(status) && (!isAdmin || t.status !== 'pending')) throw new Error('المراجعة متاحة للإدارة فقط');
+    if (status === 'archived' && !(isAdmin || (own && ['private', 'rejected'].includes(t.status)))) throw new Error('لا يمكنك أرشفة هذا القالب');
+    const reviewNote = reviewNotes[t.id]?.trim();
+    if (status === 'rejected' && !reviewNote) throw new Error('أدخل سبب طلب التعديل أولاً');
+    commit(records.map(r => r.id === t.id ? { ...r, status, reviewNote: status === 'rejected' ? reviewNote : undefined, updatedAt: new Date().toISOString() } : r));
+    setNotice(`تم تحديث حالة القالب: ${statusNames[status]}.`);
+  });
+  const importTemplate = async (file?: File) => {
+    if (!file) return;
+    await run(async () => {
+      if (!canEdit) throw new Error('سجّل الدخول لرفع قالب');
+      if (file.size > 1500000) throw new Error('الحد الأقصى لملف القالب 1.5 ميغابايت');
+      const payload = JSON.parse(await file.text());
+      if (payload.schemaVersion !== 1) throw new Error('نسخة ملف القالب غير مدعومة');
+      const validated = validateTemplate(payload.template);
+      const imported: InviteTemplate = { ...validated, id: crypto.randomUUID(), ownerId: userId, status: 'private', version: 1, reviewNote: undefined, updatedAt: new Date().toISOString() };
+      commit([...records, imported]); selectTemplate(imported); setTab('mine'); setNotice('تم استيراد نسخة خاصة من القالب.');
+    });
+  };
+  const uploadImage = async (file?: File) => {
+    if (!file) return;
+    await run(async () => {
+      if (!canEdit) throw new Error('سجّل الدخول لرفع صورة');
+      if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || file.size > 800000) throw new Error('استخدم PNG أو JPEG أو WebP بحجم لا يتجاوز 800 كيلوبايت');
+      const data = await new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(String(reader.result)); reader.onerror = () => reject(new Error('تعذر قراءة الصورة')); reader.readAsDataURL(file); });
+      const image = new Image(); image.src = data; await image.decode();
+      if (image.width > 6000 || image.height > 6000 || image.width * image.height > 16000000) throw new Error('أبعاد الصورة كبيرة جداً؛ استخدم صورة لا تتجاوز 16 مليون بكسل أو 6000 بكسل لكل ضلع');
+      patch({ image: validateDesign({ ...design, image: data }).image });
+      setNotice('تمت إضافة الصورة؛ اضبط شفافيتها للحفاظ على وضوح النص.');
+    });
+  };
+  const exportJson = () => {
+    const template: InviteTemplate = { id: 'export', ownerId: userId, name: name.trim() || 'تصميم دعوة', occasion: templateKind, style: templateStyle, color: 'ملون', status: 'private', version: 1, updatedAt: new Date().toISOString(), design };
+    downloadFile(new Blob([JSON.stringify({ schemaVersion: 1, template }, null, 2)], { type: 'application/json' }), 'invitation-template.json');
+  };
+  const shareFile = () => run(async () => {
+    const file = new File([await pngBlob(design, includeQr ? rsvpUrl : '')], 'invitation.png', { type: 'image/png' });
+    if (navigator.canShare?.({ files: [file] })) { await navigator.share({ files: [file], title: design.title }); setNotice('تمت مشاركة البطاقة.'); }
+    else { downloadFile(file, 'invitation.png'); setNotice('تم تنزيل البطاقة؛ يمكنك إرفاقها في تطبيق المشاركة.'); }
+  });
+  let rsvpUrl = '', linkError = '';
+  if (shareOrigin) {
+    try { rsvpUrl = createInvitationLink(shareOrigin, { id: occasion.id, title: design.title || occasion.title, date: design.date, time: design.time, venueName: design.venue, cityNameAr: occasion.cityNameAr }); }
+    catch { linkError = 'تعذر تجهيز رابط الدعوة؛ راجع طول العنوان والتاريخ والوقت والموقع.'; }
+  }
+  const templates = [...BUILTIN_TEMPLATES, ...records];
+  const visible = templates.filter(t => {
+    const inTab = tab === 'manage' ? isAdmin && t.ownerId !== 'system' : tab === 'mine' ? t.ownerId === userId : tab === 'favorites' ? favorites.includes(t.id) && (t.status === 'published' || t.ownerId === userId) : t.status === 'published';
+    return inTab && (tab === 'manage' || t.status !== 'archived') && (!kind || t.occasion === kind) && (!style || t.style === style) && (!color || t.color === color) && t.name.includes(search.trim());
+  });
+  const suggestions = BUILTIN_TEMPLATES.filter(t => t.occasion === templateKind);
+  if (!ready) return <p role="status" className="p-6">جارٍ تحميل مكتبة التصاميم…</p>;
+  return <div className="space-y-6" dir="rtl">
+    <div className="rounded-3xl bg-gradient-to-l from-saudi-green-950 to-saudi-green-800 p-6 text-white flex flex-wrap items-center justify-between gap-4">
+      <div><span className="text-xs text-saudi-gold-300">مساحة إبداعك</span><h3 className="text-xl font-bold mt-1">كل مناسبة تستحق دعوة تليق بها</h3><p className="text-sm text-white/80 mt-2">18 قالباً منسّقاً · تخصيص مرن · معاينة وتصدير</p></div><Palette className="h-10 w-10 text-saudi-gold-300" />
     </div>
-  );
+    <p className="text-xs text-gray-600">الحفظ والمفضلة ومراجعة القوالب محلية. رابط QR يحمل تفاصيل الدعوة الأساسية ويمكن فتحه دون بيانات محفوظة في متصفح الضيف؛ الردود والعانية ما تزال تجريبية ومحلية.</p>
+    {notice && <div role="status" aria-live="polite" className="rounded-xl border border-saudi-gold-300 bg-amber-50 p-3 text-sm">{notice}</div>}
+    <section aria-label="مكتبة القوالب" className="bg-white rounded-3xl border border-gray-200 p-4 sm:p-6 space-y-4">
+      <div className="flex flex-wrap justify-between gap-3">
+        <div role="tablist" aria-label="أقسام المكتبة" className="flex flex-wrap gap-2">
+          {(['library', 'mine', 'favorites', ...(isAdmin ? ['manage'] : [])] as typeof tab[]).map(value => <button key={value} role="tab" aria-selected={tab === value} onClick={() => { setTab(value); setKind(''); }} className={`rounded-xl px-4 py-2 text-sm font-bold ${tab === value ? 'bg-saudi-green-900 text-white' : 'bg-gray-100 text-gray-700'}`}>{({ library: 'مكتبة القوالب', mine: 'تصاميمي', favorites: 'المفضلة', manage: 'إدارة القوالب' })[value]}</button>)}
+        </div>
+        {canEdit && <label className="flex items-center gap-2 cursor-pointer rounded-xl border px-3 py-2 text-sm"><Upload size={16} /> استيراد قالب JSON<input aria-label="استيراد قالب JSON" type="file" accept=".json,application/json" className="sr-only" onChange={e => { void importTemplate(e.target.files?.[0]); e.target.value = ''; }} /></label>}
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <Field label="البحث"><div className="relative"><Search className="absolute left-2 top-3 text-gray-400" size={16} /><input className={fieldClass} placeholder="اسم القالب" value={search} onChange={e => setSearch(e.target.value)} /></div></Field>
+        <Field label="المناسبة"><select className={fieldClass} value={kind} onChange={e => setKind(e.target.value as OccasionKind | '')}><option value="">كل المناسبات</option>{Object.entries(OCCASIONS).map(([id, label]) => <option key={id} value={id}>{label}</option>)}</select></Field>
+        <Field label="الأسلوب"><select className={fieldClass} value={style} onChange={e => setStyle(e.target.value)}><option value="">كل الأساليب</option>{Object.entries(STYLES).map(([id, label]) => <option key={id} value={id}>{label}</option>)}</select></Field>
+        <Field label="الألوان"><select className={fieldClass} value={color} onChange={e => setColor(e.target.value)}><option value="">كل الألوان</option>{['فاتح', 'داكن', 'ملون'].map(c => <option key={c}>{c}</option>)}</select></Field>
+      </div>
+      <p className="text-xs text-gray-500">{visible.length} قالب متاح</p>
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 max-h-[560px] overflow-y-auto p-1">
+        {visible.map(t => <article key={t.id} className="rounded-2xl border border-gray-200 p-2 space-y-2">
+          <button className="w-full hover:opacity-90 focus-visible:ring-2 focus-visible:ring-saudi-green-800 rounded-xl" onClick={() => selectTemplate(t)} aria-label={`اختيار ${t.name}`}><Preview design={t.design} small /></button>
+          <div className="flex items-start justify-between gap-1"><div><h4 className="font-bold text-sm break-words">{t.name}</h4><p className="text-[11px] text-gray-500">{OCCASIONS[t.occasion]} · {STYLES[t.style]}</p></div><button disabled={!canEdit} aria-label={`إضافة ${t.name} إلى المفضلة`} aria-pressed={favorites.includes(t.id)} onClick={() => setFavorites(f => f.includes(t.id) ? f.filter(id => id !== t.id) : [...f, t.id])} className="p-2 rounded-lg hover:bg-rose-50 disabled:opacity-40"><Heart size={16} className={favorites.includes(t.id) ? 'fill-rose-500 text-rose-500' : 'text-gray-400'} /></button></div>
+          {t.ownerId !== 'system' && <p className="text-xs text-gray-500">{statusNames[t.status]} · الإصدار {t.version}</p>}
+          {t.reviewNote && <p className="text-xs text-amber-800">ملاحظة المراجعة: {t.reviewNote}</p>}
+          <button disabled={!canEdit} onClick={() => selectTemplate(t)} className="w-full bg-saudi-sand-100 rounded-lg py-2 text-xs disabled:opacity-40">{t.ownerId === userId && ['private', 'rejected'].includes(t.status) ? 'فتح وتعديل' : 'استخدام نسخة'}</button>
+          {t.ownerId === userId && ['private', 'rejected'].includes(t.status) && <button disabled={busy} onClick={() => void transition(t, 'pending')} className="w-full border rounded-lg py-2 text-xs">إرسال للمراجعة</button>}
+          {isAdmin && t.status === 'pending' && <div className="space-y-2"><input aria-label={`ملاحظة مراجعة ${t.name}`} className={fieldClass} maxLength={240} placeholder="سبب طلب التعديل" value={reviewNotes[t.id] || ''} onChange={e => setReviewNotes(n => ({ ...n, [t.id]: e.target.value }))} /><div className="flex gap-2"><button disabled={busy} onClick={() => void transition(t, 'published')} className="flex-1 text-green-800 bg-green-50 p-2 rounded-lg text-xs"><Check size={14} className="inline" /> نشر</button><button disabled={busy} onClick={() => void transition(t, 'rejected')} className="flex-1 bg-amber-50 p-2 rounded-lg text-xs"><X size={14} className="inline" /> تعديل</button></div></div>}
+          {t.ownerId !== 'system' && t.status !== 'archived' && (isAdmin || (t.ownerId === userId && ['private', 'rejected'].includes(t.status))) && <button disabled={busy} onClick={() => void transition(t, 'archived')} className="flex items-center gap-1 text-xs text-gray-500 p-1"><Archive size={13} /> أرشفة القالب</button>}
+        </article>)}
+      </div>
+      {!visible.length && <p className="text-center py-8 text-sm text-gray-500">لا توجد قوالب هنا. غيّر الفلاتر أو احفظ تصميمك الأول.</p>}
+    </section>
+    <div className="grid lg:grid-cols-2 gap-6 items-start">
+      <section aria-label="تخصيص البطاقة" className="bg-white rounded-3xl border border-gray-200 p-5 space-y-5">
+        <h4 className="font-bold flex gap-2 items-center"><Palette size={18} /> تخصيص تصميمك</h4>
+        {!canEdit && <p className="text-sm text-amber-800">سجّل الدخول لتخصيص التصميم وحفظه.</p>}
+        <fieldset disabled={!canEdit} className="space-y-4 disabled:opacity-60">
+          <Field label="اسم التصميم في المكتبة"><input className={fieldClass} maxLength={80} value={name} onChange={e => setName(e.target.value)} /></Field>
+          <div className="grid grid-cols-2 gap-3"><Field label="نوع المناسبة"><select className={fieldClass} value={templateKind} onChange={e => setTemplateKind(e.target.value as OccasionKind)}>{Object.entries(OCCASIONS).map(([id, label]) => <option key={id} value={id}>{label}</option>)}</select></Field><Field label="تصنيف الأسلوب"><select className={fieldClass} value={templateStyle} onChange={e => setTemplateStyle(e.target.value as InviteTemplate['style'])}>{Object.entries(STYLES).map(([id, label]) => <option key={id} value={id}>{label}</option>)}</select></Field></div>
+          <div className="rounded-2xl bg-saudi-sand-50 p-3 space-y-2"><p className="text-xs font-bold flex items-center gap-1"><Sparkles size={15} /> تنسيقات مقترحة لـ{OCCASIONS[templateKind]}</p><div className="flex flex-wrap gap-2">{suggestions.map(t => <button key={t.id} title={t.name} aria-label={`تطبيق ألوان وزخارف ${t.name}`} onClick={() => { patch({ background: t.design.background, foreground: t.design.foreground, accent: t.design.accent, motif: t.design.motif, image: '' }); setTemplateStyle(t.style); }} className="flex items-center gap-1 rounded-lg border bg-white px-2 py-1.5 text-[11px]">{[t.design.background, t.design.accent].map((c, i) => <span key={i} style={{ background: c }} className="w-3 h-3 rounded-full border" />)}{t.name}</button>)}</div><p className="text-[11px] text-gray-500">اقتراحات منسّقة حسب المناسبة؛ تطبّق الألوان والزخارف مع الاحتفاظ بنصوصك.</p></div>
+          {(['opening', 'title', 'closing', 'venue'] as const).map(key => <Field key={key} label={{ opening: 'عبارة الدعوة', title: 'العنوان وأسماء المحتفى بهم', closing: 'عبارة الختام', venue: 'الموقع والقاعة' }[key]}><textarea rows={key === 'opening' ? 2 : 1} className={fieldClass} maxLength={key === 'title' ? 100 : 240} value={design[key]} onChange={e => patch({ [key]: e.target.value })} /></Field>)}
+          <div className="grid grid-cols-2 gap-3"><Field label="التاريخ"><input className={fieldClass} maxLength={80} value={design.date} onChange={e => patch({ date: e.target.value })} /></Field><Field label="الوقت"><input className={fieldClass} maxLength={80} value={design.time} onChange={e => patch({ time: e.target.value })} /></Field></div>
+          <div className="grid grid-cols-3 gap-3">{(['background', 'foreground', 'accent'] as const).map(key => <Field key={key} label={{ background: 'الخلفية', foreground: 'النص', accent: 'العنوان والزخارف' }[key]}><input type="color" className="w-full h-10 rounded-lg border cursor-pointer" value={design[key]} onChange={e => patch({ [key]: e.target.value })} /></Field>)}</div>
+          {(contrastRatio(design.background, design.foreground) < 4.5 || contrastRatio(design.background, design.accent) < 3) && <p className="text-xs text-amber-800">تباين الألوان منخفض؛ اختر نصاً وعنواناً أوضح أو طبّق تنسيقاً مقترحاً.</p>}
+          <div className="grid grid-cols-2 gap-3"><Field label="الخط"><select className={fieldClass} value={design.font} onChange={e => patch({ font: e.target.value as CardDesign['font'] })}><option value="serif">كلاسيكي — Serif</option><option value="sans-serif">عصري — Sans Serif</option></select></Field><Field label="الزخارف"><select className={fieldClass} value={design.motif} onChange={e => patch({ motif: e.target.value as CardDesign['motif'] })}>{Object.entries(MOTIFS).map(([id, label]) => <option key={id} value={id}>{label}</option>)}</select></Field></div>
+          <div className="grid grid-cols-2 gap-3"><Field label="محاذاة النص"><select className={fieldClass} value={design.align} onChange={e => patch({ align: e.target.value as CardDesign['align'] })}><option value="center">وسط</option><option value="right">يمين</option></select></Field><Field label="المقاس"><select className={fieldClass} value={design.size} onChange={e => patch({ size: e.target.value as CardDesign['size'] })}>{Object.entries(SIZES).map(([id, value]) => <option key={id} value={id}>{value.label}</option>)}</select></Field></div>
+          <Field label={`حجم العنوان · ${design.titleSize}`}><input type="range" min={26} max={64} value={design.titleSize} onChange={e => patch({ titleSize: Number(e.target.value) })} className="w-full accent-green-800" /></Field>
+          <Field label="توزيع مجموعة النصوص عمودياً"><input type="range" min={-80} max={80} value={design.offset} onChange={e => patch({ offset: Number(e.target.value) })} className="w-full accent-green-800" /></Field>
+          <Field label="صورة الخلفية · PNG / JPEG / WebP حتى 800 كيلوبايت"><input type="file" accept="image/png,image/jpeg,image/webp" className="w-full text-xs" onChange={e => { void uploadImage(e.target.files?.[0]); e.target.value = ''; }} /></Field>
+          {design.image && <><Field label="شفافية صورة الخلفية"><input type="range" min={0} max={0.6} step={0.05} value={design.imageOpacity} onChange={e => patch({ imageOpacity: Number(e.target.value) })} className="w-full" /></Field><button onClick={() => patch({ image: '' })} className="text-xs text-red-700">إزالة الصورة</button></>}
+          <div className="grid grid-cols-2 gap-2"><button disabled={busy} onClick={() => void save()} className="bg-saudi-green-900 text-white rounded-xl py-3 text-sm flex justify-center items-center gap-2 disabled:opacity-50"><Save size={16} /> حفظ التصميم</button><button disabled={busy} onClick={() => void save(true)} className="border rounded-xl py-3 text-sm flex justify-center items-center gap-2 disabled:opacity-50"><Copy size={16} /> حفظ نسخة جديدة</button></div>
+        </fieldset>
+      </section>
+      <section aria-label="المعاينة والتصدير" className="lg:sticky lg:top-24 space-y-4">
+        <div className="flex justify-between items-center"><h4 className="font-bold">معاينة مباشرة</h4><span className="text-xs text-gray-500">{SIZES[design.size].label}</span></div>
+        <div className="bg-[#eae7e1] rounded-3xl p-5 sm:p-8"><div className="max-w-sm mx-auto"><Preview design={design} qrValue={includeQr ? rsvpUrl : ''} /></div></div>
+        <div className="bg-white border rounded-2xl p-4 space-y-3"><p className="text-sm font-bold">التصدير والمشاركة</p>
+          <Field label="عنوان الموقع للمشاركة من الهاتف"><div className="flex gap-2"><input type="url" dir="ltr" className={fieldClass} value={originInput} placeholder="https://example.com" onChange={e => setOriginInput(e.target.value)} /><button className="rounded-xl border px-3 text-xs" onClick={() => void run(() => { const origin = normalizeInvitationOrigin(originInput.trim()); localStorage.setItem(INVITATION_ORIGIN_KEY, origin); setShareOrigin(origin); setOriginInput(origin); setNotice('تم تحديث عنوان الموقع في الروابط ورموز QR.'); })}>تطبيق</button></div></Field>
+          {shareOrigin && ['localhost', '127.0.0.1', '[::1]'].includes(new URL(shareOrigin).hostname) && <p className="text-xs text-amber-800">للمسح من الهاتف، أدخل عنوان الموقع المنشور أو عنوان هذا الجهاز على الشبكة. localhost يشير إلى الهاتف نفسه.</p>}
+          {linkError && <p role="alert" className="text-xs text-red-700">{linkError}</p>}
+          <label className="flex gap-2 items-center text-xs"><input type="checkbox" checked={includeQr} onChange={e => setIncludeQr(e.target.checked)} /> تضمين QR حقيقي في البطاقة والتصدير</label>
+          <div className="flex flex-col items-center gap-2 rounded-xl bg-gray-50 p-3"><InvitationQRCode value={rsvpUrl} className="w-64 h-64 max-w-full" /><span className="text-xs text-gray-500">امسح لفتح الدعوة</span><div className="flex gap-3"><a href={rsvpUrl} target="_blank" rel="noopener noreferrer" className="text-xs underline text-green-800">فتح الدعوة</a><button disabled={!rsvpUrl || busy} className="text-xs underline text-green-800" onClick={() => void run(() => downloadFile(new Blob([qrSvg(rsvpUrl)], { type: 'image/svg+xml;charset=utf-8' }), 'invitation-qr.svg'))}>تنزيل QR</button></div></div>
+        <div className="grid grid-cols-2 gap-2">
+          <button disabled={busy} onClick={() => void run(async () => { downloadFile(await pngBlob(design, includeQr ? rsvpUrl : ''), 'invitation.png'); setNotice('تم تصدير PNG بالمقاس المحدد.'); })} className="rounded-xl border p-2 text-xs flex justify-center gap-2"><Download size={15} /> صورة PNG</button>
+          <button disabled={busy} onClick={() => void run(() => downloadFile(new Blob([cardSvg(design, includeQr ? rsvpUrl : '')], { type: 'image/svg+xml;charset=utf-8' }), 'invitation.svg'))} className="rounded-xl border p-2 text-xs flex justify-center gap-2"><Download size={15} /> ملف SVG</button>
+          <button disabled={busy} onClick={() => void run(() => printCard(design, includeQr ? rsvpUrl : ''))} className="rounded-xl border p-2 text-xs flex justify-center gap-2"><Printer size={15} /> طباعة / حفظ PDF</button>
+          <button disabled={busy} onClick={() => void run(exportJson)} className="rounded-xl border p-2 text-xs flex justify-center gap-2"><Download size={15} /> قالب قابل للتعديل</button>
+          <button disabled={busy} onClick={() => void shareFile()} className="rounded-xl bg-saudi-green-900 text-white p-2 text-xs flex justify-center gap-2"><Share2 size={15} /> مشاركة البطاقة</button>
+          <button disabled={busy || !rsvpUrl} onClick={() => void run(async () => { await navigator.clipboard.writeText(rsvpUrl); setNotice('تم نسخ رابط الدعوة القابل للفتح من متصفح آخر.'); })} className="rounded-xl border p-2 text-xs flex justify-center gap-2"><Copy size={15} /> رابط الحضور</button>
+        </div><a href={`https://wa.me/?text=${encodeURIComponent(`${design.opening}\n${design.title}\n${design.date} ${design.time}\n${design.venue}\n${rsvpUrl}`)}`} target="_blank" rel="noopener noreferrer" className="block text-center text-xs text-green-800 underline">مشاركة نص الدعوة ورابط الحضور عبر واتساب</a><p className="text-[11px] text-gray-500">A5: ملف PNG بقياس 1748 × 2480 بكسل للطباعة عند نحو 300 نقطة/بوصة. لحفظ PDF، اختر «حفظ كـ PDF» من نافذة الطباعة. اترك هوامش الأمان ظاهرة وراجع المعاينة قبل الإرسال.</p></div>
+      </section>
+    </div>
+    <details className="bg-white rounded-2xl border p-4 text-sm"><summary className="cursor-pointer font-bold">صلاحيات المستخدمين وآلية إدارة القوالب</summary><div className="space-y-2 pt-3 text-gray-600"><p>الزائر: استعراض القوالب المنشورة. المستخدم المسجّل: التخصيص والرفع والحفظ والمفضلة والتصدير؛ تعديل تصاميمه الخاصة وإرسالها للمراجعة.</p><p>الإدارة: مراجعة القوالب المرسلة، نشرها، طلب التعديل مع توضيح السبب، وأرشفة القوالب. القوالب المنشورة تُستخدم كنسخ مستقلة لحماية الأصل.</p><p>دورة القالب: خاص ← بانتظار المراجعة ← منشور أو يحتاج تعديلاً. التعديل يعيد القالب إلى خاص ويزيد رقم الإصدار؛ الأرشفة تخفيه من المكتبة. هذه الصلاحيات تنظيمية داخل النسخة المحلية، وتحتاج جلسات موثوقة وتحققاً على الخادم عند الإطلاق المشترك.</p></div></details>
+  </div>;
 }

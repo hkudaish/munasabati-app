@@ -1,5 +1,8 @@
 'use client';
 
+import InvitationQRCode from '@/components/common/InvitationQRCode';
+import { createInvitationLink, getInvitationOrigin } from '@/lib/invitations/link';
+
 import React, { useState } from 'react';
 import {
   Users,
@@ -91,7 +94,7 @@ export default function GuestManager() {
   };
 
   const generateWhatsAppMessage = (guest: Guest) => {
-    const rsvpLink = `${window.location.origin}/invite/${guest.qrCode}`;
+    const rsvpLink = createInvitationLink(getInvitationOrigin(), activeOccasion, guest.qrCode);
     const text = `السلام عليكم ورحمة الله وبركاته،\nنتشرف بدعوتكم لحضور "${activeOccasion.title}"\nالموعد: ${activeOccasion.date}\nيسعدنا تأكيد حضوركم عبر الرابط المخصص لكم:\n${rsvpLink}\n\nحضوركم يسعدنا ويشرفنا! ✨`;
     const cleanPhone = guest.phone.replace(/[^0-9]/g, '');
     return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
@@ -431,14 +434,10 @@ export default function GuestManager() {
               <p className="text-xs text-saudi-sand-200">{activeOccasion.date}</p>
             </div>
 
-            {/* Simulated QR Box */}
+            {/* Scannable invitation QR; the gate verifies the code against its guest list. */}
             <div className="bg-white p-4 rounded-2xl inline-block shadow-lg my-2">
-              <div className="w-44 h-44 bg-saudi-sand-50 border-2 border-dashed border-saudi-green-800 rounded-xl flex flex-col items-center justify-center p-2 text-center">
-                <QrCode className="w-24 h-24 text-saudi-green-950" />
-                <span className="text-[10px] font-mono text-gray-600 mt-2 font-bold">
-                  {activeQRModalGuest.qrCode}
-                </span>
-              </div>
+              <InvitationQRCode value={createInvitationLink(getInvitationOrigin(), activeOccasion, activeQRModalGuest.qrCode)} className="w-64 h-64 max-w-full mx-auto" />
+              <span className="text-[10px] font-mono text-gray-600 block mt-2">{activeQRModalGuest.qrCode}</span>
             </div>
 
             <div className="space-y-1 text-xs">
@@ -590,7 +589,7 @@ export default function GuestManager() {
             {/* List of Guests to dispatch to */}
             <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
               {occasionGuests.map((guest, idx) => {
-                const rsvpLink = typeof window !== 'undefined' ? `${window.location.origin}/invite/${guest.qrCode}` : `https://munasabati.sa/invite/${guest.qrCode}`;
+                const rsvpLink = typeof window !== 'undefined' ? createInvitationLink(getInvitationOrigin(), activeOccasion, guest.qrCode) : '';
                 const personalizedMsg = `السلام عليكم ورحمة الله وبركاته،\nنتشرف بدعوة الكريم/ة *${guest.name}* لحضور "${activeOccasion.title}"\nالموعد: ${activeOccasion.date}\nرابط بطاقة الدخول المخصصة وتأكيد الحضور:\n${rsvpLink}\n\nحضوركم يشرفنا ويسعدنا! ✨`;
                 const cleanPhone = guest.phone.replace(/[^0-9]/g, '');
 

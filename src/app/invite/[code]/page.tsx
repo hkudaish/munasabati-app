@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import {
   Sparkles,
@@ -22,6 +22,9 @@ import {
 import { useApp } from '@/lib/store';
 import { formatSAR } from '@/lib/utils';
 import confetti from 'canvas-confetti';
+import InvitationQRCode from '@/components/common/InvitationQRCode';
+import { createInvitationLink, getInvitationOrigin, PublicInvitation, readInvitationSnapshot } from '@/lib/invitations/link';
+import { INITIAL_OCCASIONS } from '@/lib/seed-data';
 import DigitalEaniyahModal from '@/components/occasion/DigitalEaniyahModal';
 
 export default function GuestRSVPPage() {
@@ -29,20 +32,55 @@ export default function GuestRSVPPage() {
   const { occasions, guests, updateGuestStatus, eaniyahGifts } = useApp();
 
   const inviteCode = (params.code as string) || 'MUN-RSVP-DEMO';
-  const currentOccasion = occasions[0]; // fallback to active demo occasion
+  const linkedGuest = guests.find(guest => guest.qrCode === inviteCode);
+  const occasionId = inviteCode.startsWith('MUN-DEMO-') ? inviteCode.slice('MUN-DEMO-'.length) : linkedGuest?.occasionId;
+  const [snapshot, setSnapshot] = useState<PublicInvitation | null>(null);
+  const [linkLoaded, setLinkLoaded] = useState(false);
+  const [qrLink, setQrLink] = useState('');
+  const [responseNotice, setResponseNotice] = useState('');
+  const currentOccasion = snapshot || occasions.find(occasion => occasion.id === occasionId)
+    || (inviteCode === 'MUN-RSVP-DEMO' ? INITIAL_OCCASIONS[0] : undefined);
+  useEffect(() => {
+    const readLink = () => {
+      setSnapshot(readInvitationSnapshot(window.location.hash, inviteCode));
+      setLinkLoaded(true);
+    };
+    readLink();
+    window.addEventListener('hashchange', readLink);
+    return () => window.removeEventListener('hashchange', readLink);
+  }, [inviteCode]);
+  useEffect(() => {
+    if (!currentOccasion) return;
+    try { setQrLink(createInvitationLink(getInvitationOrigin(), currentOccasion, inviteCode)); }
+    catch { setQrLink(''); }
+  }, [currentOccasion, inviteCode]);
 
-  const [guestName, setGuestName] = useState('الدكتورة أمل العتيبي');
-  const [phone, setPhone] = useState('+966501239988');
+  const [guestName, setGuestName] = useState('');
+  const [phone, setPhone] = useState('');
   const [status, setStatus] = useState<'confirmed' | 'declined' | null>(null);
   const [companionCount, setCompanionCount] = useState('0');
   const [congratsMessage, setCongratsMessage] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isEaniyahOpen, setIsEaniyahOpen] = useState(false);
 
+  if (!linkLoaded) return <p role="status" className="p-12 text-center">جارٍ تحميل الدعوة…</p>;
+
+  if (!currentOccasion) return (
+    <div className="min-h-[60vh] flex items-center justify-center p-6 text-center">
+      <div className="bg-white border rounded-3xl p-8 space-y-3">
+        <h1 className="text-xl font-bold">الدعوة غير متاحة</h1>
+        <p className="text-sm text-gray-600">هذا الرابط قديم أو غير صالح. اطلب من صاحب المناسبة مشاركة الرابط الجديد أو رمز QR من تبويب الدعوات.</p>
+      </div>
+    </div>
+  );
+
   const occasionEaniyah = eaniyahGifts.filter((g) => g.occasionId === currentOccasion.id);
   const totalEaniyah = occasionEaniyah.reduce((acc, g) => acc + g.amount, 0);
 
   const handleRSVP = (choice: 'confirmed' | 'declined') => {
+    if (!guestName.trim()) { setResponseNotice('يرجى كتابة اسمك أولاً.'); return; }
+    if (linkedGuest && linkedGuest.occasionId === currentOccasion.id) updateGuestStatus(linkedGuest.id, choice);
+    setResponseNotice('تأكيد الحضور محفوظ في هذا المتصفح فقط في النسخة التجريبية.');
     setStatus(choice);
     setIsSubmitted(true);
 
@@ -113,6 +151,7 @@ export default function GuestRSVPPage() {
             </button>
           </div>
 
+          {responseNotice && <p role="status" className="px-6 text-xs text-amber-800">{responseNotice}</p>}
           {/* RSVP Form / Confirmation State */}
           <div className="p-6 pt-0 space-y-5">
             {isSubmitted ? (
@@ -127,13 +166,13 @@ export default function GuestRSVPPage() {
                         تم تأكيد حضورك بنجاح! 🤍
                       </h3>
                       <p className="text-xs text-gray-500">
-                        يسعدنا حضورك وتشريفك. يرجى إبراز كود الـ QR عند بوابة الدخول:
+                        يسعدنا حضورك وتشريفك. يمكنك مسح الرمز لفتح الدعوة؛ دخول البوابة يتطلب رمز ضيف مسجلاً لدى المنظم:
                       </p>
                     </div>
 
                     {/* QR Pass Box */}
                     <div className="bg-saudi-sand-50 p-4 rounded-2xl border border-saudi-sand-300 inline-block shadow-inner">
-                      <QrCode className="w-32 h-32 mx-auto text-saudi-green-950" />
+                      <InvitationQRCode value={qrLink} className="w-64 h-64 mx-auto" />
                       <span className="text-[10px] font-mono text-gray-600 block mt-2 font-bold">
                         {inviteCode || 'MUN-RSVP-PASS'}
                       </span>
