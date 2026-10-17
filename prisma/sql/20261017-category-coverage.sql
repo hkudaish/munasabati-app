@@ -1,8 +1,12 @@
 BEGIN;
-ALTER TABLE "GeoRule" ADD COLUMN "categoryId" TEXT;
-ALTER TABLE "GeoRule" ADD CONSTRAINT "GeoRule_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "ServiceCategory"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-CREATE UNIQUE INDEX "GeoRule_cityId_categoryId_key" ON "GeoRule"("cityId", "categoryId");
-ALTER TABLE "GeoRule" DROP CONSTRAINT "GeoRule_one_service";
+ALTER TABLE "GeoRule" ADD COLUMN IF NOT EXISTS "categoryId" TEXT;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'GeoRule_categoryId_fkey' AND conrelid = '"GeoRule"'::regclass) THEN
+    ALTER TABLE "GeoRule" ADD CONSTRAINT "GeoRule_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "ServiceCategory"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  END IF;
+END $$;
+CREATE UNIQUE INDEX IF NOT EXISTS "GeoRule_cityId_categoryId_key" ON "GeoRule"("cityId", "categoryId");
+ALTER TABLE "GeoRule" DROP CONSTRAINT IF EXISTS "GeoRule_one_service";
 ALTER TABLE "GeoRule" ADD CONSTRAINT "GeoRule_one_service" CHECK (num_nonnulls("featureId", "serviceId", "categoryId") = 1);
 INSERT INTO "ServiceCategory" ("id","nameAr","nameEn","iconName","descriptionAr","color","itemCount","sortOrder") VALUES
 ('venues','قاعات ومواقع فاخرة','Venues & Halls','Building2','قاعات أفراح، فنادق، شاليهات، استراحات، مزارع، وأسطح خاصة','#004D3F',0,0),
