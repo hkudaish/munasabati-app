@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Sparkles,
@@ -16,6 +16,8 @@ import {
   Check,
 } from 'lucide-react';
 import { useApp } from '@/lib/store';
+import { useGeo } from '@/components/geo/GeoProvider';
+import { citiesForService } from '@/lib/geo/engine';
 import { OccasionTier, GenderSection, VenueType } from '@/lib/types';
 import { formatSAR } from '@/lib/utils';
 import confetti from 'canvas-confetti';
@@ -23,14 +25,17 @@ import confetti from 'canvas-confetti';
 function PlanWizardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { occasionTypes, cities, serviceCategories, createOccasion, adminConfig } = useApp();
+  const { occasionTypes, serviceCategories, createOccasion } = useApp();
 
-  // Wizard Step (1 to 10)
+  const geo = useGeo();
+  const availableCities = useMemo(() => geo.data ? citiesForService(geo.data.snapshot, 'feature:planning') : [], [geo.data]);
+
+  // Wizard Step (1 to 7)
   const [step, setStep] = useState(1);
 
   // Form states
   const [occasionTypeId, setOccasionTypeId] = useState('graduation');
-  const [cityId, setCityId] = useState('riyadh');
+  const [cityId, setCityId] = useState('');
   const [date, setDate] = useState('2026-11-20');
   const [isApproximateDate, setIsApproximateDate] = useState(false);
   const [guestCount, setGuestCount] = useState(60);
@@ -39,6 +44,7 @@ function PlanWizardContent() {
   const [budget, setBudget] = useState(18000);
   const [tier, setTier] = useState<OccasionTier>('luxury');
   const [title, setTitle] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedServices, setSelectedServices] = useState<string[]>([
     'decor',
     'hospitality',
@@ -55,8 +61,14 @@ function PlanWizardContent() {
     }
   }, [searchParams]);
 
+  useEffect(() => {
+    setCityId(current => availableCities.some(city => city.id === current) ? current
+      : availableCities.find(city => city.id === geo.data?.selection.cityId)?.id || availableCities[0]?.id || '');
+  }, [availableCities, geo.data?.selection.cityId]);
+
   const selectedOccasionObj = occasionTypes.find((o) => o.id === occasionTypeId) || occasionTypes[0];
-  const selectedCityObj = cities.find((c) => c.id === cityId) || cities[0];
+  const selectedCityObj = availableCities.find((c) => c.id === cityId);
+  const coverageReady = !geo.loading && !geo.error && !!selectedCityObj;
 
   const toggleService = (catId: string) => {
     if (selectedServices.includes(catId)) {
@@ -67,33 +79,31 @@ function PlanWizardContent() {
   };
 
   const handleFinishWizard = async () => {
+    if (isSubmitting) return;
+    if (!coverageReady || !selectedCityObj) { setStep(2); return; }
+    setIsSubmitting(true);
     try {
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 },
+      const occasionTitle = title.trim() || `مناسبة ${selectedOccasionObj.nameAr} - ${selectedCityObj.nameAr}`;
+
+      const newId = await createOccasion({
+        title: occasionTitle,
+        occasionTypeId,
+        cityId,
+        date,
+        isApproximateDate,
+        guestCount,
+        guestsSection,
+        venueType,
+        budget,
+        tier,
+        notes: `تم إنشاء المناسبة عبر المعالج التفاعلي في ${selectedCityObj.nameAr} لمستوى ${tier}.`,
       });
-    } catch {
-      // fallback
-    }
 
-    const occasionTitle = title.trim() || `مناسبة ${selectedOccasionObj.nameAr} - ${selectedCityObj.nameAr}`;
-
-    const newId = await createOccasion({
-      title: occasionTitle,
-      occasionTypeId,
-      cityId,
-      date,
-      isApproximateDate,
-      guestCount,
-      guestsSection,
-      venueType,
-      budget,
-      tier,
-      notes: `تم إنشاء المناسبة عبر المعالج التفاعلي في ${selectedCityObj.nameAr} لمستوى ${tier}.`,
-    });
-
-    if (newId) router.push(`/occasion/${newId}`);
+      if (newId) {
+        try { confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } }); } catch {}
+        router.push(`/occasion/${newId}`);
+      }
+    } finally { setIsSubmitting(false); }
   };
 
   return (
@@ -172,8 +182,13 @@ function PlanWizardContent() {
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-2">اختر المدينة:</label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  {cities.map((c) => (
+                <p className="text-xs text-gray-500 mb-3">تظهر فقط المدن التي تتوفر فيها خدمة إنشاء وتخطيط المناسبات.</p>
+                {geo.loading ? <p role="status" className="text-sm text-gray-500 py-4">جاري التحقق من المدن المتاحة…</p>
+                  : geo.error ? <div role="alert" className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm space-y-2"><p>تعذر التحقق من المدن المتاحة. أعد المحاولة قبل المتابعة.</p><button type="button" onClick={() => void geo.refresh()} className="underline font-bold">إعادة المحاولة</button></div>
+                  : !availableCities.length ? <p role="status" className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">لا تتوفر خدمة إنشاء وتخطيط المناسبات في أي مدينة حالياً. يرجى المحاولة لاحقاً.</p>
+                  : null}
+                <div role="group" aria-label="المدن المتاحة لإنشاء المناسبة" className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {(!geo.loading && !geo.error ? availableCities : []).map((c) => (
                     <button
                       key={c.id}
                       onClick={() => setCityId(c.id)}
@@ -446,7 +461,7 @@ function PlanWizardContent() {
               </div>
               <div className="flex justify-between border-b border-gray-200 pb-2">
                 <span className="text-gray-500">المدينة والموعد:</span>
-                <span className="font-bold text-gray-900">{selectedCityObj.nameAr} • {date}</span>
+                <span className="font-bold text-gray-900">{selectedCityObj?.nameAr || 'لم يتم اختيار مدينة متاحة'} • {date}</span>
               </div>
               <div className="flex justify-between border-b border-gray-200 pb-2">
                 <span className="text-gray-500">عدد الضيوف والأقسام:</span>
@@ -481,7 +496,8 @@ function PlanWizardContent() {
           {step < 7 ? (
             <button
               onClick={() => setStep(step + 1)}
-              className="px-6 py-2.5 bg-saudi-green-800 hover:bg-saudi-green-900 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition"
+              disabled={step >= 2 && !coverageReady}
+              className="px-6 py-2.5 bg-saudi-green-800 hover:bg-saudi-green-900 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span>التالي</span>
               <ArrowLeft className="w-4 h-4 text-saudi-gold-300" />
@@ -489,10 +505,11 @@ function PlanWizardContent() {
           ) : (
             <button
               onClick={handleFinishWizard}
-              className="px-8 py-3 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-black rounded-xl text-xs sm:text-sm shadow-md flex items-center gap-2 transition"
+              disabled={!coverageReady || isSubmitting}
+              className="px-8 py-3 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-black rounded-xl text-xs sm:text-sm shadow-md flex items-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Sparkles className="w-4 h-4 text-saudi-green-950" />
-              <span>توليد "خطة مناسبتي" وفتح مساحة العمل</span>
+              <span>{isSubmitting ? 'جاري إنشاء المناسبة…' : 'توليد "خطة مناسبتي" وفتح مساحة العمل'}</span>
             </button>
           )}
         </div>

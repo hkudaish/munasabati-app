@@ -1,6 +1,6 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),ts=require('typescript');
 require.extensions['.ts']=(module,filename)=>module._compile(ts.transpileModule(fs.readFileSync(filename,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,filename);
-const {availability,summary,applyChanges,matchCity}=require('../src/lib/geo/engine.ts');const {parseCSV}=require('../src/lib/geo/csv.ts');
+const {availability,summary,applyChanges,matchCity,citiesForService}=require('../src/lib/geo/engine.ts');const {parseCSV}=require('../src/lib/geo/csv.ts');
 const s={revision:0,countries:[{code:'SA',enabled:true}],cities:[{id:'riyadh',nameAr:'الرياض',nameEn:'Riyadh',aliases:['Ar Riyāḑ'],countryCode:'SA',isAvailable:true,defaultAvailable:true},{id:'jeddah',nameAr:'جدة',nameEn:'Jeddah',aliases:['Jiddah'],countryCode:'SA',isAvailable:false,defaultAvailable:false}],services:[{key:'feature:a',kind:'feature',enabled:true,visible:true},{key:'feature:b',kind:'feature',enabled:true,visible:true},{key:'item:1',kind:'item',enabled:true,visible:true,cityId:'riyadh'}],rules:[],policy:{unknownCity:'PROMPT',hideUnavailable:true},regions:[]};
 const loc={cityId:'riyadh',countryCode:'SA',source:'MANUAL'};
 assert.equal(summary(s,loc),'FULL');assert.equal(summary(s,{...loc,cityId:'jeddah'}),'NONE');assert.equal(summary(s,{...loc,cityId:'unknown'}),'UNKNOWN');
@@ -21,3 +21,23 @@ const categoryOnItemOff=applyChanges(categorized,[{type:'rules',cityIds:['riyadh
 const copiedCategory=applyChanges(categoryOff,[{type:'copy',sourceId:'riyadh',targetIds:['jeddah']}]);assert.equal(copiedCategory.rules.find(r=>r.cityId==='jeddah'&&r.key==='category:decor').status,'UNAVAILABLE');
 console.log('PASS category hierarchy: category shutdown overrides item enablement, scheduled category affects children, explicit item shutdown remains, category rules copy without mutating source.');
 console.log('PASS: full/partial/inactive/unknown coverage, global/country/city priorities, time windows, Arabic aliases, country isolation, draft/copy isolation and quoted CSV.');
+
+// The planner city list resolves its own feature, independently of other services.
+const planning = structuredClone(s);
+planning.cities[1].isAvailable = true; planning.cities[1].defaultAvailable = true;
+planning.cities.push({ id: 'makkah', nameAr: 'مكة', nameEn: 'Makkah', aliases: [], countryCode: 'SA', isAvailable: true, defaultAvailable: false });
+planning.services.push({ key: 'feature:planning', id: 'planning', kind: 'feature', enabled: true, visible: true });
+planning.rules.push({ cityId: 'jeddah', key: 'feature:planning', status: 'UNAVAILABLE' }, { cityId: 'makkah', key: 'feature:planning', status: 'AVAILABLE' });
+assert.deepEqual(citiesForService(planning, 'feature:planning').map(c => c.id), ['riyadh','makkah']);
+assert(citiesForService(planning, 'feature:a').some(c => c.id === 'jeddah'), 'Other available features must not expose a city for planning');
+assert.deepEqual(citiesForService(planning, 'missing-feature'), []);
+const delayed = applyChanges(planning, [{ type:'rules',cityIds:['makkah'],keys:['feature:planning'],status:'AVAILABLE',startsAt:'2026-12-01T00:00:00Z',endsAt:'2026-12-31T00:00:00Z' }]);
+assert.deepEqual(citiesForService(delayed,'feature:planning',new Date('2026-11-01')).map(c=>c.id),['riyadh']);
+assert.deepEqual(citiesForService(delayed,'feature:planning',new Date('2026-12-15')).map(c=>c.id),['riyadh','makkah']);
+assert.deepEqual(citiesForService(delayed,'feature:planning',new Date('2026-12-31')).map(c=>c.id),['riyadh']);
+assert.deepEqual(citiesForService(applyChanges(planning,[{type:'country',id:'SA',enabled:false}]),'feature:planning'),[]);
+assert.deepEqual(citiesForService(applyChanges(planning,[{type:'city',id:'riyadh',enabled:false}]),'feature:planning').map(c=>c.id),['makkah']);
+const stopped = structuredClone(planning); stopped.services.find(f=>f.key==='feature:planning').enabled=false;
+assert.deepEqual(citiesForService(stopped,'feature:planning'),[]);
+assert.deepEqual(citiesForService(applyChanges(planning,[{type:'rules',cityIds:['riyadh'],keys:['feature:planning'],status:'UNAVAILABLE'}]),'feature:planning').map(c=>c.id),['makkah']);
+console.log('PASS planner cities: feature-specific coverage, explicit activation, country/city/global shutdown, missing services, scheduled windows and live coverage changes.');

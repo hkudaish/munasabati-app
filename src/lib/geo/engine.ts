@@ -33,6 +33,13 @@ export function availability(snapshot:GeoSnapshot, selection:GeoSelection, now =
   }
   return snapshot.services.map(resolve);
 }
+// Resolve the requested service for each city, not the current visitor's city or
+// the city's general activation switch. Other services can have different coverage.
+export function citiesForService(snapshot: GeoSnapshot, key: string, now = new Date()) {
+  return snapshot.cities.filter(city => availability(snapshot, {
+    cityId: city.id, countryCode: city.countryCode, source: 'MANUAL',
+  }, now).some(result => result.key === key && result.available));
+}
 export function summary(snapshot:GeoSnapshot,selection:GeoSelection,items=availability(snapshot,selection)) {
   if(!snapshot.cities.some(c=>c.id===selection.cityId))return 'UNKNOWN' as const;
   const relevant=items.filter(a=>snapshot.services.some(s=>s.key===a.key&&s.enabled&&s.visible));
