@@ -1,112 +1,23 @@
-import { NextResponse } from 'next/server';
-import { createUserInDB, createVendorInDB } from '@/lib/server-db';
-
-export async function POST(request: Request) {
-  try {
-    const body = await request.json();
-    const { userType, customerData, vendorData } = body;
-
-    if (!userType || !['client', 'vendor'].includes(userType)) {
-      return NextResponse.json(
-        { error: 'نوع الحساب غير صالح. يرجى اختيار صاحب مناسبة أو مورد.' },
-        { status: 400 }
-      );
-    }
-
-    if (userType === 'client') {
-      if (!customerData?.name || !customerData?.phone || !customerData?.cityId) {
-        return NextResponse.json(
-          { error: 'يرجى إكمال بيانات الاسم ورقم الجوال والمدينة' },
-          { status: 400 }
-        );
-      }
-
-      const user = await createUserInDB({
-        name: customerData.name,
-        phone: customerData.phone,
-        email: customerData.email,
-        role: 'CLIENT',
-        cityId: customerData.cityId,
-      });
-
-      return NextResponse.json({
-        success: true,
-        messageAr: 'تم إنشاء حساب صاحب المناسبة بنجاح مرحباً بك!',
-        user: {
-          id: user.id,
-          name: user.name,
-          phone: user.phone,
-          email: user.email,
-          role: 'client',
-          cityId: user.cityId,
-          avatar: user.avatar,
-          createdAt: user.createdAt,
-        },
-      });
-    }
-
-    if (userType === 'vendor') {
-      if (!vendorData?.businessName || !vendorData?.categoryId || !vendorData?.cityId || !vendorData?.contactPhone) {
-        return NextResponse.json(
-          { error: 'يرجى إكمال بيانات المنشأة ورقم التواصل والتصنيف والمدينة' },
-          { status: 400 }
-        );
-      }
-
-      // First create or find user
-      const user = await createUserInDB({
-        name: vendorData.contactName || vendorData.businessName,
-        phone: vendorData.contactPhone,
-        email: vendorData.email,
-        role: 'VENDOR',
-        cityId: vendorData.cityId,
-      });
-
-      // Create vendor profile
-      const vendor = await createVendorInDB({
-        userId: user.id,
-        businessName: vendorData.businessName,
-        businessNameEn: vendorData.businessNameEn,
-        categoryId: vendorData.categoryId,
-        cityId: vendorData.cityId,
-        neighborhood: vendorData.neighborhood || 'حي الملقا',
-        crNumber: vendorData.crNumber,
-        freelanceLicense: vendorData.freelanceLicense,
-        vatNumber: vendorData.vatNumber,
-        startingPrice: Number(vendorData.startingPrice) || 1000,
-        contactPhone: vendorData.contactPhone,
-        whatsappNumber: vendorData.whatsappNumber || vendorData.contactPhone,
-        bioAr: vendorData.bioAr || 'نقدم أفضل خدمات المناسبات بأعلى معايير الجودة والاحترافية.',
-        specialtiesAr: vendorData.specialtiesAr || [],
-      });
-
-      return NextResponse.json({
-        success: true,
-        messageAr: 'تم تسجيل المنشأة بنجاح ومرحباً بك كشريك معتمد في مناسبتي!',
-        user: {
-          id: user.id,
-          name: user.name,
-          phone: user.phone,
-          email: user.email,
-          role: 'vendor',
-          cityId: user.cityId,
-          vendorId: vendor.id,
-          businessName: vendor.businessName,
-          crNumber: vendor.crNumber,
-          freelanceLicense: vendor.freelanceLicense,
-          isVerified: Boolean(vendor.crNumber || vendor.freelanceLicense),
-          createdAt: user.createdAt,
-        },
-        vendor,
-      });
-    }
-
-    return NextResponse.json({ error: 'طلب غير معروف' }, { status: 400 });
-  } catch (error: any) {
-    console.error('Registration API Error:', error);
-    return NextResponse.json(
-      { error: error?.message || 'حدث خطأ أثناء إنشاء الحساب' },
-      { status: 500 }
-    );
-  }
-}
+import { prisma } from '@/lib/db';
+import { api, body, text, HttpError } from '@/lib/server/http';
+import { createSession, hashPassword, profile, rateLimit } from '@/lib/server/auth';
+export const POST = api(async request => {
+  const data = await body(request, 12000);
+  if (!['client', 'vendor'].includes(data.userType)) throw new HttpError(400, 'نوع الحساب غير صالح');
+  const vendor = data.userType === 'vendor'; const input = vendor ? data.vendorData : data.customerData;
+  if (!input) throw new HttpError(400, 'بيانات التسجيل مطلوبة');
+  const phone = text(vendor ? input.contactPhone : input.phone, 20, true);
+  if (!/^\+?\d{9,15}$/.test(phone)) throw new HttpError(400, 'رقم الجوال غير صالح');
+  await rateLimit(`register:${phone}`, 5);
+  const passwordHash = await hashPassword(input.password);
+  const email = text(input.email, 254).toLowerCase() || null;
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new HttpError(400, 'البريد الإلكتروني غير صالح');
+  const cityId = text(input.cityId, 80, true);
+  const user = await prisma.$transaction(async tx => {
+    const user = await tx.user.create({ data: { name: text(vendor ? input.contactName || input.businessName : input.name, 120, true), phone, email, passwordHash, role: vendor ? 'VENDOR' : 'CLIENT', cityId } });
+    if (vendor) await tx.vendor.create({ data: { userId: user.id, businessName: text(input.businessName, 160, true), businessNameEn: text(input.businessNameEn, 160), categoryId: text(input.categoryId, 80, true), cityId, neighborhood: text(input.neighborhood, 160), logo: '', bannerImage: '', bioAr: text(input.bioAr, 4000), cancellationPolicyAr: '', contactPhone: phone, whatsappNumber: text(input.whatsappNumber || phone, 20), status: 'UNDER_REVIEW', verified: false } });
+    return tx.user.findUniqueOrThrow({ where: { id: user.id }, include: { vendorProfile: true } });
+  });
+  await createSession(user.id);
+  return { success: true, user: profile(user) };
+});

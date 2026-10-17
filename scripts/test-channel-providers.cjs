@@ -1,0 +1,34 @@
+// Pure adapter tests; fetch is mocked and no message leaves the process.
+const assert = require('node:assert/strict');
+const fs = require('node:fs'); const ts = require('typescript'); const Module = require('node:module');
+const originalLoad = Module._load;
+Module._load = function(name, ...args) { if (name === 'server-only') return {}; if(name.startsWith('@/'))name=require('node:path').resolve('src',name.slice(2)); return originalLoad.call(this, name, ...args); };
+require.extensions['.ts'] = (module, filename) => module._compile(ts.transpileModule(fs.readFileSync(filename, 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true } }).outputText, filename);
+const { encrypt, decrypt, validateConfig, deliver, internationalPhone } = require('../src/lib/server/channels.ts');
+process.env.CHANNEL_ENCRYPTION_KEY = 'a1'.repeat(32);
+const ciphertext = encrypt('private-api-key', 'owner:email');
+assert(!ciphertext.includes('private-api-key')); assert.equal(decrypt(ciphertext, 'owner:email'), 'private-api-key');
+assert.throws(() => decrypt(ciphertext, 'other-owner:email'));
+assert.throws(() => decrypt(ciphertext.slice(0,-2)+'00', 'owner:email'));
+assert.equal(internationalPhone('0501234567'), '+966501234567'); assert.equal(internationalPhone('00966501234567'), '+966501234567');
+assert.throws(() => validateConfig('sms', {accountSid:'../../evil',from:'+966501234567'}));
+assert.throws(() => validateConfig('whatsapp', {phoneNumberId:'../../evil',apiVersion:'v25.0',templateName:'invite',language:'ar'}));
+assert.throws(() => validateConfig('email', {from:'sender@example.com\r\nBcc: bad@example.com'}));
+let calls=[];
+global.fetch=async (url,init)=>{ calls.push({url,init}); return new Response(JSON.stringify(url.includes('facebook')?{messages:[{id:'wa-id'}]}:url.includes('twilio')?{sid:'sms-id'}:{id:'email-id'}),{status:200}); };
+const message={phone:'0501234567',email:'guest@example.com',name:'الضيف',title:'المناسبة',url:'https://example.com/invite/random',requestKey:'test-key'};
+(async()=>{
+  assert.equal(await deliver('whatsapp',{phoneNumberId:'12345',apiVersion:'v25.0',templateName:'invitation',language:'ar'},'secret',message),'wa-id');
+  const wa=JSON.parse(calls[0].init.body); assert.equal(wa.to,'966501234567'); assert.deepEqual(wa.template.components[0].parameters.map(p=>p.text),[message.name,message.title,message.url]);
+  assert.equal(await deliver('sms',{accountSid:'AC'+'1'.repeat(32),from:'Munasabati'},'secret',message),'sms-id');
+  assert.equal(new URLSearchParams(calls[1].init.body).get('To'),'+966501234567');
+  assert.equal(await deliver('email',{from:'sender@example.com'},'secret',message),'email-id');
+  assert.equal(calls[2].init.headers['Idempotency-Key'],'test-key'); assert.deepEqual(JSON.parse(calls[2].init.body).to,['guest@example.com']);
+  global.fetch=async()=>new Response('{}',{status:401});
+  await assert.rejects(()=>deliver('email',{from:'sender@example.com'},'secret',message),e=>e.status===502);
+  global.fetch=async()=>new Response('{}',{status:503});
+  await assert.rejects(()=>deliver('email',{from:'sender@example.com'},'secret',message),e=>e.status===504);
+  global.fetch=async()=>{throw Error('timeout')};
+  await assert.rejects(()=>deliver('email',{from:'sender@example.com'},'secret',message),e=>e.status===504);
+  console.log('PASS: authenticated encryption, owner binding, tamper protection, provider config validation, Saudi phone normalization, provider payloads, rejection and ambiguous timeout handling. No external requests sent.');
+})().catch(e=>{console.error(e);process.exitCode=1});

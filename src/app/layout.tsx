@@ -2,6 +2,13 @@ import type { Metadata } from 'next';
 import { Tajawal, Cairo } from 'next/font/google';
 import './globals.css';
 import { AppProvider } from '@/lib/store';
+import FeatureProvider, { FeatureContent } from '@/components/system/FeatureProvider';
+import { featureStates } from '@/lib/server/features';
+import { defaultFeatures } from '@/lib/system/feature-catalog';
+import GeoProvider from '@/components/geo/GeoProvider';
+import CoverageNotice from '@/components/geo/CoverageNotice';
+import SiteChrome from '@/components/geo/SiteChrome';
+import { geoContext } from '@/lib/server/geo/context';
 import Navbar from '@/components/layout/Navbar';
 import MobileBottomNav from '@/components/layout/MobileBottomNav';
 import Footer from '@/components/layout/Footer';
@@ -28,24 +35,25 @@ export const metadata: Metadata = {
   keywords: ['مناسبتي', 'تخطيط مناسبات', 'كوشة بالرياض', 'ضيافة سعودية', 'قهوجيين', 'حفلات تخرج', 'زواج', 'ملكة', 'عروض أسعار'],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const location = await geoContext().catch(() => null);
+  const features = await featureStates().catch(() => defaultFeatures().map(f => ({ ...f, enabled: false, visible: false })));
   return (
     <html lang="ar" dir="rtl" className={`${tajawal.variable} ${cairo.variable}`}>
       <body className="min-h-screen flex flex-col bg-[#FAF7F2] text-[#1E293B] antialiased selection:bg-saudi-gold-400 selection:text-saudi-green-950">
-        <AppProvider>
-          <Navbar />
+        <GeoProvider initial={location}><FeatureProvider initial={features}><AppProvider>
+          <SiteChrome><Navbar /><CoverageNotice /></SiteChrome>
           <main className="flex-1">
             {children}
           </main>
-          <LumaAIDrawer />
+          <SiteChrome><FeatureContent id="luma"><LumaAIDrawer /></FeatureContent></SiteChrome>
           <UserOnboardingModal />
-          <MobileBottomNav />
-          <Footer />
-        </AppProvider>
+          <SiteChrome><MobileBottomNav /><Footer /></SiteChrome>
+        </AppProvider></FeatureProvider></GeoProvider>
       </body>
     </html>
   );

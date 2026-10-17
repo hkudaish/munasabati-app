@@ -1,3 +1,4 @@
+import { guardService } from '@/lib/server/features';
 import { NextResponse } from 'next/server';
 import { getOMSSuborderById, saveOMSMasterOrder, recordOMSEvent } from '@/lib/oms/store';
 import { validateStateTransition } from '@/lib/oms/state-machine';
@@ -5,7 +6,7 @@ import { aggregateMasterOrderStatus } from '@/lib/oms/orchestrator';
 import { generateNotificationText, sendOMSNotification } from '@/lib/oms/notifications';
 import type { OMSOrderStatus, ActorRole } from '@/lib/oms/types';
 
-export async function POST(req: Request) {
+async function POSTHandler(req: Request) {
   try {
     const body = await req.json();
     const { suborderId, targetState, role, noteAr, deliverablesUrl, proofOfDelivery, actorUserId } = body;
@@ -99,3 +100,5 @@ export async function POST(req: Request) {
     );
   }
 }
+
+export const POST = guardService(POSTHandler, 'commerce', true);

@@ -19,14 +19,15 @@ export function normalizeInvitationOrigin(origin: string): string {
   if (!['https:', 'http:'].includes(url.protocol) || url.username || url.password || url.pathname !== '/' || url.search || url.hash) throw new Error('أدخل عنوان الموقع فقط، مثل https://example.com أو http://192.168.1.10:3000');
   return url.origin;
 }
-export function getInvitationOrigin(): string {
+export function getInvitationOrigin(savedOrigin?: string): string {
   if (typeof window === 'undefined') return '';
-  try { return normalizeInvitationOrigin(localStorage.getItem(INVITATION_ORIGIN_KEY) || window.location.origin); }
+  try { return normalizeInvitationOrigin(savedOrigin || process.env.NEXT_PUBLIC_APP_URL || window.location.origin); }
   catch { return window.location.origin; }
 }
 // A portable snapshot of public event details, never guest phones, balances or an access grant.
 // The URL fragment stays in the browser and is not sent to the server by HTTP.
 export function createInvitationLink(origin: string, occasion: PublicInvitation, code = `MUN-DEMO-${occasion.id}`): string {
+  if (/^[A-Za-z0-9_-]{43}$/.test(code)) return `${normalizeInvitationOrigin(origin)}/invite/${code}`;
   const details = publicDetails(occasion);
   if (!details || !/^[A-Za-z0-9_-]{1,140}$/.test(code)) throw new Error('تفاصيل الدعوة أو رمزها غير صالح');
   const snapshot = { v: 1, c: code, o: [details.id, details.title, details.date, details.time || '', details.venueName || '', details.cityNameAr] };

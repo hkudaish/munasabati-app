@@ -23,37 +23,33 @@ import { useApp } from '@/lib/store';
 import { formatSAR } from '@/lib/utils';
 import confetti from 'canvas-confetti';
 import InvitationQRCode from '@/components/common/InvitationQRCode';
-import { createInvitationLink, getInvitationOrigin, PublicInvitation, readInvitationSnapshot } from '@/lib/invitations/link';
-import { INITIAL_OCCASIONS } from '@/lib/seed-data';
+import { PublicInvitation } from '@/lib/invitations/link';
+import { requestJSON } from '@/lib/api-client';
 import DigitalEaniyahModal from '@/components/occasion/DigitalEaniyahModal';
 
 export default function GuestRSVPPage() {
   const params = useParams();
-  const { occasions, guests, updateGuestStatus, eaniyahGifts } = useApp();
-
-  const inviteCode = (params.code as string) || 'MUN-RSVP-DEMO';
-  const linkedGuest = guests.find(guest => guest.qrCode === inviteCode);
-  const occasionId = inviteCode.startsWith('MUN-DEMO-') ? inviteCode.slice('MUN-DEMO-'.length) : linkedGuest?.occasionId;
-  const [snapshot, setSnapshot] = useState<PublicInvitation | null>(null);
+  const { eaniyahGifts } = useApp();
+  const inviteCode = (params.code as string) || '';
+  const [currentOccasion, setCurrentOccasion] = useState<PublicInvitation | null>(null);
+  const [linkedGuest, setLinkedGuest] = useState<{ name: string; companionCount: number; status: string } | null>(null);
   const [linkLoaded, setLinkLoaded] = useState(false);
   const [qrLink, setQrLink] = useState('');
   const [responseNotice, setResponseNotice] = useState('');
-  const currentOccasion = snapshot || occasions.find(occasion => occasion.id === occasionId)
-    || (inviteCode === 'MUN-RSVP-DEMO' ? INITIAL_OCCASIONS[0] : undefined);
+  const [submitting, setSubmitting] = useState(false);
   useEffect(() => {
-    const readLink = () => {
-      setSnapshot(readInvitationSnapshot(window.location.hash, inviteCode));
-      setLinkLoaded(true);
-    };
-    readLink();
-    window.addEventListener('hashchange', readLink);
-    return () => window.removeEventListener('hashchange', readLink);
+    let cancelled = false; setLinkLoaded(false); setIsSubmitted(false); setStatus(null); setResponseNotice('');
+    requestJSON(`/api/invitations/${encodeURIComponent(inviteCode)}`).then(data => {
+      if (cancelled) return;
+      setCurrentOccasion(data.occasion); setLinkedGuest(data.guest);
+      setGuestName(data.guest?.name || ''); setCompanionCount(String(data.guest?.rsvpCompanionCount || 0));
+      setQrLink(`${window.location.origin}/invite/${encodeURIComponent(inviteCode)}`);
+      if (!data.guest) setResponseNotice('رابط عرض عام؛ لتأكيد الحضور استخدم رابط الضيف الشخصي من المنظم.');
+      else if (['confirmed','declined'].includes(data.guest.status)) { setStatus(data.guest.status); setIsSubmitted(true); }
+    }).catch(error => { if (!cancelled) { setCurrentOccasion(null); setResponseNotice(error.message); } })
+      .finally(() => { if (!cancelled) setLinkLoaded(true); });
+    return () => { cancelled = true; };
   }, [inviteCode]);
-  useEffect(() => {
-    if (!currentOccasion) return;
-    try { setQrLink(createInvitationLink(getInvitationOrigin(), currentOccasion, inviteCode)); }
-    catch { setQrLink(''); }
-  }, [currentOccasion, inviteCode]);
 
   const [guestName, setGuestName] = useState('');
   const [phone, setPhone] = useState('');
@@ -69,7 +65,7 @@ export default function GuestRSVPPage() {
     <div className="min-h-[60vh] flex items-center justify-center p-6 text-center">
       <div className="bg-white border rounded-3xl p-8 space-y-3">
         <h1 className="text-xl font-bold">الدعوة غير متاحة</h1>
-        <p className="text-sm text-gray-600">هذا الرابط قديم أو غير صالح. اطلب من صاحب المناسبة مشاركة الرابط الجديد أو رمز QR من تبويب الدعوات.</p>
+        <p className="text-sm text-gray-600">{responseNotice || 'اطلب من صاحب المناسبة رابط الدعوة الجديد.'}</p>
       </div>
     </div>
   );
@@ -77,24 +73,15 @@ export default function GuestRSVPPage() {
   const occasionEaniyah = eaniyahGifts.filter((g) => g.occasionId === currentOccasion.id);
   const totalEaniyah = occasionEaniyah.reduce((acc, g) => acc + g.amount, 0);
 
-  const handleRSVP = (choice: 'confirmed' | 'declined') => {
-    if (!guestName.trim()) { setResponseNotice('يرجى كتابة اسمك أولاً.'); return; }
-    if (linkedGuest && linkedGuest.occasionId === currentOccasion.id) updateGuestStatus(linkedGuest.id, choice);
-    setResponseNotice('تأكيد الحضور محفوظ في هذا المتصفح فقط في النسخة التجريبية.');
-    setStatus(choice);
-    setIsSubmitted(true);
-
-    if (choice === 'confirmed') {
-      try {
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 },
-        });
-      } catch {
-        // fallback
-      }
-    }
+  const handleRSVP = async (choice: 'confirmed' | 'declined') => {
+    if (!linkedGuest || submitting) return;
+    setSubmitting(true); setResponseNotice('جارٍ حفظ الرد…');
+    try {
+      await requestJSON(`/api/invitations/${encodeURIComponent(inviteCode)}`, 'POST', { status: choice, companionCount: Number(companionCount), congratsMessage });
+      setResponseNotice('حُفظ ردك لدى منظم المناسبة بنجاح.'); setStatus(choice); setIsSubmitted(true);
+      if (choice === 'confirmed') { try { confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } }); } catch {} }
+    } catch (error) { setResponseNotice(error instanceof Error ? error.message : 'تعذر حفظ الرد؛ أعد المحاولة'); }
+    finally { setSubmitting(false); }
   };
 
   const handleAddToCalendar = () => {
@@ -204,7 +191,7 @@ export default function GuestRSVPPage() {
                     هل ستشرفنا بالحضور؟ ✨
                   </h3>
                   <p className="text-xs text-gray-500">
-                    يرجى تأكيد حضورك لتسهيل تنظيم المقاعد والضيافة.
+                    يرجى تأكيد حضورك لتسهيل تنظيم المقاعد والضيافة. سيصل ردك إلى المنظم.
                   </p>
                 </div>
 
@@ -214,7 +201,7 @@ export default function GuestRSVPPage() {
                     <input
                       type="text"
                       value={guestName}
-                      onChange={(e) => setGuestName(e.target.value)}
+                      readOnly
                       className="w-full px-3 py-2 border border-gray-300 rounded-xl text-xs focus:outline-none focus:border-saudi-gold-500 font-medium"
                       required
                     />
@@ -222,20 +209,11 @@ export default function GuestRSVPPage() {
 
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="block text-xs font-bold text-gray-700 mb-1">رقم الجوال</label>
-                      <input
-                        type="tel"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-xl text-xs text-left dir-ltr focus:outline-none focus:border-saudi-gold-500"
-                      />
-                    </div>
-                    <div>
                       <label className="block text-xs font-bold text-gray-700 mb-1">عدد المرافقين</label>
                       <input
                         type="number"
                         min="0"
-                        max="5"
+                        max={linkedGuest?.companionCount || 0}
                         value={companionCount}
                         onChange={(e) => setCompanionCount(e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-xl text-xs focus:outline-none focus:border-saudi-gold-500"
@@ -257,7 +235,7 @@ export default function GuestRSVPPage() {
 
                 <div className="grid grid-cols-2 gap-3 pt-2">
                   <button
-                    onClick={() => handleRSVP('confirmed')}
+                    disabled={submitting || !linkedGuest} onClick={() => void handleRSVP('confirmed')}
                     className="py-3 bg-saudi-green-800 hover:bg-saudi-green-900 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md transition"
                   >
                     <CheckCircle2 className="w-4 h-4 text-saudi-gold-300" />
@@ -265,7 +243,7 @@ export default function GuestRSVPPage() {
                   </button>
 
                   <button
-                    onClick={() => handleRSVP('declined')}
+                    disabled={submitting || !linkedGuest} onClick={() => void handleRSVP('declined')}
                     className="py-3 bg-saudi-sand-100 hover:bg-saudi-sand-200 text-gray-700 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 transition"
                   >
                     <XCircle className="w-4 h-4 text-gray-400" />

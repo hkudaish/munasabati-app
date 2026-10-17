@@ -71,6 +71,8 @@ model User {
   name          String
   role          UserRole  @default(CLIENT)
   avatar        String?
+  passwordHash  String?
+  isActive      Boolean   @default(true)
   cityId        String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -79,6 +81,9 @@ model User {
   orders        MultiVendorOrder[]
   reviews       Review[]
   vendorProfile Vendor?
+  sessions      AuthSession[]
+  channelSettings ChannelSetting[]
+  invitationTemplates InvitationTemplate[]
 
   @@index([phone])
   @@index([role])
@@ -87,6 +92,107 @@ model User {
 // -------------------------------------------------------------
 // 2. Geography & Master Categories
 // -------------------------------------------------------------
+model GeoCountry {
+  code String @id
+  nameAr String
+  nameEn String
+  aliases String[] @default([])
+  enabled Boolean @default(false)
+  version Int @default(1)
+  updatedAt DateTime @updatedAt
+  regions GeoRegion[]
+  cities SaudiCity[]
+}
+model GeoRegion {
+  id String @id
+  countryCode String
+  country GeoCountry @relation(fields: [countryCode], references: [code])
+  nameAr String
+  nameEn String
+  cities SaudiCity[]
+  @@unique([countryCode, nameEn])
+}
+model GeoRule {
+  id String @id @default(uuid())
+  cityId String
+  city SaudiCity @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  featureId String?
+  feature SystemFeature? @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  serviceId String?
+  service ServiceItem? @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  status String @default("UNAVAILABLE")
+  startsAt DateTime?
+  endsAt DateTime?
+  reason String?
+  message String?
+  version Int @default(1)
+  updatedAt DateTime @updatedAt
+  @@unique([cityId, featureId])
+  @@unique([cityId, serviceId])
+  @@index([cityId, status])
+}
+model GeoPolicy {
+  id String @id @default("default")
+  version Int @default(1)
+  unknownCity String @default("PROMPT")
+  hideUnavailable Boolean @default(true)
+  analyticsEnabled Boolean @default(false)
+  reverseEnabled Boolean @default(false)
+  ipEnabled Boolean @default(true)
+  updatedAt DateTime @updatedAt
+}
+model GeoDraft {
+  id String @id @default(uuid())
+  ownerId String
+  name String
+  payload Json
+  baseRevision Int
+  version Int @default(1)
+  status String @default("DRAFT")
+  updatedAt DateTime @updatedAt
+  @@index([ownerId, status])
+}
+model GeoRevision {
+  id String @id @default("default")
+  version Int @default(0)
+}
+model GeoPreview {
+  id String @id @default(uuid())
+  ownerId String
+  cityId String?
+  countryCode String?
+  draftId String?
+  visitorType String @default("guest")
+  expiresAt DateTime
+  @@index([ownerId])
+}
+model GeoPreference {
+  visitorHash String @id
+  userId String?
+  cityId String?
+  countryCode String?
+  unknownName String?
+  source String
+  expiresAt DateTime
+  updatedAt DateTime @updatedAt
+  @@index([userId])
+  @@index([expiresAt])
+}
+model GeoDailyMetric {
+  day String
+  cityKey String
+  countryKey String
+  serviceKey String
+  kind String
+  count Int @default(0)
+  @@id([day, cityKey, countryKey, serviceKey, kind])
+}
+model GeoSessionEvent {
+  id String @id
+  expiresAt DateTime
+  @@index([expiresAt])
+}
+
 model SaudiCity {
   id          String   @id // e.g. 'riyadh', 'jeddah'
   nameAr      String
@@ -94,6 +200,16 @@ model SaudiCity {
   regionAr    String
   isAvailable Boolean  @default(true)
   sortOrder   Int      @default(0)
+  countryCode String?
+  country GeoCountry? @relation(fields: [countryCode], references: [code])
+  regionId String?
+  region GeoRegion? @relation(fields: [regionId], references: [id])
+  aliases String[] @default([])
+  externalId String? @unique
+  defaultAvailable Boolean @default(false)
+  version Int @default(1)
+  updatedAt DateTime @updatedAt
+  geoRules GeoRule[]
 
   vendors     Vendor[]
   occasions   Occasion[]
@@ -190,6 +306,7 @@ model VendorMetrics {
 // 4. Services, Packages & Add-ons
 // -------------------------------------------------------------
 model ServiceItem {
+  geoRules GeoRule[]
   id                     String          @id @default(uuid())
   vendorId               String
   vendor                 Vendor          @relation(fields: [vendorId], references: [id], onDelete: Cascade)
@@ -296,6 +413,10 @@ model Occasion {
   readinessPercentage Int        @default(20)
   status              String     @default("planning")
   notes               String?    @db.Text
+  shareCode           String?    @unique
+  invitationDraft     Json?
+  draftVersion        Int        @default(0)
+  shareOrigin         String?
   createdAt           DateTime   @default(now())
   updatedAt           DateTime   @updatedAt
 
@@ -312,6 +433,7 @@ model Guest {
   occasion         Occasion  @relation(fields: [occasionId], references: [id], onDelete: Cascade)
   name             String
   phone            String
+  email            String?
   category         String    @default("family")
   familyGroup      String?
   companionCount   Int       @default(0)
@@ -322,11 +444,104 @@ model Guest {
   invitedVia       String    @default("whatsapp")
   invitationSentAt DateTime?
   rsvpTime         DateTime?
+  rsvpCompanionCount Int?
+  congratulation   String? @db.Text
+  revokedAt        DateTime?
+  deliveries       InvitationDelivery[]
   notes            String?   @db.Text
   createdAt        DateTime  @default(now())
 
   @@index([occasionId])
   @@index([phone])
+}
+
+model AuthSession {
+  tokenHash String @id
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model SystemFeature {
+  geoRules GeoRule[]
+  id String @id
+  visible Boolean @default(true)
+  enabled Boolean @default(true)
+  version Int @default(1)
+  updatedAt DateTime @updatedAt
+}
+
+model SystemAuditLog {
+  id String @id @default(uuid())
+  actorId String
+  action String
+  targetId String
+  details Json?
+  createdAt DateTime @default(now())
+  @@index([createdAt])
+  @@index([actorId])
+}
+
+model SystemSetupToken {
+  tokenHash String @id
+  email String
+  expiresAt DateTime
+  consumedAt DateTime?
+  createdAt DateTime @default(now())
+  @@index([email])
+  @@index([expiresAt])
+}
+
+model AuthAttempt {
+  key String @id
+  count Int @default(1)
+  expiresAt DateTime
+}
+
+model ChannelSetting {
+  id String @id @default(uuid())
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channel String
+  enabled Boolean @default(false)
+  config Json
+  encryptedSecret String
+  updatedAt DateTime @updatedAt
+  @@unique([userId, channel])
+}
+
+model InvitationTemplate {
+  id String @id @default(uuid())
+  ownerId String
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  status String @default("private")
+  version Int @default(1)
+  data Json
+  updatedAt DateTime @updatedAt
+  @@index([ownerId, status])
+}
+
+model InvitationFavorite {
+  userId String
+  templateId String
+  @@id([userId, templateId])
+}
+
+model InvitationDelivery {
+  id String @id @default(uuid())
+  guestId String
+  guest Guest @relation(fields: [guestId], references: [id], onDelete: Cascade)
+  channel String
+  requestKey String @unique
+  status String @default("PENDING")
+  providerId String?
+  errorCode String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([guestId, createdAt])
 }
 
 // -------------------------------------------------------------

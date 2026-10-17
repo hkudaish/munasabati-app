@@ -1,20 +1,24 @@
+import { requireAdmin } from '@/lib/server/auth';
+import { HttpError } from '@/lib/server/http';
 import { NextResponse } from 'next/server';
 import { getOMSSettings, saveOMSSettings } from '@/lib/oms/store';
 
 export async function GET() {
   try {
+    await requireAdmin();
     const settings = await getOMSSettings();
     return NextResponse.json({ success: true, settings });
   } catch (error: any) {
     return NextResponse.json(
       { success: false, errorAr: error?.message || 'فشل في استرجاع إعدادات الأتمتة' },
-      { status: 500 }
+      { status: error instanceof HttpError ? error.status : 500 }
     );
   }
 }
 
 export async function POST(req: Request) {
   try {
+    await requireAdmin();
     const body = await req.json();
     const { settings, actorUserId } = body;
 
@@ -34,7 +38,7 @@ export async function POST(req: Request) {
   } catch (error: any) {
     return NextResponse.json(
       { success: false, errorAr: error?.message || 'فشل في حفظ إعدادات الأتمتة' },
-      { status: 500 }
+      { status: error instanceof HttpError ? error.status : 500 }
     );
   }
 }

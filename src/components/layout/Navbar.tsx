@@ -1,7 +1,9 @@
 'use client';
 
+import CityPicker from '@/components/geo/CityPicker';
+import { FeatureContent } from '@/components/system/FeatureProvider';
 import React, { useState, Suspense } from 'react';
-import Link from 'next/link';
+import Link from '@/components/system/FeatureLink';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useApp } from '@/lib/store';
 import {
@@ -68,38 +70,7 @@ function NavbarContent() {
       {/* Top Banner for Role Switcher & City & User Auth */}
       <div className="bg-saudi-green-900 text-white text-xs py-1.5 px-3 sm:px-4">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2.5">
-          {/* City & Location Selector */}
-          <div className="relative flex items-center gap-2">
-            <MapPin className="w-3.5 h-3.5 text-saudi-gold-400" />
-            <span className="text-gray-300 hidden sm:inline">المدينة:</span>
-            <button
-              onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
-              className="font-bold text-saudi-gold-300 hover:text-white flex items-center gap-1 bg-white/10 px-2 py-0.5 rounded transition"
-            >
-              <span>{activeCityObj.nameAr}</span>
-              <ChevronDown className="w-3 h-3" />
-            </button>
-
-            {isCityDropdownOpen && (
-              <div
-                className="absolute top-full right-0 mt-1 w-44 bg-white text-gray-800 rounded-lg shadow-xl border border-gray-100 py-1 z-50 animate-fadeIn"
-                onClick={() => setIsCityDropdownOpen(false)}
-              >
-                {cities.map((city) => (
-                  <button
-                    key={city.id}
-                    onClick={() => setSelectedCity(city.id)}
-                    className={`w-full text-right px-3 py-1.5 text-xs hover:bg-saudi-green-50 flex items-center justify-between ${
-                      selectedCity === city.id ? 'font-bold text-saudi-green-800 bg-saudi-green-50' : ''
-                    }`}
-                  >
-                    <span>{city.nameAr}</span>
-                    <span className="text-[10px] text-gray-400">{city.regionAr}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          <CityPicker />
 
           {/* Role Switcher & Account Access */}
           <div className="flex items-center gap-2 sm:gap-4">
@@ -185,7 +156,7 @@ function NavbarContent() {
                       ? 'bg-saudi-gold-500/30 text-saudi-gold-300'
                       : 'bg-emerald-800 text-emerald-200'
                   }`}>
-                    {currentUser.role === 'admin' ? 'إدارة' : currentUser.role === 'vendor' ? 'مورد' : 'عميل'}
+                    {currentUser.hasSystemAccess ? 'مدير النظام' : currentUser.role === 'admin' ? 'إدارة' : currentUser.role === 'vendor' ? 'مورد' : 'عميل'}
                   </span>
                   <ChevronDown className="w-3 h-3 text-gray-300" />
                 </button>
@@ -200,8 +171,8 @@ function NavbarContent() {
                       <p className="text-[11px] text-gray-500">{currentUser.phone || currentUser.email}</p>
                       <div className="mt-1.5 flex items-center gap-1">
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-saudi-sand-100 text-saudi-green-900">
-                          {currentUser.role === 'admin'
-                            ? '🛡️ مشرف النظام العام'
+                          {currentUser.hasSystemAccess ? '🛡️ مدير النظام' : currentUser.role === 'admin'
+                            ? '🛡️ حساب إداري'
                             : currentUser.role === 'vendor'
                             ? '🏪 حساب مورد معتمد'
                             : '👤 حساب صاحب المناسبة'}
@@ -238,6 +209,10 @@ function NavbarContent() {
                         <span>تبديل الحساب أو إنشاء حساب جديد</span>
                       </button>
 
+                      {currentUser.hasSystemAccess && <Link href="/system-admin" className="block px-3 py-2 text-xs font-bold text-amber-800 hover:bg-amber-50 rounded-xl">مدير النظام</Link>}
+                      {currentUser.hasSystemAccess && <Link href="/system-admin/geography" className="block px-3 py-2 text-xs text-emerald-900">الدول والمدن والخدمات</Link>}
+                      <Link href="/settings/channels" onClick={() => setIsUserDropdownOpen(false)} className="block px-3 py-2 text-xs font-bold text-saudi-green-900 hover:bg-gray-50 rounded-xl">إعدادات إرسال الدعوات</Link>
+                      <Link href="/settings/invitations-data" onClick={() => setIsUserDropdownOpen(false)} className="block px-3 py-2 text-xs text-gray-600 hover:bg-gray-50 rounded-xl">نقل الدعوات السابقة</Link>
                       <button
                         onClick={logoutUser}
                         className="w-full text-right px-4 py-2 hover:bg-red-50 text-red-700 font-semibold flex items-center gap-2 border-t border-gray-100 mt-1"
@@ -596,14 +571,14 @@ function NavbarContent() {
                 </Link>
 
                 {/* AI Assistant Button (لُـمى) */}
-                <button
+                <FeatureContent id="luma"><button
                   onClick={() => setIsAIOpen(true)}
                   className="flex items-center gap-1.5 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 px-3 sm:px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black shadow-md shadow-saudi-gold-500/20 hover:scale-[1.02] active:scale-[0.98] transition"
                 >
                   <Sparkles className="w-4 h-4 text-saudi-green-950 animate-spin-slow" />
                   <span className="hidden sm:inline">{adminConfig.aiAssistantNameAr} (الذكاء الاصطناعي)</span>
                   <span className="sm:hidden">لُـمى</span>
-                </button>
+                </button></FeatureContent>
 
                 {/* Create Occasion Direct CTA */}
                 <Link
@@ -627,13 +602,13 @@ function NavbarContent() {
                   <span>+ إضافة خدمة جديدة</span>
                 </Link>
 
-                <button
+                <FeatureContent id="luma"><button
                   onClick={() => setIsAIOpen(true)}
                   className="flex items-center gap-1.5 bg-saudi-green-800 hover:bg-saudi-green-900 text-white px-3 py-2 rounded-xl text-xs font-bold transition"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-saudi-gold-400" />
                   <span>مستشار المورد الذكي</span>
-                </button>
+                </button></FeatureContent>
               </>
             )}
 
@@ -676,10 +651,12 @@ function NavbarContent() {
                 <div>
                   <p className="font-bold text-xs text-gray-900">{currentUser.name}</p>
                   <p className="text-[10px] text-gray-500">
-                    {currentUser.role === 'admin' ? 'مشرف المنصة' : currentUser.role === 'vendor' ? 'مورد معتمد' : 'صاحب مناسبة'}
+                    {currentUser.hasSystemAccess ? 'مدير النظام' : currentUser.role === 'admin' ? 'مشرف المنصة' : currentUser.role === 'vendor' ? 'مورد معتمد' : 'صاحب مناسبة'}
                   </p>
                 </div>
               </div>
+              {currentUser.hasSystemAccess && <Link href="/system-admin" className="text-xs font-bold underline text-amber-800">مدير النظام</Link>}
+              <Link href="/settings/channels" className="text-xs underline text-saudi-green-900">إعدادات إرسال الدعوات</Link>
               <button
                 onClick={logoutUser}
                 className="text-[11px] text-red-600 font-bold p-1 hover:bg-white rounded"

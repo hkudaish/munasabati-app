@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useFeature } from '@/components/system/FeatureProvider';
+import { requestJSON } from '@/lib/api-client';
 import { 
   Music, 
   Sparkles, 
@@ -867,6 +869,7 @@ const FOLK_TROUPES: FolkTroupe[] = [
 // ==========================================
 
 export default function ZaffahPage() {
+  const generatorFeature = useFeature('zaffah_generator');
   const { occasions, activeOccasion, addToCart } = useApp();
 
   // Top Tabs: 'arts' (مكتبة الفنون والفرق) vs 'generator' (مولد الزفات)
@@ -1086,46 +1089,20 @@ export default function ZaffahPage() {
     }, 2000);
   };
 
+  useEffect(() => {
+    if (!generatorFeature.visible || !generatorFeature.enabled) { setActiveTab('arts'); setGeneratedPoem(''); }
+  }, [generatorFeature.visible, generatorFeature.enabled]);
+
   // AI Zaffah Generator Submission
-  const handleGenerateZaffah = (e: React.FormEvent) => {
+  const handleGenerateZaffah = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!generatorFeature.enabled || !generatorFeature.visible || isGenerating) return;
     setIsGenerating(true);
-
-    setTimeout(() => {
-      let poem = '';
-      if (zaffahStyle === 'royal') {
-        poem = `✨ *زفة ملكية خاصة | ليلة العمر في ${occasionCity}* ✨\n\n` +
-          `أَقْبَلَتْ شَمْسُ الحَسَبِ وَالعِزِّ وَالنُّورِ المُبِينْ\n` +
-          `«${brideName}» سَتْرُ الحَيَا بِنْتُ الأَكَابِرِ الطَّيِّبِينْ\n\n` +
-          `يَوْمَ زَفَّتْ طَابَتِ البُشْرَى لِقَلْبِ «${groomName}»\n` +
-          `فَارِسِ الأَمْجَادِ وَاللَّيْثِ الكَرِيمِ المُؤْتَمَنْ\n\n` +
-          `يَا هَلَا بِـ«${familyName}» كِرَامَ الجُودِ وَالوَجْهِ الطَّلِيقْ\n` +
-          `عَطَّرُوا صَحْنَ المَحَافِلِ بِالبَخُورِ وَبِالعَبِيقْ\n\n` +
-          `بَارَكَ الرَّحْمَنُ خَطْوَتَكُمْ عَلَى دَرْبِ الهَنَا\n` +
-          `وَجَعَلَ الأَفْرَاحَ عَامِرَةً مَدَى طُولِ الزَّمَنْ 🇸🇦🤍`;
-      } else if (zaffahStyle === 'traditional') {
-        poem = `🇸🇦 *أهزوجة وزفة تراثية سعودية* 🇸🇦\n\n` +
-          `يَا هَلَا يَا مَرْحَبَا بِاللِّي حَضَرْ فِي عُرْسِنَا\n` +
-          `نَوَّرَتْ «${occasionCity}» وَازْدَانَتْ لَيَالِي أُنْسِنَا\n\n` +
-          `قَامَتِ العَرْضَةُ وَرَفْرَفْ فِي سَمَانَا بَيْرَقُ الجُودِ التَّلِيدْ\n` +
-          `لِـ«${groomName}» رَاعِي المَوَاقِفِ سَيِّدِ القَوْمِ الصَّنْدِيدْ\n\n` +
-          `وَ«${brideName}» زَيْنُ الصَّبَايَا بَدْرٌ تَمَّ وَاكْتَمَلْ\n` +
-          `تَمْشِي بِثَوْبِ البَهَا وَالهَيْبَةِ وَنُورِ الأَمَلْ\n\n` +
-          `عَاشَتْ بُيُوتُ «${familyName}» عَسَاهَا فِي عِمَارْ\n` +
-          `فِي فَرَحْ دَائِمْ وَعِزٍّ مَا يِطَالِعْ لِلصَّغَارْ!`;
-      } else {
-        poem = `💫 *قصيدة زفة شاعرية رومانسية* 💫\n\n` +
-          `تَمَايَلِي يَا قُرَّةَ العَيْنِ «${brideName}» بِالدَّلَالْ\n` +
-          `فَقَدْ حَبَاكِ اللهُ مِنْ حُسْنِ المَهَابَةِ وَالجَمَالْ\n\n` +
-          `يَنْتَظِرُكِ كَفُّ «${groomName}» فِي خُطَى الحُبِّ النَّقِيّ\n` +
-          `يَعْقِدَانِ العَهْدَ مِيثَاقاً لِعُمْرٍ مُرْتَقِي\n\n` +
-          `تَشْهَدُ «${occasionCity}» أَنَّكُمَا أَجْمَلُ مَا رَأَتِ العُيُونْ\n` +
-          `عَسَى حَيَاتُكُمَا سَعَادَةً وَحِفْظاً مِنْ كُلِّ المَنُونْ.`;
-      }
-
-      setGeneratedPoem(poem);
-      setIsGenerating(false);
-    }, 600);
+    try {
+      const data = await requestJSON('/api/zaffah/generate', 'POST', { brideName, groomName, familyName, occasionCity, zaffahStyle });
+      setGeneratedPoem(data.poem);
+    } catch (error) { setGeneratedPoem(''); alert(error instanceof Error ? error.message : 'الخدمة غير متاحة'); }
+    finally { setIsGenerating(false); }
   };
 
   const handleCopyPoem = () => {
@@ -1192,8 +1169,10 @@ export default function ZaffahPage() {
               </span>
             </button>
 
-            <button
-              onClick={() => setActiveTab('generator')}
+            {generatorFeature.visible && <button
+              disabled={!generatorFeature.enabled}
+              title={!generatorFeature.enabled ? 'الخدمة معطلة حالياً' : undefined}
+              onClick={() => { if (generatorFeature.enabled) setActiveTab('generator'); }}
               className={`py-2.5 px-5 rounded-2xl transition flex items-center gap-2 ${
                 activeTab === 'generator'
                   ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 shadow-md'
@@ -1202,7 +1181,7 @@ export default function ZaffahPage() {
             >
               <Sparkles className="w-4 h-4 text-amber-500" />
               <span>مُولّد نصوص وقصائد الزفة بالذكاء الاصطناعي</span>
-            </button>
+            </button>}
           </div>
 
           <Link
@@ -1623,7 +1602,7 @@ export default function ZaffahPage() {
         {/* ========================================== */}
         {/* TAB 2: AI ZAFFHA POEM GENERATOR            */}
         {/* ========================================== */}
-        {activeTab === 'generator' && (
+        {generatorFeature.visible && generatorFeature.enabled && activeTab === 'generator' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Input Form Column (6 cols) */}
             <div className="lg:col-span-6 bg-white dark:bg-neutral-900 p-6 sm:p-8 rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-6">

@@ -1,7 +1,8 @@
 'use client';
 
+import { useGeo } from '@/components/geo/GeoProvider';
 import React, { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import {
   Star,
@@ -32,13 +33,15 @@ import confetti from 'canvas-confetti';
 
 export default function ServiceDetailPage() {
   const params = useParams();
+  const geo=useGeo();
+  const previewPath=usePathname().split('/');
   const router = useRouter();
   const { services, vendors, reviews, createBooking, addToCart, setIsAIOpen, activeOccasion } = useApp();
 
-  const serviceId = params?.id as string;
-  const rawService = services.find((s) => s.id === serviceId) || services[0];
+  const serviceId = (params?.id || (previewPath[1]==='coverage-preview'?previewPath[4]:'')) as string;
+  const rawService = services.find((s) => s.id === serviceId);
   const service = rawService ? ensureServiceDetails(rawService) : null;
-  const rawVendor = vendors.find((v) => v.id === service?.vendorId) || vendors[0];
+  const rawVendor = vendors.find((v) => v.id === service?.vendorId && v.status === 'active');
   const vendor = rawVendor ? ensureVendorDetails(rawVendor) : null;
   const serviceReviews = reviews.filter((r) => r.vendorId === vendor?.id);
 
@@ -61,7 +64,7 @@ export default function ServiceDetailPage() {
 
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
-  if (!service || !vendor) {
+  if (!service || !vendor || (geo.data?.summary!=='UNKNOWN' && !geo.data?.availability.find(a=>a.key==='item:'+serviceId)?.available)) {
     return (
       <div className="max-w-4xl mx-auto p-12 text-center space-y-4">
         <h2 className="text-xl font-bold font-cairo">الخدمة غير متوفرة</h2>
@@ -462,8 +465,8 @@ export default function ServiceDetailPage() {
           date={bookingDate}
           totalAmount={currentTotalPrice}
           onClose={() => setIsPaymentModalOpen(false)}
-          onPaymentSuccess={(method, isDeposit) => {
-            createBooking({
+          onPaymentSuccess={async (method, isDeposit) => {
+            await createBooking({
               occasionId: activeOccasion?.id,
               occasionTitle: activeOccasion?.title || service.titleAr,
               vendorId: service.vendorId,

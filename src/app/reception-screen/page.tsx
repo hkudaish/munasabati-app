@@ -32,11 +32,11 @@ function ReceptionWelcomeScreenContent() {
   // Find target occasion or active occasion
   const occasionIdParam = searchParams.get('occasionId');
   const targetOccasion =
-    occasions.find((o) => o.id === occasionIdParam) || activeOccasion || occasions[0];
+    occasionIdParam ? occasions.find((o) => o.id === occasionIdParam) : activeOccasion;
 
-  const occasionGuests = guests.filter((g) => g.occasionId === targetOccasion.id);
+  const occasionGuests = guests.filter((g) => g.occasionId === targetOccasion?.id);
   const attendedGuests = occasionGuests.filter((g) => g.status === 'attended');
-  const occasionEaniyah = eaniyahGifts.filter((g) => g.occasionId === targetOccasion.id);
+  const occasionEaniyah = eaniyahGifts.filter((g) => g.occasionId === targetOccasion?.id);
 
   // States
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -151,13 +151,14 @@ function ReceptionWelcomeScreenContent() {
   };
 
   // Manual simulator test
-  const handleSimulateArrival = (guest: Guest) => {
-    updateGuestStatus(guest.id, 'attended');
-    triggerWelcome(guest);
+  const handleSimulateArrival = async (guest: Guest) => {
+    if (await updateGuestStatus(guest.id, 'attended')) triggerWelcome(guest);
   };
 
   const attendancePercentage =
     occasionGuests.length > 0 ? Math.round((attendedGuests.length / occasionGuests.length) * 100) : 0;
+
+  if (!targetOccasion) return <p role="status" className="p-10 text-center">سجّل الدخول واختر مناسبة لعرض شاشة الاستقبال.</p>;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#00261E] via-[#003B2F] to-[#001813] text-white flex flex-col justify-between p-4 sm:p-8 select-none relative overflow-hidden font-tajawal">

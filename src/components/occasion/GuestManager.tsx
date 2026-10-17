@@ -1,5 +1,6 @@
 'use client';
 
+import GuestDeliveryControls from './GuestDeliveryControls';
 import InvitationQRCode from '@/components/common/InvitationQRCode';
 import { createInvitationLink, getInvitationOrigin } from '@/lib/invitations/link';
 
@@ -47,6 +48,7 @@ export default function GuestManager() {
   // Form states
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [category, setCategory] = useState<'men' | 'women' | 'family'>('women');
   const [companionCount, setCompanionCount] = useState('0');
   const [familyGroup, setFamilyGroup] = useState('');
@@ -71,14 +73,14 @@ export default function GuestManager() {
     pending: occasionGuests.filter((g) => g.status === 'invited').reduce((acc, g) => acc + 1 + (g.companionCount || 0), 0),
   };
 
-  const handleAddGuest = (e: React.FormEvent) => {
+  const handleAddGuest = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
 
-    addGuest({
+    const saved = await addGuest({
       occasionId: activeOccasion.id,
       name,
-      phone: phone || '+966500000000',
+      phone, email,
       category,
       companionCount: Number(companionCount) || 0,
       familyGroup: familyGroup || 'عام',
@@ -86,7 +88,9 @@ export default function GuestManager() {
       invitedVia: 'whatsapp',
     });
 
+    if (!saved) return;
     setName('');
+    setEmail('');
     setPhone('');
     setCompanionCount('0');
     setFamilyGroup('');
@@ -94,7 +98,7 @@ export default function GuestManager() {
   };
 
   const generateWhatsAppMessage = (guest: Guest) => {
-    const rsvpLink = createInvitationLink(getInvitationOrigin(), activeOccasion, guest.qrCode);
+    const rsvpLink = createInvitationLink(getInvitationOrigin(activeOccasion.shareOrigin), activeOccasion, guest.qrCode);
     const text = `السلام عليكم ورحمة الله وبركاته،\nنتشرف بدعوتكم لحضور "${activeOccasion.title}"\nالموعد: ${activeOccasion.date}\nيسعدنا تأكيد حضوركم عبر الرابط المخصص لكم:\n${rsvpLink}\n\nحضوركم يسعدنا ويشرفنا! ✨`;
     const cleanPhone = guest.phone.replace(/[^0-9]/g, '');
     return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
@@ -290,6 +294,7 @@ export default function GuestManager() {
                     </td>
                     <td className="p-3.5 text-center">
                       <div className="flex items-center justify-center gap-2">
+                        <GuestDeliveryControls guest={guest} />
                         {/* WhatsApp Invite button */}
                         <a
                           href={generateWhatsAppMessage(guest)}
@@ -350,6 +355,7 @@ export default function GuestManager() {
                 />
               </div>
 
+              <div><label className="block text-xs font-bold text-gray-700 mb-1">البريد الإلكتروني (اختياري)</label><input type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full rounded-xl border p-2 text-xs" dir="ltr" /></div>
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1">رقم الجوال (واتساب)</label>
                 <input
@@ -436,7 +442,7 @@ export default function GuestManager() {
 
             {/* Scannable invitation QR; the gate verifies the code against its guest list. */}
             <div className="bg-white p-4 rounded-2xl inline-block shadow-lg my-2">
-              <InvitationQRCode value={createInvitationLink(getInvitationOrigin(), activeOccasion, activeQRModalGuest.qrCode)} className="w-64 h-64 max-w-full mx-auto" />
+              <InvitationQRCode value={createInvitationLink(getInvitationOrigin(activeOccasion.shareOrigin), activeOccasion, activeQRModalGuest.qrCode)} className="w-64 h-64 max-w-full mx-auto" />
               <span className="text-[10px] font-mono text-gray-600 block mt-2">{activeQRModalGuest.qrCode}</span>
             </div>
 
@@ -530,14 +536,14 @@ export default function GuestManager() {
               />
               <button
                 type="button"
-                onClick={() => {
+                onClick={async () => {
                   if (!importText.trim()) return;
                   const lines = importText.split('\n');
                   let count = 0;
-                  lines.forEach((line) => {
+                  for (const line of lines) {
                     const parts = line.split(',').map((p) => p.trim());
                     if (parts[0]) {
-                      addGuest({
+                      const saved = await addGuest({
                         occasionId: activeOccasion.id,
                         name: parts[0],
                         phone: parts[1] || '+966500000000',
@@ -547,9 +553,9 @@ export default function GuestManager() {
                         status: 'invited',
                         invitedVia: 'whatsapp',
                       });
-                      count++;
+                      if (saved) count++;
                     }
-                  });
+                  }
                   setImportText('');
                   setIsImportExportOpen(false);
                   alert(`تم استيراد ${count} ضيف بنجاح!`);
@@ -589,7 +595,7 @@ export default function GuestManager() {
             {/* List of Guests to dispatch to */}
             <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
               {occasionGuests.map((guest, idx) => {
-                const rsvpLink = typeof window !== 'undefined' ? createInvitationLink(getInvitationOrigin(), activeOccasion, guest.qrCode) : '';
+                const rsvpLink = typeof window !== 'undefined' ? createInvitationLink(getInvitationOrigin(activeOccasion.shareOrigin), activeOccasion, guest.qrCode) : '';
                 const personalizedMsg = `السلام عليكم ورحمة الله وبركاته،\nنتشرف بدعوة الكريم/ة *${guest.name}* لحضور "${activeOccasion.title}"\nالموعد: ${activeOccasion.date}\nرابط بطاقة الدخول المخصصة وتأكيد الحضور:\n${rsvpLink}\n\nحضوركم يشرفنا ويسعدنا! ✨`;
                 const cleanPhone = guest.phone.replace(/[^0-9]/g, '');
 

@@ -1,14 +1,15 @@
 'use client';
 
+import { FeatureContent } from '@/components/system/FeatureProvider';
 import React from 'react';
-import Link from 'next/link';
+import Link from '@/components/system/FeatureLink';
 import { usePathname } from 'next/navigation';
 import { Home, ShoppingBag, Plus, CalendarDays, Sparkles, FileText, Store, ShieldCheck } from 'lucide-react';
 import { useApp } from '@/lib/store';
 
 export default function MobileBottomNav() {
   const pathname = usePathname();
-  const { activeOccasion, setIsAIOpen, cart, currentRole } = useApp();
+  const { activeOccasion, setIsAIOpen, cart, currentRole, currentUser } = useApp();
 
   // If Vendor is active
   if (currentRole === 'vendor') {
@@ -56,13 +57,13 @@ export default function MobileBottomNav() {
             <span className="text-[10px]">الحجوزات</span>
           </Link>
 
-          <button
+          <FeatureContent id="luma"><button
             onClick={() => setIsAIOpen(true)}
             className="flex flex-col items-center gap-1 py-1 px-2.5 rounded-lg text-saudi-gold-600 hover:text-saudi-gold-700 transition"
           >
             <Sparkles className="w-5 h-5" />
             <span className="text-[10px] font-bold">لُـمى (AI)</span>
-          </button>
+          </button></FeatureContent>
         </div>
       </div>
     );
@@ -74,13 +75,13 @@ export default function MobileBottomNav() {
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-saudi-sand-200 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] px-2 py-1.5">
         <div className="flex items-center justify-around relative">
           <Link
-            href="/admin"
+            href={currentUser?.hasSystemAccess ? '/system-admin' : '/admin'}
             className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-lg transition ${
               pathname === '/admin' ? 'text-saudi-green-800 font-bold' : 'text-gray-500 hover:text-saudi-green-800'
             }`}
           >
             <ShieldCheck className="w-5 h-5 text-saudi-green-800" />
-            <span className="text-[10px]">لوحة الإدارة</span>
+            <span className="text-[10px]">{currentUser?.hasSystemAccess ? 'مدير النظام' : 'لوحة الإدارة'}</span>
           </Link>
 
           <Link
@@ -99,13 +100,13 @@ export default function MobileBottomNav() {
             <span className="text-[10px]">الموردين</span>
           </Link>
 
-          <button
+          <FeatureContent id="luma"><button
             onClick={() => setIsAIOpen(true)}
             className="flex flex-col items-center gap-1 py-1 px-2.5 rounded-lg text-saudi-gold-600 hover:text-saudi-gold-700 transition"
           >
             <Sparkles className="w-5 h-5" />
             <span className="text-[10px] font-bold">لُـمى (AI)</span>
-          </button>
+          </button></FeatureContent>
         </div>
       </div>
     );
@@ -181,13 +182,13 @@ export default function MobileBottomNav() {
         )}
 
         {/* AI Assistant (Luma) */}
-        <button
+        <FeatureContent id="luma"><button
           onClick={() => setIsAIOpen(true)}
           className="flex flex-col items-center gap-1 py-1 px-2.5 rounded-lg text-saudi-gold-600 hover:text-saudi-gold-700 transition"
         >
           <Sparkles className="w-5 h-5" />
           <span className="text-[10px] font-bold">لُـمى (AI)</span>
-        </button>
+        </button></FeatureContent>
       </div>
     </div>
   );

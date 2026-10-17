@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import {
   Occasion,
   Guest,
@@ -36,8 +36,6 @@ import {
   VendorRegistrationPayload,
 } from './types';
 import {
-  INITIAL_OCCASIONS,
-  INITIAL_GUESTS,
   INITIAL_TABLES,
   INITIAL_BUDGET_ITEMS,
   INITIAL_TASKS,
@@ -60,11 +58,12 @@ import {
 import { 
   generateBookingNumber, 
   generateOrderNumber,
-  generateGuestQRCode,
   calculateCartTotals,
   ensureServiceDetails,
   ensureVendorDetails,
 } from './utils';
+import { useGeo } from '@/components/geo/GeoProvider';
+import { requestJSON } from './api-client';
 import { DEFAULT_RANKING_WEIGHTS } from './ranking-engine';
 
 interface AppContextType {
@@ -87,7 +86,7 @@ interface AppContextType {
   openOnboarding: (role?: 'client' | 'vendor') => void;
   registerCustomer: (payload: CustomerRegistrationPayload) => Promise<{ success: boolean; user?: UserProfile; error?: string }>;
   registerVendor: (payload: VendorRegistrationPayload) => Promise<{ success: boolean; user?: UserProfile; error?: string }>;
-  loginUser: (identifier: string, requestedRole?: UserRole) => Promise<{ success: boolean; user?: UserProfile; error?: string }>;
+  loginUser: (identifier: string, requestedRole?: UserRole, password?: string) => Promise<{ success: boolean; user?: UserProfile; error?: string }>;
   logoutUser: () => void;
   switchRole: (role: UserRole) => { allowed: boolean; messageAr?: string };
   permissionNotice: { open: boolean; targetRole: UserRole | null; messageAr: string } | null;
@@ -98,7 +97,7 @@ interface AppContextType {
   activeOccasionId: string;
   activeOccasion: Occasion | undefined;
   setActiveOccasionId: (id: string) => void;
-  createOccasion: (data: Partial<Occasion>) => string;
+  createOccasion: (data: Partial<Occasion>) => Promise<string | null>;
   updateOccasion: (id: string, data: Partial<Occasion>) => void;
   deleteOccasion: (id: string) => void;
 
@@ -113,8 +112,8 @@ interface AppContextType {
 
   // Occasion Details & Management
   guests: Guest[];
-  addGuest: (guest: Omit<Guest, 'id' | 'qrCode'>) => void;
-  updateGuestStatus: (guestId: string, status: Guest['status']) => void;
+  addGuest: (guest: Omit<Guest, 'id' | 'qrCode'>) => Promise<boolean>;
+  updateGuestStatus: (guestId: string, status: Guest['status']) => Promise<boolean>;
   deleteGuest: (guestId: string) => void;
 
   tables: SeatingTable[];
@@ -147,11 +146,11 @@ interface AppContextType {
 
   // Marketplace & RFQ & Bookings
   rfqRequests: RFQRequest[];
-  createRFQ: (rfq: Omit<RFQRequest, 'id' | 'quotes' | 'quotesCount' | 'createdAt'>) => string;
+  createRFQ: (rfq: Omit<RFQRequest, 'id' | 'quotes' | 'quotesCount' | 'createdAt'>) => Promise<string>;
   acceptRFQQuote: (rfqId: string, quoteId: string) => void;
 
   bookings: Booking[];
-  createBooking: (bookingData: Omit<Booking, 'id' | 'bookingNumber' | 'createdAt'>) => string;
+  createBooking: (bookingData: Omit<Booking, 'id' | 'bookingNumber' | 'createdAt'>) => Promise<string>;
   updateBookingStatus: (bookingId: string, status: Booking['status']) => void;
   payBookingDeposit: (bookingId: string, method: PaymentMethod) => void;
   payRemainingBooking: (bookingId: string, method: PaymentMethod) => void;
@@ -232,7 +231,7 @@ interface AppContextType {
     occasionId?: string;
     paymentMethod: PaymentMethod;
     isDepositOnly: boolean;
-  }) => MultiVendorOrder;
+  }) => Promise<MultiVendorOrder>;
 
   // Favorites & Comparison
   favoriteVendorIds: string[];
@@ -255,37 +254,32 @@ const STORAGE_KEY = 'munasabati_state_v1';
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [currentRole, setCurrentRole] = useState<'client' | 'vendor' | 'admin'>('client');
-  const [selectedCity, setSelectedCity] = useState<string>('riyadh');
+  const geo=useGeo();
+  const preview=!!geo.data?.preview || (typeof window!=='undefined' && window.location.pathname.startsWith('/coverage-preview/'));
+  const selectedCity=geo.data?.selection.cityId||'';
+  const setSelectedCity=(id:string)=>{void geo.chooseCity(id).catch(()=>{});};
   const [isAIOpen, setIsAIOpen] = useState<boolean>(false);
 
   // User Profile & Onboarding State
-  const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => ({
-    id: 'client-sara-1',
-    name: 'سارة العتيبي',
-    phone: '0501234567',
-    email: 'sara.otb@gmail.com',
-    role: 'client',
-    cityId: 'riyadh',
-    cityNameAr: 'الرياض',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
-    createdAt: '2026-01-15T10:00:00Z',
-  }));
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
+  const [databaseError, setDatabaseError] = useState('');
+  const accountRef = useRef<string | null>(null);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(false);
   const [onboardingInitialRole, setOnboardingInitialRole] = useState<'client' | 'vendor' | null>(null);
   const [permissionNotice, setPermissionNotice] = useState<{ open: boolean; targetRole: UserRole | null; messageAr: string } | null>(null);
 
-  const [occasions, setOccasions] = useState<Occasion[]>(INITIAL_OCCASIONS);
-  const [activeOccasionId, setActiveOccasionId] = useState<string>('occ-101');
+  const [occasions, setOccasions] = useState<Occasion[]>([]);
+  const [activeOccasionId, setActiveOccasionId] = useState<string>('');
 
   const [occasionTypes, setOccasionTypes] = useState<OccasionType[]>(OCCASION_TYPES);
   const [serviceCategories, setServiceCategories] = useState<ServiceCategory[]>(SERVICE_CATEGORIES);
-  const [cities, setCities] = useState<SaudiCity[]>(SAUDI_CITIES);
-  const [vendors, setVendors] = useState<Vendor[]>(() => VENDORS.map(ensureVendorDetails));
-  const [services, setServices] = useState<ServiceItem[]>(() => SERVICE_ITEMS.map(ensureServiceDetails));
+  const [cities, setCities] = useState<SaudiCity[]>(()=>(geo.data?.snapshot.cities||[]).map(c=>({...c,neighborhoods:SAUDI_CITIES.find(old=>old.id===c.id)?.neighborhoods||[]})));
+  const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [services, setServices] = useState<ServiceItem[]>([]);
   const [packages, setPackages] = useState<SmartPackage[]>(SMART_PACKAGES);
   const [inspirationPosts, setInspirationPosts] = useState<InspirationPost[]>(INSPIRATION_POSTS);
 
-  const [guests, setGuests] = useState<Guest[]>(INITIAL_GUESTS);
+  const [guests, setGuests] = useState<Guest[]>([]);
   const [tables, setTables] = useState<SeatingTable[]>(INITIAL_TABLES);
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>(INITIAL_BUDGET_ITEMS);
   const [tasks, setTasks] = useState<PlanningTask[]>(INITIAL_TASKS);
@@ -312,13 +306,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   // Load from localStorage if available
   useEffect(() => {
+    if (preview) return;
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed.occasions) setOccasions(parsed.occasions);
+        if ((parsed.occasions?.length || parsed.guests?.length) && !localStorage.getItem('munasabati_legacy_invitations_backup_v1')) {
+          localStorage.setItem('munasabati_legacy_invitations_backup_v1', JSON.stringify({ occasions: parsed.occasions || [], guests: parsed.guests || [] }));
+        }
         if (parsed.activeOccasionId) setActiveOccasionId(parsed.activeOccasionId);
-        if (parsed.guests) setGuests(parsed.guests);
         if (parsed.budgetItems) setBudgetItems(parsed.budgetItems);
         if (parsed.tasks) setTasks(parsed.tasks);
         if (parsed.runOfShowItems) setRunOfShowItems(parsed.runOfShowItems);
@@ -326,11 +322,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         if (parsed.bookings) setBookings(parsed.bookings);
         if (parsed.rfqRequests) setRfqRequests(parsed.rfqRequests);
         if (parsed.adminConfig) setAdminConfig(parsed.adminConfig);
-        if (parsed.vendors) setVendors(parsed.vendors.map(ensureVendorDetails));
-        if (parsed.services) setServices(parsed.services.map(ensureServiceDetails));
         if (parsed.packages) setPackages(parsed.packages);
         if (parsed.reviews) setReviews(parsed.reviews);
-        if (parsed.cities) setCities(parsed.cities);
         if (parsed.cart) setCart(parsed.cart);
         if (parsed.savedForLater) setSavedForLater(parsed.savedForLater);
         if (parsed.appliedCoupon) setAppliedCoupon(parsed.appliedCoupon);
@@ -343,17 +336,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     } catch (e) {
       console.warn('Failed to parse local storage', e);
     }
-  }, []);
+  }, [preview]);
 
   // Sync to localStorage
   useEffect(() => {
+    if (preview) return;
     try {
       localStorage.setItem(
         STORAGE_KEY,
         JSON.stringify({
-          occasions,
+          ...(() => { const old = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); return old.occasions && !localStorage.getItem('munasabati_legacy_invitations_backup_v1') ? { occasions: old.occasions, guests: old.guests } : {}; })(),
           activeOccasionId,
-          guests,
           budgetItems,
           tasks,
           runOfShowItems,
@@ -361,11 +354,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           bookings,
           rfqRequests,
           adminConfig,
-          vendors,
-          services,
           packages,
           reviews,
-          cities,
           cart,
           savedForLater,
           appliedCoupon,
@@ -380,6 +370,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       console.warn('Failed to save to local storage', e);
     }
   }, [
+    preview,
     occasions,
     activeOccasionId,
     guests,
@@ -405,24 +396,42 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     rankingWeights,
   ]);
 
-  // Load User & Role from LocalStorage
   useEffect(() => {
-    try {
-      const savedUser = localStorage.getItem('munasabati_user_profile_v2');
-      const savedRole = localStorage.getItem('munasabati_active_role_v2') as UserRole | null;
-      if (savedUser) {
-        const parsed = JSON.parse(savedUser);
-        setCurrentUser(parsed);
-        if (savedRole && ['client', 'vendor', 'admin'].includes(savedRole)) {
-          setCurrentRole(savedRole);
-        } else if (parsed.role) {
-          setCurrentRole(parsed.role);
-        }
-      }
-    } catch (e) {
-      console.warn('Failed to load user profile from localStorage:', e);
-    }
-  }, []);
+    let stopped = false;
+    const refresh = () => Promise.all([requestJSON('/api/catalog/vendors'),requestJSON('/api/catalog/services')]).then(([data,catalog]) => { if (!stopped) {setVendors(data.vendors.map(ensureVendorDetails));setServices(catalog.services.map(ensureServiceDetails));} }).catch(() => { if (!stopped) {setVendors([]);setServices([]);} });
+    void refresh(); const timer = setInterval(refresh, 10000);
+    return () => { stopped = true; clearInterval(timer); };
+  }, [currentUser?.id]);
+
+  useEffect(()=>{if(geo.data)setCities(geo.data.snapshot.cities.map(c=>({...c,regionAr:c.regionAr,isAvailable:c.isAvailable,neighborhoods:SAUDI_CITIES.find(old=>old.id===c.id)?.neighborhoods||[]})));},[geo.data]);
+
+  // The server session is authoritative; browser profiles are never credentials.
+  useEffect(() => {
+    if(preview){setCurrentUser(geo.data?.preview?.visitorType==='guest'?null:{id:'preview-user',name:'مستخدم المعاينة',phone:'',role:'client'});return;}
+    requestJSON('/api/auth/session').then(data => {
+      setCurrentUser(data.user); if (data.user) setCurrentRole(data.user.role);
+    }).catch(error => setDatabaseError(error.message));
+  }, [preview, geo.data?.preview?.visitorType]);
+  const authenticatedUserId = currentUser?.id;
+  useEffect(() => {
+    accountRef.current = authenticatedUserId || null;
+    setOccasions([]); setGuests([]);
+    if (!authenticatedUserId || preview) return;
+    const id = authenticatedUserId;
+    let stopped = false;
+    const refresh = () => requestJSON('/api/occasions').then(data => {
+      if (stopped || accountRef.current !== id) return;
+      setOccasions(data.occasions); setGuests(data.guests);
+      setActiveOccasionId(previous => data.occasions.some((o: Occasion) => o.id === previous) ? previous : data.occasions[0]?.id || '');
+    }).catch(error => { if (!stopped) setDatabaseError(error.message); });
+    void refresh(); const timer = setInterval(refresh, 10000);
+    const onFocus = () => void refresh(); window.addEventListener('focus', onFocus);
+    return () => { stopped = true; clearInterval(timer); window.removeEventListener('focus', onFocus); };
+  }, [authenticatedUserId, preview]);
+  async function databaseAction(action: () => Promise<void>): Promise<boolean> {
+    try { await action(); setDatabaseError(''); return true; }
+    catch (error) { setDatabaseError(error instanceof Error ? error.message : 'تعذر الحفظ في قاعدة البيانات'); return false; }
+  }
 
   const openOnboarding = (role?: 'client' | 'vendor') => {
     setOnboardingInitialRole(role || null);
@@ -489,7 +498,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       if (payload.cityId) setSelectedCity(payload.cityId);
 
       if (payload.upcomingOccasionType) {
-        createOccasion({
+        await createOccasion({
           title: `مناسبة ${userProfile.name}`,
           occasionTypeId: payload.upcomingOccasionType,
           cityId: payload.cityId,
@@ -497,10 +506,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         });
       }
 
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('munasabati_user_profile_v2', JSON.stringify(userProfile));
-        localStorage.setItem('munasabati_active_role_v2', 'client');
-      }
 
       return { success: true, user: userProfile };
     } catch (err: any) {
@@ -540,10 +545,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setCurrentRole('vendor');
       if (payload.cityId) setSelectedCity(payload.cityId);
 
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('munasabati_user_profile_v2', JSON.stringify(userProfile));
-        localStorage.setItem('munasabati_active_role_v2', 'vendor');
-      }
 
       return { success: true, user: userProfile };
     } catch (err: any) {
@@ -551,12 +552,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const loginUser = async (identifier: string, requestedRole?: UserRole) => {
+  const loginUser = async (identifier: string, requestedRole?: UserRole, password?: string) => {
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identifier, requestedRole }),
+        body: JSON.stringify({ identifier, password }),
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
@@ -573,10 +574,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setCurrentRole(userProfile.role);
       if (userProfile.cityId) setSelectedCity(userProfile.cityId);
 
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('munasabati_user_profile_v2', JSON.stringify(userProfile));
-        localStorage.setItem('munasabati_active_role_v2', userProfile.role);
-      }
 
       return { success: true, user: userProfile };
     } catch (err: any) {
@@ -585,18 +582,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logoutUser = () => {
-    setCurrentUser(null);
-    setCurrentRole('client');
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('munasabati_user_profile_v2');
-      localStorage.setItem('munasabati_active_role_v2', 'client');
-    }
+    void databaseAction(async () => {
+      await requestJSON('/api/auth/logout', 'POST', {});
+      accountRef.current = null; setCurrentUser(null); setCurrentRole('client'); setOccasions([]); setGuests([]);
+    });
   };
 
   const activeOccasion = occasions.find((o) => o.id === activeOccasionId) || occasions[0];
 
-  const createOccasion = (data: Partial<Occasion>): string => {
-    const newId = `occ-${Date.now().toString().slice(-4)}`;
+  const createOccasion = async (data: Partial<Occasion>): Promise<string | null> => {
+    let newId = crypto.randomUUID();
     const occasionTypeObj = occasionTypes.find((t) => t.id === data.occasionTypeId);
     const cityObj = cities.find((c) => c.id === data.cityId);
 
@@ -624,7 +619,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       notes: data.notes || '',
     };
 
-    setOccasions((prev) => [newOccasion, ...prev]);
+    let saved: Occasion | undefined;
+    const ok = await databaseAction(async () => { saved = (await requestJSON('/api/occasions', 'POST', newOccasion)).occasion; });
+    if (!ok || !saved) return null;
+    newId = saved.id;
+    setOccasions((prev) => [saved!, ...prev]);
     setActiveOccasionId(newId);
 
     // Auto generate default tasks based on occasion type checklist
@@ -702,55 +701,27 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateOccasion = (id: string, data: Partial<Occasion>) => {
-    setOccasions((prev) =>
-      prev.map((occ) => {
-        if (occ.id === id) {
-          return { ...occ, ...data };
-        }
-        return occ;
-      })
-    );
+    void databaseAction(async () => {
+      const result = await requestJSON(`/api/occasions/${id}`, 'PATCH', data);
+      setOccasions(prev => prev.map(o => o.id === id ? result.occasion : o));
+    });
   };
-
   const deleteOccasion = (id: string) => {
-    setOccasions((prev) => prev.filter((o) => o.id !== id));
-    if (activeOccasionId === id) {
-      const remaining = occasions.filter((o) => o.id !== id);
-      if (remaining.length > 0) {
-        setActiveOccasionId(remaining[0].id);
-      }
-    }
+    void databaseAction(async () => {
+      await requestJSON(`/api/occasions/${id}`, 'DELETE');
+      setOccasions(prev => prev.filter(o => o.id !== id)); setGuests(prev => prev.filter(g => g.occasionId !== id));
+    });
   };
-
-  const addGuest = (guestData: Omit<Guest, 'id' | 'qrCode'>) => {
-    const id = `gst-${Date.now().toString().slice(-5)}`;
-    const qrCode = generateGuestQRCode(id, guestData.occasionId);
-    const newGuest: Guest = {
-      ...guestData,
-      id,
-      qrCode,
-      invitationSentAt: new Date().toISOString(),
-    };
-    setGuests((prev) => [newGuest, ...prev]);
-  };
-
-  const updateGuestStatus = (guestId: string, status: Guest['status']) => {
-    setGuests((prev) =>
-      prev.map((g) => {
-        if (g.id === guestId) {
-          return {
-            ...g,
-            status,
-            rsvpTime: new Date().toISOString(),
-          };
-        }
-        return g;
-      })
-    );
-  };
-
-  const deleteGuest = (guestId: string) => {
-    setGuests((prev) => prev.filter((g) => g.id !== guestId));
+  const addGuest = (data: Omit<Guest, 'id' | 'qrCode'>) => databaseAction(async () => {
+    const result = await requestJSON(`/api/occasions/${data.occasionId}/guests`, 'POST', data);
+    setGuests(prev => [result.guest, ...prev]);
+  });
+  const updateGuestStatus = (id: string, status: Guest['status']) => databaseAction(async () => {
+    const result = await requestJSON(`/api/guests/${id}`, 'PATCH', { status });
+    setGuests(prev => prev.map(g => g.id === id ? result.guest : g));
+  });
+  const deleteGuest = (id: string) => {
+    void databaseAction(async () => { await requestJSON(`/api/guests/${id}`, 'DELETE'); setGuests(prev => prev.filter(g => g.id !== id)); });
   };
 
   const addTable = (tableData: Omit<SeatingTable, 'id'>) => {
@@ -759,27 +730,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const assignGuestToTable = (guestId: string, tableId: string) => {
-    const tableObj = tables.find((t) => t.id === tableId);
-    setGuests((prev) =>
-      prev.map((g) => {
-        if (g.id === guestId) {
-          return { ...g, tableId, tableName: tableObj?.name };
-        }
-        return g;
-      })
-    );
-    setTables((prev) =>
-      prev.map((t) => {
-        if (t.id === tableId) {
-          if (!t.assignedGuestIds.includes(guestId)) {
-            return { ...t, assignedGuestIds: [...t.assignedGuestIds, guestId] };
-          }
-        } else {
-          return { ...t, assignedGuestIds: t.assignedGuestIds.filter((id) => id !== guestId) };
-        }
-        return t;
-      })
-    );
+    void databaseAction(async () => {
+      const table = tables.find(t => t.id === tableId);
+      const result = await requestJSON(`/api/guests/${guestId}`, 'PATCH', { tableId, tableName: table?.name || '' });
+      setGuests(prev => prev.map(g => g.id === guestId ? result.guest : g));
+      setTables(prev => prev.map(t => ({ ...t, assignedGuestIds: t.id === tableId ? [...t.assignedGuestIds.filter(id => id !== guestId), guestId] : t.assignedGuestIds.filter(id => id !== guestId) })));
+    });
   };
 
   const addBudgetItem = (itemData: Omit<BudgetItem, 'id'>) => {
@@ -875,7 +831,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
-  const createRFQ = (rfqData: Omit<RFQRequest, 'id' | 'quotes' | 'quotesCount' | 'createdAt'>): string => {
+  const createRFQ = async (rfqData: Omit<RFQRequest, 'id' | 'quotes' | 'quotesCount' | 'createdAt'>): Promise<string> => {
+    await requestJSON('/api/geo/authorize','POST',{key:'feature:rfq',cityId:selectedCity});
     const id = `rfq-${Date.now().toString().slice(-4)}`;
     const newRFQ: RFQRequest = {
       ...rfqData,
@@ -904,7 +861,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
-  const createBooking = (bookingData: Omit<Booking, 'id' | 'bookingNumber' | 'createdAt'>): string => {
+  const createBooking = async (bookingData: Omit<Booking, 'id' | 'bookingNumber' | 'createdAt'>): Promise<string> => {
+    await requestJSON('/api/geo/authorize','POST',{keys:['feature:commerce',...(bookingData.serviceId?['item:'+bookingData.serviceId]:[])],cityId:selectedCity});
+    if(preview) throw new Error('المعاينة للعرض فقط؛ لا يتم إنشاء حجوزات.');
+    const a=geo.data?.availability.find(r=>r.key==='feature:commerce');
+    if(!selectedCity||!a?.available) throw new Error(a?.message||a?.reason||'اختر مدينة مدعومة قبل الحجز');
     const id = `bok-${Date.now().toString().slice(-4)}`;
     const bookingNumber = generateBookingNumber();
     const newBooking: Booking = {
@@ -1037,17 +998,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateVendorStatus = (vendorId: string, status: Vendor['status'], verified: boolean) => {
-    setVendors((prev) =>
-      prev.map((v) => {
-        if (v.id === vendorId) {
-          return { ...v, status, verified };
-        }
-        return v;
-      })
-    );
+    void databaseAction(async () => {
+      await requestJSON('/api/admin/vendors', 'POST', { id: vendorId, status, verified });
+      const data = await requestJSON('/api/catalog/vendors'); setVendors(data.vendors.map(ensureVendorDetails));
+    });
   };
 
-  // Service management actions
   const addService = (serviceData: Omit<ServiceItem, 'id'>): string => {
     const id = `srv-${Date.now().toString().slice(-4)}`;
     const newService: ServiceItem = {
@@ -1121,11 +1077,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   // City management actions
-  const toggleCityAvailability = (cityId: string) => {
-    setCities((prev) =>
-      prev.map((c) => (c.id === cityId ? { ...c, isAvailable: !c.isAvailable } : c))
-    );
-  };
+  const toggleCityAvailability = (_cityId: string) => { setDatabaseError('إدارة التغطية متاحة من قسم الدول والمدن والخدمات في لوحة مدير النظام.'); };
 
   const updateAdminConfig = (configData: Partial<AdminPlatformConfig>) => {
     setAdminConfig((prev) => ({ ...prev, ...configData }));
@@ -1225,6 +1177,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       itemData = serviceOrItem;
     }
 
+    if(preview) {setDatabaseError('المعاينة للعرض فقط؛ لا يتم تعديل السلة.');return;}
+    const available=geo.data?.availability.find(r=>r.key==='item:'+itemData.serviceId);
+    if(!available?.available) {setDatabaseError(available?.message||available?.reason||'اختر مدينة مدعومة قبل إضافة الخدمة');return;}
     const addonsTotal = (itemData.addons || []).reduce(
       (sum, a) => sum + (a.price || 0) * (a.quantity || 1),
       0
@@ -1265,7 +1220,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       );
     } else {
       const id = `cart-${Date.now().toString().slice(-6)}`;
-      const newItem: CartItem = {
+    const newItem: CartItem = {
         ...itemData,
         id,
         addonsTotal,
@@ -1348,7 +1303,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setAppliedCoupon(null);
   };
 
-  const checkoutCart = (checkoutData: {
+  const checkoutCart = async (checkoutData: {
     customerName: string;
     customerPhone: string;
     customerEmail?: string;
@@ -1364,14 +1319,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     occasionId?: string;
     paymentMethod: PaymentMethod;
     isDepositOnly: boolean;
-  }): MultiVendorOrder => {
+  }): Promise<MultiVendorOrder> => {
+    await requestJSON('/api/geo/authorize','POST',{keys:['feature:commerce',...cart.map(c=>'item:'+c.serviceId)],cityId:checkoutData.cityId||selectedCity});
     const orderId = `ord-${Date.now().toString().slice(-6)}`;
     const orderNumber = generateOrderNumber();
 
     const evDate = checkoutData.eventDate || checkoutData.scheduleDate || '2026-10-09';
     const evTime = checkoutData.eventTime || checkoutData.scheduleTime || '07:00 م';
     const cCity = checkoutData.cityNameAr || checkoutData.locationCity || 'الرياض';
-    const cCityId = checkoutData.cityId || 'ruh';
+    const cCityId = checkoutData.cityId || selectedCity;
     const vName = checkoutData.venueName || checkoutData.locationAddress || 'قاعة المناسبة';
     const occId = checkoutData.occasionId || activeOccasionId;
 
@@ -1651,6 +1607,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         updateRankingWeights,
       }}
     >
+      {databaseError && <div role="alert" className="sticky top-0 z-[100] bg-red-50 border-b border-red-300 p-3 text-center text-sm text-red-900" dir="rtl">{databaseError}<button className="mx-3 underline" onClick={() => setDatabaseError('')}>إغلاق</button></div>}
       {children}
     </AppContext.Provider>
   );

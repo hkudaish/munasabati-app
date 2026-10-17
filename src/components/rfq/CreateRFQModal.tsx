@@ -23,11 +23,11 @@ export default function CreateRFQModal({ onClose, onCreated }: CreateRFQModalPro
   const selectedCityObj = cities.find((c) => c.id === cityId) || cities[0];
   const selectedOccasionObj = occasionTypes.find((o) => o.id === occasionTypeId) || occasionTypes[0];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!requirements.trim()) return;
 
-    const newRFQId = createRFQ({
+    const newRFQId = await createRFQ({
       occasionId: activeOccasion?.id,
       occasionTitle: title,
       occasionTypeAr: selectedOccasionObj.nameAr,

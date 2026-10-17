@@ -35,3 +35,9 @@ next-env.d.ts
 
 # Local Netlify folder
 .netlify
+
+# Isolated system administration integration test build
+/.next-system-test*/
+/.system-test-tsconfig-*.json
+/.geo-browser-*/
+/.geo-test-artifacts/

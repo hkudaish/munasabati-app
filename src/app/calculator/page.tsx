@@ -115,8 +115,8 @@ export default function CalculatorPage() {
     marketBadgeColor = 'text-purple-600 bg-purple-50 border-purple-200';
   }
 
-  const handleCreateOccasionFromCalculator = () => {
-    const occId = createOccasion({
+  const handleCreateOccasionFromCalculator = async () => {
+    const occId = await createOccasion({
       title: `مناسبة ${occasionTypes.find(t => t.id === occasionType)?.nameAr || 'جديدة'}`,
       occasionTypeId: occasionType,
       cityId,
@@ -124,7 +124,7 @@ export default function CalculatorPage() {
       tier,
       budget: grandTotal,
     });
-    router.push(`/occasion/${occId}`);
+    if (occId) router.push(`/occasion/${occId}`);
   };
 
   const handlePrint = () => {

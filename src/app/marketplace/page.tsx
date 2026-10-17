@@ -24,6 +24,7 @@ import {
   ChevronDown,
   ChevronLeft,
 } from 'lucide-react';
+import { useGeo } from '@/components/geo/GeoProvider';
 import { useApp } from '@/lib/store';
 import ServiceCard from '@/components/marketplace/ServiceCard';
 import VendorCard from '@/components/marketplace/VendorCard';
@@ -34,6 +35,7 @@ import { formatSaudiRiyal, calculateCartTotals } from '@/lib/utils';
 import { rankVendors } from '@/lib/ranking-engine';
 
 export default function MarketplacePage() {
+  const geo=useGeo();
   const router = useRouter();
   const {
     serviceCategories,
@@ -72,13 +74,14 @@ export default function MarketplacePage() {
 
   // Filter & Sort Services
   const filteredServices = services
+    .filter(service => vendors.some(vendor => vendor.id === service.vendorId && vendor.status === 'active'))
     .filter((srv) => {
       const matchesCategory = selectedCategory === 'all' || srv.categoryId === selectedCategory;
       const matchesSearch =
         srv.titleAr.toLowerCase().includes(searchQuery.toLowerCase()) ||
         srv.vendorName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         srv.descriptionAr.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCity = !selectedCity || srv.cityId === selectedCity;
+      const matchesCity = !selectedCity || !!geo.data?.availability.find(a=>a.key==='item:'+srv.id)?.available;
       const matchesInstant = !instantBookingOnly || srv.instantBooking;
       const matchesGender =
         genderFilter === 'all' || srv.genderPreference === genderFilter || srv.genderPreference === 'unisex';
@@ -546,8 +549,8 @@ export default function MarketplacePage() {
           date="2026-10-09"
           totalAmount={bookingModalItem.price}
           onClose={() => setBookingModalItem(null)}
-          onPaymentSuccess={(method, isDeposit) => {
-            createBooking({
+          onPaymentSuccess={async (method, isDeposit) => {
+            await createBooking({
               occasionId: activeOccasion?.id,
               occasionTitle: activeOccasion?.title || bookingModalItem.titleAr,
               vendorId: bookingModalItem.vendorId,

@@ -1,5 +1,6 @@
 'use client';
 
+import { useGeo } from '@/components/geo/GeoProvider';
 import React, { useState } from 'react';
 import { Layers, Sparkles, CheckCircle2, Star, ArrowLeft, Sliders } from 'lucide-react';
 import { SmartPackage } from '@/lib/types';
@@ -12,9 +13,12 @@ interface PackageCardProps {
 }
 
 export default function PackageCard({ pkg, onBookPackage }: PackageCardProps) {
+  const geo=useGeo();
+  const allowed=!!geo.data?.availability.find(a=>a.key==='feature:packages')?.available;
   const [isCustomizerOpen, setIsCustomizerOpen] = useState(false);
   const [currentPackage, setCurrentPackage] = useState<SmartPackage>(pkg);
 
+  if(geo.data?.summary!=='UNKNOWN'&&!allowed&&geo.data?.snapshot.policy.hideUnavailable)return null;
   return (
     <div className="bg-white rounded-3xl border border-saudi-sand-300 overflow-hidden shadow-card hover:shadow-xl hover:border-saudi-gold-400 transition-all duration-300 flex flex-col justify-between group">
       {/* Banner with Savings Badge */}
@@ -90,7 +94,7 @@ export default function PackageCard({ pkg, onBookPackage }: PackageCardProps) {
           </div>
 
           <div className="flex items-center gap-2">
-            <button
+            <button disabled={!allowed||!!geo.data?.preview}
               onClick={() => setIsCustomizerOpen(true)}
               className="p-2.5 bg-saudi-sand-100 hover:bg-saudi-sand-200 text-gray-800 rounded-xl text-xs font-bold transition flex items-center gap-1"
               title="تخصيص بنود الباقة"
@@ -99,7 +103,7 @@ export default function PackageCard({ pkg, onBookPackage }: PackageCardProps) {
               <span className="hidden sm:inline">تخصيص</span>
             </button>
 
-            <button
+            <button disabled={!allowed||!!geo.data?.preview}
               onClick={() => {
                 if (onBookPackage) onBookPackage(currentPackage);
               }}

@@ -13,8 +13,7 @@ export function isDatabaseConfigured(): boolean {
   const isServerless = Boolean(
     process.env.NETLIFY ||
     process.env.VERCEL ||
-    process.env.AWS_LAMBDA_FUNCTION_NAME ||
-    (process.env.NODE_ENV === 'production' && !process.env.IS_LOCAL_DOCKER)
+    process.env.AWS_LAMBDA_FUNCTION_NAME
   );
   if (isServerless && (url.includes('localhost') || url.includes('127.0.0.1') || url.includes('::1'))) {
     return false;
@@ -55,10 +54,12 @@ export async function getVendorsFromDB(options?: {
   categoryId?: string;
   cityId?: string;
   featuredOnly?: boolean;
+  strict?: boolean;
+  includeInactive?: boolean;
 }): Promise<Vendor[]> {
   try {
     if (isDatabaseConfigured()) {
-      const where: any = { status: 'ACTIVE' };
+      const where: any = options?.includeInactive ? {} : { status: 'ACTIVE', OR: [{ userId: null }, { user: { isActive: true } }] };
       if (options?.categoryId) where.categoryId = options.categoryId;
       if (options?.cityId) where.cityId = options.cityId;
       if (options?.featuredOnly) where.featured = true;
@@ -66,6 +67,8 @@ export async function getVendorsFromDB(options?: {
       const dbVendors = await prisma.vendor.findMany({
         where,
         include: {
+          city: true,
+          category: true,
           metrics: true,
           availability: true,
           services: {
@@ -77,7 +80,7 @@ export async function getVendorsFromDB(options?: {
         },
       });
 
-      if (dbVendors && dbVendors.length > 0) {
+      if (dbVendors && (dbVendors.length > 0 || options?.strict)) {
         return dbVendors.map((v: any) => ({
           id: v.id,
           businessName: v.businessName,
@@ -132,9 +135,11 @@ export async function getVendorsFromDB(options?: {
       }
     }
   } catch (e) {
+    if (options?.strict) throw e;
     console.warn('PostgreSQL fetch fallback to memory store:', e);
   }
 
+  if (options?.strict) throw new Error('Database unavailable');
   // Resilient memory fallback
   let list = VENDORS.map(ensureVendorDetails);
   if (options?.categoryId) list = list.filter((v) => v.categoryId === options.categoryId);

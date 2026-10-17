@@ -66,7 +66,7 @@ function PlanWizardContent() {
     }
   };
 
-  const handleFinishWizard = () => {
+  const handleFinishWizard = async () => {
     try {
       confetti({
         particleCount: 100,
@@ -79,7 +79,7 @@ function PlanWizardContent() {
 
     const occasionTitle = title.trim() || `مناسبة ${selectedOccasionObj.nameAr} - ${selectedCityObj.nameAr}`;
 
-    const newId = createOccasion({
+    const newId = await createOccasion({
       title: occasionTitle,
       occasionTypeId,
       cityId,
@@ -93,7 +93,7 @@ function PlanWizardContent() {
       notes: `تم إنشاء المناسبة عبر المعالج التفاعلي في ${selectedCityObj.nameAr} لمستوى ${tier}.`,
     });
 
-    router.push(`/occasion/${newId}`);
+    if (newId) router.push(`/occasion/${newId}`);
   };
 
   return (

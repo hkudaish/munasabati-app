@@ -85,6 +85,7 @@ export default function UserOnboardingModal() {
 
   // Login Form Data
   const [loginIdentifier, setLoginIdentifier] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
 
   // Sync initial role when modal opens
   useEffect(() => {
@@ -196,7 +197,7 @@ export default function UserOnboardingModal() {
   const handleLoginSubmit = async (identifier: string, requestedRole?: 'client' | 'vendor' | 'admin') => {
     setErrorMessage('');
     setIsSubmitting(true);
-    const res = await loginUser(identifier, requestedRole);
+    const res = await loginUser(identifier, requestedRole, loginPassword);
     setIsSubmitting(false);
 
     if (!res.success) {
@@ -205,7 +206,7 @@ export default function UserOnboardingModal() {
     }
 
     triggerConfetti();
-    const dest = res.user?.role === 'admin' ? '/admin' : res.user?.role === 'vendor' ? '/vendor' : '/';
+    const dest = res.user?.hasSystemAccess ? '/system-admin' : res.user?.role === 'admin' ? '/admin' : res.user?.role === 'vendor' ? '/vendor' : '/';
     setSuccessInfo({
       name: res.user?.name || 'مرحباً بك',
       role: res.user?.role || 'client',
@@ -398,30 +399,7 @@ export default function UserOnboardingModal() {
                   </button>
                 </div>
 
-                {/* Instant Demo Role Switchers for testing */}
-                <div className="bg-saudi-sand-100/70 p-3 rounded-2xl">
-                  <p className="text-[11px] font-bold text-gray-500 mb-2">⚡ تجربة فورية بنقرة واحدة (للاختبار والمراجعة):</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                    <button
-                      onClick={() => handleLoginSubmit('0501234567', 'client')}
-                      className="text-[11px] font-bold py-1.5 px-2 bg-white rounded-xl border border-gray-200 hover:border-saudi-green-700 hover:bg-saudi-green-50 text-gray-800 transition flex items-center justify-center gap-1"
-                    >
-                      <span>👤 صاحب مناسبة (سارة)</span>
-                    </button>
-                    <button
-                      onClick={() => handleLoginSubmit('0551234567', 'vendor')}
-                      className="text-[11px] font-bold py-1.5 px-2 bg-white rounded-xl border border-gray-200 hover:border-saudi-gold-600 hover:bg-amber-50 text-gray-800 transition flex items-center justify-center gap-1"
-                    >
-                      <span>🏪 مورد معتمد (عدسة الفخامة)</span>
-                    </button>
-                    <button
-                      onClick={() => handleLoginSubmit('0599999999', 'admin')}
-                      className="text-[11px] font-bold py-1.5 px-2 bg-white rounded-xl border border-gray-200 hover:border-saudi-gold-600 hover:bg-amber-50 text-gray-800 transition flex items-center justify-center gap-1"
-                    >
-                      <span>🛡️ إدارة المنصة (Admin)</span>
-                    </button>
-                  </div>
-                </div>
+
               </div>
             </div>
           )}
@@ -520,6 +498,7 @@ export default function UserOnboardingModal() {
                   <label className="block text-xs font-bold text-gray-700 mb-1">تعيين كلمة المرور</label>
                   <input
                     type="password"
+                    required minLength={12} maxLength={128} autoComplete="new-password"
                     value={customerData.password}
                     onChange={(e) => setCustomerData({ ...customerData, password: e.target.value })}
                     placeholder="••••••••"
@@ -697,6 +676,7 @@ export default function UserOnboardingModal() {
               </div>
 
               <div className="pt-2">
+                <label className="block text-xs font-bold">كلمة المرور (12 حرفاً على الأقل)<input type="password" required minLength={12} maxLength={128} autoComplete="new-password" value={vendorData.password} onChange={e => setVendorData({ ...vendorData, password: e.target.value })} className="w-full rounded-xl border p-3 mt-1" /></label>
                 <button
                   type="submit"
                   disabled={isSubmitting}
@@ -754,6 +734,10 @@ export default function UserOnboardingModal() {
                   <label className="block text-xs font-bold text-gray-700 mb-1">كلمة المرور</label>
                   <input
                     type="password"
+                    required
+                    autoComplete="current-password"
+                    value={loginPassword}
+                    onChange={e => setLoginPassword(e.target.value)}
                     placeholder="••••••••"
                     className="w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-saudi-green-800"
                   />
@@ -768,29 +752,7 @@ export default function UserOnboardingModal() {
                 </button>
               </form>
 
-              <div className="pt-4 border-t border-gray-200">
-                <p className="text-xs font-bold text-gray-500 mb-2">أو الدخول المباشر للحسابات التجريبية:</p>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  <button
-                    onClick={() => handleLoginSubmit('0501234567', 'client')}
-                    className="text-xs font-bold p-2.5 bg-saudi-sand-50 rounded-xl border border-saudi-sand-300 hover:border-saudi-green-800 text-saudi-green-900 text-center transition"
-                  >
-                    صاحب مناسبة
-                  </button>
-                  <button
-                    onClick={() => handleLoginSubmit('0551234567', 'vendor')}
-                    className="text-xs font-bold p-2.5 bg-saudi-sand-50 rounded-xl border border-saudi-sand-300 hover:border-saudi-gold-600 text-saudi-gold-800 text-center transition"
-                  >
-                    مورد معتمد
-                  </button>
-                  <button
-                    onClick={() => handleLoginSubmit('0599999999', 'admin')}
-                    className="text-xs font-bold p-2.5 bg-saudi-sand-50 rounded-xl border border-saudi-sand-300 hover:border-saudi-green-800 text-gray-900 text-center transition"
-                  >
-                    مشرف المنصة
-                  </button>
-                </div>
-              </div>
+
             </div>
           )}
 

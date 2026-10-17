@@ -23,7 +23,7 @@ interface SaudiPaymentModalProps {
   totalAmount: number;
   depositAmount?: number;
   onClose: () => void;
-  onPaymentSuccess: (method: PaymentMethod, isDeposit: boolean, transactionRef: string) => void;
+  onPaymentSuccess: (method: PaymentMethod, isDeposit: boolean, transactionRef: string) => void | Promise<void>;
 }
 
 export default function SaudiPaymentModal({
@@ -50,12 +50,13 @@ export default function SaudiPaymentModal({
   const amountToPay = paymentType === 'deposit' ? depositAmount : totalAmount;
   const { subtotal, vat, total } = calculateVAT(amountToPay / 1.15); // extract 15% VAT
 
-  const handlePay = (e: React.FormEvent) => {
+  const handlePay = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsProcessing(true);
 
-    setTimeout(() => {
+    try {
       const ref = `TXN-SA-${Math.floor(10000000 + Math.random() * 90000000)}`;
+      await onPaymentSuccess(selectedMethod, paymentType === 'deposit', ref);
       setTransactionRef(ref);
       setIsProcessing(false);
       setIsSuccess(true);
@@ -70,8 +71,7 @@ export default function SaudiPaymentModal({
         // fallback
       }
 
-      onPaymentSuccess(selectedMethod, paymentType === 'deposit', ref);
-    }, 1200);
+    } catch (error) { setIsProcessing(false); alert(error instanceof Error ? error.message : 'تعذر إتمام العملية'); }
   };
 
   return (

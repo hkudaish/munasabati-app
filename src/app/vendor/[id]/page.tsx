@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useApp } from '@/lib/store';
 import { formatSaudiRiyal, ensureVendorDetails, ensureServiceDetails } from '@/lib/utils';
@@ -36,6 +36,7 @@ import confetti from 'canvas-confetti';
 
 export default function VendorProfilePage() {
   const params = useParams();
+  const previewPath=usePathname().split('/');
   const router = useRouter();
   const {
     vendors,
@@ -52,8 +53,8 @@ export default function VendorProfilePage() {
     activeOccasion,
   } = useApp();
 
-  const vendorId = params?.id as string;
-  const rawVendor = vendors.find((v) => v.id === vendorId) || vendors[0];
+  const vendorId = (params?.id || (previewPath[1]==='coverage-preview'?previewPath[4]:'')) as string;
+  const rawVendor = vendors.find((v) => v.id === vendorId && v.status === 'active');
   const vendor = rawVendor ? ensureVendorDetails(rawVendor) : null;
 
   const vendorServices = services.filter((s) => s.vendorId === vendor?.id);
@@ -643,8 +644,8 @@ export default function VendorProfilePage() {
           date="2026-10-09"
           totalAmount={selectedServiceToBook.price}
           onClose={() => setIsPaymentModalOpen(false)}
-          onPaymentSuccess={(method, isDeposit) => {
-            createBooking({
+          onPaymentSuccess={async (method, isDeposit) => {
+            await createBooking({
               occasionId: activeOccasion?.id,
               occasionTitle: activeOccasion?.title || selectedServiceToBook.titleAr,
               vendorId: vendor.id,

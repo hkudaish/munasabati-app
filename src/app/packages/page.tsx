@@ -132,8 +132,8 @@ export default function PackagesPage() {
           date="2026-11-20"
           totalAmount={bookingModalPkg.packagePrice}
           onClose={() => setBookingModalPkg(null)}
-          onPaymentSuccess={(method, isDeposit, ref) => {
-            createBooking({
+          onPaymentSuccess={async (method, isDeposit, ref) => {
+            await createBooking({
               occasionId: activeOccasion?.id,
               occasionTitle: activeOccasion?.title || bookingModalPkg.titleAr,
               vendorId: 'vendor-package',

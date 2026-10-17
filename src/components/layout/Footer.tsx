@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
+import Link from '@/components/system/FeatureLink';
 import { Sparkles, ShieldCheck, CreditCard, Phone, Mail, Award, HeartHandshake } from 'lucide-react';
 import { useApp } from '@/lib/store';
 

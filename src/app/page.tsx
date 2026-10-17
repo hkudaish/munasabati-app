@@ -1,7 +1,8 @@
 'use client';
 
+import { FeatureContent } from '@/components/system/FeatureProvider';
 import React, { useState } from 'react';
-import Link from 'next/link';
+import Link from '@/components/system/FeatureLink';
 import { useRouter } from 'next/navigation';
 import {
   Sparkles,
@@ -88,7 +89,7 @@ export default function HomePage() {
   // Admin approval toast simulation
   const [adminActionNotice, setAdminActionNotice] = useState<string | null>(null);
 
-  const activeCityObj = cities.find((c) => c.id === selectedCity) || cities[0];
+  const activeCityObj = cities.find((c) => c.id === selectedCity) || {id:'',nameAr:'مدينتك',nameEn:'',regionAr:'',isAvailable:false};
 
   const handleBookService = (service: ServiceItem) => {
     setBookingModalItem({
@@ -262,13 +263,13 @@ export default function HomePage() {
                   <span>طلب تسعير فوري (RFQ)</span>
                 </Link>
 
-                <button
+                <FeatureContent id="luma"><button
                   onClick={() => setIsAIOpen(true)}
                   className="px-5 py-3.5 bg-white/5 hover:bg-white/15 border border-white/20 text-white font-bold rounded-2xl text-sm backdrop-blur-md flex items-center gap-2 transition"
                 >
                   <Sparkles className="w-4 h-4 text-saudi-gold-300" />
                   <span>المساعد الذكي ({adminConfig.aiAssistantNameAr})</span>
-                </button>
+                </button></FeatureContent>
               </div>
 
               {/* Trust stats row */}
@@ -499,13 +500,13 @@ export default function HomePage() {
                 </p>
 
                 <div className="pt-2 flex flex-wrap gap-3">
-                  <button
+                  <FeatureContent id="luma"><button
                     onClick={() => setIsAIOpen(true)}
                     className="px-6 py-3 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-black rounded-2xl text-xs sm:text-sm shadow-md flex items-center gap-2 transition"
                   >
                     <Sparkles className="w-4 h-4 text-saudi-green-950" />
                     <span>جرّب التخطيط بالذكاء الاصطناعي مجاناً</span>
-                  </button>
+                  </button></FeatureContent>
                 </div>
               </div>
             </div>
@@ -1171,8 +1172,8 @@ export default function HomePage() {
           date="2026-10-30"
           totalAmount={bookingModalItem.totalAmount}
           onClose={() => setBookingModalItem(null)}
-          onPaymentSuccess={(method, isDeposit, ref) => {
-            createBooking({
+          onPaymentSuccess={async (method, isDeposit, ref) => {
+            await createBooking({
               occasionId: activeOccasion?.id,
               occasionTitle: activeOccasion?.title || bookingModalItem.title,
               vendorId: 'vendor-1',

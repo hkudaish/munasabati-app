@@ -1,15 +1,16 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Heart, Search, Sparkles, Download, Copy, Save, Upload, Share2, Palette, Printer, Archive, Check, X } from 'lucide-react';
 import { useApp } from '@/lib/store';
 import { BUILTIN_TEMPLATES, CardDesign, InviteTemplate, MOTIFS, OCCASIONS, OccasionKind, SIZES, STYLES, contrastRatio, occasionKind, validateDesign, validateTemplate } from '@/lib/invitations/catalog';
 import InvitationQRCode from '@/components/common/InvitationQRCode';
-import { createInvitationLink, getInvitationOrigin, INVITATION_ORIGIN_KEY, normalizeInvitationOrigin } from '@/lib/invitations/link';
+import { getInvitationOrigin, normalizeInvitationOrigin } from '@/lib/invitations/link';
 import { qrSvg } from '@/lib/invitations/qr';
 import { cardSvg, downloadFile, pngBlob, printCard } from '@/lib/invitations/render';
 
-const LIBRARY_KEY = 'munasabati_invitation_library_v1';
+import { requestJSON } from '@/lib/api-client';
+import Link from 'next/link';
 const statusNames = { private: 'خاص', pending: 'بانتظار المراجعة', published: 'منشور', rejected: 'يحتاج تعديلاً', archived: 'مؤرشف' };
 const fieldClass = 'w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-saudi-green-700';
 function Preview({ design, small = false, qrValue = '' }: { design: CardDesign; small?: boolean; qrValue?: string }) {
@@ -29,8 +30,11 @@ function InvitationStudio() {
   const userId = currentUser?.id || 'guest';
   const isAdmin = currentRole === 'admin' && !!(currentUser?.hasAdminAccess || currentUser?.role === 'admin');
   const canEdit = !!currentUser;
-  const personalKey = `munasabati_invitation_personal_v1_${userId}_${occasion.id}`;
-  const favoritesKey = `munasabati_invitation_favorites_v1_${userId}`;
+  const draftVersion = useRef(0);
+  const saveQueue = useRef<Promise<unknown>>(Promise.resolve());
+  const lastSaved = useRef('');
+  const [saveStatus, setSaveStatus] = useState('');
+  const [conflicted, setConflicted] = useState(false);
   const initialKind = occasionKind(occasion.occasionTypeId);
   const initialTemplate = BUILTIN_TEMPLATES.find(t => t.occasion === initialKind)!;
   const [design, setDesign] = useState<CardDesign>({ ...initialTemplate.design, title: occasion.title, date: occasion.date, time: occasion.time || '', venue: occasion.venueName || occasion.cityNameAr });
@@ -51,43 +55,43 @@ function InvitationStudio() {
   const [shareOrigin, setShareOrigin] = useState('');
   const [originInput, setOriginInput] = useState('');
   const [includeQr, setIncludeQr] = useState(true);
-  useEffect(() => { const origin = getInvitationOrigin(); setShareOrigin(origin); setOriginInput(origin); }, []);
+
+  const latestDraft = useRef('');
+  latestDraft.current = JSON.stringify({ design, shareOrigin });
   const [reviewNotes, setReviewNotes] = useState<Record<string, string>>({});
   useEffect(() => {
-    setReady(false);
-    try {
-      const stored = JSON.parse(localStorage.getItem(LIBRARY_KEY) || '[]');
-      if (!Array.isArray(stored) || stored.length > 100) throw new Error('مكتبة محلية غير صالحة');
-      setRecords(stored.map(validateTemplate));
-      const personal = JSON.parse(localStorage.getItem(personalKey) || 'null');
-      const storedFavorites = JSON.parse(localStorage.getItem(favoritesKey) || '[]');
-      setFavorites(Array.isArray(storedFavorites) ? storedFavorites.filter((x: unknown) => typeof x === 'string') : []);
-      if (personal?.draft) setDesign(validateDesign(personal.draft));
-      else setDesign({ ...initialTemplate.design, title: occasion.title, date: occasion.date, time: occasion.time || '', venue: occasion.venueName || occasion.cityNameAr });
-      setEditingId(null);
-    } catch { setNotice('تعذر قراءة بعض البيانات المحفوظة. يمكنك استيراد نسخة احتياطية.'); }
-    setReady(true);
-    // Each account and occasion has a separate draft.
+    let cancelled = false; setReady(false);
+    requestJSON(`/api/invitation-studio?occasionId=${encodeURIComponent(occasion.id)}`).then(data => {
+      if (cancelled) return;
+      setRecords(data.records.map(validateTemplate)); setFavorites(data.favorites); draftVersion.current = data.version;
+      const origin = data.shareOrigin || getInvitationOrigin(); setShareOrigin(origin); setOriginInput(origin);
+      const next = data.draft ? validateDesign(data.draft) : design;
+      setDesign(next); lastSaved.current = JSON.stringify({ design: next, shareOrigin: origin });
+      setReady(true); setSaveStatus(data.draft ? 'المسودة محفوظة في قاعدة البيانات' : '');
+    }).catch(error => { if (!cancelled) { setNotice(error.message); setSaveStatus('تعذر تحميل المسودة؛ أعد تحميل الصفحة'); } });
+    return () => { cancelled = true; };
+    // The studio remounts when its account or occasion changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [personalKey]);
-  useEffect(() => {
-    if (!ready) return;
-    try { localStorage.setItem(personalKey, JSON.stringify({ draft: design })); localStorage.setItem(favoritesKey, JSON.stringify(favorites)); }
-    catch { setNotice('تعذر الحفظ التلقائي: مساحة المتصفح ممتلئة أو التخزين معطل. صدّر ملف القالب للاحتفاظ به.'); }
-  }, [design, favorites, personalKey, favoritesKey, ready]);
-  useEffect(() => {
-    const sync = (event: StorageEvent) => {
-      if (event.key !== LIBRARY_KEY) return;
-      try { const list = JSON.parse(event.newValue || '[]'); if (Array.isArray(list)) setRecords(list.map(validateTemplate)); }
-      catch { setNotice('تعذر تحديث المكتبة من النافذة الأخرى.'); }
-    };
-    window.addEventListener('storage', sync);
-    return () => window.removeEventListener('storage', sync);
   }, []);
+  useEffect(() => {
+    const serialized = JSON.stringify({ design, shareOrigin });
+    if (!ready || !canEdit || conflicted || serialized === lastSaved.current) return;
+    setSaveStatus('تغييرات غير محفوظة…');
+    const timer = setTimeout(() => {
+      saveQueue.current = saveQueue.current.catch(() => {}).then(async () => {
+        setSaveStatus('جارٍ الحفظ في قاعدة البيانات…');
+        try {
+          const data = await requestJSON('/api/invitation-studio', 'POST', { action: 'draft', occasionId: occasion.id, version: draftVersion.current, design, shareOrigin });
+          draftVersion.current = data.version; lastSaved.current = serialized; setSaveStatus(latestDraft.current === serialized ? 'المسودة محفوظة في قاعدة البيانات' : 'تغييرات غير محفوظة…');
+        } catch (error) { setSaveStatus('تعذر حفظ المسودة؛ أعد المحاولة أو صدّر نسخة'); setNotice(error instanceof Error ? error.message : 'تعذر الحفظ'); if (error instanceof Error && error.message.includes('جهاز آخر')) setConflicted(true); }
+      });
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [design, shareOrigin, ready, canEdit, conflicted, occasion.id]);
   const patch = (value: Partial<CardDesign>) => { if (canEdit) setDesign(d => ({ ...d, ...value })); };
-  const commit = (next: InviteTemplate[]) => {
-    if (next.length > 100) throw new Error('بلغت المكتبة حد 100 تصميم محلي. صدّر نسخة احتياطية؛ الأرشفة لا تقلل عدد القوالب المخزنة.');
-    localStorage.setItem(LIBRARY_KEY, JSON.stringify(next)); setRecords(next);
+  const commit = async (record: InviteTemplate, expectedVersion?: number) => {
+    const result = await requestJSON('/api/invitation-studio', 'POST', { action: 'template', template: record, expectedVersion });
+    setRecords(result.records.map(validateTemplate));
   };
   const run = async (action: () => void | Promise<void>) => {
     setBusy(true); setNotice('');
@@ -101,22 +105,22 @@ function InvitationStudio() {
     setName(own ? t.name : `نسخة من ${t.name}`); setEditingId(own ? t.id : null); setTemplateKind(t.occasion); setTemplateStyle(t.style);
     setNotice(own ? 'فتحت تصميمك للتعديل.' : 'نسخة مستقلة جاهزة للتخصيص.');
   };
-  const save = (duplicate = false) => run(() => {
+  const save = (duplicate = false) => run(async () => {
     if (!canEdit) throw new Error('سجّل الدخول لحفظ التصميم');
     if (!name.trim() || name.length > 80) throw new Error('أدخل اسم تصميم من 1 إلى 80 حرفاً');
     const existing = records.find(t => t.id === editingId && t.ownerId === userId && (t.status === 'private' || t.status === 'rejected'));
     const id = !duplicate && existing ? existing.id : crypto.randomUUID();
     const record: InviteTemplate = { id, name: name.trim(), occasion: templateKind, style: templateStyle, color: contrastRatio(design.background, '#ffffff') > 5 ? 'داكن' : 'فاتح', design: validateDesign(design), ownerId: userId, status: 'private', version: existing && !duplicate ? existing.version + 1 : 1, updatedAt: new Date().toISOString() };
-    commit([...records.filter(t => t.id !== id), record]); setEditingId(id); setNotice('تم حفظ التصميم في «تصاميمي» على هذا المتصفح.');
+    await commit(record, !duplicate ? existing?.version : undefined); setEditingId(id); setNotice('تم حفظ التصميم في قاعدة البيانات ضمن «تصاميمي».');
   });
-  const transition = (t: InviteTemplate, status: InviteTemplate['status']) => run(() => {
+  const transition = (t: InviteTemplate, status: InviteTemplate['status']) => run(async () => {
     const own = t.ownerId === userId;
     if (status === 'pending' && (!own || !['private', 'rejected'].includes(t.status))) throw new Error('يمكن إرسال تصميمك الخاص فقط للمراجعة');
     if (['published', 'rejected'].includes(status) && (!isAdmin || t.status !== 'pending')) throw new Error('المراجعة متاحة للإدارة فقط');
     if (status === 'archived' && !(isAdmin || (own && ['private', 'rejected'].includes(t.status)))) throw new Error('لا يمكنك أرشفة هذا القالب');
     const reviewNote = reviewNotes[t.id]?.trim();
     if (status === 'rejected' && !reviewNote) throw new Error('أدخل سبب طلب التعديل أولاً');
-    commit(records.map(r => r.id === t.id ? { ...r, status, reviewNote: status === 'rejected' ? reviewNote : undefined, updatedAt: new Date().toISOString() } : r));
+    await commit({ ...t, status, reviewNote: status === 'rejected' ? reviewNote : undefined, updatedAt: new Date().toISOString() }, t.version);
     setNotice(`تم تحديث حالة القالب: ${statusNames[status]}.`);
   });
   const importTemplate = async (file?: File) => {
@@ -128,7 +132,7 @@ function InvitationStudio() {
       if (payload.schemaVersion !== 1) throw new Error('نسخة ملف القالب غير مدعومة');
       const validated = validateTemplate(payload.template);
       const imported: InviteTemplate = { ...validated, id: crypto.randomUUID(), ownerId: userId, status: 'private', version: 1, reviewNote: undefined, updatedAt: new Date().toISOString() };
-      commit([...records, imported]); selectTemplate(imported); setTab('mine'); setNotice('تم استيراد نسخة خاصة من القالب.');
+      await commit(imported); selectTemplate(imported); setTab('mine'); setNotice('تم استيراد نسخة خاصة من القالب.');
     });
   };
   const uploadImage = async (file?: File) => {
@@ -154,7 +158,7 @@ function InvitationStudio() {
   });
   let rsvpUrl = '', linkError = '';
   if (shareOrigin) {
-    try { rsvpUrl = createInvitationLink(shareOrigin, { id: occasion.id, title: design.title || occasion.title, date: design.date, time: design.time, venueName: design.venue, cityNameAr: occasion.cityNameAr }); }
+    try { rsvpUrl = occasion.shareCode ? `${normalizeInvitationOrigin(shareOrigin)}/invite/${occasion.shareCode}` : ''; }
     catch { linkError = 'تعذر تجهيز رابط الدعوة؛ راجع طول العنوان والتاريخ والوقت والموقع.'; }
   }
   const templates = [...BUILTIN_TEMPLATES, ...records];
@@ -163,12 +167,13 @@ function InvitationStudio() {
     return inTab && (tab === 'manage' || t.status !== 'archived') && (!kind || t.occasion === kind) && (!style || t.style === style) && (!color || t.color === color) && t.name.includes(search.trim());
   });
   const suggestions = BUILTIN_TEMPLATES.filter(t => t.occasion === templateKind);
-  if (!ready) return <p role="status" className="p-6">جارٍ تحميل مكتبة التصاميم…</p>;
+  if (!ready) return <div className="p-6" role="status">{notice || 'جارٍ تحميل مكتبة التصاميم…'}{notice && <button onClick={() => window.location.reload()} className="mx-3 underline">إعادة المحاولة</button>}</div>;
   return <div className="space-y-6" dir="rtl">
     <div className="rounded-3xl bg-gradient-to-l from-saudi-green-950 to-saudi-green-800 p-6 text-white flex flex-wrap items-center justify-between gap-4">
       <div><span className="text-xs text-saudi-gold-300">مساحة إبداعك</span><h3 className="text-xl font-bold mt-1">كل مناسبة تستحق دعوة تليق بها</h3><p className="text-sm text-white/80 mt-2">18 قالباً منسّقاً · تخصيص مرن · معاينة وتصدير</p></div><Palette className="h-10 w-10 text-saudi-gold-300" />
     </div>
-    <p className="text-xs text-gray-600">الحفظ والمفضلة ومراجعة القوالب محلية. رابط QR يحمل تفاصيل الدعوة الأساسية ويمكن فتحه دون بيانات محفوظة في متصفح الضيف؛ الردود والعانية ما تزال تجريبية ومحلية.</p>
+    <p className="text-xs text-gray-600">التصاميم والمفضلة والدعوات محفوظة في قاعدة البيانات. رابط البطاقة العام للعرض؛ تأكيد الحضور متاح عبر رابط الضيف الشخصي من قائمة المدعوين.</p>
+    <div className="flex flex-wrap gap-4 text-xs"><span role="status">{saveStatus}</span><Link className="underline text-green-900" href="/settings/channels">إعدادات واتساب والرسائل والبريد</Link><button className="underline" onClick={() => { lastSaved.current = ''; setDesign(d => ({ ...d })); }}>إعادة محاولة حفظ المسودة</button></div>
     {notice && <div role="status" aria-live="polite" className="rounded-xl border border-saudi-gold-300 bg-amber-50 p-3 text-sm">{notice}</div>}
     <section aria-label="مكتبة القوالب" className="bg-white rounded-3xl border border-gray-200 p-4 sm:p-6 space-y-4">
       <div className="flex flex-wrap justify-between gap-3">
@@ -187,7 +192,7 @@ function InvitationStudio() {
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 max-h-[560px] overflow-y-auto p-1">
         {visible.map(t => <article key={t.id} className="rounded-2xl border border-gray-200 p-2 space-y-2">
           <button className="w-full hover:opacity-90 focus-visible:ring-2 focus-visible:ring-saudi-green-800 rounded-xl" onClick={() => selectTemplate(t)} aria-label={`اختيار ${t.name}`}><Preview design={t.design} small /></button>
-          <div className="flex items-start justify-between gap-1"><div><h4 className="font-bold text-sm break-words">{t.name}</h4><p className="text-[11px] text-gray-500">{OCCASIONS[t.occasion]} · {STYLES[t.style]}</p></div><button disabled={!canEdit} aria-label={`إضافة ${t.name} إلى المفضلة`} aria-pressed={favorites.includes(t.id)} onClick={() => setFavorites(f => f.includes(t.id) ? f.filter(id => id !== t.id) : [...f, t.id])} className="p-2 rounded-lg hover:bg-rose-50 disabled:opacity-40"><Heart size={16} className={favorites.includes(t.id) ? 'fill-rose-500 text-rose-500' : 'text-gray-400'} /></button></div>
+          <div className="flex items-start justify-between gap-1"><div><h4 className="font-bold text-sm break-words">{t.name}</h4><p className="text-[11px] text-gray-500">{OCCASIONS[t.occasion]} · {STYLES[t.style]}</p></div><button disabled={!canEdit} aria-label={`إضافة ${t.name} إلى المفضلة`} aria-pressed={favorites.includes(t.id)} onClick={() => void run(async () => { const selected = !favorites.includes(t.id); await requestJSON('/api/invitation-studio', 'POST', { action: 'favorite', templateId: t.id, selected }); setFavorites(f => selected ? [...f, t.id] : f.filter(id => id !== t.id)); })} className="p-2 rounded-lg hover:bg-rose-50 disabled:opacity-40"><Heart size={16} className={favorites.includes(t.id) ? 'fill-rose-500 text-rose-500' : 'text-gray-400'} /></button></div>
           {t.ownerId !== 'system' && <p className="text-xs text-gray-500">{statusNames[t.status]} · الإصدار {t.version}</p>}
           {t.reviewNote && <p className="text-xs text-amber-800">ملاحظة المراجعة: {t.reviewNote}</p>}
           <button disabled={!canEdit} onClick={() => selectTemplate(t)} className="w-full bg-saudi-sand-100 rounded-lg py-2 text-xs disabled:opacity-40">{t.ownerId === userId && ['private', 'rejected'].includes(t.status) ? 'فتح وتعديل' : 'استخدام نسخة'}</button>
@@ -223,7 +228,7 @@ function InvitationStudio() {
         <div className="flex justify-between items-center"><h4 className="font-bold">معاينة مباشرة</h4><span className="text-xs text-gray-500">{SIZES[design.size].label}</span></div>
         <div className="bg-[#eae7e1] rounded-3xl p-5 sm:p-8"><div className="max-w-sm mx-auto"><Preview design={design} qrValue={includeQr ? rsvpUrl : ''} /></div></div>
         <div className="bg-white border rounded-2xl p-4 space-y-3"><p className="text-sm font-bold">التصدير والمشاركة</p>
-          <Field label="عنوان الموقع للمشاركة من الهاتف"><div className="flex gap-2"><input type="url" dir="ltr" className={fieldClass} value={originInput} placeholder="https://example.com" onChange={e => setOriginInput(e.target.value)} /><button className="rounded-xl border px-3 text-xs" onClick={() => void run(() => { const origin = normalizeInvitationOrigin(originInput.trim()); localStorage.setItem(INVITATION_ORIGIN_KEY, origin); setShareOrigin(origin); setOriginInput(origin); setNotice('تم تحديث عنوان الموقع في الروابط ورموز QR.'); })}>تطبيق</button></div></Field>
+          <Field label="عنوان الموقع للمشاركة من الهاتف"><div className="flex gap-2"><input type="url" dir="ltr" className={fieldClass} value={originInput} placeholder="https://example.com" onChange={e => setOriginInput(e.target.value)} /><button className="rounded-xl border px-3 text-xs" onClick={() => void run(() => { const origin = normalizeInvitationOrigin(originInput.trim()); setShareOrigin(origin); setOriginInput(origin); setNotice('تم تحديث عنوان المشاركة؛ تابع حالة حفظ المسودة.'); })}>تطبيق</button></div></Field>
           {shareOrigin && ['localhost', '127.0.0.1', '[::1]'].includes(new URL(shareOrigin).hostname) && <p className="text-xs text-amber-800">للمسح من الهاتف، أدخل عنوان الموقع المنشور أو عنوان هذا الجهاز على الشبكة. localhost يشير إلى الهاتف نفسه.</p>}
           {linkError && <p role="alert" className="text-xs text-red-700">{linkError}</p>}
           <label className="flex gap-2 items-center text-xs"><input type="checkbox" checked={includeQr} onChange={e => setIncludeQr(e.target.checked)} /> تضمين QR حقيقي في البطاقة والتصدير</label>
@@ -238,6 +243,6 @@ function InvitationStudio() {
         </div><a href={`https://wa.me/?text=${encodeURIComponent(`${design.opening}\n${design.title}\n${design.date} ${design.time}\n${design.venue}\n${rsvpUrl}`)}`} target="_blank" rel="noopener noreferrer" className="block text-center text-xs text-green-800 underline">مشاركة نص الدعوة ورابط الحضور عبر واتساب</a><p className="text-[11px] text-gray-500">A5: ملف PNG بقياس 1748 × 2480 بكسل للطباعة عند نحو 300 نقطة/بوصة. لحفظ PDF، اختر «حفظ كـ PDF» من نافذة الطباعة. اترك هوامش الأمان ظاهرة وراجع المعاينة قبل الإرسال.</p></div>
       </section>
     </div>
-    <details className="bg-white rounded-2xl border p-4 text-sm"><summary className="cursor-pointer font-bold">صلاحيات المستخدمين وآلية إدارة القوالب</summary><div className="space-y-2 pt-3 text-gray-600"><p>الزائر: استعراض القوالب المنشورة. المستخدم المسجّل: التخصيص والرفع والحفظ والمفضلة والتصدير؛ تعديل تصاميمه الخاصة وإرسالها للمراجعة.</p><p>الإدارة: مراجعة القوالب المرسلة، نشرها، طلب التعديل مع توضيح السبب، وأرشفة القوالب. القوالب المنشورة تُستخدم كنسخ مستقلة لحماية الأصل.</p><p>دورة القالب: خاص ← بانتظار المراجعة ← منشور أو يحتاج تعديلاً. التعديل يعيد القالب إلى خاص ويزيد رقم الإصدار؛ الأرشفة تخفيه من المكتبة. هذه الصلاحيات تنظيمية داخل النسخة المحلية، وتحتاج جلسات موثوقة وتحققاً على الخادم عند الإطلاق المشترك.</p></div></details>
+    <details className="bg-white rounded-2xl border p-4 text-sm"><summary className="cursor-pointer font-bold">صلاحيات المستخدمين وآلية إدارة القوالب</summary><div className="space-y-2 pt-3 text-gray-600"><p>الزائر: استعراض القوالب المنشورة. المستخدم المسجّل: التخصيص والرفع والحفظ والمفضلة والتصدير؛ تعديل تصاميمه الخاصة وإرسالها للمراجعة.</p><p>الإدارة: مراجعة القوالب المرسلة، نشرها، طلب التعديل مع توضيح السبب، وأرشفة القوالب. القوالب المنشورة تُستخدم كنسخ مستقلة لحماية الأصل.</p><p>دورة القالب: خاص ← بانتظار المراجعة ← منشور أو يحتاج تعديلاً. التعديل يعيد القالب إلى خاص ويزيد رقم الإصدار؛ الأرشفة تخفيه من المكتبة. تتحقق صلاحيات الملكية والمراجعة على الخادم، وتُرفض التعديلات المتعارضة بين الأجهزة.</p></div></details>
   </div>;
 }

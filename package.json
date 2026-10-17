@@ -9,7 +9,13 @@
     "lint": "next lint",
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
-    "db:seed": "node scripts/seed-postgres.mjs"
+    "db:seed": "node scripts/seed-postgres.mjs",
+    "test:invitations": "node scripts/test-invitations.cjs",
+    "test:invitation-db": "node scripts/test-invitation-database.cjs",
+    "test:channels": "node scripts/test-channel-providers.cjs",
+    "test:system-admin": "node scripts/test-system-admin.cjs",
+    "test:geo-engine": "node scripts/test-geo-engine.cjs",
+    "test:geography": "node scripts/test-geography.cjs"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

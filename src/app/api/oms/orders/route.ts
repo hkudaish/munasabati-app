@@ -1,22 +1,25 @@
+import { requireGeo,assertNotPreview } from '@/lib/server/geo/context';
+import { HttpError } from '@/lib/server/http';
+import { guardService } from '@/lib/server/features';
 import { NextResponse } from 'next/server';
 import { getAllOMSOrders, saveOMSMasterOrder, getOMSSettings } from '@/lib/oms/store';
 import { buildMultiVendorMasterOrder } from '@/lib/oms/orchestrator';
 import { recordOMSEvent } from '@/lib/oms/store';
 import { generateNotificationText, sendOMSNotification } from '@/lib/oms/notifications';
 
-export async function GET() {
+async function GETHandler() {
   try {
     const orders = await getAllOMSOrders();
     return NextResponse.json({ success: true, orders });
   } catch (error: any) {
     return NextResponse.json(
       { success: false, errorAr: error?.message || 'فشل في استرجاع قائمة الطلبات' },
-      { status: 500 }
+      { status: error instanceof HttpError ? error.status : 500 }
     );
   }
 }
 
-export async function POST(req: Request) {
+async function POSTHandler(req: Request) {
   try {
     const body = await req.json();
     const { cartGroups, customerInfo, idempotencyKey } = body;
@@ -35,6 +38,13 @@ export async function POST(req: Request) {
       );
     }
 
+    await assertNotPreview(req);
+    await requireGeo('feature:commerce', customerInfo.cityId);
+    for(const group of cartGroups)if(!Array.isArray(group.items)||!group.items.length)throw new HttpError(400,'عناصر الطلب مطلوبة');
+    for (const group of cartGroups) for (const item of group.items) {
+      if (item.cityId && item.cityId !== customerInfo.cityId) throw new HttpError(400,'مدينة الخدمة لا تطابق مدينة الطلب');
+      await requireGeo('item:'+item.serviceId, customerInfo.cityId);
+    }
     const settings = await getOMSSettings();
     const masterOrder = buildMultiVendorMasterOrder(
       cartGroups,
@@ -76,7 +86,11 @@ export async function POST(req: Request) {
   } catch (error: any) {
     return NextResponse.json(
       { success: false, errorAr: error?.message || 'فشل في إنشاء الطلب' },
-      { status: 500 }
+      { status: error instanceof HttpError ? error.status : 500 }
     );
   }
 }
+
+export const GET = guardService(GETHandler, 'commerce');
+
+export const POST = guardService(POSTHandler, 'commerce');

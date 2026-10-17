@@ -1,9 +1,12 @@
+import { requireAdmin } from '@/lib/server/auth';
+import { HttpError } from '@/lib/server/http';
 import { NextResponse } from 'next/server';
 import { getAllOMSOrders, getAllOMSExceptions, getOMSSettings, saveOMSException, saveOMSMasterOrder } from '@/lib/oms/store';
 import { runOMSWatchdogScan } from '@/lib/oms/sla-watchdog';
 
 export async function POST() {
   try {
+    await requireAdmin();
     const orders = await getAllOMSOrders();
     const existingExceptions = await getAllOMSExceptions();
     const settings = await getOMSSettings();
@@ -44,7 +47,7 @@ export async function POST() {
   } catch (error: any) {
     return NextResponse.json(
       { success: false, errorAr: error?.message || 'فشل في تشغيل خدمة المراقبة الذاتية' },
-      { status: 500 }
+      { status: error instanceof HttpError ? error.status : 500 }
     );
   }
 }

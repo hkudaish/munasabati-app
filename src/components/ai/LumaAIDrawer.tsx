@@ -628,13 +628,13 @@ export default function LumaAIDrawer() {
     }, 700);
   };
 
-  const handleApplyPlan = () => {
+  const handleApplyPlan = async () => {
     if (!generatedPlan) return;
     try {
       confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
     } catch {}
 
-    const newOccasionId = createOccasion({
+    const newOccasionId = await createOccasion({
       title: generatedPlan.occasionTitle,
       occasionTypeId: generatedPlan.occasionTypeId,
       cityId: generatedPlan.cityId,
@@ -645,7 +645,7 @@ export default function LumaAIDrawer() {
     });
 
     setIsAIOpen(false);
-    router.push(`/occasion/${newOccasionId}`);
+    if (newOccasionId) router.push(`/occasion/${newOccasionId}`);
   };
 
   const handleQuickAddService = (cand: VendorRecommendationResult) => {

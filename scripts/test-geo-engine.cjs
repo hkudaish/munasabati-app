@@ -1,0 +1,16 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),ts=require('typescript');
+require.extensions['.ts']=(module,filename)=>module._compile(ts.transpileModule(fs.readFileSync(filename,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,filename);
+const {availability,summary,applyChanges,matchCity}=require('../src/lib/geo/engine.ts');const {parseCSV}=require('../src/lib/geo/csv.ts');
+const s={revision:0,countries:[{code:'SA',enabled:true}],cities:[{id:'riyadh',nameAr:'الرياض',nameEn:'Riyadh',aliases:['Ar Riyāḑ'],countryCode:'SA',isAvailable:true,defaultAvailable:true},{id:'jeddah',nameAr:'جدة',nameEn:'Jeddah',aliases:['Jiddah'],countryCode:'SA',isAvailable:false,defaultAvailable:false}],services:[{key:'feature:a',kind:'feature',enabled:true,visible:true},{key:'feature:b',kind:'feature',enabled:true,visible:true},{key:'item:1',kind:'item',enabled:true,visible:true,cityId:'riyadh'}],rules:[],policy:{unknownCity:'PROMPT',hideUnavailable:true},regions:[]};
+const loc={cityId:'riyadh',countryCode:'SA',source:'MANUAL'};
+assert.equal(summary(s,loc),'FULL');assert.equal(summary(s,{...loc,cityId:'jeddah'}),'NONE');assert.equal(summary(s,{...loc,cityId:'unknown'}),'UNKNOWN');
+assert(availability(s,{...loc,cityId:null}).every(a=>!a.available));
+const partial=applyChanges(s,[{type:'rules',cityIds:['riyadh'],keys:['feature:a'],status:'UNAVAILABLE',message:'رسالة مدينة مخصصة'}]);assert.equal(summary(partial,loc),'PARTIAL');assert.equal(availability(partial,loc)[0].message,'رسالة مدينة مخصصة');
+assert.equal(summary(applyChanges(s,[{type:'country',id:'SA',enabled:false}]),loc),'NONE');
+const window=applyChanges(s,[{type:'rules',cityIds:['riyadh'],keys:['feature:a'],status:'AVAILABLE',startsAt:'2026-01-10T00:00:00Z',endsAt:'2026-01-20T00:00:00Z'}]);
+assert.equal(availability(window,loc,new Date('2026-01-01'))[0].status,'SOON');assert.equal(availability(window,loc,new Date('2026-01-15'))[0].available,true);assert.equal(availability(window,loc,new Date('2026-01-20'))[0].available,false);
+const globalOff=structuredClone(s);globalOff.services[0].enabled=false;assert.equal(availability(applyChanges(globalOff,[{type:'rules',cityIds:['riyadh'],keys:['feature:a'],status:'AVAILABLE'}]),loc)[0].available,false);
+assert.equal(matchCity(s,'SA',['جِدّة']),'jeddah');assert.equal(matchCity(s,'US',['Riyadh']),null);assert.equal(matchCity(s,'SA',['Unknown City']),null);
+const copied=applyChanges(partial,[{type:'copy',sourceId:'riyadh',targetIds:['jeddah']}]);assert.equal(copied.rules.find(r=>r.cityId==='jeddah').message,'رسالة مدينة مخصصة');assert.equal(s.rules.length,0);
+assert.deepEqual(parseCSV('\uFEFFid,name\r\n1,"الرياض, المدينة"\r\n2,"سطر\nثان"'),[{id:'1',name:'الرياض, المدينة'},{id:'2',name:'سطر\nثان'}]);assert.throws(()=>parseCSV('id,name\n1,"broken'));
+console.log('PASS: full/partial/inactive/unknown coverage, global/country/city priorities, time windows, Arabic aliases, country isolation, draft/copy isolation and quoted CSV.');

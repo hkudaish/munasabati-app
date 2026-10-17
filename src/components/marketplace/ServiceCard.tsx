@@ -1,5 +1,6 @@
 'use client';
 
+import { useGeo } from '@/components/geo/GeoProvider';
 import React, { useState } from 'react';
 import Link from 'next/link';
 import {
@@ -26,11 +27,16 @@ interface ServiceCardProps {
 
 export default function ServiceCard({ service, onBookNow }: ServiceCardProps) {
   const { addToCart, favoriteServiceIds, toggleFavoriteService } = useApp();
+  const geo=useGeo();
+  const allowed=!!geo.data?.availability.find(a=>a.key==='item:'+service.id)?.available;
   const [isAdded, setIsAdded] = useState(false);
 
   const isFavorite = favoriteServiceIds.includes(service.id);
 
+  if(geo.loading)return <div className="h-80 rounded-3xl bg-slate-100 animate-pulse"/>;
+  if(geo.data?.summary!=='UNKNOWN'&&!allowed&&geo.data?.snapshot.policy.hideUnavailable)return null;
   const handleQuickAdd = () => {
+    if(!allowed)return;
     const details = ensureServiceDetails(service);
     const pkg = details.packages[0] || {
       id: 'basic',
@@ -57,6 +63,7 @@ export default function ServiceCard({ service, onBookNow }: ServiceCardProps) {
 
   return (
     <div className="bg-white rounded-3xl border border-saudi-sand-300 overflow-hidden shadow-card hover:shadow-xl hover:border-saudi-gold-400/80 transition-all duration-300 flex flex-col justify-between group">
+      {!allowed&&<p className="p-3 text-xs bg-amber-50 text-amber-900">{geo.data?.selection.cityId?'غير متوفرة في مدينتك':'اختر المدينة للتحقق قبل الحجز'}</p>}
       {/* Image Banner */}
       <div className="relative h-48 w-full bg-gray-100 overflow-hidden">
         <img
@@ -165,7 +172,7 @@ export default function ServiceCard({ service, onBookNow }: ServiceCardProps) {
 
           <div className="flex items-center gap-1.5">
             <button
-              onClick={handleQuickAdd}
+              disabled={!allowed||!!geo.data?.preview} onClick={handleQuickAdd}
               className={`p-2 rounded-xl text-xs font-bold transition flex items-center gap-1 ${
                 isAdded
                   ? 'bg-emerald-700 text-white'

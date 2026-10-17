@@ -25,7 +25,7 @@ export default function GateScannerPage() {
   const occasionGuests = guests.filter((g) => g.occasionId === activeOccasion.id);
   const attendedCount = occasionGuests.filter((g) => g.status === 'attended').length;
 
-  const handleScanCode = (codeToScan: string) => {
+  const handleScanCode = async (codeToScan: string) => {
     if (!codeToScan.trim()) return;
 
     const decodedCode = codeFromScan(codeToScan);
@@ -39,7 +39,7 @@ export default function GateScannerPage() {
       return;
     }
     if (matchedGuest) {
-      updateGuestStatus(matchedGuest.id, 'attended');
+      if (!await updateGuestStatus(matchedGuest.id, 'attended')) { setScanResult({ success: false, message: 'لم يتم تسجيل الدخول؛ راجع تنبيه الخدمة وأعد المحاولة.' }); return; }
       setScanResult({
         success: true,
         guestName: matchedGuest.name,

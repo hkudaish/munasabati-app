@@ -66,13 +66,13 @@ export default function CheckoutPage() {
     );
   }
 
-  const handleConfirmOrder = () => {
+  const handleConfirmOrder = async () => {
     if (isSubmitting) return; // concurrency / idempotency protection
     setIsSubmitting(true);
 
-    setTimeout(() => {
+    try {
       const isDepositOnly = paymentOption === 'deposit';
-      const order = checkoutCart({
+      const order = await checkoutCart({
         customerName,
         customerPhone,
         customerEmail,
@@ -96,7 +96,7 @@ export default function CheckoutPage() {
           origin: { y: 0.6 },
         });
       } catch {}
-    }, 1200);
+    } catch (error) { setIsSubmitting(false); alert(error instanceof Error ? error.message : 'تعذر تأكيد الطلب'); }
   };
 
   return (

@@ -179,6 +179,8 @@ export interface SmartPackage {
 }
 
 export interface Occasion {
+  shareCode?: string;
+  shareOrigin?: string;
   id: string;
   title: string;
   occasionTypeId: string;
@@ -204,6 +206,9 @@ export interface Occasion {
 }
 
 export interface Guest {
+  email?: string;
+  revokedAt?: string;
+  rsvpCompanionCount?: number;
   id: string;
   occasionId: string;
   name: string;
@@ -215,7 +220,7 @@ export interface Guest {
   qrCode: string;
   tableId?: string;
   tableName?: string;
-  invitedVia: 'whatsapp' | 'sms' | 'link';
+  invitedVia: 'whatsapp' | 'sms' | 'email' | 'link';
   invitationSentAt?: string;
   rsvpTime?: string;
   notes?: string;
@@ -608,6 +613,7 @@ export interface UserProfile {
   isVerified?: boolean;
   createdAt?: string;
   hasAdminAccess?: boolean;
+  hasSystemAccess?: boolean;
 }
 
 export interface CustomerRegistrationPayload {

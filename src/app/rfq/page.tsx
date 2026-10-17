@@ -114,8 +114,8 @@ export default function RFQHubPage() {
           date={selectedRFQ.date}
           totalAmount={paymentModalQuote.total}
           onClose={() => setPaymentModalQuote(null)}
-          onPaymentSuccess={(method, isDeposit, ref) => {
-            createBooking({
+          onPaymentSuccess={async (method, isDeposit, ref) => {
+            await createBooking({
               occasionId: activeOccasion?.id,
               occasionTitle: selectedRFQ.occasionTitle,
               vendorId: paymentModalQuote.vendorId,

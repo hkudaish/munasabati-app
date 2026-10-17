@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -61,7 +61,9 @@ export default function OccasionWorkspacePage() {
   } = useApp();
 
   const occasionId = params.id as string;
-  const currentOccasion = occasions.find((o) => o.id === occasionId) || occasions[0];
+  const currentOccasion = occasions.find((o) => o.id === occasionId);
+
+  useEffect(() => { if (occasions.some(o => o.id === occasionId)) setActiveOccasionId(occasionId); }, [occasionId, occasions, setActiveOccasionId]);
 
   const [activeTab, setActiveTab] = useState<TabType>('overview');
 
