@@ -1,4 +1,4 @@
-import { Availability, GeoChange, GeoSelection, GeoSnapshot, GeoStatus } from './types';
+import { Availability, GeoChange, GeoSelection, GeoSnapshot, GeoStatus, GeoService } from './types';
 export const normalizePlace = (value:string) => value.normalize('NFKD').replace(/[\u064B-\u065F\u0670]/g,'').replace(/[أإآ]/g,'ا').replace(/ى/g,'ي').toLocaleLowerCase().replace(new RegExp('[^\\p{L}\\p{N}]','gu'),'');
 export function matchCity(snapshot:GeoSnapshot,countryCode:string,names:string[]):string|null {
   const aliases = new Set(names.filter(Boolean).map(normalizePlace));
@@ -8,7 +8,10 @@ export function matchCity(snapshot:GeoSnapshot,countryCode:string,names:string[]
 export function availability(snapshot:GeoSnapshot, selection:GeoSelection, now = new Date()):Availability[] {
   const city=snapshot.cities.find(c=>c.id===selection.cityId);
   const country=snapshot.countries.find(c=>c.code===(city?.countryCode||selection.countryCode));
-  return snapshot.services.map(service=>{
+  const results = new Map<string, Availability>();
+  const categoryServices = new Map(snapshot.services.filter(s=>s.kind==='category').map(s=>[s.id,s]));
+  function resolve(service:GeoService):Availability {
+    const cached=results.get(service.key);if(cached)return cached;
     let status:GeoStatus='AVAILABLE',reason='',message='';
     const rule=city?snapshot.rules.find(r=>r.cityId===city.id&&r.key===service.key):undefined;
     if(!service.enabled){status='UNAVAILABLE';reason='الخدمة موقوفة على مستوى المنصة';}
@@ -16,14 +19,19 @@ export function availability(snapshot:GeoSnapshot, selection:GeoSelection, now =
     else if(!city){if(snapshot.policy.unknownCity!=='ALLOW'){status='UNAVAILABLE';reason='اختر مدينة مسجلة للتحقق من توفر الخدمة';}}
     else if(!country){status='UNAVAILABLE';reason='تغطية الدولة غير محددة';}
     else if(!city.isAvailable){status='UNAVAILABLE';reason='الخدمات غير متاحة في هذه المدينة حالياً';}
+    else if(service.kind==='item'&&service.categoryId&&categoryServices.has(service.categoryId)&&!resolve(categoryServices.get(service.categoryId)!).available){
+      const parent=resolve(categoryServices.get(service.categoryId)!);status=parent.status;reason=parent.reason;message=parent.message;
+    }
     else if(rule){
       status=rule.status;reason=rule.reason||'';message=rule.message||'';
       if(rule.startsAt&&now<new Date(rule.startsAt)){status='SOON';reason=reason||'لم تبدأ فترة الإتاحة';}
       else if(rule.endsAt&&now>=new Date(rule.endsAt)){status='UNAVAILABLE';reason=reason||'انتهت فترة الإتاحة';}
     }else if(!city.defaultAvailable||(service.kind==='item'&&service.cityId!==city.id)) {status='UNAVAILABLE';reason='الخدمة غير مفعلة لهذه المدينة';}
     if(!reason&&status!=='AVAILABLE')reason=status==='SOON'?'قريباً؛ لا يتوفر الحجز حالياً':'الخدمة غير متاحة حالياً';
-    return {key:service.key,available:status==='AVAILABLE',status,reason,message};
-  });
+    const result={key:service.key,available:status==='AVAILABLE',status,reason,message};
+    results.set(service.key,result);return result;
+  }
+  return snapshot.services.map(resolve);
 }
 export function summary(snapshot:GeoSnapshot,selection:GeoSelection,items=availability(snapshot,selection)) {
   if(!snapshot.cities.some(c=>c.id===selection.cityId))return 'UNKNOWN' as const;

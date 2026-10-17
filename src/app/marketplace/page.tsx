@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -72,6 +72,10 @@ export default function MarketplacePage() {
 
   const [bookingModalItem, setBookingModalItem] = useState<ServiceItem | null>(null);
 
+  const categoryAvailable=(id:string)=>geo.data?.summary==='UNKNOWN'||!geo.data?.selection.cityId||!!geo.data.availability.find(a=>a.key==='category:'+id)?.available;
+  const visibleCategories=serviceCategories.filter(c=>!geo.data?.snapshot.policy.hideUnavailable||categoryAvailable(c.id));
+  useEffect(()=>{if(selectedCategory!=='all'&&geo.data?.selection.cityId&&!geo.data?.availability.find(a=>a.key==='category:'+selectedCategory)?.available)setSelectedCategory('all');},[geo.data,selectedCategory]);
+
   // Filter & Sort Services
   const filteredServices = services
     .filter(service => vendors.some(vendor => vendor.id === service.vendorId && vendor.status === 'active'))
@@ -121,7 +125,7 @@ export default function MarketplacePage() {
         v.businessName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         v.bioAr.toLowerCase().includes(searchQuery.toLowerCase()) ||
         v.cityNameAr.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCity = !selectedCity || v.cityId === selectedCity;
+      const matchesCity = !selectedCity || (v.cityId === selectedCity && categoryAvailable(v.categoryId));
       const matchesVerified = !verifiedOnly || v.verified;
 
       return matchesCategory && matchesSearch && matchesCity && matchesVerified;
@@ -320,10 +324,10 @@ export default function MarketplacePage() {
           كافة التصنيفات ({activeTab === 'services' ? services.length : vendors.length})
         </button>
 
-        {serviceCategories.map((cat) => (
+        {visibleCategories.map((cat) => (
           <button
             key={cat.id}
-            onClick={() => setSelectedCategory(cat.id)}
+            disabled={!categoryAvailable(cat.id)} title={categoryAvailable(cat.id)?cat.nameAr:'غير متاح في المدينة المختارة'} onClick={() => setSelectedCategory(cat.id)}
             className={`px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition flex items-center gap-1.5 ${
               selectedCategory === cat.id
                 ? 'bg-saudi-green-800 text-white shadow-md'

@@ -24,9 +24,9 @@ export async function writeChanges(tx:Prisma.TransactionClient,changes:GeoChange
   if(d.type==='city')await tx.saudiCity.update({where:{id:d.id},data:{isAvailable:d.enabled,...(d.defaultAvailable!==undefined?{defaultAvailable:d.defaultAvailable}:{}),version:{increment:1}}});
   if(d.type==='policy')await tx.geoPolicy.upsert({where:{id:'default'},create:{id:'default',...d.value},update:{...d.value,version:{increment:1}}});
   if(d.type==='rules'){
-   const featureIds=d.keys.filter(k=>k.startsWith('feature:')).map(k=>k.slice(8)),serviceIds=d.keys.filter(k=>k.startsWith('item:')).map(k=>k.slice(5));
-   await tx.geoRule.deleteMany({where:{cityId:{in:d.cityIds},OR:[{featureId:{in:featureIds}},{serviceId:{in:serviceIds}}]}});
-   await tx.geoRule.createMany({data:d.cityIds.flatMap(cityId=>d.keys.map(key=>({cityId,...(key.startsWith('feature:')?{featureId:key.slice(8)}:{serviceId:key.slice(5)}),status:d.status,startsAt:d.startsAt?new Date(d.startsAt):null,endsAt:d.endsAt?new Date(d.endsAt):null,reason:d.reason,message:d.message})))});
+   const featureIds=d.keys.filter(k=>k.startsWith('feature:')).map(k=>k.slice(8)),serviceIds=d.keys.filter(k=>k.startsWith('item:')).map(k=>k.slice(5)),categoryIds=d.keys.filter(k=>k.startsWith('category:')).map(k=>k.slice(9));
+   await tx.geoRule.deleteMany({where:{cityId:{in:d.cityIds},OR:[{featureId:{in:featureIds}},{serviceId:{in:serviceIds}},{categoryId:{in:categoryIds}}]}});
+   await tx.geoRule.createMany({data:d.cityIds.flatMap(cityId=>d.keys.map(key=>({cityId,...(key.startsWith('feature:')?{featureId:key.slice(8)}:key.startsWith('category:')?{categoryId:key.slice(9)}:{serviceId:key.slice(5)}),status:d.status,startsAt:d.startsAt?new Date(d.startsAt):null,endsAt:d.endsAt?new Date(d.endsAt):null,reason:d.reason,message:d.message})))});
   }
   if(d.type==='copy'){const rules=await tx.geoRule.findMany({where:{cityId:d.sourceId}});const source=await tx.saudiCity.findUniqueOrThrow({where:{id:d.sourceId}});
    for(const cityId of d.targetIds){await tx.geoRule.deleteMany({where:{cityId}});if(rules.length)await tx.geoRule.createMany({data:rules.map(({id,version,updatedAt,...r})=>({...r,cityId}))});await tx.saudiCity.update({where:{id:cityId},data:{defaultAvailable:source.defaultAvailable,version:{increment:1}}});}

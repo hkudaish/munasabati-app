@@ -121,6 +121,8 @@ model GeoRule {
   feature SystemFeature? @relation(fields: [featureId], references: [id], onDelete: Cascade)
   serviceId String?
   service ServiceItem? @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  categoryId String?
+  category ServiceCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   status String @default("UNAVAILABLE")
   startsAt DateTime?
   endsAt DateTime?
@@ -130,6 +132,7 @@ model GeoRule {
   updatedAt DateTime @updatedAt
   @@unique([cityId, featureId])
   @@unique([cityId, serviceId])
+  @@unique([cityId, categoryId])
   @@index([cityId, status])
 }
 model GeoPolicy {
@@ -231,6 +234,7 @@ model ServiceCategory {
 
   vendors       Vendor[]
   services      ServiceItem[]
+  geoRules      GeoRule[]
 }
 
 // -------------------------------------------------------------

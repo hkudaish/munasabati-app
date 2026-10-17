@@ -30,6 +30,12 @@ module.exports=async function browserTest(base,sessionCookie,previewUrl){
   const fakeUser=await evaluate("fetch('/api/auth/session').then(r=>r.json())");assert.equal(fakeUser.user,null);
   await send('Emulation.setDeviceMetricsOverride',{width:1440,height:1000,deviceScaleFactor:1,mobile:false});await send('Page.navigate',{url:base+'/system-admin/geography'});await wait("document.querySelectorAll('tbody tr').length>=3");
   shot=await send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(artifact,'geography-manager.png'),Buffer.from(shot.data,'base64'));
+  await evaluate("Array.from(document.querySelectorAll('aside button')).find(b=>b.innerText.trim()==='تصنيفات الخدمات حسب المدن').click()");
+  await wait("Array.from(document.querySelectorAll('h2')).some(h=>h.innerText.includes('تصنيفات الخدمات حسب المدن')) && document.querySelectorAll('thead th').length>=13");
+  assert(await evaluate("document.body.innerText.includes('تأجير مستلزمات وجلسات') && document.body.innerText.includes('متجر مستلزمات الحفلات')"));
+  await evaluate("document.querySelector('button[aria-label=\"تعطيل كوش وديكور وتنسيق في الرياض\"]').click()");await wait("document.body.innerText.includes('أضيف التغيير للمسودة')");
+  await evaluate("Array.from(document.querySelectorAll('h2')).find(h=>h.innerText.includes('تصنيفات الخدمات حسب المدن')).scrollIntoView({block:'start'})");
+  shot=await send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(artifact,'geography-categories.png'),Buffer.from(shot.data,'base64'));
   console.log('PASS browser: unknown location, manual choice, partial/inactive messages, no automatic geolocation prompt, mobile picker bounds, and real manager page. Screenshots: .geo-test-artifacts/');
  }catch(e){console.error('Browser errors:',browserErrors.slice(-8));console.error('Script resources:',resources.slice(-20));try{const shot=await send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(artifact,'geography-failure.png'),Buffer.from(shot.data,'base64'));console.error(await evaluate('JSON.stringify({ready:document.readyState,react:Object.keys(document.querySelector("button[aria-controls] ")||{}),resources:performance.getEntriesByType("resource").slice(-10).map(r=>r.name),body:document.body.innerText.slice(0,1000)})'));}catch{}throw e;}finally{try{ws?.close();}catch{}if(child.pid)spawnSync('C:\\Windows\\System32\\taskkill.exe',['/pid',String(child.pid),'/T','/F'],{stdio:'ignore'});try{fs.rmSync(profile,{recursive:true,force:true});}catch{}}
 };

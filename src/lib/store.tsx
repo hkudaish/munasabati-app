@@ -272,7 +272,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [activeOccasionId, setActiveOccasionId] = useState<string>('');
 
   const [occasionTypes, setOccasionTypes] = useState<OccasionType[]>(OCCASION_TYPES);
-  const [serviceCategories, setServiceCategories] = useState<ServiceCategory[]>(SERVICE_CATEGORIES);
+  const [serviceCategories, setServiceCategories] = useState<ServiceCategory[]>(geo.data?.snapshot.categories||SERVICE_CATEGORIES);
   const [cities, setCities] = useState<SaudiCity[]>(()=>(geo.data?.snapshot.cities||[]).map(c=>({...c,neighborhoods:SAUDI_CITIES.find(old=>old.id===c.id)?.neighborhoods||[]})));
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [services, setServices] = useState<ServiceItem[]>([]);
@@ -403,6 +403,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return () => { stopped = true; clearInterval(timer); };
   }, [currentUser?.id]);
 
+  useEffect(()=>{if(geo.data?.snapshot.categories)setServiceCategories(geo.data.snapshot.categories);},[geo.data?.snapshot.categories]);
   useEffect(()=>{if(geo.data)setCities(geo.data.snapshot.cities.map(c=>({...c,regionAr:c.regionAr,isAvailable:c.isAvailable,neighborhoods:SAUDI_CITIES.find(old=>old.id===c.id)?.neighborhoods||[]})));},[geo.data]);
 
   // The server session is authoritative; browser profiles are never credentials.
