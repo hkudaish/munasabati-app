@@ -18,6 +18,7 @@
     "test:geography": "node scripts/test-geography.cjs"
   },
   "dependencies": {
+    "@netlify/database": "^2.0.1",
     "@prisma/client": "^6.19.3",
     "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
