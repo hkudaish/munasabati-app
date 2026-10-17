@@ -113,7 +113,7 @@ export default function DigitalEaniyahModal({
       return;
     }
     if (currentAmount < 50) {
-      alert('الحد الأدنى للعانية هو 50 ر.س');
+      alert(`الحد الأدنى للعانية هو ${formatSAR(50)}`);
       return;
     }
 
@@ -286,7 +286,7 @@ export default function DigitalEaniyahModal({
                     onChange={(e) => handleCustomChange(e.target.value)}
                     className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-saudi-gold-500 font-bold"
                   />
-                  <span className="absolute left-3 top-2.5 text-xs text-gray-400 font-bold">ر.س</span>
+                  <span className="absolute left-3 top-2.5 text-xs text-gray-400 font-bold">⃁</span>
                 </div>
               </div>
 

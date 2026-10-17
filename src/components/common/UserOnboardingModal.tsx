@@ -653,7 +653,7 @@ export default function UserOnboardingModal() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">متوسط السعر المبدئي (ر.س)</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">متوسط السعر المبدئي (⃁)</label>
                   <input
                     type="number"
                     value={vendorData.startingPrice}

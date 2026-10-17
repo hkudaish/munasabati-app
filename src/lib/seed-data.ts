@@ -2078,7 +2078,7 @@ export const INITIAL_ADMIN_CONFIG: AdminPlatformConfig = {
   taglineAr: 'خططها. احجزها. اعزمهم. احتفل.',
   commissionRatePercent: 10,
   vatPercent: 15,
-  currencyAr: 'ر.س',
+  currencyAr: '⃁',
   emergencyPhone: '920012345',
   aiAssistantNameAr: 'لُـمى',
   activeCitiesCount: 12,

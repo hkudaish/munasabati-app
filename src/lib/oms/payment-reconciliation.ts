@@ -1,3 +1,4 @@
+import { formatSAR } from '../utils';
 // Payment Reconciliation & Idempotency Engine
 // Verifies payment webhooks, checks idempotency keys, manages payment vs fulfillment states, and prevents duplicate transactions.
 
@@ -76,7 +77,7 @@ export function reconcileOrderPayment(
       receivedAmount: paidAmount,
       discrepancyAmount: Math.abs(discrepancy),
       status: 'DISCREPANCY_UNDERPAID',
-      reconciliationNotesAr: `وجود نقص في المبلغ المدفوع بمقدار ${Math.abs(discrepancy)} ر.س`,
+      reconciliationNotesAr: `وجود نقص في المبلغ المدفوع بمقدار ${formatSAR(Math.abs(discrepancy))}`,
     };
   }
 
@@ -86,6 +87,6 @@ export function reconcileOrderPayment(
     receivedAmount: paidAmount,
     discrepancyAmount: discrepancy,
     status: 'DISCREPANCY_OVERPAID',
-    reconciliationNotesAr: `فائض في المبلغ المدفوع بمقدار ${discrepancy} ر.س`,
+    reconciliationNotesAr: `فائض في المبلغ المدفوع بمقدار ${formatSAR(discrepancy)}`,
   };
 }

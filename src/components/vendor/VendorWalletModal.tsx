@@ -162,7 +162,7 @@ export const VendorWalletModal: React.FC<VendorWalletModalProps> = ({
 
               <div>
                 <label className="block text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-1">
-                  المبلغ المطلوب سحبه (ر.س)
+                  المبلغ المطلوب سحبه (⃁)
                 </label>
                 <input
                   type="number"

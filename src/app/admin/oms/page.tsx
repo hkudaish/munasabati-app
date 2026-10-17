@@ -1,5 +1,7 @@
 'use client';
 
+import { formatSAR } from '@/lib/utils';
+
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
@@ -442,7 +444,7 @@ export default function OMSAdminCommandCenter() {
 
                         {/* SLA Indicator */}
                         <div className="flex items-center justify-between text-[10px] pt-1">
-                          <span className="text-slate-400">الإجمالي: <strong className="text-white">{sub.totalAmount.toLocaleString()} ر.س</strong></span>
+                          <span className="text-slate-400">الإجمالي: <strong className="text-white">{formatSAR(sub.totalAmount)}</strong></span>
                           {sub.isDelayed ? (
                             <span className="text-rose-400 font-bold flex items-center gap-1">
                               <AlertTriangle className="w-3 h-3" /> متأخر
@@ -510,7 +512,7 @@ export default function OMSAdminCommandCenter() {
 
                         <td className="p-4">
                           <div className="font-semibold text-amber-300">{sub.vendorName}</div>
-                          <div className="text-[10px] text-slate-400">إجمالي الحجز: {sub.totalAmount.toLocaleString()} ر.س</div>
+                          <div className="text-[10px] text-slate-400">إجمالي الحجز: {formatSAR(sub.totalAmount)}</div>
                         </td>
 
                         <td className="p-4">
@@ -553,7 +555,7 @@ export default function OMSAdminCommandCenter() {
                         </td>
 
                         <td className="p-4 font-mono text-white font-bold">
-                          {sub.totalAmount.toLocaleString()} ر.س
+                          {formatSAR(sub.totalAmount)}
                         </td>
 
                         <td className="p-4 text-center">

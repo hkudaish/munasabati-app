@@ -1,5 +1,7 @@
 'use client';
 
+import { formatSAR } from '@/lib/utils';
+
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
@@ -218,7 +220,7 @@ export default function SupplierOrderWorkspace() {
 
                 <div className="flex items-center gap-2 text-slate-400">
                   <DollarSign className="w-4 h-4 text-slate-500" />
-                  <span>المبلغ الإجمالي: <strong className="text-white">{sub.totalAmount.toLocaleString()} ر.س</strong></span>
+                  <span>المبلغ الإجمالي: <strong className="text-white">{formatSAR(sub.totalAmount)}</strong></span>
                 </div>
               </div>
 

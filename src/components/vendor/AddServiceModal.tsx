@@ -145,7 +145,7 @@ export const AddServiceModal: React.FC<AddServiceModalProps> = ({
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300 mb-1">
-                  السعر شامل الضريبة (ر.س) *
+                  السعر شامل الضريبة (⃁) *
                 </label>
                 <input
                   type="number"

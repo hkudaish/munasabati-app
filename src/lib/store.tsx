@@ -1,5 +1,7 @@
 'use client';
 
+import { formatSAR } from '@/lib/utils';
+
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import {
   Occasion,
@@ -1293,7 +1295,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (currentSubtotal < found.minOrderAmount) {
       return {
         success: false,
-        messageAr: `الحد الأدنى لتفعيل هذا الكوبون هو ${found.minOrderAmount} ر.س. أضف المزيد للسلة.`,
+        messageAr: `الحد الأدنى لتفعيل هذا الكوبون هو ${formatSAR(found.minOrderAmount)}. أضف المزيد للسلة.`,
       };
     }
     setAppliedCoupon(found);

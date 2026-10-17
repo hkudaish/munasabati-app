@@ -83,7 +83,7 @@ function ReceptionWelcomeScreenContent() {
     const updateTime = () => {
       const now = new Date();
       setCurrentTime(
-        now.toLocaleTimeString('ar-SA', {
+        now.toLocaleTimeString('ar-SA-u-nu-latn', {
           hour: '2-digit',
           minute: '2-digit',
           second: '2-digit',
@@ -91,7 +91,7 @@ function ReceptionWelcomeScreenContent() {
         })
       );
       setCurrentDateString(
-        now.toLocaleDateString('ar-SA', {
+        now.toLocaleDateString('ar-SA-u-nu-latn', {
           weekday: 'long',
           year: 'numeric',
           month: 'long',

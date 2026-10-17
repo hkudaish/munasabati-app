@@ -135,7 +135,7 @@ export default function CreateRFQModal({ onClose, onCreated }: CreateRFQModalPro
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1">الميزانية (ر.س)</label>
+              <label className="block text-xs font-bold text-gray-700 mb-1">الميزانية (⃁)</label>
               <input
                 type="number"
                 value={budget}

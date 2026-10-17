@@ -337,7 +337,7 @@ function PlanWizardContent() {
 
             <div className="space-y-5">
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-2">الميزانية المقدرة (ر.س):</label>
+                <label className="block text-xs font-bold text-gray-700 mb-2">الميزانية المقدرة (⃁):</label>
                 <div className="flex items-center gap-2">
                   <input
                     type="number"

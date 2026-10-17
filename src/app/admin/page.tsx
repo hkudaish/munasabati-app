@@ -42,6 +42,7 @@ import {
 import Link from 'next/link';
 import { useApp } from '@/lib/store';
 import { formatSAR } from '@/lib/utils';
+import PackageManagementCard from '@/components/admin/PackageManagementCard';
 import { Vendor, ServiceItem, SmartPackage, Review, Booking } from '@/lib/types';
 
 function AdminDashboardContent() {
@@ -420,7 +421,7 @@ function AdminDashboardContent() {
             <CheckCircle2 className="w-4 h-4 text-saudi-green-800" />
           </div>
           <span className="text-2xl font-black font-cairo text-saudi-green-950 block">
-            {adminConfig.totalBookings.toLocaleString('ar-SA')} حجز
+            {adminConfig.totalBookings.toLocaleString('ar-SA-u-nu-latn')} حجز
           </span>
           <span className="text-[11px] text-gray-400 block">{bookings.length} حجوزات نشطة حالياً</span>
         </div>
@@ -880,8 +881,8 @@ function AdminDashboardContent() {
 
         {/* 4. Smart Packages Tab */}
         {activeTab === 'packages' && (
-          <div className="bg-white rounded-3xl border border-saudi-sand-300 p-6 shadow-sm space-y-6">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="bg-white rounded-3xl border border-saudi-sand-300 p-4 sm:p-6 shadow-sm space-y-6">
+            <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
               <div>
                 <h4 className="text-base font-bold text-gray-900 font-cairo">
                   إدارة الباقات الذكية المتكاملة ({packages.length})
@@ -892,63 +893,18 @@ function AdminDashboardContent() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-2 2xl:grid-cols-3">
               {packages.map((pkg) => (
-                <div
-                  key={pkg.id}
-                  className="bg-white rounded-2xl border border-saudi-sand-300 shadow-sm p-5 space-y-4 flex flex-col justify-between"
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] bg-saudi-gold-100 text-saudi-gold-900 font-bold px-2.5 py-0.5 rounded-full">
-                        {pkg.occasionTypeNameAr}
-                      </span>
-                      <span className="text-[11px] text-green-700 font-bold">
-                        وفر {formatSAR(pkg.savings || (pkg.originalPrice - pkg.packagePrice))}
-                      </span>
-                    </div>
-
-                    <h5 className="text-sm font-bold text-saudi-green-950 font-cairo">
-                      {pkg.titleAr}
-                    </h5>
-                    <p className="text-xs text-gray-500 line-clamp-2">{pkg.descriptionAr}</p>
-
-                    <div className="space-y-1 bg-saudi-sand-50 p-3 rounded-xl text-xs">
-                      <span className="text-[10px] font-bold text-gray-400 block">الخدمات المشمولة:</span>
-                      {pkg.items.map((item, i) => (
-                        <div key={i} className="flex justify-between text-gray-700 text-[11px]">
-                          <span>• {item.serviceName}</span>
-                          <span className="font-mono text-gray-400">{formatSAR(item.pricePortion)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="border-t border-gray-100 pt-3 flex items-center justify-between">
-                    <div>
-                      <span className="text-[10px] text-gray-400 line-through block">
-                        {formatSAR(pkg.originalPrice)}
-                      </span>
-                      <strong className="text-base font-black font-cairo text-saudi-green-950">
-                        {formatSAR(pkg.packagePrice)}
-                      </strong>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => {
-                          const newPrice = prompt('أدخل سعر الباقة الجديد بالريال:', pkg.packagePrice.toString());
-                          if (newPrice && !isNaN(Number(newPrice))) {
-                            updatePackage(pkg.id, { packagePrice: Number(newPrice) });
-                          }
-                        }}
-                        className="px-3 py-1.5 bg-saudi-sand-100 hover:bg-saudi-sand-200 rounded-xl text-xs font-bold text-saudi-green-900 transition"
-                      >
-                        تعديل السعر
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                <PackageManagementCard key={pkg.id} pkg={pkg} onEditPrice={() => {
+                  const value = prompt('أدخل سعر الباقة الجديد بالريال:', pkg.packagePrice.toString());
+                  if (value === null) return;
+                  const price = Number(value.replace(/,/g, '').trim());
+                  if (!value.trim() || !Number.isFinite(price) || price <= 0) {
+                    alert('يرجى إدخال سعر صالح أكبر من 0.');
+                    return;
+                  }
+                  updatePackage(pkg.id, { packagePrice: price, savings: Math.max(0, pkg.originalPrice - price) });
+                }} />
               ))}
             </div>
           </div>
@@ -1615,7 +1571,7 @@ function AdminDashboardContent() {
                 </div>
 
                 <div>
-                  <label className="block font-bold text-gray-700 mb-1">السعر المبدئي (ر.س)</label>
+                  <label className="block font-bold text-gray-700 mb-1">السعر المبدئي (⃁)</label>
                   <input
                     type="number"
                     value={newVendorStartingPrice}
@@ -1703,7 +1659,7 @@ function AdminDashboardContent() {
                 </div>
 
                 <div>
-                  <label className="block font-bold text-gray-700 mb-1">السعر (ر.س)</label>
+                  <label className="block font-bold text-gray-700 mb-1">السعر (⃁)</label>
                   <input
                     type="number"
                     value={newServicePrice}

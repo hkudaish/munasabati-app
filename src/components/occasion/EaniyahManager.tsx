@@ -254,7 +254,7 @@ export default function EaniyahManager({ occasionId }: EaniyahManagerProps) {
                       </h4>
                       <div className="flex items-center gap-2 text-[10px] text-gray-400">
                         <Calendar className="w-3 h-3" />
-                        <span>{new Date(gift.createdAt).toLocaleDateString('ar-SA')}</span>
+                        <span>{new Date(gift.createdAt).toLocaleDateString('ar-SA-u-nu-latn')}</span>
                         <span>•</span>
                         <span>{gift.paymentMethod.toUpperCase()}</span>
                       </div>

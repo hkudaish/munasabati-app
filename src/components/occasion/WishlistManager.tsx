@@ -168,7 +168,7 @@ export default function WishlistManager() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">القيمة التقريبية (ر.س)</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">القيمة التقريبية (⃁)</label>
                   <input
                     type="number"
                     value={price}
@@ -252,7 +252,7 @@ export default function WishlistManager() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">مبلغ المساهمة (ر.س)</label>
+                <label className="block text-xs font-bold text-gray-700 mb-1">مبلغ المساهمة (⃁)</label>
                 <input
                   type="number"
                   value={contributeAmount}

@@ -6,30 +6,24 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatSAR(amount: number, includeCurrency = true): string {
-  const formatted = new Intl.NumberFormat('ar-SA', {
-    maximumFractionDigits: 0,
+  const formatted = new Intl.NumberFormat('en-US', {
+    maximumFractionDigits: 2,
     minimumFractionDigits: 0,
   }).format(amount);
 
-  return includeCurrency ? `${formatted} ر.س` : formatted;
+  // Isolate the full price so Arabic surroundings cannot reorder its digits or symbol.
+  return includeCurrency ? `\u2066⃁\u00a0${formatted}\u2069` : formatted;
 }
 
 export const formatSaudiRiyal = formatSAR;
 
-export function formatSAR_EN(amount: number, includeCurrency = true): string {
-  const formatted = new Intl.NumberFormat('en-US', {
-    maximumFractionDigits: 0,
-    minimumFractionDigits: 0,
-  }).format(amount);
-
-  return includeCurrency ? `${formatted} SAR` : formatted;
-}
+export const formatSAR_EN = formatSAR;
 
 export function formatDateArabic(dateStr: string): string {
   if (!dateStr) return '';
   try {
     const date = new Date(dateStr);
-    return new Intl.DateTimeFormat('ar-SA', {
+    return new Intl.DateTimeFormat('ar-SA-u-nu-latn', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',

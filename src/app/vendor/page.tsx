@@ -415,7 +415,7 @@ export default function VendorPortalPage() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                           <label className="block text-[11px] font-bold text-gray-700 mb-1">
-                            السعر الإجمالي شامل التركيب والضريبة (ر.س)
+                            السعر الإجمالي شامل التركيب والضريبة (⃁)
                           </label>
                           <input
                             type="number"

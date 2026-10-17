@@ -306,7 +306,7 @@ export default function BudgetManager() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">المبلغ المقدر (ر.س)</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">المبلغ المقدر (⃁)</label>
                   <input
                     type="number"
                     value={newAllocated}
@@ -317,7 +317,7 @@ export default function BudgetManager() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">المصروف الفعلي (ر.س)</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">المصروف الفعلي (⃁)</label>
                   <input
                     type="number"
                     value={newSpent}

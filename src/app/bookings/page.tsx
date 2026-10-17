@@ -210,7 +210,7 @@ export default function BookingsPage() {
                         booking.isFullyPaid ? 'text-neutral-400' : 'text-amber-600'
                       }`}
                     >
-                      {booking.isFullyPaid ? '0 ر.س (مسدد)' : formatSaudiRiyal(booking.remainingAmount)}
+                      {booking.isFullyPaid ? `${formatSaudiRiyal(0)} (مسدد)` : formatSaudiRiyal(booking.remainingAmount)}
                     </span>
                   </div>
                 </div>

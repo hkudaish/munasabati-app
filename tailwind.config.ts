@@ -48,8 +48,10 @@ const config: Config = {
         },
       },
       fontFamily: {
-        cairo: ["var(--font-cairo)", "Cairo", "sans-serif"],
-        tajawal: ["var(--font-tajawal)", "Tajawal", "sans-serif"],
+        cairo: ["Saudi Riyal", "var(--font-cairo)", "Cairo", "sans-serif"],
+        tajawal: ["Saudi Riyal", "var(--font-tajawal)", "Tajawal", "sans-serif"],
+        sans: ["Saudi Riyal", "var(--font-tajawal)", "sans-serif"],
+        mono: ["Saudi Riyal", "ui-monospace", "monospace"],
       },
       boxShadow: {
         glow: "0 0 25px -5px rgba(197, 155, 39, 0.25)",

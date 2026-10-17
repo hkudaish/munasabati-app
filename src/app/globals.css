@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* U+20C1 is new; ship its official outline rather than depend on device fonts. */
+@font-face {
+  font-family: 'Saudi Riyal';
+  src: url('/fonts/saudi-riyal.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+20C1;
+}
+
 :root {
   --font-cairo: 'Cairo', sans-serif;
   --font-tajawal: 'Tajawal', sans-serif;
@@ -15,7 +25,8 @@
 }
 
 body {
-  font-family: var(--font-tajawal), 'Cairo', sans-serif;
+  font-family: 'Saudi Riyal', var(--font-tajawal), 'Cairo', sans-serif;
+  font-variant-numeric: lining-nums tabular-nums;
   direction: rtl;
   text-align: right;
   background-color: #FAF7F2;

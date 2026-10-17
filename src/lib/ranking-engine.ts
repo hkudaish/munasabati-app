@@ -1,3 +1,4 @@
+import { formatSAR } from './utils';
 import { 
   Vendor, 
   ServiceItem, 
@@ -301,7 +302,7 @@ export function rankVendors(
       reasonsAr.push(`تقييم استثنائي (${v.rating} من 5) بناءً على ${v.reviewsCount} تقييم حقيقي.`);
     }
     if (v.startingPrice === minPrice) {
-      reasonsAr.push(`الخيار الأقل تكلفة في الفئة بدءاً من ${v.startingPrice} ر.س.`);
+      reasonsAr.push(`الخيار الأقل تكلفة في الفئة بدءاً من ${formatSAR(v.startingPrice)}.`);
     } else if (criteria.budgetMax && v.startingPrice <= criteria.budgetMax * 0.8) {
       reasonsAr.push(`سعر منافس وموفر يوفر لك أكثر من 20% من سقف الميزانية.`);
     }

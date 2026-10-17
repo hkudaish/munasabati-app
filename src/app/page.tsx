@@ -896,7 +896,7 @@ export default function HomePage() {
 
                 <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10">
                   <div className="flex items-center justify-between text-gray-300 text-xs mb-1">
-                    <span>حجم المعاملات SAR</span>
+                    <span>حجم المعاملات (⃁)</span>
                     <CreditCard className="w-4 h-4 text-saudi-gold-400" />
                   </div>
                   <div className="text-2xl font-black text-saudi-gold-300 font-cairo">
