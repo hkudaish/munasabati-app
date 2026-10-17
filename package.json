@@ -18,7 +18,9 @@
     "test:geography": "node scripts/test-geography.cjs",
     "test:commerce": "node scripts/test-commerce.cjs",
     "test:commerce-rules": "node scripts/test-commerce-rules.cjs",
-    "test:commerce-migration": "node scripts/test-commerce-migration.cjs"
+    "test:commerce-migration": "node scripts/test-commerce-migration.cjs",
+    "test:service-catalog": "node scripts/test-service-catalog.cjs",
+    "test:service-catalog-migration": "node scripts/test-service-catalog-migration.cjs"
   },
   "dependencies": {
     "@netlify/database": "^2.0.1",

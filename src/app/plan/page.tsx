@@ -15,6 +15,9 @@ import {
   CheckCircle2,
   Check,
 } from 'lucide-react';
+import { useCatalogOptions } from '@/components/catalog/useCatalogOptions';
+import ServiceSelectionFields from '@/components/catalog/ServiceSelectionFields';
+import type { ServiceSelection } from '@/lib/catalog/types';
 import { useApp } from '@/lib/store';
 import { useGeo } from '@/components/geo/GeoProvider';
 import { citiesForService } from '@/lib/geo/engine';
@@ -28,6 +31,8 @@ function PlanWizardContent() {
   const { occasionTypes, serviceCategories, createOccasion } = useApp();
 
   const geo = useGeo();
+  const catalog = useCatalogOptions();
+  const [details, setDetails] = useState<Record<string, ServiceSelection>>({});
   const availableCities = useMemo(() => geo.data ? citiesForService(geo.data.snapshot, 'feature:planning') : [], [geo.data]);
 
   // Wizard Step (1 to 7)
@@ -73,6 +78,7 @@ function PlanWizardContent() {
   const toggleService = (catId: string) => {
     if (selectedServices.includes(catId)) {
       setSelectedServices(selectedServices.filter((s) => s !== catId));
+      setDetails(previous => { const copy = { ...previous }; delete copy[catId]; return copy; });
     } else {
       setSelectedServices([...selectedServices, catId]);
     }
@@ -96,6 +102,7 @@ function PlanWizardContent() {
         venueType,
         budget,
         tier,
+        serviceSelections: selectedServices.map(categoryId => details[categoryId] || { categoryId, subcategoryIds: [], artistIds: [] }),
         notes: `تم إنشاء المناسبة عبر المعالج التفاعلي في ${selectedCityObj.nameAr} لمستوى ${tier}.`,
       });
 
@@ -414,14 +421,16 @@ function PlanWizardContent() {
               </h2>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-72 overflow-y-auto p-1">
+            {catalog.error && <p role="alert" className="text-sm text-red-800">تعذر تحميل الخيارات الفرعية. <button onClick={() => void catalog.refresh()} className="underline">إعادة المحاولة</button></p>}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[34rem] overflow-y-auto p-1">
               {serviceCategories.map((cat) => {
                 const isSelected = selectedServices.includes(cat.id);
                 return (
+                  <div key={cat.id} className="min-w-0 rounded-2xl border border-gray-200 overflow-hidden self-start">
                   <button
-                    key={cat.id}
+                    type="button" aria-pressed={isSelected}
                     onClick={() => toggleService(cat.id)}
-                    className={`p-3 rounded-2xl border text-right transition flex items-center justify-between ${
+                    className={`w-full p-3 text-right transition flex items-center justify-between ${
                       isSelected
                         ? 'border-saudi-green-800 bg-saudi-green-50 text-saudi-green-950 font-bold'
                         : 'border-gray-200 text-gray-700 hover:bg-gray-50'
@@ -435,6 +444,8 @@ function PlanWizardContent() {
                       className="rounded text-saudi-green-800"
                     />
                   </button>
+                  {isSelected && <ServiceSelectionFields categoryId={cat.id} value={details[cat.id] || { categoryId: cat.id, subcategoryIds: [], artistIds: [] }} options={catalog} onChange={value => setDetails(previous => ({ ...previous, [cat.id]: value }))} />}
+                  </div>
                 );
               })}
             </div>
@@ -473,8 +484,9 @@ function PlanWizardContent() {
               </div>
               <div className="flex justify-between pt-1">
                 <span className="text-gray-500">الخدمات المختارة:</span>
-                <span className="font-bold text-saudi-green-800">{selectedServices.length} خدمات مجهزة</span>
+                <span className="font-bold text-saudi-green-800">{selectedServices.length} خدمات مختارة</span>
               </div>
+              {selectedServices.map(id => details[id]).filter(Boolean).map(row => <div key={row.categoryId} className="border-t pt-2 space-y-1"><strong>{serviceCategories.find(c => c.id === row.categoryId)?.nameAr}</strong><p>{row.subcategoryIds.map(id => catalog.subcategories.find(s => s.id === id)?.nameAr).filter(Boolean).join('، ')}</p><p className="text-emerald-800 font-bold">{row.artistIds.map(id => catalog.artists.find(a => a.id === id)?.nameAr).filter(Boolean).join('، ')}</p></div>)}
             </div>
           </div>
         )}

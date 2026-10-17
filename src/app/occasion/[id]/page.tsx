@@ -1,5 +1,6 @@
 'use client';
 
+import RequestedServices from '@/components/catalog/RequestedServices';
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -90,6 +91,7 @@ export default function OccasionWorkspacePage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
+      <RequestedServices selections={currentOccasion.serviceSelections} />
       {/* 1. Occasion Header Banner */}
       <div className="bg-gradient-to-r from-saudi-green-950 via-saudi-green-900 to-saudi-green-800 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden border border-saudi-gold-500/30">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">

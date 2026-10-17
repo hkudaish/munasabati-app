@@ -8,6 +8,7 @@ async function seedGeography(prisma){
  const categoriesFile=require('node:path').resolve(__dirname,'../src/lib/system/service-categories.ts');const categories={exports:{}};
  new Function('exports',ts.transpileModule(fs.readFileSync(categoriesFile,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText)(categories.exports);
  await prisma.serviceCategory.createMany({data:categories.exports.SERVICE_CATEGORIES.map((c,i)=>({...c,itemCount:0,sortOrder:i})),skipDuplicates:true});
+ await require('./seed-service-catalog.cjs').seedServiceCatalog(prisma);
  await prisma.geoPolicy.upsert({where:{id:'default'},create:{id:'default'},update:{}});
  await prisma.geoRevision.upsert({where:{id:'default'},create:{id:'default'},update:{}});
  await prisma.saudiCity.updateMany({where:{countryCode:null},data:{countryCode:'SA',defaultAvailable:true}});

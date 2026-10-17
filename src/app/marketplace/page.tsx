@@ -339,6 +339,7 @@ export default function MarketplacePage() {
         ))}
       </div>
 
+      <Link href="/artists" className="inline-block rounded-xl bg-emerald-800 text-white px-5 py-3 font-bold text-sm">استعرض التصنيفات الفرعية والفنانين ومكتبات الزفات</Link>
       {/* Filter and Search Bar */}
       <div className="bg-white p-4 rounded-3xl border border-saudi-sand-300 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
         {/* Search Input */}

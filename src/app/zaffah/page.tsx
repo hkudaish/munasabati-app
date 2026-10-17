@@ -1,5 +1,6 @@
 'use client';
 
+import CatalogServiceExplorer from '@/components/catalog/CatalogServiceExplorer';
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useFeature } from '@/components/system/FeatureProvider';
@@ -1113,6 +1114,7 @@ export default function ZaffahPage() {
 
   return (
     <div className="min-h-screen bg-neutral-50/50 dark:bg-neutral-950 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 py-6"><CatalogServiceExplorer audioOnly /></div>
       <div className="max-w-7xl mx-auto space-y-8">
         
         {/* ========================================== */}

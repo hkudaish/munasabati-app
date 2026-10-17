@@ -62,6 +62,8 @@ export interface Vendor {
   badges: string[];
   bioAr: string;
   portfolio: string[];
+  videoUrls?: string[];
+  libraryUrl?: string | null;
   contactPhone: string;
   whatsappNumber: string;
   genderSpecialty?: 'men_specialist' | 'women_specialist' | 'both';
@@ -119,6 +121,13 @@ export interface ServiceAvailability {
 }
 
 export interface ServiceItem {
+  subcategoryId?: string | null;
+  artistId?: string | null;
+  subcategory?: import('./catalog/types').CatalogSubcategory | null;
+  artist?: import('./catalog/types').CatalogArtist | null;
+  previewAudioUrl?: string | null;
+  videoUrls?: string[];
+  isPublished?: boolean;
   id: string;
   vendorId: string;
   vendorName: string;
@@ -179,6 +188,7 @@ export interface SmartPackage {
 }
 
 export interface Occasion {
+  serviceSelections?: import('./catalog/types').ServiceSelection[];
   shareCode?: string;
   shareOrigin?: string;
   id: string;

@@ -113,3 +113,7 @@ npm run test:commerce-rules
 npm run test:commerce-migration
 npm run test:commerce
 ```
+
+## التصنيفات الفرعية والفنانون ومكتبات الموردين
+
+يمكن حفظ اختيارات التصنيفات الفرعية والفنانين ضمن المناسبة، ونشر خدمات الموردين وربطها بالأسماء، وإضافة روابط صور وفيديوهات المحل ومكتبته الصوتية. الإدارة من `/system-admin/catalog`، وإدارة المتجر من `/vendor/catalog`، والاستعراض من `/artists` و`/zaffah#supplier-library`. راجع [دليل الاستخدام والترحيل والاختبارات](docs/SERVICE_CATALOG.md).

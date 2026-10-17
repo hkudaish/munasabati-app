@@ -400,8 +400,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let stopped = false;
     const refresh = () => Promise.all([requestJSON('/api/catalog/vendors'),requestJSON('/api/catalog/services')]).then(([data,catalog]) => { if (!stopped) {setVendors(data.vendors.map(ensureVendorDetails));setServices(catalog.services.map(ensureServiceDetails));} }).catch(() => { if (!stopped) {setVendors([]);setServices([]);} });
-    void refresh(); const timer = setInterval(refresh, 10000);
-    return () => { stopped = true; clearInterval(timer); };
+    void refresh(); const timer = setInterval(refresh, 10000); window.addEventListener('catalog-updated', refresh);
+    return () => { stopped = true; clearInterval(timer); window.removeEventListener('catalog-updated', refresh); };
   }, [currentUser?.id]);
 
   useEffect(()=>{if(geo.data?.snapshot.categories)setServiceCategories(geo.data.snapshot.categories);},[geo.data?.snapshot.categories]);
@@ -642,6 +642,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       status: 'planning',
       createdAt: new Date().toISOString(),
       notes: data.notes || '',
+      serviceSelections: data.serviceSelections || [],
     };
 
     let saved: Occasion | undefined;

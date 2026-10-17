@@ -232,6 +232,7 @@ model ServiceCategory {
   itemCount     Int      @default(0)
   sortOrder     Int      @default(0)
 
+  subcategories ServiceSubcategory[]
   vendors       Vendor[]
   services      ServiceItem[]
   geoRules      GeoRule[]
@@ -267,6 +268,8 @@ model Vendor {
   badges                 String[]       @default([])
   bioAr                  String         @db.Text
   portfolio              String[]       @default([])
+  videoUrls              String[]       @default([])
+  libraryUrl             String?
   contactPhone           String
   whatsappNumber         String
   genderSpecialty        String?
@@ -310,7 +313,35 @@ model VendorMetrics {
 // -------------------------------------------------------------
 // 4. Services, Packages & Add-ons
 // -------------------------------------------------------------
+model ServiceSubcategory {
+  id String @id
+  categoryId String
+  category ServiceCategory @relation(fields: [categoryId], references: [id])
+  nameAr String
+  kind String @default("standard")
+  artistKind String?
+  isActive Boolean @default(true)
+  sortOrder Int @default(0)
+  services ServiceItem[]
+  @@index([categoryId, isActive])
+}
+model CatalogArtist {
+  id String @id
+  nameAr String
+  kind String
+  enabled Boolean @default(true)
+  sortOrder Int @default(0)
+  services ServiceItem[]
+}
 model ServiceItem {
+  subcategoryId String?
+  subcategory ServiceSubcategory? @relation(fields: [subcategoryId], references: [id])
+  artistId String?
+  artist CatalogArtist? @relation(fields: [artistId], references: [id])
+  previewAudioUrl String?
+  videoUrls String[] @default([])
+  rightsConfirmed Boolean @default(false)
+  isPublished Boolean @default(true)
   geoRules GeoRule[]
   id                     String          @id @default(uuid())
   vendorId               String
@@ -342,6 +373,7 @@ model ServiceItem {
   reviews                Review[]
 
   @@index([vendorId])
+  @@index([subcategoryId, artistId])
   @@index([categoryId])
   @@index([price])
 }
@@ -419,6 +451,7 @@ model Occasion {
   status              String     @default("planning")
   notes               String?    @db.Text
   shareCode           String?    @unique
+  serviceSelections   Json       @default("[]")
   invitationDraft     Json?
   draftVersion        Int        @default(0)
   shareOrigin         String?

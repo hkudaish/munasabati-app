@@ -62,8 +62,8 @@ export default function VendorPortalPage() {
   const [newBlackoutDate, setNewBlackoutDate] = useState('');
 
   // Verification document submission simulation state
-  const [crInput, setCrInput] = useState(currentVendor.crNumber || '1010784920');
-  const [vatInput, setVatInput] = useState(currentVendor.vatNumber || '310984920100003');
+  const [crInput, setCrInput] = useState(currentVendor?.crNumber || '1010784920');
+  const [vatInput, setVatInput] = useState(currentVendor?.vatNumber || '310984920100003');
   const [ibanInput, setIbanInput] = useState('SA44 8000 0456 1234 5678 9012');
   const [isDocSaved, setIsDocSaved] = useState(false);
 
@@ -73,9 +73,9 @@ export default function VendorPortalPage() {
   const [quoteNotes, setQuoteNotes] = useState('');
   const [quoteSentSuccess, setQuoteSentSuccess] = useState(false);
 
-  const vendorBookings = bookings.filter((b) => b.vendorId === currentVendor.id || b.vendorName.includes('ضيافة'));
+  const vendorBookings = bookings.filter((b) => b.vendorId === matchedVendor?.id);
   const totalRevenue = vendorBookings.reduce((acc, b) => acc + b.totalAmount, 0);
-  const vendorServices = services.filter((s) => s.vendorId === currentVendor.id || s.vendorName.includes('ضيافة'));
+  const vendorServices = services.filter((s) => s.vendorId === matchedVendor?.id);
 
   const handleSendQuote = (e: React.FormEvent, rfq: RFQRequest) => {
     e.preventDefault();
@@ -148,6 +148,8 @@ export default function VendorPortalPage() {
       </div>
     );
   }
+
+  if (!matchedVendor) return <div className="max-w-3xl mx-auto p-10 space-y-4" dir="rtl"><h1 className="text-2xl font-bold">إدارة متجرك</h1><p>يمكنك تجهيز خدمات متجرك ومعرض أعمالك أثناء مراجعة الحساب.</p><Link href="/vendor/catalog" className="inline-block rounded-xl bg-emerald-800 text-white px-5 py-3">الخدمات ومعرض الأعمال</Link></div>;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
@@ -749,8 +751,10 @@ export default function VendorPortalPage() {
         )}
       </div>
 
+      <div className="max-w-6xl mx-auto px-4 py-4"><Link href="/vendor/catalog" className="inline-block rounded-xl bg-emerald-800 text-white px-5 py-3 font-bold">إدارة الخدمات والتصنيفات والصور ومكتبة الزفات</Link></div>
       {/* Modals */}
       <AddServiceModal
+        vendor={matchedVendor ? { ...matchedVendor, status: matchedVendor.status.toUpperCase() } : undefined}
         isOpen={isAddServiceOpen}
         onClose={() => setIsAddServiceOpen(false)}
       />

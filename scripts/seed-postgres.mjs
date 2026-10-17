@@ -244,6 +244,7 @@ async function main() {
   });
 
   console.log(`✅ Seeded Sample Vendor, Services, Packages, and Addons.`);
+  await (await import('./seed-service-catalog.cjs')).seedServiceCatalog(prisma);
   console.log('🎉 Munasabati PostgreSQL Seeding Completed Successfully!');
 }
 

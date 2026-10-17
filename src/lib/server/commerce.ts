@@ -81,8 +81,8 @@ export async function createOrder(input: Record<string, any>) {
     if (occasionId && !await tx.occasion.findFirst({ where: { id: occasionId, userId: user.id } })) throw new HttpError(404, 'المناسبة غير موجودة');
     const groups = new Map<string, { vendor: any; items: any[] }>();
     for (const selection of canonical.items) {
-      const service = await tx.serviceItem.findUnique({ where: { id: selection.serviceId }, include: { packages: true, addons: true, availability: true, vendor: { include: { user: true, availability: true } } } });
-      if (!service || service.vendor.status !== 'ACTIVE' || service.vendor.user?.isActive === false) throw new HttpError(409, 'إحدى الخدمات غير متاحة');
+      const service = await tx.serviceItem.findUnique({ where: { id: selection.serviceId }, include: { subcategory: true, artist: true, packages: true, addons: true, availability: true, vendor: { include: { user: true, availability: true } } } });
+      if (!service || !service.isPublished || service.subcategory?.isActive === false || service.artist?.enabled === false || service.vendor.status !== 'ACTIVE' || service.vendor.user?.isActive === false) throw new HttpError(409, 'إحدى الخدمات غير متاحة');
       if (service.cityId !== cityId && !service.vendor.serviceAreas.includes(cityId)) throw new HttpError(409, 'الخدمة لا تغطي المدينة المحددة');
       await requireGeo('item:' + service.id, cityId, tx);
       for (const availability of [service.availability, service.vendor.availability]) {
@@ -96,7 +96,7 @@ export async function createOrder(input: Record<string, any>) {
       try { priced = priceSelection(service, selection); } catch (e: any) { throw new HttpError(400, e.message); }
       if (service.priceType === 'PER_PERSON' && !selection.packageId) throw new HttpError(400, 'الخدمة حسب الشخص تتطلب باقة بسعر محدد');
       const group = groups.get(service.vendorId) || { vendor: service.vendor, items: [] };
-      group.items.push({ id: randomUUID(), serviceId: service.id, serviceTitleAr: service.titleAr, serviceImage: service.images[0] || '', ...priced,
+      group.items.push({ id: randomUUID(), serviceId: service.id, serviceTitleAr: [service.titleAr, service.artist?.nameAr].filter(Boolean).join(' — '), serviceImage: service.images[0] || '', ...priced,
         scheduledDate: eventDate, scheduledTime: eventTime, cityId, cityNameAr: '', venueAddress: venueName, notes: selection.notes });
       groups.set(service.vendorId, group);
     }

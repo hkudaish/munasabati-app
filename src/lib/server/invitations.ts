@@ -1,6 +1,7 @@
 import 'server-only';
 import { randomBytes } from 'node:crypto';
 import { prisma } from '@/lib/db';
+import { parseSelections } from './catalog';
 import { HttpError, integer, text } from './http';
 export const newCode = () => randomBytes(32).toString('base64url');
 export function occasionDTO(o: any) { return { ...o, cityNameAr: o.city?.nameAr || '', city: undefined, userId: undefined, guests: undefined, orders: undefined, invitationDraft: undefined, }; }
@@ -20,6 +21,7 @@ export function occasionData(d: Record<string, any>, partial = false) {
   }
   for (const key of ['guestCount','budget','spent','readinessPercentage']) if (d[key] !== undefined) result[key] = integer(d[key], key === 'readinessPercentage' ? 100 : 100000000);
   if (d.isApproximateDate !== undefined) { if (typeof d.isApproximateDate !== 'boolean') throw new HttpError(400, 'قيمة غير صالحة'); result.isApproximateDate = d.isApproximateDate; }
+  if (d.serviceSelections !== undefined) result.serviceSelections = parseSelections(d.serviceSelections);
   return result;
 }
 export function guestData(d: Record<string, any>) {

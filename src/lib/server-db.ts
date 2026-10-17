@@ -105,6 +105,8 @@ export async function getVendorsFromDB(options?: {
           badges: v.badges,
           bioAr: v.bioAr,
           portfolio: v.portfolio,
+          videoUrls: v.videoUrls,
+          libraryUrl: v.libraryUrl,
           contactPhone: v.contactPhone,
           whatsappNumber: v.whatsappNumber,
           cancellationPolicyAr: v.cancellationPolicyAr,

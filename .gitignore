@@ -46,3 +46,8 @@ next-env.d.ts
 /.next-commerce-*/
 /.commerce-test-tsconfig-*.json
 /.commerce-build-tsconfig.json
+
+# Isolated catalog validation output
+/.next-catalog-*/
+/.catalog-test-tsconfig-*.json
+/.catalog-build-tsconfig.json

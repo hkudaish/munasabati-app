@@ -1,3 +1,4 @@
+import { validateSelections } from '@/lib/server/catalog';
 import { requireGeo } from '@/lib/server/geo/context';
 import { prisma } from '@/lib/db';
 import { api, body } from '@/lib/server/http';
@@ -12,6 +13,7 @@ export const GET = api(async () => {
 export const POST = api(async request => {
   const user = await requireUser(); const d = occasionData(await body(request, 20000));
   await requireGeo('feature:planning',d.cityId);
+  if (d.serviceSelections) await validateSelections(d.serviceSelections);
   const occasion = await prisma.occasion.create({ data: { ...d, userId: user.id, shareCode: newCode() } as any, include: { city: true } });
   return { occasion: occasionDTO(occasion) };
 });

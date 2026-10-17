@@ -328,7 +328,7 @@ export default function VendorProfilePage() {
         <div className="flex items-center gap-2 border-b border-saudi-sand-300 text-sm font-bold overflow-x-auto pb-1">
           {[
             { id: 'services', label: `الخدمات والأسعار (${vendorServices.length})` },
-            { id: 'portfolio', label: `معرض الأعمال (${vendor.portfolio?.length || 4})` },
+            { id: 'portfolio', label: `معرض الأعمال (${(vendor.portfolio?.length || 0) + (vendor.videoUrls?.length || 0)})` },
             { id: 'reviews', label: `التقييمات الموثقة (${vendorReviews.length || vendor.reviewsCount})` },
             { id: 'about', label: 'عن المزود والسياسات' },
           ].map((tab) => (
@@ -433,16 +433,12 @@ export default function VendorProfilePage() {
         {/* Tab 2: Portfolio Gallery */}
         {activeTab === 'portfolio' && (
           <div className="space-y-6">
+            {vendor.libraryUrl && <a href={vendor.libraryUrl} target="_blank" rel="noopener noreferrer" className="inline-block rounded-xl bg-emerald-800 text-white px-5 py-3 text-sm font-bold">استمع واختر من مكتبة المحل ↗</a>}
+            {!vendor.portfolio?.length && !vendor.videoUrls?.length && <p className="text-sm text-gray-500">لم يضف المورد صوراً أو فيديوهات بعد.</p>}
+            {!!vendor.videoUrls?.length && <div className="grid sm:grid-cols-2 gap-4">{vendor.videoUrls.map(url => <video key={url} controls preload="none" src={url} className="w-full max-h-96 rounded-2xl border" />)}</div>}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {(vendor.portfolio && vendor.portfolio.length > 0
-                ? vendor.portfolio
-                : [
-                    'https://images.unsplash.com/photo-1519741497674-611481863552?w=800&auto=format&fit=crop&q=80',
-                    'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&auto=format&fit=crop&q=80',
-                    'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=800&auto=format&fit=crop&q=80',
-                    'https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=800&auto=format&fit=crop&q=80',
-                  ]
-              ).map((imgUrl, idx) => (
+              {(vendor.portfolio || []).map((imgUrl, idx) => (
                 <div
                   key={idx}
                   className="group relative h-64 rounded-3xl overflow-hidden bg-neutral-900 border border-saudi-sand-300 shadow-sm cursor-pointer"

@@ -117,6 +117,12 @@ export default function ServiceDetailPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
+      {(service.artist || service.previewAudioUrl || !!service.videoUrls?.length) && <section className="bg-white border rounded-2xl p-5 space-y-3">
+        {service.subcategory && <p className="text-sm text-gray-500">{service.subcategory.nameAr}</p>}
+        {service.artist && <p className="font-bold text-emerald-900 text-lg">{service.artist.nameAr}</p>}
+        {service.previewAudioUrl && <div><h2 className="font-bold mb-2">استمع إلى عينة الزفة</h2><audio controls preload="none" src={service.previewAudioUrl} className="w-full max-w-xl">متصفحك لا يدعم تشغيل الصوت.</audio></div>}
+        {!!service.videoUrls?.length && <div className="grid sm:grid-cols-2 gap-4">{service.videoUrls.map(url => <video key={url} controls preload="none" src={url} className="w-full rounded-xl max-h-80" />)}</div>}
+      </section>}
       {/* Toast Alert */}
       {toastMessage && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-saudi-green-950 text-white px-6 py-3 rounded-2xl shadow-2xl border border-saudi-gold-400 flex items-center gap-3 animate-slideDown">
