@@ -12,10 +12,15 @@ export const POST = api(async request => {
   const actual = createHash('sha256').update(token).digest();
   if (!timingSafeEqual(actual, Buffer.from(expected, 'hex'))) throw new HttpError(404, 'غير متاح');
   const data = await body(request, 1500000);
-  const sql = text(data.sql, 1400000, true);
-  const db = getDatabase();
+  let db;
+  try { db = getDatabase(); } catch { throw new HttpError(503, 'Managed database connection is not configured'); }
   const client = await db.pool.connect();
   try {
+    if (data.action === 'inspect') {
+      const status = await client.query('SELECT current_user, current_database()');
+      return { connected: true, role: status.rows[0].current_user };
+    }
+    const sql = text(data.sql, 1400000, true);
     await client.query('BEGIN');
     await client.query("SELECT pg_advisory_xact_lock(hashtext('munasabati-initial-transfer'))");
     const result = await client.query('SELECT (SELECT count(*) FROM "User")::int AS users, (SELECT count(*) FROM "SaudiCity")::int AS cities');
