@@ -893,7 +893,7 @@ function AdminDashboardContent() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-2 2xl:grid-cols-3">
+            <div className="grid grid-cols-1 items-stretch gap-5 xl:grid-cols-2 2xl:grid-cols-3">
               {packages.map((pkg) => (
                 <PackageManagementCard key={pkg.id} pkg={pkg} onEditPrice={() => {
                   const value = prompt('أدخل سعر الباقة الجديد بالريال:', pkg.packagePrice.toString());

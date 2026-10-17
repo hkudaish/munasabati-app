@@ -12,7 +12,7 @@ export default function PackageManagementCard({ pkg, onEditPrice }: {
   const discount = pkg.originalPrice > 0 ? Math.round(savings / pkg.originalPrice * 100) : 0;
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-saudi-sand-200 bg-white shadow-sm transition-shadow hover:shadow-card" data-package-card={pkg.id}>
+    <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-saudi-sand-200 bg-white shadow-sm transition-shadow hover:shadow-card" data-package-card={pkg.id}>
       <div className="border-b border-saudi-sand-200 bg-saudi-sand-50 p-4 sm:p-5">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <span className="rounded-full border border-saudi-gold-200 bg-white px-3 py-1 text-xs font-bold text-saudi-gold-800">{pkg.occasionTypeNameAr}</span>
@@ -38,7 +38,7 @@ export default function PackageManagementCard({ pkg, onEditPrice }: {
         </ul>
       </div>
 
-      <div className="border-t border-saudi-sand-200 bg-saudi-green-50/50 p-4 sm:p-5">
+      <div className="mt-auto border-t border-saudi-sand-200 bg-saudi-green-50/50 p-4 sm:p-5">
         <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="mb-1 text-xs font-semibold text-slate-600">سعر الباقة</p>
