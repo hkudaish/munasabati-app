@@ -23,7 +23,7 @@
 
 ## 📁 الملفات المُعدة للنشر
 
-1. **[netlify.toml](file:///d:/EventsApp/netlify.toml)**: يتضمن أمر البناء `npm run build`، مجلد الإخراج `.next`، المكون `@netlify/plugin-nextjs`، إصدار Node.js `20` وترويسات الحماية والأمان.
+1. **[netlify.toml](file:///d:/EventsApp/netlify.toml)**: يتضمن أمر البناء `npm run build`، مجلد الإخراج `.next`، المكون `@netlify/plugin-nextjs`، إصدار Node.js `22` وترويسات الحماية والأمان.
 2. **[package.json](file:///d:/EventsApp/package.json)**: يحتوي على جميع الحزم والاعتماديات الأساسية مثل `lucide-react`, `canvas-confetti`, `tailwind-merge` والمكوّن الإضافي لـ Netlify.
 3. **[.gitignore](file:///d:/EventsApp/.gitignore)**: تم استبعاد ملفات الكاش ومجلدات `.next` و `node_modules` وملفات البيئة المحلية.
 
@@ -49,7 +49,7 @@
 6. سيتعرف Netlify تلقائياً على ملف `netlify.toml` ويملأ الإعدادات:
    - **Build command**: `npm run build`
    - **Publish directory**: `.next`
-   - **Node Version**: `20`
+   - **Node Version**: `22`
 7. اضغط **"Deploy Site"**، وسيتم نشر الموقع وتزويدك برابط فوري مع شهادة SSL مجانية.
 
 ---

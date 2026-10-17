@@ -2,13 +2,13 @@
 // Implements resilient hybrid fetching: uses PostgreSQL via Prisma when connected,
 // and gracefully falls back to optimized in-memory seed data when offline.
 
-import prisma from './db';
+import prisma, { databaseConnectionUrl } from './db';
 import { VENDORS, SERVICE_ITEMS, SAUDI_CITIES, SERVICE_CATEGORIES } from './seed-data';
 import { ensureVendorDetails, ensureServiceDetails } from './utils';
 import type { Vendor, ServiceItem, MultiVendorOrder } from './types';
 
 export function isDatabaseConfigured(): boolean {
-  const url = process.env.DATABASE_URL;
+  const url = databaseConnectionUrl();
   if (!url) return false;
   const isServerless = Boolean(
     process.env.NETLIFY ||
@@ -25,7 +25,7 @@ export async function checkDatabaseHealth(): Promise<{ isConnected: boolean; mes
   const start = Date.now();
   try {
     if (!isDatabaseConfigured()) {
-      const url = process.env.DATABASE_URL;
+      const url = databaseConnectionUrl();
       const isLocalhostInCloud = url && (url.includes('localhost') || url.includes('127.0.0.1'));
       return {
         isConnected: false,
@@ -41,10 +41,10 @@ export async function checkDatabaseHealth(): Promise<{ isConnected: boolean; mes
       message: 'PostgreSQL connection healthy and verified.',
       latencyMs: Date.now() - start,
     };
-  } catch (error: any) {
+  } catch {
     return {
       isConnected: false,
-      message: `Database connection unavailable: ${error?.message || 'Check credentials'}. Fallback active.`,
+      message: 'Database connection unavailable. Check the server database configuration.',
       latencyMs: Date.now() - start,
     };
   }

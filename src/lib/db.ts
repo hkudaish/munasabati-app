@@ -6,10 +6,15 @@ const globalForPrisma = globalThis as unknown as {
   databaseUrl: string | undefined;
 };
 
-function databaseClient() {
+export function databaseConnectionUrl() {
   let connection = process.env.DATABASE_URL;
   // Resolve inside the request: Netlify supplies credentials for its current DB branch.
   try { connection = getConnectionString(); } catch { /* Local PostgreSQL uses DATABASE_URL. */ }
+  return connection;
+}
+
+function databaseClient() {
+  let connection = databaseConnectionUrl();
   if (connection) {
     const url = new URL(connection);
     if (!url.searchParams.has('connection_limit')) url.searchParams.set('connection_limit', '2');

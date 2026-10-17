@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { checkDatabaseHealth } from '@/lib/server-db';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   const health = await checkDatabaseHealth();
   return NextResponse.json({
@@ -9,5 +11,5 @@ export async function GET() {
     details: health.message,
     latencyMs: health.latencyMs ?? null,
     timestamp: new Date().toISOString(),
-  });
+  }, { headers: { 'Cache-Control': 'no-store' } });
 }
