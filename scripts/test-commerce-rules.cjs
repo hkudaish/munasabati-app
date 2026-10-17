@@ -1,0 +1,24 @@
+const assert = require('node:assert/strict'), fs = require('node:fs'), ts = require('typescript');
+require.extensions['.ts'] = (module, filename) => module._compile(ts.transpileModule(fs.readFileSync(filename, 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText, filename);
+const { priceSelection, bookingInterval, overlaps } = require('../src/lib/oms/pricing.ts');
+const service = { price: 1000, priceType: 'FIXED', packages: [{ id: 'package-a', nameAr: 'باقة', price: 1500 }], addons: [{ id: 'addon-a', titleAr: 'إضافة', price: 100, isAvailable: true, maxQuantity: 3 }] };
+const priced = priceSelection(service, { quantity: 2, packageId: 'package-a', packagePrice: 1, addons: [{ addonId: 'addon-a', quantity: 3, price: 1 }] });
+assert.equal(priced.subtotal, 3600); assert.equal(priced.taxAmount, 540); assert.equal(priced.totalAmount, 4140);
+assert.throws(() => priceSelection(service, { quantity: -1 }));
+assert.throws(() => priceSelection(service, { quantity: 1, packageId: 'other-service-package' }));
+assert.throws(() => priceSelection(service, { quantity: 1, addons: [{ addonId: 'addon-a', quantity: 4 }] }));
+assert.throws(() => priceSelection(service, { quantity: 1, addons: [{ addonId: 'addon-a', quantity: 1 }, { addonId: 'addon-a', quantity: 1 }] }));
+assert.throws(() => priceSelection({ ...service, priceType: 'STARTING_AT' }, { quantity: 1 }));
+assert.throws(() => bookingInterval('2026-02-30', '18:00', 4));
+assert.throws(() => bookingInterval('2026-11-01', '24:00', 4));
+const a = bookingInterval('2026-11-01', '23:00', 4), b = bookingInterval('2026-11-02', '01:00', 1), c = bookingInterval('2026-11-02', '03:00', 1);
+assert(overlaps(a, b)); assert(!overlaps(a, c));
+assert.equal(a.start, Date.parse('2026-11-01T20:00:00Z'));
+console.log('PASS commerce pricing and interval rules: authoritative package/addon prices, quantities, duplicates, invalid dates, Riyadh timezone, overnight overlap, adjacent slots.');
+
+const { ensureServiceDetails } = require('../src/lib/utils.ts');
+const baseOnly = ensureServiceDetails({ price: 0, featuresAr: [], packages: [], addons: [] });
+assert.equal(baseOnly.packages.length, 1); assert.equal(baseOnly.packages[0].price, 0); assert.equal(baseOnly.packages[0].id, ''); assert.deepEqual(baseOnly.addons, []);
+const basePriced = priceSelection({ price: 1000, priceType: 'FIXED', packages: [], addons: [] }, { quantity: 1 });
+assert.equal(basePriced.totalAmount, 1150); assert.equal(basePriced.packageId, undefined);
+console.log('PASS base-price services keep real prices and never invent package tiers or add-ons.');

@@ -78,7 +78,7 @@ export default function SupplierOrderWorkspace() {
         setProofNotes('');
         fetchOrders();
       } else {
-        alert(data.errorAr || 'فشل تنفيذ الإجراء');
+        alert(data.error || data.errorAr || 'فشل تنفيذ الإجراء');
       }
     } catch (e) {
       alert('خطأ أثناء التواصل مع السيرفر');

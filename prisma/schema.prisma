@@ -631,10 +631,10 @@ model MultiVendorOrder {
   finalTotal     Int
   totalDeposit   Int
   paymentMethod  PaymentMethod @default(MADA)
-  paymentStatus  PaymentStatus @default(PAID)
+  paymentStatus  PaymentStatus @default(UNPAID)
   isDepositOnly  Boolean       @default(true)
-  status         String        @default("confirmed")
-  omsStatus      OMSOrderStatus @default(PAYMENT_CONFIRMED)
+  status         String        @default("requested")
+  omsStatus      OMSOrderStatus @default(AWAITING_ACCEPTANCE)
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
@@ -647,6 +647,7 @@ model MultiVendorOrder {
   @@index([customerPhone])
   @@index([createdAt])
   @@index([omsStatus])
+  @@index([customerId, createdAt])
 }
 
 model Suborder {
@@ -662,7 +663,7 @@ model Suborder {
   totalAmount           Int
   depositAmount         Int
   remainingAmount       Int
-  status                BookingStatus @default(CONFIRMED)
+  status                BookingStatus @default(PENDING)
   omsStatus             OMSOrderStatus @default(AWAITING_ACCEPTANCE)
   bookingNumber         String        @unique
 
@@ -701,6 +702,7 @@ model Suborder {
   @@index([bookingNumber])
   @@index([omsStatus])
   @@index([isAtRisk])
+  @@index([vendorId, omsStatus])
   @@index([isDelayed])
 }
 
@@ -731,6 +733,7 @@ model OrderItem {
 
   @@index([suborderId])
   @@index([serviceId])
+  @@index([scheduledDate])
 }
 
 // -------------------------------------------------------------

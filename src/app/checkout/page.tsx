@@ -28,20 +28,20 @@ import confetti from 'canvas-confetti';
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { cart, appliedCoupon, checkoutCart, cities, activeOccasion } = useApp();
+  const { cart, appliedCoupon, checkoutCart, cities, activeOccasion, currentUser, removeCoupon } = useApp();
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [createdOrderNumber, setCreatedOrderNumber] = useState<string | null>(null);
 
   // Form State
-  const [customerName, setCustomerName] = useState('سارة العتيبي');
-  const [customerPhone, setCustomerPhone] = useState('+966501234567');
-  const [customerEmail, setCustomerEmail] = useState('sara@example.com');
-  const [eventDate, setEventDate] = useState('2026-10-09');
-  const [eventTime, setEventTime] = useState('18:00');
+  const [customerName, setCustomerName] = useState(currentUser?.name || '');
+  const [customerPhone, setCustomerPhone] = useState(currentUser?.phone || '');
+  const [customerEmail, setCustomerEmail] = useState(currentUser?.email || '');
+  const [eventDate, setEventDate] = useState(activeOccasion?.date || cart[0]?.scheduledDate || '');
+  const [eventTime, setEventTime] = useState(cart[0]?.scheduledTime || '18:00');
   const [eventCity, setEventCity] = useState('الرياض');
-  const [eventVenue, setEventVenue] = useState('قاعة الخزامى الكبرى - حي النخيل');
+  const [eventVenue, setEventVenue] = useState(activeOccasion?.venueName || cart[0]?.venueAddress || '');
 
   // Payment Options
   const [paymentOption, setPaymentOption] = useState<'deposit' | 'full'>('deposit');
@@ -108,7 +108,7 @@ export default function CheckoutPage() {
           <span>العودة للسلة</span>
         </Link>
         <span>/</span>
-        <span className="text-saudi-green-900">إتمام الحجز والدفع الآمن</span>
+        <span className="text-saudi-green-900">إرسال طلب الحجز</span>
       </div>
 
       {/* Checkout Steps Progress Bar */}
@@ -146,7 +146,7 @@ export default function CheckoutPage() {
             >
               2
             </div>
-            <span className="text-[11px] font-bold text-gray-800">طريقة الدفع</span>
+            <span className="text-[11px] font-bold text-gray-800">مراجعة الطلب</span>
           </div>
 
           {/* Step 3 Node */}
@@ -160,11 +160,12 @@ export default function CheckoutPage() {
             >
               3
             </div>
-            <span className="text-[11px] font-bold text-gray-800">تأكيد الحجز</span>
+            <span className="text-[11px] font-bold text-gray-800">تسجيل الطلب</span>
           </div>
         </div>
       </div>
 
+      {appliedCoupon && step !== 3 && <div role="alert" className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-sm">الخصومات غير مفعلة لهذا المسار حالياً. <button className="underline font-bold" onClick={removeCoupon}>إزالة الكوبون والمتابعة بالسعر الكامل</button></div>}
       {/* Main Steps Content */}
       {step === 1 && (
         /* STEP 1: CONTACT & SCHEDULE */
@@ -223,6 +224,7 @@ export default function CheckoutPage() {
                 <label className="text-xs font-bold text-gray-700">تاريخ المناسبة *</label>
                 <input
                   type="date"
+                  min={new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Riyadh' }).format(new Date())}
                   value={eventDate}
                   onChange={(e) => setEventDate(e.target.value)}
                   className="w-full px-4 py-2.5 bg-saudi-sand-50 border border-saudi-sand-300 rounded-xl text-xs sm:text-sm text-gray-900 focus:outline-none focus:border-saudi-gold-500"
@@ -272,10 +274,10 @@ export default function CheckoutPage() {
             <div className="flex justify-end pt-4">
               <button
                 onClick={() => setStep(2)}
-                disabled={!customerName || !customerPhone || !eventDate}
+                disabled={!customerName || !customerPhone || !eventDate || !eventTime || !eventVenue}
                 className="px-8 py-3.5 bg-saudi-green-800 hover:bg-saudi-green-900 disabled:opacity-50 text-white font-bold rounded-2xl text-xs sm:text-sm flex items-center gap-2 shadow-lg transition"
               >
-                <span>المتابعة لاختيار طريقة الدفع</span>
+                <span>المتابعة لاختيار مراجعة الطلب</span>
                 <ArrowLeft className="w-4 h-4 text-saudi-gold-300" />
               </button>
             </div>
@@ -308,112 +310,13 @@ export default function CheckoutPage() {
           <div className="lg:col-span-8 bg-white rounded-3xl p-6 sm:p-8 border border-saudi-sand-300 shadow-sm space-y-6">
             <h2 className="text-xl font-bold font-cairo text-saudi-green-950 flex items-center gap-2">
               <CreditCard className="w-5 h-5 text-saudi-gold-600" />
-              <span>خطة الدفع</span>
+              <span>مراجعة طلب الحجز</span>
             </h2>
 
-            {/* Deposit vs Full Payment Toggle */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <label
-                onClick={() => setPaymentOption('deposit')}
-                className={`p-4 rounded-2xl border-2 cursor-pointer transition flex flex-col justify-between space-y-2 ${
-                  paymentOption === 'deposit'
-                    ? 'border-saudi-green-800 bg-saudi-green-50/50'
-                    : 'border-saudi-sand-300 bg-white hover:bg-saudi-sand-50'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-xs sm:text-sm text-saudi-green-950">
-                    دفع عربون التأكيد فقط (30%)
-                  </span>
-                  <div
-                    className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                      paymentOption === 'deposit' ? 'border-saudi-green-800' : 'border-gray-300'
-                    }`}
-                  >
-                    {paymentOption === 'deposit' && (
-                      <div className="w-2 h-2 rounded-full bg-saudi-green-800" />
-                    )}
-                  </div>
-                </div>
-                <p className="text-[11px] text-gray-500">
-                  ادفع الآن لتثبيت موعد الموردين في أسبوع المناسبة، والمتبقي يُسدد عند التنفيذ.
-                </p>
-                <span className="text-lg font-black font-cairo text-saudi-green-950 block">
-                  {formatSaudiRiyal(totals.depositAmount)}
-                </span>
-              </label>
-
-              <label
-                onClick={() => setPaymentOption('full')}
-                className={`p-4 rounded-2xl border-2 cursor-pointer transition flex flex-col justify-between space-y-2 ${
-                  paymentOption === 'full'
-                    ? 'border-saudi-green-800 bg-saudi-green-50/50'
-                    : 'border-saudi-sand-300 bg-white hover:bg-saudi-sand-50'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-xs sm:text-sm text-saudi-green-950">
-                    سداد كامل المبلغ مقدماً (100%)
-                  </span>
-                  <div
-                    className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                      paymentOption === 'full' ? 'border-saudi-green-800' : 'border-gray-300'
-                    }`}
-                  >
-                    {paymentOption === 'full' && (
-                      <div className="w-2 h-2 rounded-full bg-saudi-green-800" />
-                    )}
-                  </div>
-                </div>
-                <p className="text-[11px] text-gray-500">
-                  سداد كامل القيمة مع حفظها في حساب الضمان حتى إتمام كافة خدمات الحفل.
-                </p>
-                <span className="text-lg font-black font-cairo text-saudi-green-950 block">
-                  {formatSaudiRiyal(totals.finalTotal)}
-                </span>
-              </label>
+            <div role="status" className="bg-amber-50 border border-amber-200 rounded-2xl p-5 text-sm leading-7">
+              يُرسل الطلب للموردين لمراجعة التوفر والتفاصيل. لا يُعد الحجز مؤكداً بمجرد الإرسال.
+              الدفع الإلكتروني غير مفعّل حالياً، ولن يتم تحصيل أي مبلغ أو إصدار فاتورة دفع.
             </div>
-
-            {/* Payment Method Selector */}
-            <h3 className="font-bold text-sm text-saudi-green-950 font-cairo pt-3 border-t">
-              اختر بوابة الدفع المعتمدة:
-            </h3>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {[
-                { id: 'mada', label: 'بطاقة مدى', icon: '💳' },
-                { id: 'apple_pay', label: 'Apple Pay', icon: '🍏' },
-                { id: 'stc_pay', label: 'stc pay', icon: '📱' },
-                { id: 'tamara', label: 'تمارا (4 دفعات)', icon: '✨' },
-              ].map((m) => (
-                <button
-                  key={m.id}
-                  type="button"
-                  onClick={() => setPaymentMethod(m.id as any)}
-                  className={`p-3.5 rounded-2xl border-2 text-center text-xs font-bold transition flex flex-col items-center gap-1.5 ${
-                    paymentMethod === m.id
-                      ? 'border-saudi-gold-500 bg-saudi-gold-50 text-saudi-green-950 shadow-sm'
-                      : 'border-saudi-sand-300 hover:border-saudi-green-800 text-gray-700 bg-white'
-                  }`}
-                >
-                  <span className="text-xl">{m.icon}</span>
-                  <span>{m.label}</span>
-                </button>
-              ))}
-            </div>
-
-            {/* Guarantee Statement */}
-            <div className="bg-saudi-sand-50 p-4 rounded-2xl border border-saudi-sand-300 space-y-2 text-xs">
-              <div className="flex items-center gap-2 text-saudi-green-900 font-bold">
-                <ShieldCheck className="w-4 h-4 text-saudi-green-700" />
-                <span>ضمان منصة مناسبتي المعتمد 🇸🇦</span>
-              </div>
-              <p className="text-[11px] text-gray-600 leading-relaxed font-tajawal">
-                تُحفظ جميع المبالغ المدفوعة في حساب بنكي ضماني، ولا يتم الإفراج عنها للموردين إلا بعد
-                تأكيد حضورهم وتقديم الخدمة بالجودة المتفق عليها في العقد الإلكتروني.
-              </p>
-            </div>
-
             <div className="flex items-center justify-between pt-4">
               <button
                 onClick={() => setStep(1)}
@@ -431,16 +334,13 @@ export default function CheckoutPage() {
                 {isSubmitting ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>جاري معالجة الحجز والدفع الآمن...</span>
+                    <span>جاري حفظ طلبك...</span>
                   </>
                 ) : (
                   <>
                     <Lock className="w-4 h-4 text-saudi-gold-300" />
                     <span>
-                      تأكيد الحجز وسداد{' '}
-                      {formatSaudiRiyal(
-                        paymentOption === 'deposit' ? totals.depositAmount : totals.finalTotal
-                      )}
+                      إرسال طلب الحجز
                     </span>
                   </>
                 )}
@@ -451,7 +351,7 @@ export default function CheckoutPage() {
           {/* Pricing Box */}
           <div className="lg:col-span-4 bg-white rounded-3xl p-6 border border-saudi-sand-300 shadow-sm space-y-4">
             <h3 className="font-bold text-sm text-saudi-green-950 font-cairo border-b pb-2">
-              تفاصيل الدفع اليوم
+              التكلفة التقديرية للطلب
             </h3>
 
             <div className="space-y-2 text-xs text-gray-600">
@@ -460,7 +360,7 @@ export default function CheckoutPage() {
                 <span className="font-bold text-gray-900">{formatSaudiRiyal(totals.finalTotal)}</span>
               </div>
               <div className="flex justify-between">
-                <span>المبلغ المستحق الآن:</span>
+                <span>العربون المتوقع بعد التأكيد:</span>
                 <span className="font-black text-saudi-green-900 text-base">
                   {formatSaudiRiyal(
                     paymentOption === 'deposit' ? totals.depositAmount : totals.finalTotal
@@ -487,15 +387,15 @@ export default function CheckoutPage() {
 
           <div className="space-y-2">
             <span className="bg-saudi-gold-100 text-saudi-gold-900 text-xs font-bold px-3 py-1 rounded-full border border-saudi-gold-300 inline-block">
-              حجز مؤكد وعقد إلكتروني معتمد 🇸🇦
+              طلب محفوظ • بانتظار مراجعة المورد
             </span>
             <h2 className="text-2xl sm:text-3xl font-black font-cairo text-saudi-green-950">
-              تم تأكيد حجز مناسبتك بنجاح!
+              تم استلام طلب مناسبتك!
             </h2>
             <p className="text-xs sm:text-sm text-gray-600 max-w-lg mx-auto font-tajawal">
-              تم إشعار كافة الموردين المعنيين وتوليد عقود التنفيذ الرسمية برقم الطلب الموحد:
+              تم حفظ الطلب وإضافته إلى قائمة طلبات الموردين برقم الطلب الموحد:
             </p>
-            <div className="inline-block bg-saudi-sand-100 px-4 py-2 rounded-xl text-sm font-black font-mono text-saudi-green-900 tracking-wider">
+            <div className="inline-block bg-saudi-sand-100 px-4 py-2 rounded-xl text-sm font-black font-mono text-saudi-green-900 tracking-wider break-all">
               {createdOrderNumber}
             </div>
           </div>
@@ -513,7 +413,7 @@ export default function CheckoutPage() {
             <div className="flex justify-between">
               <span className="text-gray-500">حالة الدفع:</span>
               <span className="font-bold text-emerald-700">
-                {paymentOption === 'deposit' ? 'تم سداد العربون (30%)' : 'تم السداد بالكامل (100%)'}
+                غير مدفوع — لم يتم تحصيل أي مبلغ
               </span>
             </div>
           </div>
@@ -524,7 +424,7 @@ export default function CheckoutPage() {
               className="w-full sm:w-auto px-6 py-3.5 bg-saudi-green-800 hover:bg-saudi-green-900 text-white font-bold rounded-2xl text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2"
             >
               <FileCheck className="w-4 h-4 text-saudi-gold-300" />
-              <span>متابعة حجوزاتي وفواتيري</span>
+              <span>متابعة طلباتي وحجوزاتي</span>
             </Link>
 
             <Link

@@ -79,70 +79,13 @@ export function ensureServiceDetails(service: ServiceItem): ServiceItem & {
   addons: ServiceAddon[];
   availability: ServiceAvailability;
 } {
-  const base = service.price || 1000;
-  const packages = service.packages && service.packages.length > 0 ? service.packages : [
-    {
-      id: `${service.id}-pkg-basic`,
-      nameAr: 'الباقة الأساسية',
-      nameEn: 'Basic Package',
-      tier: 'basic' as const,
-      price: Math.round(base * 0.8),
-      descriptionAr: 'تجهيز قياسي مناسب للمناسبات العائلية المصغرة مع أساسيات الخدمة.',
-      durationHours: 3,
-      featuresAr: service.featuresAr.slice(0, 3),
-    },
-    {
-      id: `${service.id}-pkg-standard`,
-      nameAr: 'الباقة المتكاملة (الأكثر طلباً)',
-      nameEn: 'Standard Package',
-      tier: 'standard' as const,
-      price: base,
-      descriptionAr: 'الخيار المثالي المتكامل مع كافة التجهيزات الموصى بها وكادر متكامل.',
-      durationHours: 5,
-      featuresAr: service.featuresAr,
-      isPopular: true,
-    },
-    {
-      id: `${service.id}-pkg-vip`,
-      nameAr: 'الباقة الملكية VIP',
-      nameEn: 'VIP Royal Package',
-      tier: 'vip' as const,
-      price: Math.round(base * 1.45),
-      descriptionAr: 'أعلى مستوى من الفخامة مع إضافات حصرية وتغطية ممتدة وضيافة خاصة.',
-      durationHours: 7,
-      featuresAr: [...service.featuresAr, 'خدمة إشراف VIP مخصصة', 'أولوية التنفيذ والتجهيز المبكر', 'هدية تذكارية فاخرة للمناسبة'],
-    },
-  ];
-
-  const addons = service.addons && service.addons.length > 0 ? service.addons : [
-    {
-      id: `${service.id}-add-1`,
-      titleAr: 'ساعة إضافية في الموقع',
-      descriptionAr: 'تمديد مدة تواجد الفريق أو الخدمة لمدة 60 دقيقة إضافية',
-      price: Math.round(base * 0.15) || 300,
-      pricingType: 'per_hour' as const,
-      isAvailable: true,
-      maxQuantity: 4,
-    },
-    {
-      id: `${service.id}-add-2`,
-      titleAr: 'طاقم عمل / كادر إضافي',
-      descriptionAr: 'مباشر أو مساعد إضافي بزي تراثي وموحد لتسريع الخدمة',
-      price: 250,
-      pricingType: 'per_person' as const,
-      isAvailable: true,
-      maxQuantity: 6,
-    },
-    {
-      id: `${service.id}-add-3`,
-      titleAr: 'ترقية فاخرة ومباخر عود موروكي',
-      descriptionAr: 'توفير مباخر نحاسية ملكية وتبخير مستمر بدهن العود طوال المناسبة',
-      price: 450,
-      pricingType: 'fixed' as const,
-      isAvailable: true,
-      maxQuantity: 2,
-    },
-  ];
+  // An empty package ID means the actual service base price, not a catalog package.
+  // Do not invent tiers, discounts, add-ons or deliverables for an empty catalog.
+  const packages = service.packages?.length ? service.packages : [{
+    id: '', nameAr: 'الخدمة بالسعر الأساسي', tier: 'standard' as const, price: service.price,
+    durationHours: service.executionDurationHours, featuresAr: service.featuresAr || [],
+  }];
+  const addons = service.addons || [];
 
   const availability = service.availability || {
     workingDays: [0, 1, 2, 3, 4, 5, 6],

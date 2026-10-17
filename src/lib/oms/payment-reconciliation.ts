@@ -15,12 +15,10 @@ export interface PaymentWebhookPayload {
   signature?: string;
 }
 
-export function verifyPaymentSignature(payload: PaymentWebhookPayload, secret: string = 'MUNASABATI_SECURE_HMAC'): boolean {
-  // Production-grade signature check (validates webhooks coming from Mada/HyperPay/ApplePay/Tamara)
-  if (!payload.transactionRef || !payload.orderNumber || payload.amount <= 0) {
-    return false;
-  }
-  return true;
+// Fail closed until a selected provider supplies a real raw-body signature adapter.
+// There is no generic signature scheme shared by all payment gateways.
+export function verifyPaymentSignature(_payload: PaymentWebhookPayload, _secret?: string): boolean {
+  return false;
 }
 
 export function mapPaymentProviderStatus(providerStatus: string): PaymentStatus {

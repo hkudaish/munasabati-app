@@ -100,3 +100,16 @@ npm run start
 ## التغطية الجغرافية
 
 إدارة الدول والمدن وإتاحة الخدمات والمسودات والمعاينة من `/system-admin/geography`، مع اختيار المدينة يدوياً والتحقق من إتاحتها على الخادم. راجع [دليل التغطية الجغرافية](docs/GEOGRAPHIC_COVERAGE.md) للترقية وإعداد الموقع والخصوصية والاختبارات.
+
+## تطبيق متطلبات MunasabityMD2
+
+تم توصيل إنشاء الطلبات متعددة الموردين والتتبع والصلاحيات والتدقيق بقاعدة البيانات، مع منع تأكيد الدفع أو الحجز تلقائياً. راجع [تقرير التنفيذ والواجهات والاختبارات والمتبقي](docs/MUNASABITY_MD2_IMPLEMENTATION.md). التقرير يوضح حدود التنفيذ؛ متطلبات المنصة التجارية الكاملة لم تنتهِ بعد.
+
+لقواعد البيانات المحلية القديمة، طبّق الترقية الإضافية قبل التشغيل:
+
+```bash
+npx prisma db execute --file prisma/sql/20261017-commerce-compatibility.sql --schema prisma/schema.prisma
+npm run test:commerce-rules
+npm run test:commerce-migration
+npm run test:commerce
+```

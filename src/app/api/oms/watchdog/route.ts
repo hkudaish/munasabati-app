@@ -1,53 +1,35 @@
+import { prisma } from '@/lib/db';
 import { requireAdmin } from '@/lib/server/auth';
-import { HttpError } from '@/lib/server/http';
-import { NextResponse } from 'next/server';
-import { getAllOMSOrders, getAllOMSExceptions, getOMSSettings, saveOMSException, saveOMSMasterOrder } from '@/lib/oms/store';
+import { api } from '@/lib/server/http';
+import { assertNotPreview } from '@/lib/server/geo/context';
+import { getOMSSettings } from '@/lib/oms/store';
 import { runOMSWatchdogScan } from '@/lib/oms/sla-watchdog';
+import { orderInclude, serializeOrder } from '@/lib/server/commerce';
 
-export async function POST() {
-  try {
-    await requireAdmin();
-    const orders = await getAllOMSOrders();
-    const existingExceptions = await getAllOMSExceptions();
-    const settings = await getOMSSettings();
-
-    // Flatten all suborders from master orders
-    const allSuborders = orders.flatMap((o) => o.suborders);
-
-    const { detectedExceptions, updatedSuborders } = runOMSWatchdogScan(
-      allSuborders,
-      existingExceptions,
-      settings
-    );
-
-    // Save newly created exceptions
-    for (const exc of detectedExceptions) {
-      await saveOMSException(exc);
+export const GET = api(async () => {
+  await requireAdmin();
+  return { success: true, exceptions: await prisma.oMSException.findMany({ where: { status: { in: ['OPEN','IN_REVIEW','ACTION_TAKEN'] } }, orderBy: { detectedAt: 'desc' }, take: 200 }) };
+});
+export const POST = api(async request => {
+  await assertNotPreview(request);
+  const user = await requireAdmin(); const settings = await getOMSSettings();
+  return prisma.$transaction(async tx => {
+    // Concurrent scans share a lock; risk updates never overwrite workflow or payment state.
+    await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${'oms-watchdog'}))::text`;
+    const [orders, exceptions] = await Promise.all([
+      tx.multiVendorOrder.findMany({ include: orderInclude }), tx.oMSException.findMany({ where: { status: { notIn: ['RESOLVED','CLOSED'] } } })
+    ]);
+    const suborders = JSON.parse(JSON.stringify(orders.map(serializeOrder).flatMap(o => o.suborders)));
+    const result = runOMSWatchdogScan(suborders, JSON.parse(JSON.stringify(exceptions)), settings);
+    const seen = new Set<string>(); const created = [];
+    for (const exception of result.detectedExceptions) {
+      if (!exception.suborderId || seen.has(exception.suborderId)) continue;
+      seen.add(exception.suborderId);
+      created.push(await tx.oMSException.create({ data: { orderId: exception.orderId, suborderId: exception.suborderId, issueType: exception.issueType!, severity: exception.severity,
+        assignedRole: exception.assignedRole, correctiveActionAr: exception.correctiveActionAr!, resolutionDeadline: exception.resolutionDeadline ? new Date(exception.resolutionDeadline) : null } }));
     }
-
-    // Save updated suborders status (e.g. risk/delayed flags)
-    for (const sub of updatedSuborders) {
-      const parentOrder = orders.find((o) => o.suborders.some((s) => s.id === sub.id));
-      if (parentOrder) {
-        const subIdx = parentOrder.suborders.findIndex((s) => s.id === sub.id);
-        if (subIdx >= 0) {
-          parentOrder.suborders[subIdx] = sub;
-          await saveOMSMasterOrder(parentOrder);
-        }
-      }
-    }
-
-    return NextResponse.json({
-      success: true,
-      scannedOrdersCount: allSuborders.length,
-      newExceptionsCount: detectedExceptions.length,
-      detectedExceptions,
-      messageAr: `تم تنفيذ مسح المراقبة الذاتية (Watchdog). تم رصد ${detectedExceptions.length} استثناءات جديدة.`,
-    });
-  } catch (error: any) {
-    return NextResponse.json(
-      { success: false, errorAr: error?.message || 'فشل في تشغيل خدمة المراقبة الذاتية' },
-      { status: error instanceof HttpError ? error.status : 500 }
-    );
-  }
-}
+    for (const sub of result.updatedSuborders) await tx.suborder.update({ where: { id: sub.id }, data: { isAtRisk: sub.isAtRisk, isDelayed: sub.isDelayed } });
+    await tx.systemAuditLog.create({ data: { actorId: user.id, action: 'OMS_WATCHDOG_SCAN', targetId: 'orders', details: { scanned: suborders.length, exceptions: created.length } } });
+    return { success: true, scannedOrdersCount: suborders.length, newExceptionsCount: created.length, detectedExceptions: created };
+  }, { timeout: 20000 });
+});

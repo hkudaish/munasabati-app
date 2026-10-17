@@ -41,3 +41,8 @@ next-env.d.ts
 /.system-test-tsconfig-*.json
 /.geo-browser-*/
 /.geo-test-artifacts/
+
+# Isolated commerce validation output
+/.next-commerce-*/
+/.commerce-test-tsconfig-*.json
+/.commerce-build-tsconfig.json

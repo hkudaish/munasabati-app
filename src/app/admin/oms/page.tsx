@@ -57,6 +57,9 @@ export default function OMSAdminCommandCenter() {
       const resSettings = await fetch('/api/oms/settings');
       const dataSettings = await resSettings.json();
 
+      const exceptionResponse = await fetch('/api/oms/watchdog');
+      const exceptionData = await exceptionResponse.json();
+      if (exceptionData.success) setExceptions(exceptionData.exceptions);
       if (dataOrders.success) setOrders(dataOrders.orders || []);
       if (dataSettings.success) setSettings(dataSettings.settings);
     } catch (e) {
@@ -108,7 +111,7 @@ export default function OMSAdminCommandCenter() {
         setActionNote('');
         fetchOMSData();
       } else {
-        alert(data.errorAr || 'فشل تنفيذ الإجراء');
+        alert(data.error || data.errorAr || 'فشل تنفيذ الإجراء');
       }
     } catch (e) {
       alert('خطأ في الاتصال بالسيرفر');

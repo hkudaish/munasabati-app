@@ -67,6 +67,15 @@ export const VALID_TRANSITIONS: StateTransitionRule[] = [
     nextAssignedRole: 'operations',
   },
 
+  {
+    from: 'ACCEPTED', to: 'CANCEL_REQUESTED', allowedRoles: ['CUSTOMER', 'VENDOR'],
+    actionName: 'REQUEST_CANCEL', nextAction: 'REVIEW_CANCELLATION', nextAssignedRole: 'operations', requiresNote: true,
+  },
+  {
+    from: 'ACCEPTED', to: 'CANCELLED', allowedRoles: ['CUSTOMER', 'VENDOR', 'ADMIN'],
+    actionName: 'CANCEL_UNPAID_RESERVATION', nextAction: 'CLOSE_ORDER', nextAssignedRole: 'admin', requiresNote: true,
+  },
+
   // Execution Phase
   {
     from: 'ACCEPTED',

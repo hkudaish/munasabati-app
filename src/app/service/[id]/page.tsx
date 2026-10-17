@@ -1,7 +1,7 @@
 'use client';
 
 import { useGeo } from '@/components/geo/GeoProvider';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -28,7 +28,6 @@ import { useApp } from '@/lib/store';
 import { formatSaudiRiyal, ensureServiceDetails, ensureVendorDetails } from '@/lib/utils';
 import { checkAvailability } from '@/lib/ranking-engine';
 import { ServicePackage, ServiceAddon } from '@/lib/types';
-import SaudiPaymentModal from '@/components/payments/SaudiPaymentModal';
 import confetti from 'canvas-confetti';
 
 export default function ServiceDetailPage() {
@@ -36,7 +35,7 @@ export default function ServiceDetailPage() {
   const geo=useGeo();
   const previewPath=usePathname().split('/');
   const router = useRouter();
-  const { services, vendors, reviews, createBooking, addToCart, setIsAIOpen, activeOccasion } = useApp();
+  const { services, vendors, reviews, addToCart, setIsAIOpen } = useApp();
 
   const serviceId = (params?.id || (previewPath[1]==='coverage-preview'?previewPath[4]:'')) as string;
   const rawService = services.find((s) => s.id === serviceId);
@@ -48,21 +47,25 @@ export default function ServiceDetailPage() {
   // Configuration state for booking / cart
   const [selectedPackage, setSelectedPackage] = useState<ServicePackage>(
     service?.packages[0] || {
-      id: 'basic',
+      id: '',
       nameAr: 'الباقة الأساسية',
-      price: service?.price || 1500,
+      price: service?.price || 0,
       featuresAr: service?.featuresAr || [],
       durationHours: 4,
     }
   );
 
   const [selectedAddons, setSelectedAddons] = useState<ServiceAddon[]>([]);
-  const [bookingDate, setBookingDate] = useState<string>('2026-10-09');
+  const [bookingDate, setBookingDate] = useState<string>('');
   const [bookingTime, setBookingTime] = useState<string>('18:00');
   const [bookingNotes, setBookingNotes] = useState<string>('');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  useEffect(() => {
+    if (!rawService) return;
+    const packages = ensureServiceDetails(rawService).packages;
+    setSelectedPackage(previous => packages.find(p => p.id === previous.id) || packages[0]);
+  }, [rawService]);
 
   if (!service || !vendor || (geo.data?.summary!=='UNKNOWN' && !geo.data?.availability.find(a=>a.key==='item:'+serviceId)?.available)) {
     return (
@@ -94,6 +97,8 @@ export default function ServiceDetailPage() {
   };
 
   const handleAddToCart = () => {
+    const available = geo.data?.availability.find(a => a.key === 'item:' + serviceId);
+    if (geo.data?.preview || !available?.available) { setToastMessage(available?.message || 'اختر مدينة مدعومة قبل إضافة الخدمة'); return false; }
     addToCart(service, selectedPackage, selectedAddons, {
       date: bookingDate,
       time: bookingTime,
@@ -107,6 +112,7 @@ export default function ServiceDetailPage() {
     try {
       confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
     } catch {}
+    return true;
   };
 
   return (
@@ -400,7 +406,7 @@ export default function ServiceDetailPage() {
               {availabilityResult.available ? (
                 <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>المورد متاح للتنفيذ في هذا التاريخ! ⚡</span>
+                  <span>التوفر النهائي يخضع لمراجعة المورد</span>
                 </div>
               ) : (
                 <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-center gap-2">
@@ -437,62 +443,27 @@ export default function ServiceDetailPage() {
               </button>
 
               <button
-                onClick={() => setIsPaymentModalOpen(true)}
+                onClick={() => { if (handleAddToCart()) router.push('/checkout'); }}
                 className="w-full py-3 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-bold rounded-2xl text-xs flex items-center justify-center gap-2 transition"
               >
                 <Zap className="w-4 h-4" />
-                <span>حجز ودفع فوري مباشر</span>
+                <span>متابعة طلب الحجز</span>
               </button>
             </div>
 
             <div className="text-center space-y-1">
               <span className="text-[10px] text-gray-400 block">
-                🔒 دفع آمن مع حماية منصة مناسبتي وعقد إلكتروني معتمد
+                يتم تأكيد الطلب بعد مراجعة التوفر وشروط الدفع
               </span>
               <span className="text-[10px] text-saudi-green-800 font-bold block">
-                إلغاء مجاني حتى 5 أيام قبل موعد المناسبة
+                {vendor.cancellationPolicyAr || 'اطلب سياسة الإلغاء من المورد قبل التأكيد'}
               </span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Immediate Payment Modal */}
-      {isPaymentModalOpen && (
-        <SaudiPaymentModal
-          bookingTitle={`${service.titleAr} (${selectedPackage.nameAr})`}
-          vendorName={service.vendorName}
-          date={bookingDate}
-          totalAmount={currentTotalPrice}
-          onClose={() => setIsPaymentModalOpen(false)}
-          onPaymentSuccess={async (method, isDeposit) => {
-            await createBooking({
-              occasionId: activeOccasion?.id,
-              occasionTitle: activeOccasion?.title || service.titleAr,
-              vendorId: service.vendorId,
-              vendorName: service.vendorName,
-              vendorLogo: service.vendorLogo,
-              serviceId: service.id,
-              serviceTitleAr: `${service.titleAr} (${selectedPackage.nameAr})`,
-              date: bookingDate,
-              cityAr: service.cityNameAr,
-              customerName: 'سارة العتيبي',
-              customerPhone: '+966501234567',
-              totalAmount: currentTotalPrice,
-              depositAmount: Math.round(currentTotalPrice * 0.3),
-              remainingAmount: currentTotalPrice - Math.round(currentTotalPrice * 0.3),
-              depositPaid: isDeposit,
-              isFullyPaid: !isDeposit,
-              paymentMethod: method,
-              status: 'confirmed',
-              cancellationPolicyAr: 'إلغاء مجاني حتى 5 أيام قبل موعد المناسبة.',
-              deliverablesAr: selectedPackage.featuresAr,
-            });
-            setIsPaymentModalOpen(false);
-            router.push('/bookings');
-          }}
-        />
-      )}
+
     </div>
   );
 }

@@ -289,7 +289,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [wishlistGifts, setWishlistGifts] = useState<WishlistGift[]>(INITIAL_WISHLIST);
   const [eaniyahGifts, setEaniyahGifts] = useState<EaniyahGift[]>(INITIAL_EANIYAH_GIFTS);
   const [rfqRequests, setRfqRequests] = useState<RFQRequest[]>(INITIAL_RFQS);
-  const [bookings, setBookings] = useState<Booking[]>(INITIAL_BOOKINGS);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [reviews, setReviews] = useState<Review[]>(INITIAL_REVIEWS);
   const [adminConfig, setAdminConfig] = useState<AdminPlatformConfig>(INITIAL_ADMIN_CONFIG);
 
@@ -316,12 +316,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         if ((parsed.occasions?.length || parsed.guests?.length) && !localStorage.getItem('munasabati_legacy_invitations_backup_v1')) {
           localStorage.setItem('munasabati_legacy_invitations_backup_v1', JSON.stringify({ occasions: parsed.occasions || [], guests: parsed.guests || [] }));
         }
+        if ((parsed.bookings?.length || parsed.multiVendorOrders?.length) && !localStorage.getItem('munasabati_legacy_commerce_backup_v1')) localStorage.setItem('munasabati_legacy_commerce_backup_v1', JSON.stringify({ bookings: parsed.bookings || [], orders: parsed.multiVendorOrders || [] }));
         if (parsed.activeOccasionId) setActiveOccasionId(parsed.activeOccasionId);
         if (parsed.budgetItems) setBudgetItems(parsed.budgetItems);
         if (parsed.tasks) setTasks(parsed.tasks);
         if (parsed.runOfShowItems) setRunOfShowItems(parsed.runOfShowItems);
         if (parsed.eaniyahGifts) setEaniyahGifts(parsed.eaniyahGifts);
-        if (parsed.bookings) setBookings(parsed.bookings);
+
         if (parsed.rfqRequests) setRfqRequests(parsed.rfqRequests);
         if (parsed.adminConfig) setAdminConfig(parsed.adminConfig);
         if (parsed.packages) setPackages(parsed.packages);
@@ -329,7 +330,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         if (parsed.cart) setCart(parsed.cart);
         if (parsed.savedForLater) setSavedForLater(parsed.savedForLater);
         if (parsed.appliedCoupon) setAppliedCoupon(parsed.appliedCoupon);
-        if (parsed.multiVendorOrders) setMultiVendorOrders(parsed.multiVendorOrders);
+
         if (parsed.favoriteVendorIds) setFavoriteVendorIds(parsed.favoriteVendorIds);
         if (parsed.favoriteServiceIds) setFavoriteServiceIds(parsed.favoriteServiceIds);
         if (parsed.comparisonVendorIds) setComparisonVendorIds(parsed.comparisonVendorIds);
@@ -353,7 +354,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           tasks,
           runOfShowItems,
           eaniyahGifts,
-          bookings,
           rfqRequests,
           adminConfig,
           packages,
@@ -361,7 +361,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           cart,
           savedForLater,
           appliedCoupon,
-          multiVendorOrders,
           favoriteVendorIds,
           favoriteServiceIds,
           comparisonVendorIds,
@@ -430,6 +429,29 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     void refresh(); const timer = setInterval(refresh, 10000);
     const onFocus = () => void refresh(); window.addEventListener('focus', onFocus);
     return () => { stopped = true; clearInterval(timer); window.removeEventListener('focus', onFocus); };
+  }, [authenticatedUserId, preview]);
+  useEffect(() => {
+    setBookings([]); setMultiVendorOrders([]);
+    if (!authenticatedUserId || preview) return;
+    let stopped = false;
+    const refresh = () => requestJSON('/api/oms/orders').then(data => {
+      if (stopped) return;
+      setMultiVendorOrders(data.orders);
+      setBookings(data.orders.flatMap((order: any) => order.suborders.map((sub: any) => ({
+        id: sub.id, bookingNumber: sub.bookingNumber, occasionId: order.occasionId, occasionTitle: '',
+        vendorId: sub.vendorId, vendorName: sub.vendorName, vendorLogo: sub.vendorLogo,
+        serviceId: sub.items[0]?.serviceId || '', serviceTitleAr: sub.items.map((i: any) => i.serviceTitleAr).join(' + '),
+        date: order.eventDate, time: order.eventTime || '', cityAr: order.cityNameAr,
+        customerName: order.customerName, customerPhone: order.customerPhone, customerEmail: order.customerEmail,
+        totalAmount: sub.totalAmount, depositAmount: sub.depositAmount, remainingAmount: sub.remainingAmount,
+        depositPaid: order.paymentStatus === 'PAID', isFullyPaid: order.paymentStatus === 'PAID' && !order.isDepositOnly,
+        paymentMethod: order.paymentMethod, status: sub.omsStatus === 'ACCEPTED' ? 'deposit_required' : sub.status === 'pending' ? 'awaiting_vendor' : sub.status,
+        cancellationPolicyAr: 'تطبق سياسة المورد المتفق عليها.', createdAt: order.createdAt, deliverablesAr: sub.items.map((i: any) => i.serviceTitleAr),
+      }))));
+    }).catch(error => { if (!stopped) setDatabaseError(error.message); });
+    void refresh(); const timer = setInterval(refresh, 10000);
+    window.addEventListener('munasabati-orders-refresh', refresh);
+    return () => { stopped = true; clearInterval(timer); window.removeEventListener('munasabati-orders-refresh', refresh); };
   }, [authenticatedUserId, preview]);
   async function databaseAction(action: () => Promise<void>): Promise<boolean> {
     try { await action(); setDatabaseError(''); return true; }
@@ -864,48 +886,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
-  const createBooking = async (bookingData: Omit<Booking, 'id' | 'bookingNumber' | 'createdAt'>): Promise<string> => {
-    await requestJSON('/api/geo/authorize','POST',{keys:['feature:commerce',...(bookingData.serviceId?['item:'+bookingData.serviceId]:[])],cityId:selectedCity});
-    if(preview) throw new Error('المعاينة للعرض فقط؛ لا يتم إنشاء حجوزات.');
-    const a=geo.data?.availability.find(r=>r.key==='feature:commerce');
-    if(!selectedCity||!a?.available) throw new Error(a?.message||a?.reason||'اختر مدينة مدعومة قبل الحجز');
-    const id = `bok-${Date.now().toString().slice(-4)}`;
-    const bookingNumber = generateBookingNumber();
-    const newBooking: Booking = {
-      ...bookingData,
-      id,
-      bookingNumber,
-      createdAt: new Date().toISOString(),
-    };
-    setBookings((prev) => [newBooking, ...prev]);
-    return id;
+  const createBooking = async (_data: Omit<Booking, 'id' | 'bookingNumber' | 'createdAt'>): Promise<string> => {
+    throw new Error('أضف الخدمة إلى السلة وأرسل طلب الحجز من صفحة إتمام الطلب');
   };
-
   const updateBookingStatus = (bookingId: string, status: Booking['status']) => {
-    setBookings((prev) =>
-      prev.map((b) => {
-        if (b.id === bookingId) {
-          return { ...b, status };
-        }
-        return b;
-      })
-    );
+    const targetState = ({ confirmed: 'ACCEPTED', in_preparation: 'IN_PROGRESS', completed: 'COMPLETED', cancelled: 'CANCELLED', disputed: 'DISPUTED' } as Record<string, string>)[status];
+    if (!targetState) { setDatabaseError('انتقال الحالة غير مدعوم'); return; }
+    void databaseAction(async () => {
+      await requestJSON('/api/oms/orders/transition', 'POST', { suborderId: bookingId, targetState });
+      window.dispatchEvent(new Event('munasabati-orders-refresh'));
+    });
   };
-
-  const payBookingDeposit = (bookingId: string, method: PaymentMethod) => {
-    setBookings((prev) =>
-      prev.map((b) => {
-        if (b.id === bookingId) {
-          return {
-            ...b,
-            depositPaid: true,
-            paymentMethod: method,
-            status: 'confirmed',
-          };
-        }
-        return b;
-      })
-    );
+  const payBookingDeposit = (_bookingId: string, _method: PaymentMethod) => {
+    setDatabaseError('الدفع الإلكتروني غير مفعّل حالياً؛ لم يتم تحصيل أي مبلغ');
   };
 
   const addRunOfShowItem = (itemData: Omit<RunOfShowItem, 'id'>) => {
@@ -929,21 +922,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setRunOfShowItems((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const payRemainingBooking = (bookingId: string, method: PaymentMethod) => {
-    setBookings((prev) =>
-      prev.map((b) => {
-        if (b.id === bookingId) {
-          return {
-            ...b,
-            isFullyPaid: true,
-            remainingAmount: 0,
-            paymentMethod: method,
-            status: 'completed',
-          };
-        }
-        return b;
-      })
-    );
+  const payRemainingBooking = (_bookingId: string, _method: PaymentMethod) => {
+    setDatabaseError('الدفع الإلكتروني غير مفعّل حالياً؛ لم يتم تحصيل أي مبلغ');
   };
 
   const addReview = (reviewData: Omit<Review, 'id' | 'date'>) => {
@@ -1049,34 +1029,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   // Escrow and bookings actions
-  const releaseEscrowPayout = (bookingId: string) => {
-    setBookings((prev) =>
-      prev.map((b) => {
-        if (b.id === bookingId) {
-          return {
-            ...b,
-            payoutReleased: true,
-            payoutRef: `SARIE-${Date.now().toString().slice(-6)}`,
-            status: 'completed',
-          };
-        }
-        return b;
-      })
-    );
+  const releaseEscrowPayout = (_bookingId: string) => {
+    setDatabaseError('تحويل مستحقات الموردين يتطلب تكامل دفع وتحويلات فعلياً');
   };
-
-  const refundBooking = (bookingId: string) => {
-    setBookings((prev) =>
-      prev.map((b) => {
-        if (b.id === bookingId) {
-          return {
-            ...b,
-            status: 'cancelled',
-          };
-        }
-        return b;
-      })
-    );
+  const refundBooking = (_bookingId: string) => {
+    setDatabaseError('الاسترداد يتطلب تأكيداً من بوابة الدفع؛ لم يتم تنفيذ استرداد');
   };
 
   // City management actions
@@ -1131,7 +1088,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (selectedPackage !== undefined || selectedAddons !== undefined || config !== undefined) {
       const service: ServiceItem = serviceOrItem;
       const pkg: ServicePackage = selectedPackage || {
-        id: `${service.id}-pkg-default`,
+        id: '',
         nameAr: 'الباقة القياسية',
         tier: 'standard',
         price: service.price,
@@ -1323,109 +1280,32 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     paymentMethod: PaymentMethod;
     isDepositOnly: boolean;
   }): Promise<MultiVendorOrder> => {
-    await requestJSON('/api/geo/authorize','POST',{keys:['feature:commerce',...cart.map(c=>'item:'+c.serviceId)],cityId:checkoutData.cityId||selectedCity});
-    const orderId = `ord-${Date.now().toString().slice(-6)}`;
-    const orderNumber = generateOrderNumber();
-
-    const evDate = checkoutData.eventDate || checkoutData.scheduleDate || '2026-10-09';
-    const evTime = checkoutData.eventTime || checkoutData.scheduleTime || '07:00 م';
-    const cCity = checkoutData.cityNameAr || checkoutData.locationCity || 'الرياض';
-    const cCityId = checkoutData.cityId || selectedCity;
-    const vName = checkoutData.venueName || checkoutData.locationAddress || 'قاعة المناسبة';
-    const occId = checkoutData.occasionId || activeOccasionId;
-
-    // Group items by vendor into suborders
-    const groups: Record<string, CartItem[]> = {};
-    cart.forEach((it) => {
-      if (!groups[it.vendorId]) groups[it.vendorId] = [];
-      groups[it.vendorId].push(it);
-    });
-
-    const vatRate = adminConfig.vatPercent ? adminConfig.vatPercent / 100 : 0.15;
-    const suborders = Object.entries(groups).map(([vendorId, items], idx) => {
-      const vSubtotal = items.reduce((acc, it) => acc + it.subtotal, 0);
-      const vTax = Math.round(vSubtotal * vatRate);
-      const vTotal = vSubtotal + vTax;
-      const vDeposit = Math.round(vTotal * 0.3);
-      const vBookingNumber = generateBookingNumber();
-
-      // Create Booking in store for vendor dashboard and user tracking
-      const firstItem = items[0];
-      const newBooking: Booking = {
-        id: `bok-${Date.now().toString().slice(-4)}-${idx}`,
-        bookingNumber: vBookingNumber,
-        occasionId: occId,
-        occasionTitle: activeOccasion?.title || 'مناسبة خاصة',
-        vendorId,
-        vendorName: firstItem.vendorName,
-        vendorLogo: firstItem.vendorLogo,
-        serviceId: firstItem.serviceId,
-        serviceTitleAr: items.map((it) => it.serviceTitleAr).join(' + '),
-        date: evDate || firstItem.scheduledDate || firstItem.scheduleDate || '2026-10-09',
-        time: evTime || firstItem.scheduledTime || firstItem.scheduleTime || '07:00 م',
-        cityAr: cCity || firstItem.cityNameAr || 'الرياض',
-        customerName: checkoutData.customerName,
-        customerPhone: checkoutData.customerPhone,
-        customerEmail: checkoutData.customerEmail,
-        totalAmount: vTotal,
-        depositAmount: vDeposit,
-        remainingAmount: checkoutData.isDepositOnly ? vTotal - vDeposit : 0,
-        depositPaid: true,
-        isFullyPaid: !checkoutData.isDepositOnly,
-        paymentMethod: checkoutData.paymentMethod,
-        status: 'confirmed',
-        cancellationPolicyAr: 'تطبق سياسة الإلغاء المعتمدة لكل مورد.',
-        createdAt: new Date().toISOString(),
-        deliverablesAr: items.map((it) => `${it.serviceTitleAr} (${it.packageNameAr || 'باقة قياسية'})`),
-        commissionAmount: Math.round(vTotal * ((adminConfig.commissionRatePercent || 10) / 100)),
-      };
-      setBookings((prev) => [newBooking, ...prev]);
-
-      return {
-        suborderId: `subord-${orderId}-${idx + 1}`,
-        vendorId,
-        vendorName: firstItem.vendorName,
-        vendorLogo: firstItem.vendorLogo,
-        items,
-        subtotal: vSubtotal,
-        taxAmount: vTax,
-        totalAmount: vTotal,
-        depositAmount: vDeposit,
-        remainingAmount: checkoutData.isDepositOnly ? vTotal - vDeposit : 0,
-        status: 'confirmed' as const,
-        bookingNumber: vBookingNumber,
-      };
-    });
-
-    const newOrder: MultiVendorOrder = {
-      id: orderId,
-      orderNumber,
-      customerId: 'cust-demo-1',
-      customerName: checkoutData.customerName,
-      customerPhone: checkoutData.customerPhone,
-      customerEmail: checkoutData.customerEmail,
-      eventDate: evDate,
-      eventTime: evTime,
-      cityId: cCityId,
-      cityNameAr: cCity,
-      venueName: vName,
-      suborders,
-      totalSubtotal: cartTotals.subtotal,
-      totalTax: cartTotals.tax,
-      couponDiscount: cartTotals.discount,
-      couponCode: appliedCoupon?.code,
-      finalTotal: cartTotals.total,
-      totalDeposit: cartTotals.depositAmount,
-      paymentMethod: checkoutData.paymentMethod,
-      isDepositOnly: checkoutData.isDepositOnly,
-      createdAt: new Date().toISOString(),
-      status: 'confirmed',
+    if (!currentUser) throw new Error('يرجى تسجيل الدخول قبل إرسال الطلب');
+    const payload = {
+      items: cart.map(item => ({ serviceId: item.serviceId, packageId: item.packageId || item.selectedPackage?.id, quantity: item.quantity, addons: item.addons, notes: item.notes })),
+      customerInfo: {
+        customerName: checkoutData.customerName, customerPhone: checkoutData.customerPhone, customerEmail: checkoutData.customerEmail,
+        occasionId: checkoutData.occasionId || undefined,
+        eventDate: checkoutData.eventDate || checkoutData.scheduleDate,
+        eventTime: checkoutData.eventTime || checkoutData.scheduleTime,
+        cityId: checkoutData.cityId || cities.find(c => c.nameAr === checkoutData.locationCity)?.id || selectedCity,
+        venueName: checkoutData.venueName || checkoutData.locationAddress,
+        paymentMethod: checkoutData.paymentMethod, isDepositOnly: checkoutData.isDepositOnly, couponCode: appliedCoupon?.code,
+      },
     };
-
-    setMultiVendorOrders((prev) => [newOrder, ...prev]);
+    // Preserve the same key across network failures and reloads, but never across changed requests/accounts.
+    const fingerprint = JSON.stringify({ userId: currentUser.id, payload });
+    let pending: { fingerprint: string; key: string } | null = null;
+    try { pending = JSON.parse(sessionStorage.getItem('munasabati_pending_checkout') || 'null'); } catch {}
+    if (!pending || pending.fingerprint !== fingerprint) pending = { fingerprint, key: crypto.randomUUID() };
+    sessionStorage.setItem('munasabati_pending_checkout', JSON.stringify(pending));
+    const result = await requestJSON('/api/oms/orders', 'POST', { ...payload, idempotencyKey: pending.key });
+    const order = result.masterOrder;
+    setMultiVendorOrders(previous => [order, ...previous.filter(o => o.id !== order.id)]);
+    sessionStorage.removeItem('munasabati_pending_checkout');
     clearCart();
-
-    return newOrder;
+    window.dispatchEvent(new Event('munasabati-orders-refresh'));
+    return order;
   };
 
   const toggleFavoriteVendor = (vendorId: string) => {

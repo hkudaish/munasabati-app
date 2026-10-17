@@ -15,32 +15,18 @@ export interface OMSNotificationPayload {
   messageAr: string;
 }
 
-export async function sendOMSNotification(
-  payload: OMSNotificationPayload
-): Promise<OMSNotificationRecord> {
-  const record: OMSNotificationRecord = {
-    id: `notif_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
-    orderId: payload.orderId,
-    suborderId: payload.suborderId,
-    recipientPhone: payload.recipientPhone,
-    recipientEmail: payload.recipientEmail,
-    channel: payload.channel,
-    event: payload.event,
-    status: 'SENT',
-    attempts: 1,
-    lastAttemptAt: new Date().toISOString(),
-    createdAt: new Date().toISOString(),
-  };
-
-  try {
-    // Dispatch to channel log (Simulated integrations with SMS/WhatsApp/Email APIs)
-    console.log(`[OMS NOTIFICATION SEND] [${payload.channel}] -> ${payload.recipientPhone}: ${payload.messageAr}`);
-  } catch (err: any) {
-    record.status = 'FAILED';
-    record.errorDetails = err?.message || 'Failed to transmit notification';
-  }
-
-  return record;
+export async function sendOMSNotification(payload: OMSNotificationPayload): Promise<OMSNotificationRecord> {
+  const { prisma } = await import('../db');
+  const row = await prisma.oMSNotificationLog.create({ data: {
+    orderId: payload.orderId, suborderId: payload.suborderId, recipientPhone: payload.recipientPhone,
+    recipientEmail: payload.recipientEmail, channel: payload.channel, event: payload.event,
+    status: payload.channel === 'IN_APP' ? 'SENT' : 'FAILED',
+    errorDetails: payload.channel === 'IN_APP' ? undefined : 'External OMS notification provider is not configured',
+  } });
+  return { ...row, orderId: row.orderId || undefined, suborderId: row.suborderId || undefined,
+    recipientEmail: row.recipientEmail || undefined, channel: row.channel as OMSNotificationRecord['channel'],
+    status: row.status as OMSNotificationRecord['status'], errorDetails: row.errorDetails || undefined,
+    lastAttemptAt: row.lastAttemptAt.toISOString(), createdAt: row.createdAt.toISOString() };
 }
 
 export function generateNotificationText(

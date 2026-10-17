@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import {
@@ -19,9 +19,12 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import type { OMSMasterOrder, OMSSuborder } from '@/lib/oms/types';
+import { ORDER_STATUS_LABELS } from '@/lib/oms/labels';
+import { useApp } from '@/lib/store';
 import { LumaOMSAssistant } from '@/components/ai/LumaOMSAssistant';
 
 export default function CustomerOrderTrackingPage() {
+  const { currentUser } = useApp();
   const params = useParams();
   const id = params?.id as string;
 
@@ -30,30 +33,37 @@ export default function CustomerOrderTrackingPage() {
   const [showLuma, setShowLuma] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  const fetchOrder = async () => {
+  const requestId = useRef(0);
+  const cancelPending = useCallback(() => { requestId.current++; }, []);
+  const fetchOrder = useCallback(async () => {
+    const attempt = ++requestId.current;
     setLoading(true);
     try {
-      const res = await fetch('/api/oms/orders');
+      setMasterOrder(null);
+      const res = await fetch(`/api/oms/orders/${encodeURIComponent(id)}`, { cache: 'no-store' });
       const data = await res.json();
-      if (data.success && data.orders) {
-        const found = data.orders.find(
-          (o: OMSMasterOrder) =>
-            o.id === id ||
-            o.orderNumber === id ||
-            o.suborders.some((s) => s.id === id || s.bookingNumber === id)
-        );
-        if (found) setMasterOrder(found);
-      }
+      if (!res.ok) throw new Error(data.error || 'تعذر تحميل الطلب');
+      if (attempt === requestId.current) setMasterOrder(data.masterOrder);
     } catch (e) {
       console.error('Error fetching order:', e);
     } finally {
-      setLoading(false);
+      if (attempt === requestId.current) setLoading(false);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
-    fetchOrder();
-  }, [id]);
+    void fetchOrder();
+    return cancelPending;
+  }, [fetchOrder, cancelPending, currentUser?.id]);
+
+  const handleCancel = async (suborderId: string) => {
+    const noteAr = prompt('سبب إلغاء الطلب:'); if (!noteAr) return;
+    try {
+      const response = await fetch('/api/oms/orders/transition', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ suborderId, targetState: 'CANCELLED', noteAr }) });
+      const data = await response.json(); if (!response.ok) throw new Error(data.error || 'تعذر الإلغاء');
+      setToastMessage('تم إلغاء الطلب الفرعي'); void fetchOrder();
+    } catch (e) { setToastMessage(e instanceof Error ? e.message : 'تعذر الإلغاء'); }
+  };
 
   const handleCustomerApprove = async (suborderId: string) => {
     try {
@@ -71,7 +81,7 @@ export default function CustomerOrderTrackingPage() {
       if (data.success) {
         setToastMessage('شكراً لك! تم اعتماد استلام الخدمة واكتمال الطلب بنجاح.');
         fetchOrder();
-      }
+      } else { setToastMessage(data.error || data.errorAr || 'تعذر تحديث الطلب'); }
     } catch (e) {
       alert('حدث خطأ أثناء اعتماد الاستلام');
     }
@@ -96,7 +106,7 @@ export default function CustomerOrderTrackingPage() {
       if (data.success) {
         setToastMessage('تم تسجيل ملاحظتك ورفع الطلب إلى فريق العمليات للحل الفوري.');
         fetchOrder();
-      }
+      } else { setToastMessage(data.error || data.errorAr || 'تعذر تحديث الطلب'); }
     } catch (e) {
       alert('حدث خطأ أثناء تسجيل الشكوى');
     }
@@ -173,8 +183,8 @@ export default function CustomerOrderTrackingPage() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2">
             <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center space-y-1">
               <CheckCircle2 className="w-5 h-5 text-emerald-400 mx-auto" />
-              <div className="text-xs font-bold text-white">1. تأكيد الدفع</div>
-              <div className="text-[10px] text-slate-500">تم التأكيد</div>
+              <div className="text-xs font-bold text-white">1. حالة الدفع</div>
+              <div className="text-[10px] text-slate-500">{masterOrder.paymentStatus === 'PAID' ? 'تم تأكيد الدفع' : 'لم يتم تأكيد الدفع'}</div>
             </div>
 
             <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center space-y-1">
@@ -213,7 +223,7 @@ export default function CustomerOrderTrackingPage() {
                 </div>
 
                 <span className="bg-slate-950 text-amber-400 border border-amber-500/30 px-3 py-1 rounded-full text-xs font-bold self-start sm:self-auto">
-                  حالة الخدمة: {sub.omsStatus}
+                  حالة الخدمة: {ORDER_STATUS_LABELS[sub.omsStatus] || 'قيد المتابعة'}
                 </span>
               </div>
 
@@ -237,7 +247,8 @@ export default function CustomerOrderTrackingPage() {
 
               {/* Customer Actions */}
               <div className="flex flex-wrap gap-2 pt-2">
-                {['READY_FOR_DELIVERY', 'DELIVERED'].includes(sub.omsStatus) && (
+                {['AWAITING_ACCEPTANCE','ACCEPTED'].includes(sub.omsStatus) && masterOrder.paymentStatus === 'UNPAID' && <button onClick={() => void handleCancel(sub.id)} className="border border-rose-500/40 text-rose-300 px-4 py-2.5 rounded-xl text-xs font-bold">إلغاء الطلب</button>}
+                {['DELIVERED', 'CUSTOMER_REVIEW'].includes(sub.omsStatus) && (
                   <button
                     onClick={() => handleCustomerApprove(sub.id)}
                     className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs transition"
@@ -246,12 +257,12 @@ export default function CustomerOrderTrackingPage() {
                   </button>
                 )}
 
-                <button
+                {['IN_PROGRESS','DELIVERED'].includes(sub.omsStatus) && <button
                   onClick={() => handleOpenDispute(sub.id)}
                   className="bg-rose-500/20 hover:bg-rose-500 text-rose-300 hover:text-white font-bold px-4 py-2.5 rounded-xl text-xs border border-rose-500/30 transition"
                 >
                   تقديم ملاحظة / فتح نزاع
-                </button>
+                </button>}
               </div>
             </div>
           ))}
