@@ -1,3 +1,5 @@
+import { catalog } from '@/lib/server/commerce-v2/catalog';
+import { GET as optionsGET } from '@/app/api/catalog/options/route';
 import { api,HttpError } from '@/lib/server/http';
 import { previewContext } from '@/lib/server/geo/context';
 import { getVendorsFromDB } from '@/lib/server-db';
@@ -6,6 +8,8 @@ export const dynamic='force-dynamic';
 export const GET=api(async(request,{params})=>{
  const d=await previewContext(params.token),path=params.path.join('/');
  if(path==='geo/context')return d;
+ if(path==='commerce/catalog')return catalog(false,d.snapshot);
+ if(path==='catalog/options'){const r=await optionsGET(request,{});return r.json();}
  if(path==='features')return {features:d.snapshot.services.filter(s=>s.kind==='feature').map(s=>({id:s.id,visible:s.visible,enabled:s.enabled,version:0}))};
  if(path==='auth/session')return {user:d.preview?.visitorType==='guest'?null:{id:'preview-user',name:d.preview?.visitorType==='subscriber'?'مشترك المعاينة':'مستخدم المعاينة',phone:'',role:'client',hasAdminAccess:false,hasSystemAccess:false}};
  if(path==='catalog/vendors')return {vendors:await getVendorsFromDB({strict:true})};

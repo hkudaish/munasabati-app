@@ -56,3 +56,8 @@ next-env.d.ts
 /.next-booking-*/
 /.booking-test-tsconfig-*.json
 /.booking-build-tsconfig.json
+
+# Isolated MD3 commerce checks
+/.next-md3-*/
+/.md3-test-tsconfig-*.json
+/.md3-build-tsconfig.json

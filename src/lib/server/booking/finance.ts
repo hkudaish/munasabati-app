@@ -11,13 +11,13 @@ export async function listFinance(id:string){await requireAdmin();return {entrie
 export async function recordFinance(input:any){
  const user=await requireAdmin();await rateLimit('booking-finance:'+user.id,100);const id=text(input.id,100,true),action=text(input.action,30,true);
  return atomic(async tx=>{
-  let row=await requestRow(tx,id,true);if(input.version!==row.version)throw new HttpError(409,'تغيّر الطلب؛ أعد التحميل');const data={...row.body};
+  let row=await requestRow(tx,id,true);if((await tx.$queryRaw<any[]>`SELECT "id" FROM "CommerceBooking" WHERE "requestId"=${id}`).length)throw new HttpError(409,'سجل التحصيل والاسترداد من الطلب التجاري المرتبط');if(input.version!==row.version)throw new HttpError(409,'تغيّر الطلب؛ أعد التحميل');const data={...row.body};
   const entries=await tx.$queryRaw<any[]>`SELECT * FROM "ServiceFinanceEntry" WHERE "requestId"=${id}`;
   const sum=(kind:string,status='VERIFIED',recipient?:string)=>entries.filter(e=>e.kind===kind&&e.status===status&&(!recipient||e.body.recipientId===recipient)).reduce((s,e)=>s+e.amount,0);
   if(action==='RECORD'){
    const kind=text(input.kind,30,true),reference=text(input.reference,160,true),noteAr=text(input.noteAr,2000,true),evidenceUrl=mediaUrl(input.evidenceUrl);let value;try{value=amount(input.amount);}catch(e:any){throw new HttpError(400,e.message);}if(!value||!evidenceUrl||!['PAYMENT','REFUND','PAYOUT'].includes(kind))throw new HttpError(400,'أدخل نوع العملية ومبلغها وإثبات التحويل البنكي');
    if(!/^[A-Za-z0-9:_/-]{6,160}$/.test(reference))throw new HttpError(400,'مرجع التحويل غير صالح');
-   await lock(tx,'finance-reference:'+reference);
+   await lock(tx,'finance-reference:'+reference);if((await tx.$queryRaw<any[]>`SELECT "id" FROM "CommerceTransfer" WHERE "reference"=${reference}`).length)throw new HttpError(409,'مرجع التحويل مسجل لطلب تجاري');
    const prior=await tx.$queryRaw<any[]>`SELECT * FROM "ServiceFinanceEntry" WHERE "reference"=${reference}`;
    if(prior.length){if(prior[0].requestId!==id||prior[0].amount!==value||prior[0].kind!==kind||prior[0].makerId!==user.id)throw new HttpError(409,'مرجع التحويل مسجل لعملية أخرى');return view(row,user);}
    const recipientId=kind==='PAYOUT'?text(input.recipientId,100,true):row.customerId;

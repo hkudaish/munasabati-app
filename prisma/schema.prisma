@@ -88,6 +88,13 @@ model User {
 
   @@index([phone])
   @@index([role])
+  CommerceService_ownerId CommerceService[] @relation("CommerceService_ownerId")
+  CommerceCart_userId CommerceCart? @relation("CommerceCart_userId")
+  CommerceOrder_customerId CommerceOrder[] @relation("CommerceOrder_customerId")
+  CommercePackage_ownerId CommercePackage[] @relation("CommercePackage_ownerId")
+  CommerceFulfillmentGroup_managerId CommerceFulfillmentGroup[] @relation("CommerceFulfillmentGroup_managerId")
+  CommerceTransfer_makerId CommerceTransfer[] @relation("CommerceTransfer_makerId")
+  CommerceTransfer_checkerId CommerceTransfer[] @relation("CommerceTransfer_checkerId")
 }
 
 // -------------------------------------------------------------
@@ -291,6 +298,7 @@ model Vendor {
   @@index([status])
   @@index([rating])
   @@index([featured])
+  CommerceService_vendorId CommerceService[] @relation("CommerceService_vendorId")
 }
 
 model VendorMetrics {
@@ -376,6 +384,7 @@ model ServiceItem {
   @@index([subcategoryId, artistId])
   @@index([categoryId])
   @@index([price])
+  CommerceService_sourceId CommerceService? @relation("CommerceService_sourceId")
 }
 
 model ServicePackage {
@@ -971,6 +980,7 @@ model ServiceRequest {
   @@index([customerId, createdAt])
   @@index([status, startAt])
   @@index([offeringId, startAt])
+  CommerceBooking_requestId CommerceBooking? @relation("CommerceBooking_requestId")
 }
 model ServiceReservation {
   id String @id
@@ -979,6 +989,8 @@ model ServiceReservation {
   startAt DateTime @db.Timestamptz(3)
   endAt DateTime @db.Timestamptz(3)
   active Boolean @default(true)
+  quantity Int @default(1)
+  expiresAt DateTime? @db.Timestamptz(3)
   @@unique([requestId, resourceKey])
   @@index([resourceKey, active, startAt, endAt])
 }
@@ -1016,4 +1028,172 @@ model ServiceInbox {
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   @@unique([userId, requestId, event])
   @@index([userId, dueAt])
+}
+
+model CommerceService {
+  id String @id
+  sourceId String? @unique
+  ownerId String?
+  vendorId String?
+  body Json
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @default(now()) @db.Timestamptz(3)
+  CommerceOffer_serviceId CommerceOffer[] @relation("CommerceOffer_serviceId")
+  CommerceOrderItem_serviceId CommerceOrderItem[] @relation("CommerceOrderItem_serviceId")
+  sourceIdReference ServiceItem? @relation("CommerceService_sourceId", fields: [sourceId], references: [id], onDelete: Restrict)
+  ownerIdReference User? @relation("CommerceService_ownerId", fields: [ownerId], references: [id], onDelete: Restrict)
+  vendorIdReference Vendor? @relation("CommerceService_vendorId", fields: [vendorId], references: [id], onDelete: Restrict)
+  CommerceRelationship_serviceId CommerceRelationship[] @relation("CommerceRelationship_serviceId")
+  CommerceRelationship_relatedServiceId CommerceRelationship[] @relation("CommerceRelationship_relatedServiceId")
+}
+
+model CommerceOffer {
+  id String @id
+  serviceId String
+  body Json
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @default(now()) @db.Timestamptz(3)
+  serviceIdRelation CommerceService @relation("CommerceOffer_serviceId", fields: [serviceId], references: [id], onDelete: Restrict)
+  CommerceOfferVersion_offerId CommerceOfferVersion[] @relation("CommerceOfferVersion_offerId")
+  CommercePackageItem_offerId CommercePackageItem[] @relation("CommercePackageItem_offerId")
+  CommerceOrderItem_offerId CommerceOrderItem[] @relation("CommerceOrderItem_offerId")
+  @@index([serviceId])
+}
+
+model CommerceOfferVersion {
+  id String @id
+  offerId String
+  version Int
+  snapshot Json
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  offerIdRelation CommerceOffer @relation("CommerceOfferVersion_offerId", fields: [offerId], references: [id], onDelete: Restrict)
+  @@unique([offerId,version])
+}
+
+model CommercePackage {
+  id String @id
+  ownerId String
+  body Json
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @default(now()) @db.Timestamptz(3)
+  CommercePackageItem_packageId CommercePackageItem[] @relation("CommercePackageItem_packageId")
+  CommercePackageVersion_packageId CommercePackageVersion[] @relation("CommercePackageVersion_packageId")
+  CommerceOrderItem_packageId CommerceOrderItem[] @relation("CommerceOrderItem_packageId")
+  ownerIdReference User @relation("CommercePackage_ownerId", fields: [ownerId], references: [id], onDelete: Restrict)
+}
+
+model CommercePackageItem {
+  id String @id
+  packageId String
+  offerId String
+  body Json
+  packageIdRelation CommercePackage @relation("CommercePackageItem_packageId", fields: [packageId], references: [id], onDelete: Restrict)
+  offerIdRelation CommerceOffer @relation("CommercePackageItem_offerId", fields: [offerId], references: [id], onDelete: Restrict)
+}
+
+model CommercePackageVersion {
+  id String @id
+  packageId String
+  version Int
+  snapshot Json
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  packageIdRelation CommercePackage @relation("CommercePackageVersion_packageId", fields: [packageId], references: [id], onDelete: Restrict)
+  @@unique([packageId,version])
+}
+
+model CommerceCart {
+  userId String @id
+  body Json
+  version Int @default(1)
+  updatedAt DateTime @default(now()) @db.Timestamptz(3)
+  userIdReference User @relation("CommerceCart_userId", fields: [userId], references: [id], onDelete: Restrict)
+}
+
+model CommerceOrder {
+  id String @id
+  customerId String
+  number String @unique
+  body Json
+  version Int @default(1)
+  idempotencyKey String @unique
+  requestHash String
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @default(now()) @db.Timestamptz(3)
+  CommerceOrderItem_orderId CommerceOrderItem[] @relation("CommerceOrderItem_orderId")
+  CommerceFulfillmentGroup_orderId CommerceFulfillmentGroup[] @relation("CommerceFulfillmentGroup_orderId")
+  CommerceTransfer_orderId CommerceTransfer[] @relation("CommerceTransfer_orderId")
+  @@index([customerId])
+  customerIdReference User @relation("CommerceOrder_customerId", fields: [customerId], references: [id], onDelete: Restrict)
+}
+
+model CommerceOrderItem {
+  id String @id
+  orderId String
+  serviceId String
+  offerId String
+  packageId String?
+  snapshot Json
+  body Json
+  version Int @default(1)
+  orderIdRelation CommerceOrder @relation("CommerceOrderItem_orderId", fields: [orderId], references: [id], onDelete: Restrict)
+  serviceIdRelation CommerceService @relation("CommerceOrderItem_serviceId", fields: [serviceId], references: [id], onDelete: Restrict)
+  offerIdRelation CommerceOffer @relation("CommerceOrderItem_offerId", fields: [offerId], references: [id], onDelete: Restrict)
+  packageIdRelation CommercePackage? @relation("CommerceOrderItem_packageId", fields: [packageId], references: [id], onDelete: Restrict)
+  CommerceBooking_orderItemId CommerceBooking? @relation("CommerceBooking_orderItemId")
+  @@index([orderId])
+}
+
+model CommerceFulfillmentGroup {
+  id String @id
+  orderId String
+  managerId String
+  body Json
+  orderIdRelation CommerceOrder @relation("CommerceFulfillmentGroup_orderId", fields: [orderId], references: [id], onDelete: Restrict)
+  @@index([managerId])
+  @@unique([orderId,managerId])
+  managerIdReference User @relation("CommerceFulfillmentGroup_managerId", fields: [managerId], references: [id], onDelete: Restrict)
+}
+
+model CommerceBooking {
+  id String @id
+  orderItemId String @unique
+  requestId String @unique
+  status String
+  fulfillmentStatus String @default("NOT_STARTED")
+  body Json
+  orderItemIdRelation CommerceOrderItem @relation("CommerceBooking_orderItemId", fields: [orderItemId], references: [id], onDelete: Restrict)
+  requestIdReference ServiceRequest @relation("CommerceBooking_requestId", fields: [requestId], references: [id], onDelete: Restrict)
+}
+
+model CommerceTransfer {
+  id String @id
+  orderId String
+  kind String
+  status String @default("PENDING")
+  amount Int
+  reference String @unique
+  makerId String
+  checkerId String?
+  body Json
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @default(now()) @db.Timestamptz(3)
+  orderIdRelation CommerceOrder @relation("CommerceTransfer_orderId", fields: [orderId], references: [id], onDelete: Restrict)
+  @@index([orderId])
+  makerIdReference User @relation("CommerceTransfer_makerId", fields: [makerId], references: [id], onDelete: Restrict)
+  checkerIdReference User? @relation("CommerceTransfer_checkerId", fields: [checkerId], references: [id], onDelete: Restrict)
+}
+
+model CommerceRelationship {
+  id String @id
+  serviceId String
+  relatedServiceId String
+  kind String
+  body Json
+  @@index([serviceId])
+  @@unique([serviceId,relatedServiceId,kind])
+  serviceIdReference CommerceService @relation("CommerceRelationship_serviceId", fields: [serviceId], references: [id], onDelete: Restrict)
+  relatedServiceIdReference CommerceService @relation("CommerceRelationship_relatedServiceId", fields: [relatedServiceId], references: [id], onDelete: Restrict)
 }

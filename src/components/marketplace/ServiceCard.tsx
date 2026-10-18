@@ -36,29 +36,8 @@ export default function ServiceCard({ service, onBookNow }: ServiceCardProps) {
   if(geo.loading)return <div className="h-80 rounded-3xl bg-slate-100 animate-pulse"/>;
   if(geo.data?.summary!=='UNKNOWN'&&!allowed&&geo.data?.snapshot.policy.hideUnavailable)return null;
   const handleQuickAdd = () => {
-    if(!allowed)return;
-    const details = ensureServiceDetails(service);
-    const pkg = details.packages[0] || {
-      id: 'basic',
-      nameAr: 'الباقة الأساسية',
-      price: service.price,
-      featuresAr: service.featuresAr,
-      durationHours: 4,
-    };
-
-    addToCart(service, pkg, [], {
-      date: '2026-10-09',
-      time: '18:00',
-      locationCity: service.cityNameAr,
-      notes: 'أضيف من بطاقة الخدمة',
-    });
-
-    setIsAdded(true);
-    setTimeout(() => setIsAdded(false), 2000);
-
-    try {
-      confetti({ particleCount: 40, spread: 50, origin: { y: 0.7 } });
-    } catch {}
+    if (!allowed || geo.data?.preview) return;
+    addToCart(service);
   };
 
   return (
@@ -178,7 +157,7 @@ export default function ServiceCard({ service, onBookNow }: ServiceCardProps) {
                   ? 'bg-emerald-700 text-white'
                   : 'bg-saudi-sand-100 hover:bg-saudi-green-100 text-saudi-green-900'
               }`}
-              title="أضف للسلة"
+              title="اختر عرض الشراء"
             >
               {isAdded ? (
                 <Check className="w-4 h-4 text-white" />

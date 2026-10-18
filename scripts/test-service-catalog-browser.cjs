@@ -30,7 +30,7 @@ module.exports=async function catalogBrowser(base,clientCookie,vendorCookie,arti
  await click('توليد "خطة مناسبتي" وفتح مساحة العمل');await wait(`location.pathname.startsWith('/occasion/')&&document.body.innerText.includes('الخدمات والاختيارات المطلوبة')&&document.body.innerText.includes('محمد عبده')`);
  await send('Page.reload');await wait(`document.body.innerText.includes('محمد عبده')&&document.body.innerText.includes('تجهيز حفلات الزواج كاملة')`);
  await send('Page.navigate',{url:base+'/artists?artist='+artistId});await wait(`document.querySelector('a[href="/service/${serviceId}"]')`);
- await send('Page.navigate',{url:base+'/service/'+serviceId});await wait(`document.body.innerText.includes('محمد عبده')&&Array.from(document.querySelectorAll('button')).some(b=>b.innerText.trim()==='عرض السعر والشروط وطلب الحجز')`);
+ await send('Page.navigate',{url:base+'/service/'+serviceId});await wait(`document.body.innerText.includes('خيارات شراء الخدمة')&&document.body.innerText.includes('لم ينشر مقدم الخدمة عرض شراء معتمداً حتى الآن')`);
  await cookie(vendorCookie);await send('Page.navigate',{url:base+'/vendor/catalog'});await wait(`document.body.innerText.includes('خدمات متجري ومعرض الأعمال')&&document.querySelector('input[type="url"]')`);
  assert.equal(await evaluate(`document.querySelector('input[type="url"]').value`),'https://example.invalid/library');
  await click('+ إضافة خدمة');await wait(`document.querySelector('[aria-labelledby="service-editor-title"]')`);

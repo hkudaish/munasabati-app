@@ -1,3 +1,4 @@
+import { registerLegacyService } from '@/lib/server/commerce-v2/catalog';
 import { prisma } from '@/lib/db';
 import { api, body, HttpError, text } from '@/lib/server/http';
 import { ownVendor, mediaUrl, mediaUrls, serviceData } from '@/lib/server/catalog';
@@ -25,6 +26,7 @@ export const POST = api(async request => {
     await prisma.$transaction(async tx => {
       const result = await tx.serviceItem.updateMany({ where: { id, vendorId: vendor.id }, data: { isPublished: false } });
       if (!result.count) throw new HttpError(404, 'الخدمة غير موجودة');
+      await tx.$executeRaw`UPDATE "CommerceService" SET "body"=jsonb_set("body",'{published}','false'::jsonb),"version"="version"+1 WHERE "id"=${id}`;
       await tx.systemAuditLog.create({ data: { actorId: user.id, action: 'SERVICE_UNPUBLISHED', targetId: id } });
     });
     return { success: true };
@@ -38,6 +40,7 @@ export const POST = api(async request => {
       saved = await tx.serviceItem.findUniqueOrThrow({ where: { id } });
     } else saved = await tx.serviceItem.create({ data: { ...data, vendorId: vendor.id } });
     await tx.systemAuditLog.create({ data: { actorId: user.id, action: id ? 'SERVICE_UPDATED' : 'SERVICE_CREATED', targetId: saved.id } });
+    await registerLegacyService(tx,saved,vendor);
     return saved;
   });
   return { success: true, service };

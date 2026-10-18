@@ -306,7 +306,7 @@ function NavbarContent() {
                     <span>حاسبة التكاليف</span>
                   </Link>
                   <Link
-                    href="/rfq"
+                    href="/commerce"
                     className={`px-3 py-2 rounded-lg transition flex items-center gap-1 ${
                       pathname.startsWith('/rfq') ? 'text-saudi-green-800 font-bold bg-saudi-green-50' : 'hover:text-saudi-green-800 hover:bg-gray-50'
                     }`}
@@ -315,7 +315,7 @@ function NavbarContent() {
                     <span>عروض الأسعار</span>
                   </Link>
                   <Link
-                    href="/bookings"
+                    href="/commerce/orders"
                     className={`px-3 py-2 rounded-lg transition flex items-center gap-1 ${
                       pathname.startsWith('/bookings') ? 'text-saudi-green-800 font-bold bg-saudi-green-50' : 'hover:text-saudi-green-800 hover:bg-gray-50'
                     }`}
@@ -366,32 +366,32 @@ function NavbarContent() {
                     <span>بوابة الموردين</span>
                   </Link>
                   <Link
-                    href="/vendor"
+                    href="/commerce/orders"
                     className="px-3 py-2 rounded-lg hover:text-saudi-green-800 hover:bg-gray-50 transition flex items-center gap-1"
                   >
                     <Calendar className="w-4 h-4 text-saudi-gold-600" />
                     <span>طلبات الحجز المباشرة</span>
                   </Link>
                   <Link
-                    href="/vendor"
+                    href="/commerce/orders"
                     className="px-3 py-2 rounded-lg hover:text-saudi-green-800 hover:bg-gray-50 transition flex items-center gap-1"
                   >
                     <FileText className="w-4 h-4 text-saudi-gold-600" />
                     <span>طلبات عروض الأسعار (RFQ)</span>
                   </Link>
                   <Link
-                    href="/vendor"
+                    href="/commerce/manage"
                     className="px-3 py-2 rounded-lg hover:text-saudi-green-800 hover:bg-gray-50 transition flex items-center gap-1"
                   >
                     <Layers className="w-4 h-4 text-saudi-gold-600" />
                     <span>خدماتي وباقاتي</span>
                   </Link>
                   <Link
-                    href="/vendor"
+                    href="/vendor/catalog"
                     className="px-3 py-2 rounded-lg hover:text-saudi-green-800 hover:bg-gray-50 transition flex items-center gap-1"
                   >
                     <ShieldCheck className="w-4 h-4 text-saudi-green-700" />
-                    <span>التوثيق والتراخيص</span>
+                    <span>بيانات المتجر</span>
                   </Link>
                   <Link
                     href="/marketplace"
@@ -440,7 +440,7 @@ function NavbarContent() {
                     <span>الموردين والاعتماد</span>
                   </Link>
                   <Link
-                    href="/admin?tab=bookings"
+                    href="/commerce/orders"
                     className={`px-3 py-2 rounded-lg transition flex items-center gap-1 ${
                       pathname === '/admin' && currentTab === 'bookings'
                         ? 'text-saudi-green-800 font-bold bg-saudi-green-50'
@@ -451,7 +451,7 @@ function NavbarContent() {
                     <span>الحجوزات والمالية</span>
                   </Link>
                   <Link
-                    href="/admin?tab=services"
+                    href="/commerce/manage"
                     className={`px-3 py-2 rounded-lg transition flex items-center gap-1 ${
                       pathname === '/admin' && currentTab === 'services'
                         ? 'text-saudi-green-800 font-bold bg-saudi-green-50'
@@ -557,7 +557,7 @@ function NavbarContent() {
 
                 {/* Shopping Cart Button */}
                 <Link
-                  href="/cart"
+                  href="/commerce/cart"
                   className="relative flex items-center gap-1.5 bg-saudi-sand-100 hover:bg-saudi-sand-200 text-saudi-green-950 px-2.5 sm:px-3 py-2 rounded-xl text-xs font-bold border border-saudi-sand-300 transition"
                   title="سلة الحجوزات"
                 >
@@ -694,7 +694,7 @@ function NavbarContent() {
                 سوق الخدمات والتجهيزات
               </Link>
               <Link
-                href="/cart"
+                href="/commerce/cart"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="flex items-center justify-between py-2 text-sm font-bold text-saudi-green-900"
               >
@@ -723,14 +723,14 @@ function NavbarContent() {
                 حاسبة تكاليف وميزانية المناسبات
               </Link>
               <Link
-                href="/bookings"
+                href="/commerce/orders"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="block py-2 text-sm font-bold text-gray-800 hover:text-saudi-green-800"
               >
-                حجوزاتي وفواتيري الضريبية
+                طلباتي وحجوزاتي
               </Link>
               <Link
-                href="/rfq"
+                href="/commerce"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="block py-2 text-sm font-bold text-gray-800 hover:text-saudi-green-800"
               >
@@ -797,7 +797,7 @@ function NavbarContent() {
                 الموردين والاعتماد
               </Link>
               <Link
-                href="/admin?tab=bookings"
+                href="/commerce/orders"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`block py-2 text-sm font-bold ${
                   pathname === '/admin' && currentTab === 'bookings' ? 'text-saudi-green-800' : 'text-gray-700'
@@ -806,7 +806,7 @@ function NavbarContent() {
                 الحجوزات والمالية
               </Link>
               <Link
-                href="/admin?tab=services"
+                href="/commerce/manage"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`block py-2 text-sm font-bold ${
                   pathname === '/admin' && currentTab === 'services' ? 'text-saudi-green-800' : 'text-gray-700'

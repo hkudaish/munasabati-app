@@ -156,7 +156,7 @@ export async function transitionOrder(input: Record<string, any>) {
         await requireGeo('item:' + item.serviceId, item.cityId, tx);
         if (bookingInterval(item.scheduledDate, item.scheduledTime || '', item.service.executionDurationHours).start <= Date.now()) throw new HttpError(409, 'انتهى موعد تنفيذ الطلب');
       }
-      const vendorReservations = await tx.$queryRaw<any[]>`SELECT * FROM "ServiceReservation" WHERE "resourceKey" IN (${Prisma.join(resourceKeys)}) AND "active"=true`;
+      const vendorReservations = await tx.$queryRaw<any[]>`SELECT * FROM "ServiceReservation" WHERE "resourceKey" IN (${Prisma.join(resourceKeys)}) AND "active"=true AND ("expiresAt" IS NULL OR "expiresAt">CURRENT_TIMESTAMP)`;
       for (const item of sub.items) {
         const current=bookingInterval(item.scheduledDate,item.scheduledTime||'',Math.max(item.service.executionDurationHours,item.service.packages.find(p=>p.id===item.packageId)?.durationHours??0));
         if(vendorReservations.some(r=>overlaps(current,{start:+new Date(r.startAt),end:+new Date(r.endAt)}))) throw new HttpError(409,'يوجد حجز مؤكد متعارض في التقويم الموحد');
