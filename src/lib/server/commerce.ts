@@ -83,6 +83,8 @@ export async function createOrder(input: Record<string, any>) {
     for (const selection of canonical.items) {
       const service = await tx.serviceItem.findUnique({ where: { id: selection.serviceId }, include: { subcategory: true, artist: true, packages: true, addons: true, availability: true, vendor: { include: { user: true, availability: true } } } });
       if (!service || !service.isPublished || service.subcategory?.isActive === false || service.artist?.enabled === false || service.vendor.status !== 'ACTIVE' || service.vendor.user?.isActive === false) throw new HttpError(409, 'إحدى الخدمات غير متاحة');
+      const configured = await tx.$queryRaw<any[]>`SELECT "id" FROM "ServiceDefinition" WHERE "kind"='OFFERING' AND "body"->>'serviceId'=${service.id} LIMIT 1`;
+      if (configured.length) throw new HttpError(409, 'هذه الخدمة تستخدم إعدادات الحجز التفصيلية؛ افتح صفحة الخدمة ثم إدارة الحجز');
       if (service.cityId !== cityId && !service.vendor.serviceAreas.includes(cityId)) throw new HttpError(409, 'الخدمة لا تغطي المدينة المحددة');
       await requireGeo('item:' + service.id, cityId, tx);
       for (const availability of [service.availability, service.vendor.availability]) {
@@ -133,10 +135,11 @@ export async function transitionOrder(input: Record<string, any>) {
   await rateLimit(`commerce-transition:${user.id}`, 120);
   const suborderId = text(input.suborderId, 100, true), targetState = text(input.targetState, 60, true), noteAr = text(input.noteAr, 2000);
   return transaction(async tx => {
-    const initial = await tx.suborder.findFirst({ where: { OR: [{ id: suborderId }, { bookingNumber: suborderId }], order: orderScope(user) } });
+    const initial = await tx.suborder.findFirst({ where: { OR: [{ id: suborderId }, { bookingNumber: suborderId }], order: orderScope(user) }, include: {items:{include:{service:true}}} });
     if (!initial) throw new HttpError(404, 'الطلب غير موجود');
     // Lock the vendor across dates so overnight bookings cannot race each other.
-    await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`vendor:${initial.vendorId}`}))::text`;
+    const resourceKeys=Array.from(new Set(['vendor:'+initial.vendorId,...initial.items.filter(i=>i.service.artistId).map(i=>'artist:'+i.service.artistId)])).sort();
+    for(const resource of resourceKeys) await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${resource}))::text`;
     const sub = await tx.suborder.findUniqueOrThrow({ where: { id: initial.id }, include: { vendor: true, items: { include: { service: { include: { packages: true } } } }, order: { include: orderInclude } } });
     const admin = ['ADMIN','SUPER_ADMIN'].includes(user.role);
     if (user.role === 'VENDOR' && sub.vendorId !== user.vendorProfile?.id) throw new HttpError(404, 'الطلب غير موجود');
@@ -152,6 +155,11 @@ export async function transitionOrder(input: Record<string, any>) {
       for (const item of sub.items) {
         await requireGeo('item:' + item.serviceId, item.cityId, tx);
         if (bookingInterval(item.scheduledDate, item.scheduledTime || '', item.service.executionDurationHours).start <= Date.now()) throw new HttpError(409, 'انتهى موعد تنفيذ الطلب');
+      }
+      const vendorReservations = await tx.$queryRaw<any[]>`SELECT * FROM "ServiceReservation" WHERE "resourceKey" IN (${Prisma.join(resourceKeys)}) AND "active"=true`;
+      for (const item of sub.items) {
+        const current=bookingInterval(item.scheduledDate,item.scheduledTime||'',Math.max(item.service.executionDurationHours,item.service.packages.find(p=>p.id===item.packageId)?.durationHours??0));
+        if(vendorReservations.some(r=>overlaps(current,{start:+new Date(r.startAt),end:+new Date(r.endAt)}))) throw new HttpError(409,'يوجد حجز مؤكد متعارض في التقويم الموحد');
       }
       const booked = await tx.orderItem.findMany({ where: { suborder: { vendorId: sub.vendorId, id: { not: sub.id }, omsStatus: { in: ['ACCEPTED','IN_PROGRESS','READY_FOR_DELIVERY','DELIVERED','CUSTOMER_REVIEW','PAUSED','AWAITING_CUSTOMER_INFO','EXTENSION_REQUESTED','MODIFICATION_REQUESTED','DISPUTED','CANCEL_REQUESTED'] } } }, include: { service: { include: { packages: true } } } });
       const intervalFor = (item: typeof sub.items[number]) => bookingInterval(item.scheduledDate, item.scheduledTime || '', Math.max(item.service.executionDurationHours, item.service.packages.find(p => p.id === item.packageId)?.durationHours ?? 0));

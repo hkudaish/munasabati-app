@@ -28,14 +28,13 @@ import { useApp } from '@/lib/store';
 import { formatSaudiRiyal, ensureServiceDetails, ensureVendorDetails } from '@/lib/utils';
 import { checkAvailability } from '@/lib/ranking-engine';
 import { ServicePackage, ServiceAddon } from '@/lib/types';
-import confetti from 'canvas-confetti';
 
 export default function ServiceDetailPage() {
   const params = useParams();
   const geo=useGeo();
   const previewPath=usePathname().split('/');
   const router = useRouter();
-  const { services, vendors, reviews, addToCart, setIsAIOpen } = useApp();
+  const { services, vendors, reviews, setIsAIOpen } = useApp();
 
   const serviceId = (params?.id || (previewPath[1]==='coverage-preview'?previewPath[4]:'')) as string;
   const rawService = services.find((s) => s.id === serviceId);
@@ -97,22 +96,9 @@ export default function ServiceDetailPage() {
   };
 
   const handleAddToCart = () => {
-    const available = geo.data?.availability.find(a => a.key === 'item:' + serviceId);
-    if (geo.data?.preview || !available?.available) { setToastMessage(available?.message || 'اختر مدينة مدعومة قبل إضافة الخدمة'); return false; }
-    addToCart(service, selectedPackage, selectedAddons, {
-      date: bookingDate,
-      time: bookingTime,
-      locationCity: service.cityNameAr,
-      notes: bookingNotes,
-    });
-
-    setToastMessage(`تمت إضافة باقة "${selectedPackage.nameAr}" إلى سلتك بنجاح! 🛍️`);
-    setTimeout(() => setToastMessage(null), 3500);
-
-    try {
-      confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
-    } catch {}
-    return true;
+    if (geo.data?.preview) { setToastMessage('المعاينة للعرض فقط ولا تسمح بإرسال طلبات فعلية'); return; }
+    try { sessionStorage.setItem('booking-selection',JSON.stringify({serviceId,date:bookingDate,time:bookingTime,packageId:selectedPackage.id,options:selectedAddons.map(a=>({id:a.id,quantity:1})),notes:bookingNotes,cityId:geo.data?.selection.cityId})); } catch {}
+    router.push('/bookings/manage?serviceId='+encodeURIComponent(serviceId));
   };
 
   return (
@@ -187,7 +173,7 @@ export default function ServiceDetailPage() {
               {service.instantBooking && (
                 <span className="bg-emerald-100 text-emerald-800 font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
                   <Zap className="w-3 h-3 fill-current" />
-                  حجز فوري ومؤكد
+                  طلب الحجز وفق التوفر والموافقات
                 </span>
               )}
             </div>
@@ -422,21 +408,7 @@ export default function ServiceDetailPage() {
               )}
             </div>
 
-            {/* Deposit Breakdown */}
-            <div className="space-y-2 text-xs text-gray-600 border-t border-b border-saudi-sand-200 py-3">
-              <div className="flex justify-between">
-                <span>عربون تأكيد الحجز (30%):</span>
-                <span className="font-bold text-saudi-green-900">
-                  {formatSaudiRiyal(Math.round(currentTotalPrice * 0.3))}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span>المتبقي عند التنفيذ:</span>
-                <span className="font-bold text-gray-800">
-                  {formatSaudiRiyal(currentTotalPrice - Math.round(currentTotalPrice * 0.3))}
-                </span>
-              </div>
-            </div>
+            <p className="text-xs text-gray-600 border-y py-3 leading-6">تظهر قيمة الخدمة والضريبة والدفعات وشروط الإلغاء حسب إعداداتها في الخطوة التالية. التوفر النهائي يخضع للتقويم والموافقات المطلوبة.</p>
 
             {/* CTA Buttons */}
             <div className="space-y-2">
@@ -445,15 +417,15 @@ export default function ServiceDetailPage() {
                 className="w-full py-4 bg-gradient-to-r from-saudi-green-800 to-saudi-green-950 hover:from-saudi-green-900 hover:to-black text-white font-bold rounded-2xl text-sm shadow-xl shadow-saudi-green-900/20 flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99] transition"
               >
                 <ShoppingBag className="w-4 h-4 text-saudi-gold-400" />
-                <span>أضف إلى السلة</span>
+                <span>إعداد طلب الخدمة</span>
               </button>
 
               <button
-                onClick={() => { if (handleAddToCart()) router.push('/checkout'); }}
+                onClick={handleAddToCart}
                 className="w-full py-3 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-bold rounded-2xl text-xs flex items-center justify-center gap-2 transition"
               >
                 <Zap className="w-4 h-4" />
-                <span>متابعة طلب الحجز</span>
+                <span>عرض السعر والشروط وطلب الحجز</span>
               </button>
             </div>
 

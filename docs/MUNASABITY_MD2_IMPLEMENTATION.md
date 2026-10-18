@@ -122,3 +122,7 @@ Execution overlap uses the longer of the catalog service duration and selected p
 ## Catalog implementation update — 18 October 2026
 
 The subsequent catalog change adds 13 editable subcategories, 22 artist names, saved occasion service/artist preferences, supplier-owned service create/edit/drafts/unpublishing, supplier photo/video/library URLs, licensed audio preview metadata, customer artist/service discovery and request booking through the existing order engine. See [the catalog guide](SERVICE_CATALOG.md). Direct file uploads/object storage, payment integration and external proof of artist representation remain outside this update; seeded names alone do not create bookable offers.
+
+## تحديث 18 أكتوبر: إعداد الخدمات والحجوزات والتسويات
+
+أضيف محرك إعداد مستقل للخدمات والأشخاص والجهات المخولة، مع وراثة السياسات والتسعير بالهللة والتوفر وحجز الموارد المتزامن وإعادة الجدولة والموافقات والدفعات. أضيفت دورة مطابقة بنكية مستقلة مع فصل تسجيل التحويل عن اعتماده والاسترداد والتسوية، وإشعارات وتذكيرات داخل المنصة. التعريفات والحالات ومراجعة الأقسام ومتطلبات التسويات وحدود التكامل موثقة في `docs/CONFIGURABLE_BOOKINGS.md`. لا تُصنف الطلبات القديمة تلقائياً كحجوزات مؤكدة، ولا يُفترض تفعيل بوابة الدفع أو إرسال الرسائل الخارجية.

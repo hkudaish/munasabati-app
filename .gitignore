@@ -51,3 +51,8 @@ next-env.d.ts
 /.next-catalog-*/
 /.catalog-test-tsconfig-*.json
 /.catalog-build-tsconfig.json
+
+# Isolated unified booking checks
+/.next-booking-*/
+/.booking-test-tsconfig-*.json
+/.booking-build-tsconfig.json

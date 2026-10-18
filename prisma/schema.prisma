@@ -943,3 +943,77 @@ model AuditLog {
   @@index([createdAt])
 }
 
+
+// Configuration-driven booking domain. Financial amounts are integer halalas.
+model ServiceDefinition {
+  id String @id
+  kind String
+  body Json
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @default(now()) @db.Timestamptz(3)
+  @@index([kind])
+}
+model ServiceRequest {
+  id String @id
+  customerId String
+  offeringId String
+  status String
+  cityId String
+  startAt DateTime @db.Timestamptz(3)
+  endAt DateTime @db.Timestamptz(3)
+  body Json
+  version Int @default(1)
+  idempotencyKey String @unique
+  requestHash String
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @default(now()) @db.Timestamptz(3)
+  @@index([customerId, createdAt])
+  @@index([status, startAt])
+  @@index([offeringId, startAt])
+}
+model ServiceReservation {
+  id String @id
+  requestId String
+  resourceKey String
+  startAt DateTime @db.Timestamptz(3)
+  endAt DateTime @db.Timestamptz(3)
+  active Boolean @default(true)
+  @@unique([requestId, resourceKey])
+  @@index([resourceKey, active, startAt, endAt])
+}
+model ServiceRequestEvent {
+  id String @id
+  requestId String
+  actorId String
+  action String
+  body Json
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  @@index([requestId, createdAt])
+}
+model ServiceFinanceEntry {
+  id String @id
+  requestId String
+  kind String
+  status String @default("PENDING")
+  amount Int
+  reference String @unique
+  makerId String
+  checkerId String?
+  body Json
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @default(now()) @db.Timestamptz(3)
+  @@index([requestId, status])
+}
+model ServiceInbox {
+  id String @id
+  userId String
+  requestId String
+  event String
+  dueAt DateTime @default(now()) @db.Timestamptz(3)
+  readAt DateTime? @db.Timestamptz(3)
+  body Json
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  @@unique([userId, requestId, event])
+  @@index([userId, dueAt])
+}
