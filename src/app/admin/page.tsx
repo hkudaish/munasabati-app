@@ -703,7 +703,7 @@ function AdminDashboardContent() {
                         <img src={v.logo} alt={v.businessName} className="w-8 h-8 rounded-xl object-cover" />
                         <div>
                           <span>{v.businessName}</span>
-                          <span className="block text-caption2 text-gray-500 font-normal">{v.contactPhone}</span>
+                          <span className="block text-caption2 text-gray-500 font-normal"><bdi dir="ltr">{v.contactPhone}</bdi></span>
                         </div>
                       </td>
                       <td className="p-3.5 text-gray-600">
@@ -965,7 +965,7 @@ function AdminDashboardContent() {
 
                     <h5 className="text-sm font-bold text-gray-900">{b.serviceTitleAr}</h5>
                     <p className="text-xs text-gray-500">
-                      العميل: <strong className="text-gray-800">{b.customerName}</strong> ({b.customerPhone}) • المورد: <strong className="text-saudi-green-900">{b.vendorName}</strong> • التاريخ: {b.date}
+                      العميل: <strong className="text-gray-800">{b.customerName}</strong> (<bdi dir="ltr">{b.customerPhone}</bdi>) • المورد: <strong className="text-saudi-green-900">{b.vendorName}</strong> • التاريخ: {b.date}
                     </p>
                   </div>
 

@@ -312,13 +312,13 @@ export default function HomePage() {
                 <Link
                   key={occ.id}
                   href={`/plan?type=${occ.id}`}
-                  className="group bg-white rounded-2xl border border-saudi-sand-300 overflow-hidden shadow-card hover:border-saudi-gold-500 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
+                  className="group bg-white rounded-2xl border border-saudi-sand-300 overflow-hidden shadow-card hover:border-saudi-gold-500 hover:shadow-xl hover:-translate-y-1 transition duration-300 flex flex-col"
                 >
                   <div className="relative h-28 w-full bg-gray-100 overflow-hidden">
                     <img
                       src={occ.coverImage}
                       alt={occ.nameAr}
-                      className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                     <span className="absolute bottom-2 right-2 text-white font-bold text-xs font-cairo">
@@ -969,7 +969,7 @@ export default function HomePage() {
                         السجل التجاري: <strong className="font-mono">{vendor.crNumber || 'تحت التدقيق'}</strong>
                       </div>
                       <div>
-                        رقم الاتصال: <span className="font-mono">{vendor.contactPhone}</span>
+                        رقم الاتصال: <span className="font-mono dir-ltr inline-block">{vendor.contactPhone}</span>
                       </div>
                     </div>
                   </div>

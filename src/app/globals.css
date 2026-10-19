@@ -170,3 +170,30 @@ html {
   color: #6b7280;
   opacity: 1;
 }
+
+/* Motion: strong ease-out for UI feedback (the built-in CSS easings are too weak). */
+:root {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Every button acknowledges the press (HIG: "always include a press state for a custom button"). */
+button:not(:disabled):not([data-no-press]),
+[role='button']:not([aria-disabled='true']):not([data-no-press]) {
+  transition: scale 120ms var(--ease-out);
+}
+button:not(:disabled):not([data-no-press]):active,
+[role='button']:not([aria-disabled='true']):not([data-no-press]):active {
+  scale: 0.97;
+}
+
+/* Numbers, phone numbers and emails inside Arabic text must keep their own left-to-right order.
+   (Tailwind has no dir-ltr utility; this makes the class used across the app actually work.) */
+.dir-ltr {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* Long unbreakable user content (emails, long hyphenated names) wraps instead of overflowing. */
+body {
+  overflow-wrap: break-word;
+}

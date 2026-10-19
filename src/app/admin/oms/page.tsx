@@ -204,7 +204,7 @@ export default function OMSAdminCommandCenter() {
     <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8 font-sans" dir="rtl">
       {/* Toast Alert */}
       {toastMessage && (
-        <div className="fixed top-6 left-6 z-50 bg-amber-500 text-slate-950 font-bold px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3 animate-bounce">
+        <div className="fixed top-6 left-6 z-50 bg-amber-500 text-slate-950 font-bold px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3 animate-slide-up">
           <Bell className="w-5 h-5" />
           <span>{toastMessage}</span>
         </div>
@@ -510,7 +510,7 @@ export default function OMSAdminCommandCenter() {
 
                         <td className="p-4">
                           <div className="font-semibold text-white">{master.customerName}</div>
-                          <div className="text-caption2 text-slate-400">{master.customerPhone} | {master.cityNameAr}</div>
+                          <div className="text-caption2 text-slate-400"><bdi dir="ltr">{master.customerPhone}</bdi> | {master.cityNameAr}</div>
                           <div className="text-caption2 text-amber-400">{master.eventDate}</div>
                         </td>
 

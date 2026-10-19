@@ -408,7 +408,7 @@ export default function CheckoutPage() {
           <div className="bg-saudi-sand-50 rounded-2xl p-4 text-xs text-right space-y-2 border border-saudi-sand-200">
             <div className="flex justify-between">
               <span className="text-gray-500">صاحب الحجز:</span>
-              <span className="font-bold text-gray-900">{customerName} ({customerPhone})</span>
+              <span className="font-bold text-gray-900">{customerName} (<bdi dir="ltr">{customerPhone}</bdi>)</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-500">الموعد والموقع:</span>
