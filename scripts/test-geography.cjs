@@ -13,6 +13,7 @@ fs.writeFileSync(testTsconfig,fs.readFileSync('tsconfig.json'));
 const env={...process.env,DATABASE_URL:url.toString(),NEXT_TEST_DIST_DIR:undefined,NEXT_TEST_TSCONFIG:testTsconfig,NODE_ENV:'production',NEXT_PUBLIC_APP_URL:'http://localhost:3101'};
 const prisma=new PrismaClient({datasourceUrl:url.toString()});let server,logs='';
 const base='http://localhost:3101';
+const futureDate=new Date(Date.now()+30*864e5).toISOString().slice(0,10);
 async function call(route,method='GET',data,cookie) {
  const r=await fetch(base+route,{method,headers:{...(data===undefined?{}:{'Content-Type':'application/json'}),...(cookie?{Cookie:cookie}:{})},body:data===undefined?undefined:JSON.stringify(data)});
  const value=await r.json();return{status:r.status,data:value,cookie:r.headers.get('set-cookie')?.split(';')[0]};
@@ -54,7 +55,7 @@ async function call(route,method='GET',data,cookie) {
  assert.equal((await call('/api/geo/authorize','POST',{key:'item:service-one',cityId:'riyadh'})).status,200);
  assert.equal((await change({action:'publish',id:categoryDraft.data.draft.id,version:categoryDraft.data.draft.version})).status,200);
  assert.equal((await call('/api/geo/authorize','POST',{key:'item:service-one',cityId:'riyadh'})).status,403);
- const categoryOrderBlocked=await call('/api/oms/orders','POST',{cartGroups:[{vendorId:vendor.id,items:[{serviceId:'service-one',cityId:'riyadh'}]}],customerInfo:{customerName:'Test',customerPhone:'0500000015',cityId:'riyadh'}},a.cookie);assert.equal(categoryOrderBlocked.status,403);
+ const categoryOrderBlocked=await call('/api/oms/orders','POST',{idempotencyKey:'geo-category-'+Date.now(),cartGroups:[{vendorId:vendor.id,items:[{serviceId:'service-one',cityId:'riyadh'}]}],customerInfo:{customerName:'Test',customerPhone:'0500000015',cityId:'riyadh',eventDate:futureDate,eventTime:'20:00',venueName:'Test venue'}},a.cookie);assert.equal(categoryOrderBlocked.status,403,JSON.stringify(categoryOrderBlocked.data));
  assert.equal((await prisma.geoRule.findUniqueOrThrow({where:{cityId_categoryId:{cityId:'riyadh',categoryId:'test'}}})).status,'UNAVAILABLE');
  const extra=await prisma.serviceItem.create({data:{id:'service-category-new',vendorId:vendor.id,categoryId:'test',cityId:'riyadh',titleAr:'خدمة جديدة في التصنيف',descriptionAr:'اختبار',price:100}});
  assert.equal((await call('/api/geo/authorize','POST',{key:'item:'+extra.id,cityId:'riyadh'})).status,403);await prisma.serviceItem.delete({where:{id:extra.id}});
@@ -76,7 +77,7 @@ async function call(route,method='GET',data,cookie) {
  assert.equal((await call(`/api/coverage-preview/${previewId}/oms/orders`,'POST',{},a.cookie)).status,403);assert.equal(await prisma.geoPreference.count(),preferencesBefore);
  assert.equal((await change({action:'publish',id:draft.id,version:draft.version})).status,200);
  assert.equal((await call('/api/geo/authorize','POST',{key:'item:service-one',cityId:'riyadh'})).status,403);
- const directOrder=await call('/api/oms/orders','POST',{cartGroups:[{vendorId:vendor.id,items:[{serviceId:'service-one',cityId:'riyadh'}]}],customerInfo:{customerName:'Test',customerPhone:'0500000015',cityId:'riyadh'}},a.cookie);assert.equal(directOrder.status,403,JSON.stringify(directOrder.data));
+ const directOrder=await call('/api/oms/orders','POST',{idempotencyKey:'geo-direct-'+Date.now(),cartGroups:[{vendorId:vendor.id,items:[{serviceId:'service-one',cityId:'riyadh'}]}],customerInfo:{customerName:'Test',customerPhone:'0500000015',cityId:'riyadh',eventDate:futureDate,eventTime:'20:00',venueName:'Test venue'}},a.cookie);assert.equal(directOrder.status,403,JSON.stringify(directOrder.data));
  const stop=await change({action:'saveDraft',name:'إيقاف المدينة',changes:[{type:'city',id:'riyadh',enabled:false}]});assert.equal((await change({action:'publish',id:stop.data.draft.id,version:stop.data.draft.version})).status,200);
  assert.equal((await call('/api/geo/context','GET',undefined,locationCookie)).data.summary,'NONE');assert.equal((await prisma.multiVendorOrder.findUniqueOrThrow({where:{id:order.id}})).status,'confirmed');
  assert.equal((await call('/api/invitations/'+guestCode,'POST',{status:'confirmed',companionCount:0})).status,200);
