@@ -89,6 +89,8 @@ export default function InspirationPage() {
 
                 <button
                   onClick={() => handleToggleLike(post.id)}
+                  aria-label={isLiked ? 'إزالة الإعجاب' : 'إعجاب'}
+                  aria-pressed={isLiked}
                   className="absolute bottom-3 left-3 w-9 h-9 rounded-full bg-black/50 backdrop-blur-md text-white flex items-center justify-center hover:scale-110 active:scale-95 transition"
                 >
                   <Heart

@@ -235,6 +235,7 @@ function NavbarContent() {
                 </button>
                 <button
                   onClick={() => openOnboarding()}
+                  aria-label="تسجيل الدخول"
                   className="text-gray-300 hover:text-white px-2 py-1 rounded text-xs font-bold transition flex items-center gap-1"
                 >
                   <LogIn className="w-3 h-3" />
@@ -628,6 +629,8 @@ function NavbarContent() {
             {/* Mobile menu button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label={isMobileMenuOpen ? 'إغلاق القائمة' : 'فتح القائمة'}
+              aria-expanded={isMobileMenuOpen}
               className="lg:hidden p-2 text-gray-700 hover:text-saudi-green-800 rounded-lg"
             >
               {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
