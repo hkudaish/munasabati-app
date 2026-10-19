@@ -126,11 +126,11 @@ export default function HomePage() {
       {/* =========================================================================
           ROLE CONTEXT & FILTER BAR (عرض مخصص حسب نوع الحساب النشط)
       ========================================================================= */}
+      {currentRole !== 'client' && (
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
         <div className="bg-gradient-to-r from-saudi-green-950 via-saudi-green-900 to-saudi-green-950 border border-saudi-gold-500/30 rounded-2xl p-3.5 sm:p-4 text-white shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-saudi-gold-500/20 border border-saudi-gold-400/40 flex items-center justify-center shrink-0">
-              {currentRole === 'client' && <Sparkles className="w-5 h-5 text-saudi-gold-300" />}
               {currentRole === 'vendor' && <Store className="w-5 h-5 text-saudi-gold-300" />}
               {currentRole === 'admin' && <ShieldCheck className="w-5 h-5 text-saudi-gold-300" />}
             </div>
@@ -140,7 +140,6 @@ export default function HomePage() {
                   طريقة العرض المخصصة حالياً:
                 </span>
                 <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-black bg-saudi-gold-500 text-saudi-green-950 shadow-sm">
-                  {currentRole === 'client' && 'صاحب المناسبة (العميل)'}
                   {currentRole === 'vendor' && 'مورد ومزود خدمات معتمد'}
                   {currentRole === 'admin' && 'إدارة المنصة المركزية'}
                 </span>
@@ -151,59 +150,14 @@ export default function HomePage() {
                 )}
               </div>
               <p className="text-xs text-gray-300 mt-0.5 font-tajawal">
-                {currentRole === 'client' && 'يتم عرض خدمات التخطيط، باقات المناسبات، حاسبة الميزانية، وتصفح الموردين المعتمدين.'}
                 {currentRole === 'vendor' && 'يتم عرض فرص طلبات التسعير (RFQs)، إدارة الخدمات، جدول الحجوزات، وأدوات نمو المورد.'}
                 {currentRole === 'admin' && 'يتم عرض مؤشرات أداء المنصة، طلبات توثيق السجلات، تدقيق الخدمات، وسجل المعاملات.'}
               </p>
             </div>
           </div>
-
-          {/* Quick role changer shortcut */}
-          <div className="flex items-center gap-1.5 self-end md:self-center shrink-0 bg-black/30 p-1 rounded-xl border border-white/10">
-            <span className="text-xs text-gray-300 px-2 font-medium">تبديل المنظور:</span>
-            <button
-              onClick={() => switchRole('client')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition ${
-                currentRole === 'client'
-                  ? 'bg-saudi-gold-500 text-saudi-green-950 shadow-sm'
-                  : 'text-gray-300 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              عميل
-            </button>
-            <button
-              onClick={() => {
-                const res = switchRole('vendor');
-                if (!res.allowed) {
-                  openOnboarding('vendor');
-                }
-              }}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition ${
-                currentRole === 'vendor'
-                  ? 'bg-saudi-gold-500 text-saudi-green-950 shadow-sm'
-                  : 'text-gray-300 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              مورد
-            </button>
-            <button
-              onClick={() => {
-                const res = switchRole('admin');
-                if (!res.allowed) {
-                  openOnboarding();
-                }
-              }}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition ${
-                currentRole === 'admin'
-                  ? 'bg-saudi-gold-500 text-saudi-green-950 shadow-sm'
-                  : 'text-gray-300 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              إدارة
-            </button>
-          </div>
         </div>
       </section>
+      )}
 
       {/* =========================================================================
           VIEW A: CUSTOMER / CLIENT (صاحب المناسبة)
@@ -233,7 +187,7 @@ export default function HomePage() {
                   </span>
                 </h1>
                 <p className="text-sm sm:text-base text-gray-300 leading-relaxed max-w-2xl font-tajawal">
-                  من الفكرة وحتى آخر ضيف — كل تجهيزات مناسبتك في مكان واحد: قاعات، ضيافة سعودية، كوش وتنسيق، مصورين، باقات جاهزة، وحجز فوري موثق.
+                  من الفكرة وحتى آخر ضيف — كل تجهيزات مناسبتك في مكان واحد: قاعات، ضيافة سعودية، كوش وتنسيق، مصورين، باقات جاهزة، وطلب موثّق يؤكده المورد.
                 </p>
               </div>
 
@@ -248,28 +202,12 @@ export default function HomePage() {
                 </Link>
 
                 <Link
-                  href="/calculator"
-                  className="px-5 py-3.5 bg-white/10 hover:bg-white/20 border border-saudi-gold-400/40 text-saudi-gold-300 font-bold rounded-2xl text-sm backdrop-blur-md flex items-center gap-2 transition"
-                >
-                  <DollarSign className="w-4 h-4 text-saudi-gold-400" />
-                  <span>حاسبة الميزانية الذكية</span>
-                </Link>
-
-                <Link
                   href="/rfq"
                   className="px-5 py-3.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold rounded-2xl text-sm backdrop-blur-md flex items-center gap-2 transition"
                 >
                   <FileText className="w-4 h-4 text-saudi-gold-300" />
                   <span>اطلب عروض أسعار (RFQ)</span>
                 </Link>
-
-                <FeatureContent id="luma"><button
-                  onClick={() => setIsAIOpen(true)}
-                  className="px-5 py-3.5 bg-white/5 hover:bg-white/15 border border-white/20 text-white font-bold rounded-2xl text-sm backdrop-blur-md flex items-center gap-2 transition"
-                >
-                  <Sparkles className="w-4 h-4 text-saudi-gold-300" />
-                  <span>المساعد الذكي ({adminConfig.aiAssistantNameAr})</span>
-                </button></FeatureContent>
               </div>
 
               {/* Trust stats row */}
@@ -284,7 +222,7 @@ export default function HomePage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-saudi-gold-400" />
-                  <span>تغطية فورية في {cities.length} مدن سعودية</span>
+                  <span>تغطية في {cities.length} مدن سعودية</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <HeartHandshake className="w-4 h-4 text-saudi-gold-400" />

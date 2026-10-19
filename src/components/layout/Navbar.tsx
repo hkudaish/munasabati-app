@@ -64,6 +64,10 @@ function NavbarContent() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const activeCityObj = cities.find((c) => c.id === selectedCity) || cities[0];
+  // Role switching is for accounts that actually hold more than one role.
+  const canUseVendor = !!currentUser && (currentUser.role === 'vendor' || !!currentUser.vendorId);
+  const canUseAdmin = !!currentUser && (currentUser.role === 'admin' || !!currentUser.hasAdminAccess || !!currentUser.hasSystemAccess);
+  const showRoleSwitcher = canUseVendor || canUseAdmin;
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-saudi-sand-200 shadow-sm">
@@ -75,6 +79,7 @@ function NavbarContent() {
           {/* Role Switcher & Account Access */}
           <div className="flex items-center gap-2 sm:gap-4">
             {/* Visual Segmented Role Switcher matching reference image */}
+            {showRoleSwitcher && (
             <div className="flex items-center gap-1.5 sm:gap-2">
               <span className="text-gray-300 text-xs sm:text-xs font-medium hidden md:inline">عرض بصفتك:</span>
               <div className="bg-saudi-green-950/90 p-0.5 rounded-lg border border-saudi-gold-500/30 flex items-center gap-0.5 sm:gap-1 shadow-inner">
@@ -97,7 +102,7 @@ function NavbarContent() {
                 </button>
 
                 {/* 2. Supplier Option */}
-                <button
+                {canUseVendor && (<button
                   onClick={() => {
                     const res = switchRole('vendor');
                     if (res.allowed && pathname === '/admin') {
@@ -113,10 +118,10 @@ function NavbarContent() {
                 >
                   <Store className="w-3.5 h-3.5" />
                   <span>بوابة الموردين</span>
-                </button>
+                </button>)}
 
                 {/* 3. Admin Option (elevated gold badge if active or admin) */}
-                <button
+                {canUseAdmin && (<button
                   onClick={() => {
                     const res = switchRole('admin');
                     if (res.allowed && pathname === '/vendor') {
@@ -132,9 +137,10 @@ function NavbarContent() {
                 >
                   <ShieldCheck className="w-3.5 h-3.5" />
                   <span>لوحة الإدارة</span>
-                </button>
+                </button>)}
               </div>
             </div>
+            )}
 
             {/* User Profile or Register/Login Button */}
             {currentUser ? (
@@ -307,7 +313,7 @@ function NavbarContent() {
                     <span>حاسبة التكاليف</span>
                   </Link>
                   <Link
-                    href="/commerce"
+                    href="/rfq"
                     className={`px-3 py-2 rounded-lg transition flex items-center gap-1 ${
                       pathname.startsWith('/rfq') ? 'text-saudi-green-800 font-bold bg-saudi-green-50' : 'hover:text-saudi-green-800 hover:bg-gray-50'
                     }`}
@@ -324,33 +330,38 @@ function NavbarContent() {
                     <ShieldCheck className="w-4 h-4 text-saudi-green-700" />
                     <span>حجوزاتي وفواتيري</span>
                   </Link>
-                  <Link
-                    href="/zaffah"
-                    className={`px-3 py-2 rounded-lg transition flex items-center gap-1 ${
-                      pathname.startsWith('/zaffah') ? 'text-saudi-green-800 font-bold bg-saudi-green-50' : 'hover:text-saudi-green-800 hover:bg-gray-50'
-                    }`}
-                  >
-                    <Music className="w-4 h-4 text-saudi-gold-600" />
-                    <span>الزفات والفنون</span>
-                  </Link>
-                  <Link
-                    href="/inspiration"
-                    className={`px-3 py-2 rounded-lg transition flex items-center gap-1 ${
-                      pathname.startsWith('/inspiration') ? 'text-saudi-green-800 font-bold bg-saudi-green-50' : 'hover:text-saudi-green-800 hover:bg-gray-50'
-                    }`}
-                  >
-                    <Lightbulb className="w-4 h-4 text-saudi-gold-600" />
-                    <span>إلهام</span>
-                  </Link>
-                  <Link
-                    href="/scan"
-                    className={`px-3 py-2 rounded-lg transition flex items-center gap-1 ${
-                      pathname.startsWith('/scan') ? 'text-saudi-green-800 font-bold bg-saudi-green-50' : 'hover:text-saudi-green-800 hover:bg-gray-50'
-                    }`}
-                  >
-                    <QrCode className="w-4 h-4 text-saudi-green-700" />
-                    <span>ماسح الدخول</span>
-                  </Link>
+                  <details className="relative">
+                    <summary className="flex cursor-pointer list-none items-center gap-1 rounded-lg px-3 py-2 transition hover:bg-gray-50 hover:text-saudi-green-800 [&::-webkit-details-marker]:hidden">
+                      <span>المزيد</span>
+                      <ChevronDown className="w-3.5 h-3.5" />
+                    </summary>
+                    <div className="absolute right-0 top-full z-50 mt-1 w-52 rounded-2xl border border-gray-100 bg-white p-1.5 shadow-xl">
+                      <Link
+                        href="/zaffah"
+                        onClick={(e) => e.currentTarget.closest('details')?.removeAttribute('open')}
+                        className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition ${pathname.startsWith('/zaffah') ? 'bg-saudi-green-50 font-bold text-saudi-green-800' : 'hover:bg-gray-50 hover:text-saudi-green-800'}`}
+                      >
+                        <Music className="w-4 h-4 text-saudi-gold-600" />
+                        <span>الزفات والفنون</span>
+                      </Link>
+                      <Link
+                        href="/inspiration"
+                        onClick={(e) => e.currentTarget.closest('details')?.removeAttribute('open')}
+                        className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition ${pathname.startsWith('/inspiration') ? 'bg-saudi-green-50 font-bold text-saudi-green-800' : 'hover:bg-gray-50 hover:text-saudi-green-800'}`}
+                      >
+                        <Lightbulb className="w-4 h-4 text-saudi-gold-600" />
+                        <span>إلهام</span>
+                      </Link>
+                      <Link
+                        href="/scan"
+                        onClick={(e) => e.currentTarget.closest('details')?.removeAttribute('open')}
+                        className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition ${pathname.startsWith('/scan') ? 'bg-saudi-green-50 font-bold text-saudi-green-800' : 'hover:bg-gray-50 hover:text-saudi-green-800'}`}
+                      >
+                        <QrCode className="w-4 h-4 text-saudi-gold-600" />
+                        <span>ماسح الدخول</span>
+                      </Link>
+                    </div>
+                  </details>
                 </>
               )}
 
