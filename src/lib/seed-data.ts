@@ -176,7 +176,7 @@ export const OCCASION_TYPES: OccasionType[] = [
     categoryTag: 'family',
     descriptionAr: 'فرحة قدوم المولود الجديد مع أرق الديكورات وألذ التوزيعات',
     popular: true,
-    coverImage: 'https://images.unsplash.com/photo-1555252333-978fead06c00?w=800&auto=format&fit=crop&q=80',
+    coverImage: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800&auto=format&fit=crop&q=80',
     color: '#2B6CB0',
     suggestedServiceCategories: ['decor', 'hospitality', 'giveaways', 'cake', 'invitations'],
     defaultChecklist: [

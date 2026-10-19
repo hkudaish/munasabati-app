@@ -15,6 +15,7 @@ import Footer from '@/components/layout/Footer';
 import LumaAIDrawer from '@/components/ai/LumaAIDrawer';
 import UserOnboardingModal from '@/components/common/UserOnboardingModal';
 import Toaster from '@/components/common/Toaster';
+import ImageFallback from '@/components/common/ImageFallback';
 
 const tajawal = Tajawal({
   subsets: ['arabic'],
@@ -64,6 +65,7 @@ export default async function RootLayout({
           <SiteChrome><FeatureContent id="luma"><LumaAIDrawer /></FeatureContent></SiteChrome>
           <UserOnboardingModal />
           <Toaster />
+          <ImageFallback />
           <SiteChrome><MobileBottomNav /><Footer /></SiteChrome>
         </AppProvider></FeatureProvider></GeoProvider>
       </body>
