@@ -30,7 +30,13 @@ it must not create a parallel order system.
    status `INVITED | DECLINED | QUOTED | EXPIRED`.
 3. **`RfqQuote`**: vendor-authored, immutable once submitted: line items, setup/transport fees, VAT (all
    halalas), delivery notes, `validUntil`, status `SUBMITTED | ACCEPTED | DECLINED | EXPIRED | WITHDRAWN`.
-4. **Acceptance** (single transaction, idempotent):
+4. **`RfqShare`** (friends and family): the owner creates a share link or invites people by phone/email
+   (WhatsApp links follow the existing invitation-link pattern). Each share has a role `VIEWER`, an expiry
+   (default: the RFQ's `closesAt`), and can be revoked at any time. A viewer needs no vendor or admin rights.
+5. **`RfqOpinion`**: a viewer's reaction to one quote (👍 / 👎 or a rating, plus an optional short comment),
+   one per viewer per quote. The owner sees the tally and comments; viewers never see each other's contact
+   details.
+6. **Acceptance** (single transaction, idempotent, **owner only**):
    - mark the quote `ACCEPTED`, the others `DECLINED`, the RFQ `AWARDED`;
    - create a **private `CommerceOffer` version** from the accepted quote, visible only to that customer,
      expiring at `validUntil`, never listed in the catalog;
@@ -51,6 +57,13 @@ that already exists. If vendors' availability should be checked during quoting, 
 - Feature flag `rfq` and per-city geography gating stay in force; a disabled flag hides the pages and APIs.
 - Expiry: RFQs, invitations and quotes expire on schedule (reuse the existing watchdog pattern).
 - Notifications through `ServiceInbox` in the same transaction as each event.
+- Sharing privacy: a viewer sees only what the owner chose to share (by default quote totals, items, delivery
+  notes and vendor business names; budget and contact details are hidden unless the owner turns them on).
+  Share tokens are long random values stored hashed, revocable, rate-limited, never indexed by search engines
+  (`noindex`), and give read access to one RFQ only. Viewers cannot accept, decline, edit or pay.
+- Quote validity: default 7 days, editable by the owner (RFQ deadline) and by the vendor (quote `validUntil`,
+  capped by an admin setting); the admin-set maximum lives in the existing admin configuration.
+- Fees: private-offer orders go through the same commission and fee settings as catalog offers.
 
 ## Work breakdown
 | Phase | Deliverable | Rough effort |
@@ -60,9 +73,10 @@ that already exists. If vendors' availability should be checked during quoting, 
 | 2. API | Create/list/close RFQ, invite, submit/withdraw quote, accept (with private-offer creation) | 3–4 days |
 | 3. Vendor UI | Inbox of invitations, quote form, quote status; reuse vendor portal layout | 3 days |
 | 4. Customer UI | Replace the local demo: create RFQ, compare quotes, accept → cart | 3 days |
+| 4b. Sharing and opinions | `RfqShare`/`RfqOpinion`, viewer page (no login), revoke and expiry, owner tally | 3 days |
 | 5. Private offers | Offer visibility (customer-scoped), expiry, hidden from catalog; checkout accepts them | 2–3 days |
 | 6. Hardening | Integration tests (ownership, idempotency, double accept, expiry), crawl, a11y, rollout behind flag | 3 days |
-| **Total** | | **about 3 weeks for one developer** |
+| **Total** | | **about 3.5 weeks for one developer** |
 
 ## Acceptance tests (what "done" means)
 - A customer cannot read or accept another customer's RFQ; a vendor cannot see RFQs they were not invited to.
@@ -71,6 +85,8 @@ that already exists. If vendors' availability should be checked during quoting, 
 - The price at checkout equals the accepted quote total, computed server-side; changing it in the browser has
   no effect.
 - An expired quote cannot be accepted; a withdrawn quote disappears from comparison.
+- A viewer can open only the RFQ they were given, cannot accept/decline/edit/pay, and loses access immediately
+  after revocation or expiry; the share URL carries no vendor contact details or the owner's budget unless enabled.
 - With the `rfq` flag off or the city unavailable, pages and APIs refuse cleanly.
 - Existing suites still pass; a new `test:rfq` runs against an isolated schema like the commerce suites.
 
@@ -80,21 +96,19 @@ that already exists. If vendors' availability should be checked during quoting, 
 - **Platform fees:** apply as for catalog offers, managed and customizable. Private-offer orders use the same
   commission engine and the same admin controls; a per-vendor or per-RFQ override is allowed only through the
   existing admin-managed fee settings, never from the vendor or customer side.
-- **Who is invited:** answered as "common people, friends, family members, etc."; this needs one
-  clarification (see below) before the data model is final.
+- **Who is invited:** the customer can share an RFQ with friends, family and other people they choose, so they
+  can view the quotes and give their opinion. Vendors are still chosen separately (customer-picked or matched
+  by category and city). Only the RFQ owner can accept a quote or close the RFQ.
 
 ## Still open
-1. **Who is invited, exactly?** Which of these did you mean?
-   - (a) the customer shares the RFQ with friends and family so they can view and weigh in on the quotes
-     (collaborative decision); vendors are still chosen separately;
-   - (b) any registered person may create an RFQ, and vendors are matched automatically by category and city;
-   - (c) the RFQ is addressed to people rather than vendors (a different product from quotes).
-2. **Availability:** must a vendor's calendar be checked while quoting, or only at confirmation?
-3. **Changes after acceptance:** is a re-quote allowed, or does the customer cancel and start again?
-4. **Existing demo data:** drop it, or migrate any stored local RFQs? (They are not on the server today.)
+1. **Availability:** must a vendor's calendar be checked while quoting, or only at confirmation?
+2. **Changes after acceptance:** is a re-quote allowed, or does the customer cancel and start again?
+3. **Existing demo data:** drop it, or migrate any stored local RFQs? (They are not on the server today.)
 
 ## Risks
 - **Scope creep into negotiation** (counter-offers, chat). Keep v1 to submit, compare, accept.
 - **Private-offer visibility** touches the catalog queries; it needs focused tests so private offers never leak
   into public listings.
+- **Privacy of shared RFQs.** Links leak. Keep tokens revocable and short-lived, expose the minimum, and show
+  the owner who has access.
 - **Spam / abuse** (an RFQ to every vendor): cap invitations per RFQ and RFQs per customer per day.
