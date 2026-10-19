@@ -48,8 +48,11 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const location = await geoContext().catch(() => null);
-  const features = await featureStates().catch(() => defaultFeatures().map(f => ({ ...f, enabled: false, visible: false })));
+  // Independent database reads: run them together so the layout waits for the slower one, not both.
+  const [location, features] = await Promise.all([
+    geoContext().catch(() => null),
+    featureStates().catch(() => defaultFeatures().map(f => ({ ...f, enabled: false, visible: false }))),
+  ]);
   return (
     <html lang="ar" dir="rtl" className={`${tajawal.variable} ${cairo.variable}`}>
       <body className="min-h-screen flex flex-col bg-[#FAF7F2] text-[#1E293B] antialiased selection:bg-saudi-gold-400 selection:text-saudi-green-950">
