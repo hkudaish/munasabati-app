@@ -266,11 +266,11 @@ export default function GuestRSVPPage() {
                 <h4 className="text-xs font-black font-cairo text-saudi-green-950">
                   العانية والرفد الرقمي (Digital Eaniyah) 🎁
                 </h4>
-                <p className="text-caption2 text-gray-600">شارك فرحتك بهدية مالية مباركة تصل فوراً</p>
+                <p className="text-caption2 text-gray-600">شارك فرحتك بهدية مالية مباركة تصل لصاحب المناسبة</p>
               </div>
             </div>
             <span className="text-caption2 font-bold text-saudi-green-900 bg-white px-2 py-0.5 rounded-full border border-saudi-gold-300 shadow-sm">
-              Apple Pay / مدى
+              مدى
             </span>
           </div>
 

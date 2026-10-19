@@ -1,5 +1,6 @@
 'use client';
 import { notify } from '@/lib/notify';
+import { useApplePayAvailable } from '@/lib/apple-pay';
 
 import React, { useState } from 'react';
 import { 
@@ -89,7 +90,8 @@ export default function DigitalEaniyahModal({
   const [blessingMessage, setBlessingMessage] = useState<string>(PRESET_MESSAGES[0]);
   const [isPrivateAmount, setIsPrivateAmount] = useState<boolean>(false);
   const [cardStyle, setCardStyle] = useState<EaniyahGift['cardStyle']>('royal_gold');
-  const [paymentMethod, setPaymentMethod] = useState<'apple_pay' | 'mada' | 'stc_pay'>('apple_pay');
+  const applePayAvailable = useApplePayAvailable();
+  const [paymentMethod, setPaymentMethod] = useState<'apple_pay' | 'mada' | 'stc_pay'>('mada');
 
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [completedGift, setCompletedGift] = useState<EaniyahGift | null>(null);
@@ -384,20 +386,22 @@ export default function DigitalEaniyahModal({
 
               {/* Payment Methods */}
               <div className="space-y-2 pt-1">
-                <label className="block text-xs font-bold text-gray-700">طريقة الدفع الفوري</label>
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('apple_pay')}
-                    className={`py-3 px-2 rounded-2xl border text-xs font-bold flex flex-col items-center justify-center gap-1 transition ${
-                      paymentMethod === 'apple_pay'
-                        ? 'bg-black text-white border-black shadow-md'
-                        : 'bg-white border-gray-200 text-gray-800 hover:bg-gray-50'
-                    }`}
-                  >
-                    <Smartphone className="w-4 h-4" />
-                    <span>Apple Pay</span>
-                  </button>
+                <label className="block text-xs font-bold text-gray-700">طريقة الدفع</label>
+                <div className={`grid ${applePayAvailable ? 'grid-cols-3' : 'grid-cols-2'} gap-2`}>
+                  {applePayAvailable && (
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod('apple_pay')}
+                      className={`py-3 px-2 rounded-2xl border text-xs font-bold flex flex-col items-center justify-center gap-1 transition ${
+                        paymentMethod === 'apple_pay'
+                          ? 'bg-black text-white border-black shadow-md'
+                          : 'bg-white border-gray-200 text-gray-800 hover:bg-gray-50'
+                      }`}
+                    >
+                      <Smartphone className="w-4 h-4" />
+                      <span>Apple Pay</span>
+                    </button>
+                  )}
 
                   <button
                     type="button"

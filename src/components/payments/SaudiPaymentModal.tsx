@@ -2,6 +2,7 @@
 import { notify } from '@/lib/notify';
 
 import React, { useState } from 'react';
+import { useApplePayAvailable } from '@/lib/apple-pay';
 import {
   X,
   ShieldCheck,
@@ -39,10 +40,13 @@ export default function SaudiPaymentModal({
   const [paymentType, setPaymentType] = useState<'deposit' | 'full'>('deposit');
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>('mada');
 
-  const [cardNumber, setCardNumber] = useState('5888 4000 1234 5678');
-  const [cardHolder, setCardHolder] = useState('سارة عبدالله العتيبي');
-  const [cardExpiry, setCardExpiry] = useState('08/28');
-  const [cardCvv, setCardCvv] = useState('982');
+  const applePayAvailable = useApplePayAvailable();
+  // No payment gateway is connected yet, so the card form is hidden and never prefilled.
+  const showCardForm = false;
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardHolder, setCardHolder] = useState('');
+  const [cardExpiry, setCardExpiry] = useState('');
+  const [cardCvv, setCardCvv] = useState('');
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -86,10 +90,10 @@ export default function SaudiPaymentModal({
             </div>
             <div>
               <h3 className="text-base font-bold font-cairo text-white" id="dlg-1957-1">
-                بوابة الدفع الآمنة (Saudi Secure Pay)
+                تأكيد الطلب والدفعة
               </h3>
               <span className="text-caption2 text-saudi-gold-300">
-                مشفرة ومتوافقة مع هيئة الزكاة والضريبة والجمارك (ZATCA) 🇸🇦
+                لا يتم خصم أي مبلغ الآن؛ يؤكد المورد طلبك أولاً
               </span>
             </div>
           </div>
@@ -111,10 +115,10 @@ export default function SaudiPaymentModal({
 
               <div className="space-y-1">
                 <h4 className="text-xl font-black font-cairo text-saudi-green-950">
-                  تم تأكيد الدفع والحجز بنجاح! 🎉
+                  تم إرسال طلبك! 🎉
                 </h4>
                 <p className="text-xs text-gray-500">
-                  رقم العملية المرجعي: <span className="font-mono font-bold text-gray-800">{transactionRef}</span>
+                  رقم الطلب المرجعي: <span className="font-mono font-bold text-gray-800">{transactionRef}</span>
                 </p>
               </div>
 
@@ -230,7 +234,7 @@ export default function SaudiPaymentModal({
               {/* Payment Method Selector */}
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-2">طريقة الدفع:</label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className={`grid ${applePayAvailable ? 'grid-cols-3' : 'grid-cols-2'} gap-2`}>
                   <button
                     type="button"
                     onClick={() => setSelectedMethod('mada')}
@@ -244,18 +248,20 @@ export default function SaudiPaymentModal({
                     <span className="text-caption2 text-gray-500">بطاقات البنوك السعودية</span>
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => setSelectedMethod('apple_pay')}
-                    className={`p-2.5 rounded-xl border text-center transition flex flex-col items-center justify-center gap-1 ${
-                      selectedMethod === 'apple_pay'
-                        ? 'border-saudi-green-800 bg-black text-white font-bold'
-                        : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
-                    }`}
-                  >
-                    <span className="text-xs font-bold">Apple Pay</span>
-                    <span className="text-caption2 text-gray-500">دفع بضغطة واحدة</span>
-                  </button>
+                  {applePayAvailable && (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedMethod('apple_pay')}
+                      className={`p-2.5 rounded-xl border text-center transition flex flex-col items-center justify-center gap-1 ${
+                        selectedMethod === 'apple_pay'
+                          ? 'border-saudi-green-800 bg-black text-white font-bold'
+                          : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      <span className="text-xs font-bold">Apple Pay</span>
+                      <span className="text-caption2 text-gray-500">دفع بضغطة واحدة</span>
+                    </button>
+                  )}
 
                   <button
                     type="button"
@@ -273,7 +279,7 @@ export default function SaudiPaymentModal({
               </div>
 
               {/* Card Inputs */}
-              {(selectedMethod === 'mada' || selectedMethod === 'visa_mastercard') && (
+              {showCardForm && (selectedMethod === 'mada' || selectedMethod === 'visa_mastercard') && (
                 <div className="space-y-2.5 bg-white p-4 rounded-2xl border border-gray-200">
                   <div>
                     <label className="block text-xs font-bold text-gray-700 mb-1">رقم بطاقة مدى / الائتمان</label>

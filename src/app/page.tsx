@@ -260,7 +260,7 @@ export default function HomePage() {
                   className="px-5 py-3.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold rounded-2xl text-sm backdrop-blur-md flex items-center gap-2 transition"
                 >
                   <FileText className="w-4 h-4 text-saudi-gold-300" />
-                  <span>طلب تسعير فوري (RFQ)</span>
+                  <span>اطلب عروض أسعار (RFQ)</span>
                 </Link>
 
                 <FeatureContent id="luma"><button
@@ -280,7 +280,7 @@ export default function HomePage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Zap className="w-4 h-4 text-saudi-gold-400" />
-                  <span>حجز فوري وضمان أسعار المنصة</span>
+                  <span>أسعار واضحة قبل الطلب، والمورد يؤكد الحجز</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-saudi-gold-400" />

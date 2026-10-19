@@ -76,7 +76,7 @@ export default function ServiceCard({ service, onBookNow }: ServiceCardProps) {
           {service.instantBooking && (
             <span className="bg-emerald-600 text-white text-caption2 font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
               <Zap className="w-3 h-3 fill-current" />
-              حجز فوري
+              طلب مباشر
             </span>
           )}
         </div>

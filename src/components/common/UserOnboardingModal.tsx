@@ -325,7 +325,7 @@ export default function UserOnboardingModal() {
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="w-3.5 h-3.5 text-saudi-green-700 flex-shrink-0" />
-                        <span>عانية ونقوط رقمية فورية عبر Apple Pay ومدى</span>
+                        <span>عانية ونقوط رقمية تصل لصاحب المناسبة</span>
                       </li>
                     </ul>
                   </div>
@@ -374,7 +374,7 @@ export default function UserOnboardingModal() {
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="w-3.5 h-3.5 text-saudi-gold-600 flex-shrink-0" />
-                        <span>ضمان التحصيل المالي وفواتير ضريبية معتمدة 15%</span>
+                        <span>عروض أسعار تتضمن ضريبة القيمة المضافة 15%</span>
                       </li>
                     </ul>
                   </div>

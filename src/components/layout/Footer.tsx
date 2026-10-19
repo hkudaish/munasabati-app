@@ -18,7 +18,7 @@ export default function Footer() {
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-saudi-gold-200">تخطيط ذكي وفوري</h4>
+              <h4 className="text-sm font-bold text-saudi-gold-200">تخطيط ذكي وسريع</h4>
               <p className="text-xs text-gray-400">بناء خطة المناسبة وتوزيع الميزانية في دقيقتين</p>
             </div>
           </div>
@@ -38,8 +38,8 @@ export default function Footer() {
               <CreditCard className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-saudi-gold-200">دفع سعودي آمن 100%</h4>
-              <p className="text-xs text-gray-400">مدى، Apple Pay، سداد، وأقساط تابي وتمارا</p>
+              <h4 className="text-sm font-bold text-saudi-gold-200">الدفع بعد تأكيد المورد</h4>
+              <p className="text-xs text-gray-400">لا يُحصَّل أي مبلغ قبل موافقة المورد على طلبك</p>
             </div>
           </div>
 
@@ -138,11 +138,7 @@ export default function Footer() {
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
           <p>© 2026 {adminConfig.platformNameAr}. جميع الحقوق محفوظة في المملكة العربية السعودية 🇸🇦</p>
           <div className="flex items-center gap-3">
-            <span className="bg-white/10 px-2 py-0.5 rounded text-caption2 text-gray-300">مدى Mada</span>
-            <span className="bg-white/10 px-2 py-0.5 rounded text-caption2 text-gray-300">Apple Pay</span>
-            <span className="bg-white/10 px-2 py-0.5 rounded text-caption2 text-gray-300">STC Pay</span>
-            <span className="bg-white/10 px-2 py-0.5 rounded text-caption2 text-gray-300">تابي / تمارا</span>
-            <span className="bg-saudi-gold-500/20 text-saudi-gold-300 px-2 py-0.5 rounded text-caption2">ضريبة 15% ZATCA</span>
+            <span className="bg-saudi-gold-500/20 text-saudi-gold-300 px-2 py-0.5 rounded text-caption2">الأسعار تشمل ضريبة القيمة المضافة 15%</span>
           </div>
         </div>
       </div>

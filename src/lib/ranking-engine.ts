@@ -36,7 +36,7 @@ export function checkAvailability(
   targetDateStr: string | undefined
 ): { isAvailable: boolean; available: boolean; reasonAr: string; reason: string } {
   if (!targetDateStr) {
-    return { isAvailable: true, available: true, reasonAr: 'متاح للحجز الفوري', reason: 'متاح للحجز الفوري' };
+    return { isAvailable: true, available: true, reasonAr: 'متاح للطلب', reason: 'متاح للطلب' };
   }
 
   if (!availability) {
