@@ -1,6 +1,9 @@
 {
   "extends": "next/core-web-vitals",
   "rules": {
-    "react/no-unescaped-entities": "off"
+    "react/no-unescaped-entities": "off",
+    // Suppliers and users provide image URLs from arbitrary hosts; next/image only serves hosts
+    // listed in next.config.mjs, so it would break them. Cards use loading="lazy" decoding="async".
+    "@next/next/no-img-element": "off"
   }
 }
