@@ -6,6 +6,19 @@ export async function featureStates() {
   const rows = await prisma.systemFeature.findMany();
   return defaultFeatures().map(f => { const row = rows.find(r => r.id === f.id); return row ? { id: f.id, visible: row.visible, enabled: row.enabled, version: row.version } : f; });
 }
+// Layout-only cache: feature visibility in the page chrome may lag by a few seconds.
+// requireFeature() and the APIs always read the database.
+const LAYOUT_TTL_MS = 10_000;
+let layoutStates: { at: number; value: ReturnType<typeof featureStates> } | null = null;
+export function featureStatesForLayout() {
+  if (process.env.NODE_ENV !== 'production') return featureStates();
+  if (!layoutStates || Date.now() - layoutStates.at > LAYOUT_TTL_MS) {
+    const value = featureStates();
+    layoutStates = { at: Date.now(), value };
+    value.catch(() => { if (layoutStates?.value === value) layoutStates = null; });
+  }
+  return layoutStates.value;
+}
 export async function requireFeature(id: FeatureId) {
   const states = await featureStates();
   const feature = states.find(f => f.id === id);

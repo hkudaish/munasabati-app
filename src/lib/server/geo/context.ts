@@ -35,7 +35,19 @@ export async function previewContext(id:string):Promise<GeoContextData>{
 export function makeContext(snapshot:GeoSnapshot,location:GeoSelection,preview?:GeoContextData['preview']):GeoContextData {
  const rows=availability(snapshot,location);return {snapshot,selection:location,availability:rows,summary:summary(snapshot,location,rows),preview,reverseConfigured:!!process.env.GEOAPIFY_API_KEY};
 }
-export async function geoContext(){const s=await readGeo();return makeContext(s,await selection(s));}
+// Page layouts render on every request; share the (visitor-independent) snapshot for a few seconds.
+// APIs and admin screens keep reading fresh data. Disabled outside production so tests see their own writes.
+const LAYOUT_TTL_MS=10_000;
+let layoutSnapshot:{at:number;value:Promise<GeoSnapshot>}|null=null;
+function readGeoForLayout(){
+ if(process.env.NODE_ENV!=='production')return readGeo();
+ if(!layoutSnapshot||Date.now()-layoutSnapshot.at>LAYOUT_TTL_MS){
+  const value=readGeo();layoutSnapshot={at:Date.now(),value};
+  value.catch(()=>{if(layoutSnapshot?.value===value)layoutSnapshot=null;});
+ }
+ return layoutSnapshot.value;
+}
+export async function geoContext(options:{layout?:boolean}={}){const s=await(options.layout?readGeoForLayout():readGeo());return makeContext(s,await selection(s));}
 export async function requireGeo(key:string,cityId?:string,db?:Parameters<typeof readGeo>[0]){
  const snapshot=await readGeo(db);const chosen=cityId?{cityId,countryCode:snapshot.cities.find(c=>c.id===cityId)?.countryCode||null,source:'MANUAL' as const}:await selection(snapshot);
  const row=availability(snapshot,chosen).find(a=>a.key===key);

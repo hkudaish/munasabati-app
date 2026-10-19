@@ -3,7 +3,7 @@ import { Tajawal, Cairo } from 'next/font/google';
 import './globals.css';
 import { AppProvider } from '@/lib/store';
 import FeatureProvider, { FeatureContent } from '@/components/system/FeatureProvider';
-import { featureStates } from '@/lib/server/features';
+import { featureStatesForLayout } from '@/lib/server/features';
 import { defaultFeatures } from '@/lib/system/feature-catalog';
 import GeoProvider from '@/components/geo/GeoProvider';
 import CoverageNotice from '@/components/geo/CoverageNotice';
@@ -50,8 +50,8 @@ export default async function RootLayout({
 }) {
   // Independent database reads: run them together so the layout waits for the slower one, not both.
   const [location, features] = await Promise.all([
-    geoContext().catch(() => null),
-    featureStates().catch(() => defaultFeatures().map(f => ({ ...f, enabled: false, visible: false }))),
+    geoContext({ layout: true }).catch(() => null),
+    featureStatesForLayout().catch(() => defaultFeatures().map(f => ({ ...f, enabled: false, visible: false }))),
   ]);
   return (
     <html lang="ar" dir="rtl" className={`${tajawal.variable} ${cairo.variable}`}>
