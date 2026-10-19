@@ -164,3 +164,9 @@ html {
 .glassmorphism-dark :where(a, button, input, select, textarea):focus-visible {
   outline-color: #E2C076 !important;
 }
+
+/* Placeholders are hints, not labels, but they still need to be readable (4.5:1 on white). */
+::placeholder {
+  color: #6b7280;
+  opacity: 1;
+}
