@@ -55,7 +55,7 @@ export default function CheckoutPage() {
     return (
       <div className="max-w-xl mx-auto py-16 px-4 text-center space-y-4">
         <ShoppingBag className="w-16 h-16 text-gray-300 mx-auto" />
-        <h2 className="text-xl font-bold font-cairo text-gray-900">سلتك فارغة</h2>
+        <h1 className="text-xl font-bold font-cairo text-gray-900">سلتك فارغة</h1>
         <p className="text-xs text-gray-500">لا توجد خدمات في السلة للمتابعة إلى صفحة الدفع.</p>
         <Link
           href="/marketplace"
@@ -102,6 +102,9 @@ export default function CheckoutPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
+      <p role="note" className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm font-bold text-amber-900">
+        هذه السلة السابقة قيد الإيقاف التدريجي. أكمل طلبك الحالي هنا، وستتم الحجوزات الجديدة عبر <a className="underline" href="/commerce">متجر الخدمات والباقات</a>.
+      </p>
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-xs font-bold text-gray-500">
         <Link href="/cart" className="hover:text-saudi-green-800 transition flex items-center gap-1">

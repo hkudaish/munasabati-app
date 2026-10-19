@@ -81,6 +81,9 @@ export default function CartPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
+      <p role="note" className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm font-bold text-amber-900">
+        هذه السلة السابقة قيد الإيقاف التدريجي. أكمل طلبك الحالي هنا، وستتم الحجوزات الجديدة عبر <a className="underline" href="/commerce">متجر الخدمات والباقات</a>.
+      </p>
       {/* Page Breadcrumb & Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-saudi-sand-200 pb-5">
         <div>
