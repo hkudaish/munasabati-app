@@ -158,7 +158,12 @@ function ReceptionWelcomeScreenContent() {
   const attendancePercentage =
     occasionGuests.length > 0 ? Math.round((attendedGuests.length / occasionGuests.length) * 100) : 0;
 
-  if (!targetOccasion) return <p role="status" className="p-10 text-center">سجّل الدخول واختر مناسبة لعرض شاشة الاستقبال.</p>;
+  if (!targetOccasion) return (
+    <div className="p-10 text-center space-y-2">
+      <h1 className="text-2xl font-black font-cairo text-saudi-green-950">شاشة الاستقبال</h1>
+      <p role="status">سجّل الدخول واختر مناسبة لعرض شاشة الاستقبال.</p>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#00261E] via-[#003B2F] to-[#001813] text-white flex flex-col justify-between p-4 sm:p-8 select-none relative overflow-hidden font-tajawal">

@@ -20,7 +20,12 @@ export default function GateScannerPage() {
     message: string;
   } | null>(null);
 
-  if (!activeOccasion) return null;
+  if (!activeOccasion) return (
+    <div className="max-w-2xl mx-auto px-4 py-16 text-center space-y-3">
+      <h1 className="text-2xl font-black font-cairo text-saudi-green-950">قارئ بطاقات دخول المناسبة</h1>
+      <p role="status" className="text-sm text-gray-600">اختر مناسبة أولاً لبدء مسح بطاقات الدخول.</p>
+    </div>
+  );
 
   const occasionGuests = guests.filter((g) => g.occasionId === activeOccasion.id);
   const attendedCount = occasionGuests.filter((g) => g.status === 'attended').length;

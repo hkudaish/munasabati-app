@@ -115,6 +115,7 @@ function PlanWizardContent() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 sm:py-12 space-y-8 animate-fadeIn">
+      <h1 className="sr-only">تخطيط مناسبة جديدة</h1>
       {/* Wizard Progress Bar */}
       <div className="space-y-2">
         <div className="flex items-center justify-between text-xs text-gray-500 font-bold">
