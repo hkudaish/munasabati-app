@@ -276,7 +276,7 @@ export default function CartPage() {
                             <span className="text-base font-black font-cairo text-saudi-green-950 block">
                               {formatSaudiRiyal(item.totalPrice)}
                             </span>
-                            <span className="text-[11px] text-gray-500">شامل الضريبة 15%</span>
+                            <span className="text-caption2 text-gray-500">شامل الضريبة 15%</span>
                           </div>
 
                           {/* Quantity Stepper */}
@@ -376,7 +376,7 @@ export default function CartPage() {
                 <div className="bg-emerald-50 border border-emerald-200 p-3 rounded-2xl flex items-center justify-between text-xs">
                   <div>
                     <span className="font-bold text-emerald-800 block">{appliedCoupon.code}</span>
-                    <span className="text-[11px] text-emerald-600">{appliedCoupon.descriptionAr}</span>
+                    <span className="text-caption2 text-emerald-600">{appliedCoupon.descriptionAr}</span>
                   </div>
                   <button
                     onClick={removeCoupon}
@@ -414,7 +414,7 @@ export default function CartPage() {
                       <span>{couponSuccess}</span>
                     </p>
                   )}
-                  <p className="text-[11px] text-gray-500">
+                  <p className="text-caption2 text-gray-500">
                     جرب كود الترحيب: <span className="font-bold text-gray-600">MUNASABATI10</span> (خصم 10%)
                   </p>
                 </form>
@@ -483,10 +483,10 @@ export default function CartPage() {
               </button>
 
               <div className="text-center space-y-1 pt-1">
-                <span className="text-[11px] text-gray-500 block">
+                <span className="text-caption2 text-gray-500 block">
                   🔒 دفع إلكتروني آمن معتمد من البنك المركزي السعودي (SAMA)
                 </span>
-                <span className="text-[11px] text-saudi-green-800 font-bold block">
+                <span className="text-caption2 text-saudi-green-800 font-bold block">
                   🛡️ عقد إلكتروني موحد يضمن حقوق الطرفين وسياسة إلغاء مرنة
                 </span>
               </div>

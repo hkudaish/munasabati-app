@@ -160,10 +160,10 @@ export default function GuestRSVPPage() {
                     {/* QR Pass Box */}
                     <div className="bg-saudi-sand-50 p-4 rounded-2xl border border-saudi-sand-300 inline-block shadow-inner">
                       <InvitationQRCode value={qrLink} className="w-64 h-64 mx-auto" />
-                      <span className="text-[11px] font-mono text-gray-600 block mt-2 font-bold">
+                      <span className="text-caption2 font-mono text-gray-600 block mt-2 font-bold">
                         {inviteCode || 'MUN-RSVP-PASS'}
                       </span>
-                      <span className="text-[11px] font-bold text-saudi-green-800 block mt-1">
+                      <span className="text-caption2 font-bold text-saudi-green-800 block mt-1">
                         الضيف: {guestName}
                       </span>
                     </div>
@@ -266,10 +266,10 @@ export default function GuestRSVPPage() {
                 <h4 className="text-xs font-black font-cairo text-saudi-green-950">
                   العانية والرفد الرقمي (Digital Eaniyah) 🎁
                 </h4>
-                <p className="text-[11px] text-gray-600">شارك فرحتك بهدية مالية مباركة تصل فوراً</p>
+                <p className="text-caption2 text-gray-600">شارك فرحتك بهدية مالية مباركة تصل فوراً</p>
               </div>
             </div>
-            <span className="text-[11px] font-bold text-saudi-green-900 bg-white px-2 py-0.5 rounded-full border border-saudi-gold-300 shadow-sm">
+            <span className="text-caption2 font-bold text-saudi-green-900 bg-white px-2 py-0.5 rounded-full border border-saudi-gold-300 shadow-sm">
               Apple Pay / مدى
             </span>
           </div>
@@ -295,7 +295,7 @@ export default function GuestRSVPPage() {
                 <MessageSquare className="w-3.5 h-3.5 text-saudi-gold-600" />
                 <span>سجل التهاني والتبريكات المباشر</span>
               </span>
-              <span className="text-[11px] font-bold text-saudi-gold-600">
+              <span className="text-caption2 font-bold text-saudi-gold-600">
                 {occasionEaniyah.length} مباركين
               </span>
             </div>
@@ -309,14 +309,14 @@ export default function GuestRSVPPage() {
                       {g.isPrivateAmount ? 'عانية شرف' : formatSAR(g.amount)}
                     </span>
                   </div>
-                  <p className="text-[11px] text-gray-600 italic">"{g.blessingMessage}"</p>
+                  <p className="text-caption2 text-gray-600 italic">"{g.blessingMessage}"</p>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        <div className="text-center text-[11px] text-gray-500">
+        <div className="text-center text-caption2 text-gray-500">
           منصة مناسبتـي 🇸🇦 • المنصة السعودية لإدارة وتنظيم المناسبات
         </div>
 

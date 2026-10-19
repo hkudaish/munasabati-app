@@ -233,14 +233,14 @@ export default function GuestManager() {
                   <tr key={guest.id} className="hover:bg-saudi-sand-50/60 transition">
                     <td className="p-3.5">
                       <span className="font-bold text-gray-900 block">{guest.name}</span>
-                      <span className="text-[11px] text-gray-500 dir-ltr inline-block">{guest.phone}</span>
+                      <span className="text-caption2 text-gray-500 dir-ltr inline-block">{guest.phone}</span>
                     </td>
                     <td className="p-3.5">
-                      <span className="bg-saudi-sand-100 text-saudi-green-900 text-[11px] font-bold px-2 py-0.5 rounded-md">
+                      <span className="bg-saudi-sand-100 text-saudi-green-900 text-caption2 font-bold px-2 py-0.5 rounded-md">
                         {guest.category === 'women' ? 'نساء' : guest.category === 'men' ? 'رجال' : 'عائلة'}
                       </span>
                       {guest.familyGroup && (
-                        <span className="text-[11px] text-gray-500 block mt-0.5">{guest.familyGroup}</span>
+                        <span className="text-caption2 text-gray-500 block mt-0.5">{guest.familyGroup}</span>
                       )}
                     </td>
                     <td className="p-3.5 font-bold text-gray-700">
@@ -256,25 +256,25 @@ export default function GuestManager() {
                     <td className="p-3.5">
                       <div className="flex items-center gap-1.5">
                         {guest.status === 'confirmed' && (
-                          <span className="bg-green-100 text-green-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                          <span className="bg-green-100 text-green-800 text-caption2 font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
                             <CheckCircle className="w-3 h-3" />
                             مؤكد الحضور
                           </span>
                         )}
                         {guest.status === 'attended' && (
-                          <span className="bg-saudi-green-900 text-saudi-gold-300 text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                          <span className="bg-saudi-green-900 text-saudi-gold-300 text-caption2 font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
                             <QrCode className="w-3 h-3" />
                             حضر بالقاعة
                           </span>
                         )}
                         {guest.status === 'invited' && (
-                          <span className="bg-amber-100 text-amber-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                          <span className="bg-amber-100 text-amber-800 text-caption2 font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
                             <Clock className="w-3 h-3" />
                             بانتظار الرد
                           </span>
                         )}
                         {guest.status === 'declined' && (
-                          <span className="bg-red-100 text-red-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                          <span className="bg-red-100 text-red-800 text-caption2 font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
                             <XCircle className="w-3 h-3" />
                             اعتذر
                           </span>
@@ -284,7 +284,7 @@ export default function GuestManager() {
                         <select
                           value={guest.status}
                           onChange={(e) => updateGuestStatus(guest.id, e.target.value as any)}
-                          className="text-[11px] bg-transparent border border-gray-200 rounded px-1 py-0.5 text-gray-600"
+                          className="text-caption2 bg-transparent border border-gray-200 rounded px-1 py-0.5 text-gray-600"
                         >
                           <option value="invited">دعوة</option>
                           <option value="confirmed">تأكيد</option>
@@ -432,7 +432,7 @@ export default function GuestManager() {
             <div className="absolute top-0 right-0 left-0 h-2 bg-gold-gradient" />
 
             <div className="space-y-1">
-              <span className="text-[11px] font-bold text-saudi-gold-400 uppercase tracking-widest">
+              <span className="text-caption2 font-bold text-saudi-gold-400 uppercase tracking-widest">
                 بطاقة دخول المناسبة (VIP Pass)
               </span>
               <h4 className="text-lg font-bold font-cairo text-white" id="dlg-2299-2">
@@ -444,7 +444,7 @@ export default function GuestManager() {
             {/* Scannable invitation QR; the gate verifies the code against its guest list. */}
             <div className="bg-white p-4 rounded-2xl inline-block shadow-lg my-2">
               <InvitationQRCode value={createInvitationLink(getInvitationOrigin(activeOccasion.shareOrigin), activeOccasion, activeQRModalGuest.qrCode)} className="w-64 h-64 max-w-full mx-auto" />
-              <span className="text-[11px] font-mono text-gray-600 block mt-2">{activeQRModalGuest.qrCode}</span>
+              <span className="text-caption2 font-mono text-gray-600 block mt-2">{activeQRModalGuest.qrCode}</span>
             </div>
 
             <div className="space-y-1 text-xs">
@@ -608,9 +608,9 @@ export default function GuestManager() {
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-gray-900">{guest.name}</span>
-                        <span className="text-[11px] text-gray-500 dir-ltr font-mono">{guest.phone}</span>
+                        <span className="text-caption2 text-gray-500 dir-ltr font-mono">{guest.phone}</span>
                       </div>
-                      <span className="text-[11px] text-emerald-700 font-medium mt-0.5 block">
+                      <span className="text-caption2 text-emerald-700 font-medium mt-0.5 block">
                         كود: {guest.qrCode} • {guest.status === 'confirmed' ? '✓ مؤكد الحضور' : 'بانتظار الرد'}
                       </span>
                     </div>

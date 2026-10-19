@@ -146,13 +146,13 @@ export const VisualFloorPlan: React.FC<VisualFloorPlanProps> = ({
                     {table.name}
                   </span>
 
-                  <span className={`text-[11px] font-mono font-bold mt-0.5 ${
+                  <span className={`text-caption2 font-mono font-bold mt-0.5 ${
                     isFull ? 'text-rose-400' : 'text-emerald-400'
                   }`}>
                     {assignedCount} / {table.capacity}
                   </span>
 
-                  <span className="text-[11px] text-neutral-400">
+                  <span className="text-caption2 text-neutral-400">
                     {table.section === 'vip' ? 'VIP' : table.section === 'men' ? 'رجال' : 'نساء'}
                   </span>
                 </button>
@@ -188,7 +188,7 @@ export const VisualFloorPlan: React.FC<VisualFloorPlanProps> = ({
                       {selectedTable.name}
                     </h4>
                     {selectedTable.section === 'vip' && (
-                      <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300">
+                      <span className="px-2 py-0.5 rounded-full text-caption2 font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300">
                         طاولة VIP
                       </span>
                     )}
@@ -199,7 +199,7 @@ export const VisualFloorPlan: React.FC<VisualFloorPlanProps> = ({
                 </div>
 
                 <div className="text-left font-mono">
-                  <span className="text-[11px] text-neutral-400 block">الإشغال</span>
+                  <span className="text-caption2 text-neutral-400 block">الإشغال</span>
                   <span className="text-sm font-black text-emerald-600 dark:text-emerald-400">
                     {assignedGuests.length} / {selectedTable.capacity} مقعد
                   </span>
@@ -227,7 +227,7 @@ export const VisualFloorPlan: React.FC<VisualFloorPlanProps> = ({
                           <span className="font-bold text-neutral-900 dark:text-white block">
                             {guest.name}
                           </span>
-                          <span className="text-[11px] text-neutral-400 font-mono">
+                          <span className="text-caption2 text-neutral-400 font-mono">
                             {guest.companionCount > 0 ? `+ ${guest.companionCount} مرافقين` : 'بدون مرافق'}
                           </span>
                         </div>

@@ -47,6 +47,17 @@ const config: Config = {
           violet: "#4A154B",
         },
       },
+      // Type scale (apple-design): 11px is the floor; 16px is body.
+      fontSize: {
+        caption2: ["0.6875rem", { lineHeight: "1rem" }],
+        caption: ["0.75rem", { lineHeight: "1.125rem" }],
+        footnote: ["0.8125rem", { lineHeight: "1.25rem" }],
+        subhead: ["0.9375rem", { lineHeight: "1.375rem" }],
+        body: ["1rem", { lineHeight: "1.625rem" }],
+        headline: ["1.0625rem", { lineHeight: "1.625rem", fontWeight: "700" }],
+        title: ["1.375rem", { lineHeight: "1.875rem", fontWeight: "800" }],
+        "large-title": ["2rem", { lineHeight: "2.5rem", fontWeight: "800" }],
+      },
       fontFamily: {
         cairo: ["Saudi Riyal", "var(--font-cairo)", "Cairo", "sans-serif"],
         tajawal: ["Saudi Riyal", "var(--font-tajawal)", "Tajawal", "sans-serif"],

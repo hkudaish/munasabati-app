@@ -95,7 +95,7 @@ export default function PackageCustomizerModal({
                         {item.categoryName}
                       </span>
                       {!item.customizable && (
-                        <span className="text-[11px] text-gray-500">(بند أساسي لا يمكن إزالته)</span>
+                        <span className="text-caption2 text-gray-500">(بند أساسي لا يمكن إزالته)</span>
                       )}
                     </div>
                     <h5 className="text-xs sm:text-sm font-bold text-gray-900">
@@ -112,7 +112,7 @@ export default function PackageCustomizerModal({
                   <span className="text-sm font-black font-cairo text-saudi-green-950 block">
                     {formatSAR(item.pricePortion)}
                   </span>
-                  <span className="text-[11px] text-gray-500">سعر البند ضمن الباقة</span>
+                  <span className="text-caption2 text-gray-500">سعر البند ضمن الباقة</span>
                 </div>
               </div>
             ))}

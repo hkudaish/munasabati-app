@@ -149,7 +149,7 @@ function NavbarContent() {
                     className="w-4 h-4 rounded-full object-cover border border-saudi-gold-400"
                   />
                   <span className="font-bold max-w-[85px] sm:max-w-[120px] truncate">{currentUser.name}</span>
-                  <span className={`text-[11px] px-1.5 py-0.2 rounded font-black ${
+                  <span className={`text-caption2 px-1.5 py-0.2 rounded font-black ${
                     currentUser.role === 'admin'
                       ? 'bg-purple-900/60 text-purple-200'
                       : currentUser.role === 'vendor'
@@ -170,7 +170,7 @@ function NavbarContent() {
                       <p className="font-bold text-gray-900 text-xs">{currentUser.name}</p>
                       <p className="text-xs text-gray-500">{currentUser.phone || currentUser.email}</p>
                       <div className="mt-1.5 flex items-center gap-1">
-                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-saudi-sand-100 text-saudi-green-900">
+                        <span className="text-caption2 font-bold px-2 py-0.5 rounded-full bg-saudi-sand-100 text-saudi-green-900">
                           {currentUser.hasSystemAccess ? '🛡️ مدير النظام' : currentUser.role === 'admin'
                             ? '🛡️ حساب إداري'
                             : currentUser.role === 'vendor'
@@ -259,7 +259,7 @@ function NavbarContent() {
                 <span className="text-2xl font-black tracking-tight text-saudi-green-900 font-cairo">
                   {adminConfig.platformNameAr}
                 </span>
-                <span className="text-[11px] -mt-1 text-saudi-gold-600 font-medium">
+                <span className="text-caption2 -mt-1 text-saudi-gold-600 font-medium">
                   {adminConfig.taglineAr}
                 </span>
               </div>
@@ -491,7 +491,7 @@ function NavbarContent() {
                         <span className="text-xs font-bold text-gray-900 line-clamp-1 max-w-[130px]">
                           {activeOccasion?.title}
                         </span>
-                        <span className="text-[11px] text-saudi-green-700 font-semibold">
+                        <span className="text-caption2 text-saudi-green-700 font-semibold">
                           جاهزية: {activeOccasion?.readinessPercentage}%
                         </span>
                       </div>
@@ -520,7 +520,7 @@ function NavbarContent() {
                             >
                               <div>
                                 <p className="font-bold text-gray-900">{occ.title}</p>
-                                <p className="text-[11px] text-gray-500">{occ.cityNameAr} • {occ.date}</p>
+                                <p className="text-caption2 text-gray-500">{occ.cityNameAr} • {occ.date}</p>
                               </div>
                               <span className="text-xs font-bold text-saudi-green-800 bg-saudi-green-100 px-2 py-0.5 rounded-full">
                                 {occ.readinessPercentage}%
@@ -549,7 +549,7 @@ function NavbarContent() {
                   >
                     <ArrowLeftRight className="w-3.5 h-3.5 text-saudi-gold-600" />
                     <span className="hidden sm:inline">مقارنة</span>
-                    <span className="bg-saudi-gold-500 text-saudi-green-950 text-[11px] font-black w-4 h-4 rounded-full flex items-center justify-center">
+                    <span className="bg-saudi-gold-500 text-saudi-green-950 text-caption2 font-black w-4 h-4 rounded-full flex items-center justify-center">
                       {comparisonVendorIds.length}
                     </span>
                   </Link>
@@ -564,7 +564,7 @@ function NavbarContent() {
                   <ShoppingBag className="w-4 h-4 text-saudi-green-800" />
                   <span className="hidden sm:inline">السلة</span>
                   {cart.length > 0 && (
-                    <span className="bg-saudi-green-800 text-white text-[11px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
+                    <span className="bg-saudi-green-800 text-white text-caption2 font-black w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
                       {cart.reduce((sum, item) => sum + item.quantity, 0)}
                     </span>
                   )}
@@ -650,7 +650,7 @@ function NavbarContent() {
                 />
                 <div>
                   <p className="font-bold text-xs text-gray-900">{currentUser.name}</p>
-                  <p className="text-[11px] text-gray-600">
+                  <p className="text-caption2 text-gray-600">
                     {currentUser.hasSystemAccess ? 'مدير النظام' : currentUser.role === 'admin' ? 'مشرف المنصة' : currentUser.role === 'vendor' ? 'مورد معتمد' : 'صاحب مناسبة'}
                   </p>
                 </div>

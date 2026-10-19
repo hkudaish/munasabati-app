@@ -69,12 +69,12 @@ export default function ServiceCard({ service, onBookNow }: ServiceCardProps) {
         {/* Badges */}
         <div className="absolute top-3 right-3 flex flex-col gap-1.5 items-end">
           {service.badge && (
-            <span className="bg-saudi-green-900/90 backdrop-blur-md text-saudi-gold-300 text-[11px] font-bold px-2.5 py-1 rounded-full border border-saudi-gold-400/30 shadow-sm">
+            <span className="bg-saudi-green-900/90 backdrop-blur-md text-saudi-gold-300 text-caption2 font-bold px-2.5 py-1 rounded-full border border-saudi-gold-400/30 shadow-sm">
               {service.badge}
             </span>
           )}
           {service.instantBooking && (
-            <span className="bg-emerald-600 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+            <span className="bg-emerald-600 text-white text-caption2 font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
               <Zap className="w-3 h-3 fill-current" />
               حجز فوري
             </span>
@@ -82,7 +82,7 @@ export default function ServiceCard({ service, onBookNow }: ServiceCardProps) {
         </div>
 
         {/* City & Gender tag */}
-        <div className="absolute bottom-3 right-3 flex items-center gap-1 bg-black/60 backdrop-blur-md text-white text-[11px] font-medium px-2 py-0.5 rounded-md">
+        <div className="absolute bottom-3 right-3 flex items-center gap-1 bg-black/60 backdrop-blur-md text-white text-caption2 font-medium px-2 py-0.5 rounded-md">
           <MapPin className="w-3 h-3 text-saudi-gold-400" />
           <span>{service.cityNameAr}</span>
           {service.genderPreference && (
@@ -143,7 +143,7 @@ export default function ServiceCard({ service, onBookNow }: ServiceCardProps) {
         {/* Price & Action Buttons */}
         <div className="pt-3 border-t border-saudi-sand-200 flex items-center justify-between">
           <div>
-            <span className="text-[11px] text-gray-500 block">السعر شامل الضريبة</span>
+            <span className="text-caption2 text-gray-500 block">السعر شامل الضريبة</span>
             <span className="text-base font-black font-cairo text-saudi-green-950">
               {formatSaudiRiyal(service.price)}
             </span>

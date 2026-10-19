@@ -63,7 +63,7 @@ export default function RFQHubPage() {
               }`}
             >
               <span>{rfq.occasionTitle}</span>
-              <span className="bg-saudi-gold-500 text-saudi-green-950 text-[11px] font-black px-1.5 py-0.2 rounded-full">
+              <span className="bg-saudi-gold-500 text-saudi-green-950 text-caption2 font-black px-1.5 py-0.2 rounded-full">
                 {rfq.quotes.length} عروض
               </span>
             </button>

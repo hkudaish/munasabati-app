@@ -703,7 +703,7 @@ function AdminDashboardContent() {
                         <img src={v.logo} alt={v.businessName} className="w-8 h-8 rounded-xl object-cover" />
                         <div>
                           <span>{v.businessName}</span>
-                          <span className="block text-[11px] text-gray-500 font-normal">{v.contactPhone}</span>
+                          <span className="block text-caption2 text-gray-500 font-normal">{v.contactPhone}</span>
                         </div>
                       </td>
                       <td className="p-3.5 text-gray-600">
@@ -715,12 +715,12 @@ function AdminDashboardContent() {
                       <td className="p-3.5 font-bold text-saudi-gold-700">★ {v.rating} ({v.reviewsCount})</td>
                       <td className="p-3.5">
                         {v.verified ? (
-                          <span className="bg-green-100 text-green-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 w-fit">
+                          <span className="bg-green-100 text-green-800 text-caption2 font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 w-fit">
                             <CheckCircle2 className="w-3 h-3" />
                             موثق رسمي 🇸🇦
                           </span>
                         ) : (
-                          <span className="bg-amber-100 text-amber-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 w-fit">
+                          <span className="bg-amber-100 text-amber-800 text-caption2 font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 w-fit">
                             <Clock className="w-3 h-3" />
                             قيد المراجعة
                           </span>
@@ -833,7 +833,7 @@ function AdminDashboardContent() {
                       <h5 className="font-bold text-xs text-saudi-green-950 font-cairo leading-snug">
                         {srv.titleAr}
                       </h5>
-                      <span className="text-[11px] bg-saudi-green-100 text-saudi-green-800 font-bold px-2 py-0.5 rounded-md shrink-0">
+                      <span className="text-caption2 bg-saudi-green-100 text-saudi-green-800 font-bold px-2 py-0.5 rounded-md shrink-0">
                         {srv.categoryNameAr}
                       </span>
                     </div>
@@ -847,7 +847,7 @@ function AdminDashboardContent() {
 
                   <div className="border-t border-saudi-sand-200 pt-3 flex items-center justify-between">
                     <div>
-                      <span className="text-[11px] text-gray-500 block">السعر:</span>
+                      <span className="text-caption2 text-gray-500 block">السعر:</span>
                       <strong className="text-sm font-black font-cairo text-saudi-green-950">
                         {formatSAR(srv.price)}
                       </strong>
@@ -949,15 +949,15 @@ function AdminDashboardContent() {
                       <span className="text-xs font-mono font-bold text-saudi-gold-600">
                         {b.bookingNumber}
                       </span>
-                      <span className="bg-saudi-green-100 text-saudi-green-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full">
+                      <span className="bg-saudi-green-100 text-saudi-green-800 text-caption2 font-bold px-2.5 py-0.5 rounded-full">
                         {b.status === 'confirmed' ? 'مؤكد بالعربون' : b.status === 'completed' ? 'مكتمل' : b.status}
                       </span>
                       {b.payoutReleased ? (
-                        <span className="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2 py-0.5 rounded-full font-mono">
+                        <span className="bg-emerald-100 text-emerald-800 text-caption2 font-bold px-2 py-0.5 rounded-full font-mono">
                           صُرف للمورد ({b.payoutRef})
                         </span>
                       ) : (
-                        <span className="bg-amber-100 text-amber-800 text-[11px] font-bold px-2 py-0.5 rounded-full">
+                        <span className="bg-amber-100 text-amber-800 text-caption2 font-bold px-2 py-0.5 rounded-full">
                           محتجز في الضمان 🛡️
                         </span>
                       )}
@@ -971,7 +971,7 @@ function AdminDashboardContent() {
 
                   <div className="flex items-center gap-4 text-xs self-end md:self-auto">
                     <div className="text-left">
-                      <span className="text-[11px] text-gray-500 block">إجمالي العقد</span>
+                      <span className="text-caption2 text-gray-500 block">إجمالي العقد</span>
                       <strong className="text-sm font-black font-cairo text-saudi-green-950">
                         {formatSAR(b.totalAmount)}
                       </strong>
@@ -1025,7 +1025,7 @@ function AdminDashboardContent() {
                   className="bg-saudi-sand-50/60 rounded-2xl p-5 border border-saudi-sand-200 space-y-3"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-mono text-gray-500 font-bold">#{occ.id}</span>
+                    <span className="text-caption2 font-mono text-gray-500 font-bold">#{occ.id}</span>
                     <span className="text-xs font-bold bg-saudi-green-100 text-saudi-green-800 px-2.5 py-0.5 rounded-full">
                       جاهزية: {occ.readinessPercentage}%
                     </span>
@@ -1101,9 +1101,9 @@ function AdminDashboardContent() {
                       <div>
                         <div className="flex items-center gap-2">
                           <h5 className="font-bold text-xs text-gray-900">{rev.customerName}</h5>
-                          <span className="text-[11px] text-gray-500">({rev.customerCityAr} - {rev.occasionTypeAr})</span>
+                          <span className="text-caption2 text-gray-500">({rev.customerCityAr} - {rev.occasionTypeAr})</span>
                           {rev.featured && (
-                            <span className="bg-saudi-gold-100 text-saudi-gold-900 text-[11px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
+                            <span className="bg-saudi-gold-100 text-saudi-gold-900 text-caption2 font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
                               <Star className="w-3 h-3 fill-saudi-gold-500" />
                               مميز في الواجهة
                             </span>
@@ -1205,8 +1205,8 @@ function AdminDashboardContent() {
                 >
                   <div>
                     <h5 className="font-bold text-xs text-gray-900">{city.nameAr}</h5>
-                    <span className="text-[11px] text-gray-500 block">{city.regionAr}</span>
-                    <span className="text-[11px] text-saudi-green-800 font-semibold block mt-1">
+                    <span className="text-caption2 text-gray-500 block">{city.regionAr}</span>
+                    <span className="text-caption2 text-saudi-green-800 font-semibold block mt-1">
                       {city.neighborhoods.length} أحياء مغطاة
                     </span>
                   </div>
@@ -1367,7 +1367,7 @@ function AdminDashboardContent() {
                     onChange={(e) => updateRankingWeights({ ratingWeight: parseInt(e.target.value, 10) })}
                     className="w-full accent-saudi-green-800 cursor-pointer"
                   />
-                  <span className="text-[11px] text-gray-500 block">أهمية النجوم والمراجعات الموثقة</span>
+                  <span className="text-caption2 text-gray-500 block">أهمية النجوم والمراجعات الموثقة</span>
                 </div>
 
                 {/* Price weight */}
@@ -1385,7 +1385,7 @@ function AdminDashboardContent() {
                     onChange={(e) => updateRankingWeights({ priceWeight: parseInt(e.target.value, 10) })}
                     className="w-full accent-saudi-green-800 cursor-pointer"
                   />
-                  <span className="text-[11px] text-gray-500 block">أفضلية الأسعار المناسبة للميزانية</span>
+                  <span className="text-caption2 text-gray-500 block">أفضلية الأسعار المناسبة للميزانية</span>
                 </div>
 
                 {/* Availability weight */}
@@ -1403,7 +1403,7 @@ function AdminDashboardContent() {
                     onChange={(e) => updateRankingWeights({ availabilityWeight: parseInt(e.target.value, 10) })}
                     className="w-full accent-saudi-green-800 cursor-pointer"
                   />
-                  <span className="text-[11px] text-gray-500 block">التوفر في تاريخ ووقت المناسبة</span>
+                  <span className="text-caption2 text-gray-500 block">التوفر في تاريخ ووقت المناسبة</span>
                 </div>
 
                 {/* Completed orders weight */}
@@ -1421,7 +1421,7 @@ function AdminDashboardContent() {
                     onChange={(e) => updateRankingWeights({ ordersWeight: parseInt(e.target.value, 10) })}
                     className="w-full accent-saudi-green-800 cursor-pointer"
                   />
-                  <span className="text-[11px] text-gray-500 block">عدد المناسبات المنجزة بنجاح</span>
+                  <span className="text-caption2 text-gray-500 block">عدد المناسبات المنجزة بنجاح</span>
                 </div>
 
                 {/* Distance weight */}
@@ -1439,7 +1439,7 @@ function AdminDashboardContent() {
                     onChange={(e) => updateRankingWeights({ distanceWeight: parseInt(e.target.value, 10) })}
                     className="w-full accent-saudi-green-800 cursor-pointer"
                   />
-                  <span className="text-[11px] text-gray-500 block">موقع المورد ونطاق التغطية بالحي</span>
+                  <span className="text-caption2 text-gray-500 block">موقع المورد ونطاق التغطية بالحي</span>
                 </div>
 
                 {/* Response speed weight */}
@@ -1457,7 +1457,7 @@ function AdminDashboardContent() {
                     onChange={(e) => updateRankingWeights({ responseSpeedWeight: parseInt(e.target.value, 10) })}
                     className="w-full accent-saudi-green-800 cursor-pointer"
                   />
-                  <span className="text-[11px] text-gray-500 block">الرد بالدقائق على رسائل العملاء</span>
+                  <span className="text-caption2 text-gray-500 block">الرد بالدقائق على رسائل العملاء</span>
                 </div>
 
                 {/* Verification weight */}
@@ -1475,7 +1475,7 @@ function AdminDashboardContent() {
                     onChange={(e) => updateRankingWeights({ verificationWeight: parseInt(e.target.value, 10) })}
                     className="w-full accent-saudi-green-800 cursor-pointer"
                   />
-                  <span className="text-[11px] text-gray-500 block">سجل تجاري / وثيقة عمل حر معتمدة</span>
+                  <span className="text-caption2 text-gray-500 block">سجل تجاري / وثيقة عمل حر معتمدة</span>
                 </div>
 
                 {/* On-time rate weight */}
@@ -1493,7 +1493,7 @@ function AdminDashboardContent() {
                     onChange={(e) => updateRankingWeights({ onTimeWeight: parseInt(e.target.value, 10) })}
                     className="w-full accent-saudi-green-800 cursor-pointer"
                   />
-                  <span className="text-[11px] text-gray-500 block">نسبة الحضور والتجهيز بالوقت المحدد</span>
+                  <span className="text-caption2 text-gray-500 block">نسبة الحضور والتجهيز بالوقت المحدد</span>
                 </div>
               </div>
             </div>

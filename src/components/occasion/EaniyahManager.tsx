@@ -110,7 +110,7 @@ export default function EaniyahManager({ occasionId }: EaniyahManagerProps) {
               <Gift className="w-4 h-4" />
               <span>إجمالي العانية الرقمية</span>
             </span>
-            <span className="bg-saudi-gold-500/20 text-saudi-gold-300 text-[11px] font-bold px-2 py-0.5 rounded-full border border-saudi-gold-400/30">
+            <span className="bg-saudi-gold-500/20 text-saudi-gold-300 text-caption2 font-bold px-2 py-0.5 rounded-full border border-saudi-gold-400/30">
               {gifts.length} مساهمين
             </span>
           </div>
@@ -132,7 +132,7 @@ export default function EaniyahManager({ occasionId }: EaniyahManagerProps) {
               <ArrowDownLeft className="w-4 h-4 text-green-600" />
               <span>الرصيد المتاح للتحويل</span>
             </span>
-            <span className="text-[11px] text-green-700 font-bold bg-green-50 px-2 py-0.5 rounded-full">
+            <span className="text-caption2 text-green-700 font-bold bg-green-50 px-2 py-0.5 rounded-full">
               فوري للحساب
             </span>
           </div>
@@ -161,7 +161,7 @@ export default function EaniyahManager({ occasionId }: EaniyahManagerProps) {
               <CheckCircle2 className="w-4 h-4 text-saudi-gold-600" />
               <span>مبالغ تم تحويلها</span>
             </span>
-            <span className="text-[11px] text-gray-500">حسابك البنكي</span>
+            <span className="text-caption2 text-gray-500">حسابك البنكي</span>
           </div>
 
           <div>
@@ -173,7 +173,7 @@ export default function EaniyahManager({ occasionId }: EaniyahManagerProps) {
             </p>
           </div>
 
-          <div className="p-2.5 bg-saudi-sand-50 rounded-xl border border-saudi-sand-200 text-[11px] text-gray-600 flex items-center gap-2">
+          <div className="p-2.5 bg-saudi-sand-50 rounded-xl border border-saudi-sand-200 text-caption2 text-gray-600 flex items-center gap-2">
             <Lock className="w-3.5 h-3.5 text-saudi-green-800 shrink-0" />
             <span>نظام إيداع آمن متصل بسريع وبوابات الدفع الوطنية</span>
           </div>
@@ -247,13 +247,13 @@ export default function EaniyahManager({ occasionId }: EaniyahManagerProps) {
                       <h4 className="text-sm font-bold font-cairo text-saudi-green-950 flex items-center gap-2">
                         <span>{gift.senderName}</span>
                         {gift.isPrivateAmount && (
-                          <span className="text-[11px] text-gray-500 flex items-center gap-0.5">
+                          <span className="text-caption2 text-gray-500 flex items-center gap-0.5">
                             <EyeOff className="w-3 h-3" />
                             <span>مبلغ سري</span>
                           </span>
                         )}
                       </h4>
-                      <div className="flex items-center gap-2 text-[11px] text-gray-500">
+                      <div className="flex items-center gap-2 text-caption2 text-gray-500">
                         <Calendar className="w-3 h-3" />
                         <span>{new Date(gift.createdAt).toLocaleDateString('ar-SA-u-nu-latn')}</span>
                         <span>•</span>
@@ -266,7 +266,7 @@ export default function EaniyahManager({ occasionId }: EaniyahManagerProps) {
                     <span className="text-base font-black font-cairo text-saudi-green-900 block">
                       {formatSAR(gift.amount)}
                     </span>
-                    <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${badge.bg}`}>
+                    <span className={`text-caption2 font-bold px-2 py-0.5 rounded-full border ${badge.bg}`}>
                       {badge.label}
                     </span>
                   </div>
@@ -279,9 +279,9 @@ export default function EaniyahManager({ occasionId }: EaniyahManagerProps) {
 
                 {/* Card Footer status */}
                 <div className="flex items-center justify-between text-xs pt-1">
-                  <span className="text-gray-500 font-mono text-[11px]">{gift.transactionRef}</span>
+                  <span className="text-gray-500 font-mono text-caption2">{gift.transactionRef}</span>
                   <span
-                    className={`font-bold text-[11px] px-2 py-0.5 rounded-full ${
+                    className={`font-bold text-caption2 px-2 py-0.5 rounded-full ${
                       gift.status === 'transferred'
                         ? 'bg-blue-50 text-blue-700'
                         : 'bg-green-50 text-green-700'
@@ -358,7 +358,7 @@ export default function EaniyahManager({ occasionId }: EaniyahManagerProps) {
                     placeholder="SA0000000000000000000000"
                     className="w-full px-3 py-2 border border-gray-300 rounded-xl text-xs font-mono dir-ltr text-right focus:outline-none focus:border-saudi-gold-500 font-bold"
                   />
-                  <span className="text-[11px] text-gray-500">
+                  <span className="text-caption2 text-gray-500">
                     ملاحظة: يجب أن يتطابق اسم صاحب الحساب مع اسم صاحب المناسبة للتحقق الأمني.
                   </span>
                 </div>

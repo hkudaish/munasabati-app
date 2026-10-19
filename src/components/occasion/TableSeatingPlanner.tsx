@@ -119,7 +119,7 @@ export default function TableSeatingPlanner() {
                   </div>
                   <div>
                     <h5 className="font-bold text-sm text-gray-900 font-cairo">{table.name}</h5>
-                    <span className="text-[11px] text-gray-500">
+                    <span className="text-caption2 text-gray-500">
                       {table.section === 'vip' ? 'طاولة كبار الشخصيات VIP' : table.section === 'women' ? 'قسم النساء' : 'قسم الرجال'}
                     </span>
                   </div>
@@ -146,7 +146,7 @@ export default function TableSeatingPlanner() {
 
               {/* Assigned guests chips */}
               <div className="space-y-1.5 min-h-[70px]">
-                <span className="text-[11px] font-bold text-gray-500 block">الضيوف المخصصون:</span>
+                <span className="text-caption2 font-bold text-gray-500 block">الضيوف المخصصون:</span>
                 {assignedGuestsList.length === 0 ? (
                   <p className="text-xs text-gray-500 italic">لا يوجد ضيوف مخصصون بعد على هذه الطاولة.</p>
                 ) : (

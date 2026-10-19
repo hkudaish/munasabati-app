@@ -48,7 +48,7 @@ export function LumaOMSAssistant({ suborder, masterOrder, onClose }: LumaOMSAssi
           </div>
           <div>
             <h3 className="font-bold text-white text-sm">المساعد الذكي لُـمى (Luma Order Assistant)</h3>
-            <p className="text-[11px] text-slate-400">مساعدك الشخصي لتتبع الطلب وحماية حقوقك</p>
+            <p className="text-caption2 text-slate-400">مساعدك الشخصي لتتبع الطلب وحماية حقوقك</p>
           </div>
         </div>
 
@@ -86,7 +86,7 @@ export function LumaOMSAssistant({ suborder, masterOrder, onClose }: LumaOMSAssi
               onClick={() => {
                 setInput(act);
               }}
-              className="text-[11px] bg-slate-950 hover:bg-slate-800 text-amber-300 border border-amber-500/30 px-2.5 py-1 rounded-full transition"
+              className="text-caption2 bg-slate-950 hover:bg-slate-800 text-amber-300 border border-amber-500/30 px-2.5 py-1 rounded-full transition"
             >
               • {act}
             </button>

@@ -220,7 +220,7 @@ export default function CustomerReviewsShowcase({
 
                 {/* Verified Badge */}
                 {rev.isVerifiedBooking && (
-                  <div className="inline-flex items-center gap-1.5 bg-saudi-green-50 border border-saudi-green-200 text-saudi-green-800 px-2.5 py-0.5 rounded-full text-[11px] font-bold">
+                  <div className="inline-flex items-center gap-1.5 bg-saudi-green-50 border border-saudi-green-200 text-saudi-green-800 px-2.5 py-0.5 rounded-full text-caption2 font-bold">
                     <CheckCircle2 className="w-3 h-3 text-saudi-green-700" />
                     <span>حجز ودفع موثوق عبر مناسبتـي 🇸🇦</span>
                   </div>
@@ -233,7 +233,7 @@ export default function CustomerReviewsShowcase({
                 </p>
 
                 {/* 4 Criteria Micro-Ratings */}
-                <div className="grid grid-cols-2 gap-2 text-[11px] text-gray-500 pt-1">
+                <div className="grid grid-cols-2 gap-2 text-caption2 text-gray-500 pt-1">
                   <div className="flex items-center justify-between bg-gray-50 px-2 py-1 rounded-lg">
                     <span>جودة الخدمة:</span>
                     <strong className="text-saudi-green-900 font-mono">★ {rev.qualityRating}</strong>
@@ -276,7 +276,7 @@ export default function CustomerReviewsShowcase({
                   </span>
                 </Link>
 
-                <span className="text-[11px] text-gray-500 font-mono">{rev.date}</span>
+                <span className="text-caption2 text-gray-500 font-mono">{rev.date}</span>
               </div>
             </div>
           );

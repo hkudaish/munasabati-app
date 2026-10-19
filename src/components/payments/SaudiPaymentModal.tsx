@@ -88,7 +88,7 @@ export default function SaudiPaymentModal({
               <h3 className="text-base font-bold font-cairo text-white" id="dlg-1957-1">
                 بوابة الدفع الآمنة (Saudi Secure Pay)
               </h3>
-              <span className="text-[11px] text-saudi-gold-300">
+              <span className="text-caption2 text-saudi-gold-300">
                 مشفرة ومتوافقة مع هيئة الزكاة والضريبة والجمارك (ZATCA) 🇸🇦
               </span>
             </div>
@@ -123,9 +123,9 @@ export default function SaudiPaymentModal({
                 <div className="flex items-center justify-between border-b border-gray-100 pb-2">
                   <div>
                     <span className="font-bold text-gray-900 block">{bookingTitle}</span>
-                    <span className="text-[11px] text-gray-500">المزود: {vendorName}</span>
+                    <span className="text-caption2 text-gray-500">المزود: {vendorName}</span>
                   </div>
-                  <span className="bg-green-100 text-green-800 text-[11px] font-bold px-2 py-0.5 rounded-full">
+                  <span className="bg-green-100 text-green-800 text-caption2 font-bold px-2 py-0.5 rounded-full">
                     مؤكد ومضمون
                   </span>
                 </div>
@@ -206,7 +206,7 @@ export default function SaudiPaymentModal({
                     <span className="text-base font-black font-cairo text-saudi-green-950 block mt-1">
                       {formatSAR(depositAmount)}
                     </span>
-                    <span className="text-[11px] text-gray-500">والمتبقي قبل الحفل</span>
+                    <span className="text-caption2 text-gray-500">والمتبقي قبل الحفل</span>
                   </button>
 
                   <button
@@ -222,7 +222,7 @@ export default function SaudiPaymentModal({
                     <span className="text-base font-black font-cairo text-saudi-green-950 block mt-1">
                       {formatSAR(totalAmount)}
                     </span>
-                    <span className="text-[11px] text-gray-500">خصم وحجز مؤكد 100%</span>
+                    <span className="text-caption2 text-gray-500">خصم وحجز مؤكد 100%</span>
                   </button>
                 </div>
               </div>
@@ -241,7 +241,7 @@ export default function SaudiPaymentModal({
                     }`}
                   >
                     <span className="text-xs font-bold">بطاقة مدى Mada</span>
-                    <span className="text-[11px] text-gray-500">بطاقات البنوك السعودية</span>
+                    <span className="text-caption2 text-gray-500">بطاقات البنوك السعودية</span>
                   </button>
 
                   <button
@@ -254,7 +254,7 @@ export default function SaudiPaymentModal({
                     }`}
                   >
                     <span className="text-xs font-bold">Apple Pay</span>
-                    <span className="text-[11px] text-gray-500">دفع بضغطة واحدة</span>
+                    <span className="text-caption2 text-gray-500">دفع بضغطة واحدة</span>
                   </button>
 
                   <button
@@ -267,7 +267,7 @@ export default function SaudiPaymentModal({
                     }`}
                   >
                     <span className="text-xs font-bold">STC Pay</span>
-                    <span className="text-[11px] text-gray-500">المحفظة الرقمية</span>
+                    <span className="text-caption2 text-gray-500">المحفظة الرقمية</span>
                   </button>
                 </div>
               </div>

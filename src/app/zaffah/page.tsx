@@ -1167,7 +1167,7 @@ export default function ZaffahPage() {
             >
               <Music className="w-4 h-4" />
               <span>مكتبة الفنون والفرق الشعبية</span>
-              <span className="px-2 py-0.5 rounded-full text-[11px] bg-amber-500 text-neutral-950 font-black">
+              <span className="px-2 py-0.5 rounded-full text-caption2 bg-amber-500 text-neutral-950 font-black">
                 {FOLK_GENRES.length + FOLK_TROUPES.length}
               </span>
             </button>
@@ -1217,7 +1217,7 @@ export default function ZaffahPage() {
                     }`}
                   >
                     <span>🎭 ألوان الفنون التراثية</span>
-                    <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-neutral-200 dark:bg-neutral-700 font-bold">
+                    <span className="text-caption2 px-1.5 py-0.5 rounded-full bg-neutral-200 dark:bg-neutral-700 font-bold">
                       {FOLK_GENRES.length}
                     </span>
                   </button>
@@ -1231,7 +1231,7 @@ export default function ZaffahPage() {
                     }`}
                   >
                     <span>👥 الفرق الشعبية المعتمدة للحجز</span>
-                    <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-white/20 text-white font-bold">
+                    <span className="text-caption2 px-1.5 py-0.5 rounded-full bg-white/20 text-white font-bold">
                       {FOLK_TROUPES.length}
                     </span>
                   </button>
@@ -1337,7 +1337,7 @@ export default function ZaffahPage() {
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
 
-                          <span className={`absolute top-3 right-3 px-3 py-1 rounded-full text-[11px] font-bold shadow-md ${genre.badgeColor || 'bg-amber-500 text-neutral-950'}`}>
+                          <span className={`absolute top-3 right-3 px-3 py-1 rounded-full text-caption2 font-bold shadow-md ${genre.badgeColor || 'bg-amber-500 text-neutral-950'}`}>
                             {genre.badge}
                           </span>
 
@@ -1394,7 +1394,7 @@ export default function ZaffahPage() {
                                 </div>
                               </div>
 
-                              <span className="text-[11px] font-mono text-neutral-400">{genre.duration}</span>
+                              <span className="text-caption2 font-mono text-neutral-400">{genre.duration}</span>
                             </div>
                           </div>
 
@@ -1405,7 +1405,7 @@ export default function ZaffahPage() {
                               {genre.instrumentsAr.map((inst, idx) => (
                                 <span
                                   key={idx}
-                                  className="text-[11px] px-2 py-0.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300"
+                                  className="text-caption2 px-2 py-0.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300"
                                 >
                                   🥁 {inst}
                                 </span>
@@ -1424,7 +1424,7 @@ export default function ZaffahPage() {
                       {/* Footer Action */}
                       <div className="p-5 pt-0 border-t border-neutral-100 dark:border-neutral-800/60 mt-2 flex items-center justify-between">
                         <div>
-                          <span className="text-[11px] text-neutral-400 block">تبدأ أسعار الفرق من</span>
+                          <span className="text-caption2 text-neutral-400 block">تبدأ أسعار الفرق من</span>
                           <span className="font-mono text-base font-black text-emerald-600 dark:text-emerald-400">
                             {formatSaudiRiyal(genre.startingPrice)}
                           </span>
@@ -1480,7 +1480,7 @@ export default function ZaffahPage() {
 
                             <div className="flex-1 min-w-0 space-y-1">
                               <div className="flex items-center justify-between gap-2">
-                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-caption2 font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
                                   <Award className="w-3 h-3" />
                                   {troupe.badgeAr}
                                 </span>
@@ -1488,7 +1488,7 @@ export default function ZaffahPage() {
                                 <div className="flex items-center gap-1 text-xs font-bold text-neutral-900 dark:text-white">
                                   <Star className="w-3.5 h-3.5 text-amber-500 fill-current" />
                                   <span>{troupe.rating}</span>
-                                  <span className="text-[11px] text-neutral-400 font-normal">({troupe.reviewsCount})</span>
+                                  <span className="text-caption2 text-neutral-400 font-normal">({troupe.reviewsCount})</span>
                                 </div>
                               </div>
 
@@ -1516,12 +1516,12 @@ export default function ZaffahPage() {
                           {/* Quick Stats Grid */}
                           <div className="grid grid-cols-2 gap-2 text-xs">
                             <div className="p-2.5 rounded-xl bg-neutral-50 dark:bg-neutral-800/40 border border-neutral-100 dark:border-neutral-800">
-                              <span className="text-[11px] text-neutral-400 block">عدد المؤدين والعارضين:</span>
+                              <span className="text-caption2 text-neutral-400 block">عدد المؤدين والعارضين:</span>
                               <span className="font-bold text-neutral-900 dark:text-white">{troupe.membersCountRange}</span>
                             </div>
 
                             <div className="p-2.5 rounded-xl bg-neutral-50 dark:bg-neutral-800/40 border border-neutral-100 dark:border-neutral-800">
-                              <span className="text-[11px] text-neutral-400 block">نطاق التغطية:</span>
+                              <span className="text-caption2 text-neutral-400 block">نطاق التغطية:</span>
                               <span className="font-bold text-neutral-900 dark:text-white truncate block">{troupe.coverageAr}</span>
                             </div>
                           </div>
@@ -1557,17 +1557,17 @@ export default function ZaffahPage() {
                               <span className="text-xs font-bold text-neutral-900 dark:text-white truncate block">
                                 {troupe.sampleAudioTitle}
                               </span>
-                              <span className="text-[11px] text-neutral-400">عينة أداء حي ومباشر</span>
+                              <span className="text-caption2 text-neutral-400">عينة أداء حي ومباشر</span>
                             </div>
 
-                            <span className="text-[11px] font-mono text-neutral-400">{troupe.audioDuration}</span>
+                            <span className="text-caption2 font-mono text-neutral-400">{troupe.audioDuration}</span>
                           </div>
                         </div>
 
                         {/* Footer Price & Booking CTA */}
                         <div className="p-6 pt-0 border-t border-neutral-100 dark:border-neutral-800/60 mt-2 flex items-center justify-between gap-3">
                           <div>
-                            <span className="text-[11px] text-neutral-400 block">السعر يبدأ من</span>
+                            <span className="text-caption2 text-neutral-400 block">السعر يبدأ من</span>
                             <span className="font-mono text-base font-black text-emerald-600 dark:text-emerald-400">
                               {formatSaudiRiyal(troupe.startingPrice)}
                             </span>
@@ -1698,7 +1698,7 @@ export default function ZaffahPage() {
                         }`}
                       >
                         <div className="font-bold text-xs">{style.label}</div>
-                        <div className="text-[11px] text-neutral-400">{style.desc}</div>
+                        <div className="text-caption2 text-neutral-400">{style.desc}</div>
                       </button>
                     ))}
                   </div>
@@ -1839,7 +1839,7 @@ export default function ZaffahPage() {
                       </div>
                       <div className="flex flex-wrap gap-1">
                         {pkg.featuresAr.map((f, i) => (
-                          <span key={i} className="text-[11px] px-2 py-0.5 rounded-md bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300">
+                          <span key={i} className="text-caption2 px-2 py-0.5 rounded-md bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300">
                             ✓ {f}
                           </span>
                         ))}
@@ -1893,7 +1893,7 @@ export default function ZaffahPage() {
                   <ShieldCheck className="w-4 h-4 text-emerald-500" />
                   <span>ضمان منصة مناسبتي للحجوزات الفلكلورية:</span>
                 </div>
-                <p className="text-[11px] leading-relaxed">
+                <p className="text-caption2 leading-relaxed">
                   حجزك مؤمّن بنظام الضمان المالي السعودي (Escrow)؛ لا يتم تحويل المبلغ للفرقة إلا بعد إتمام العرض في ليلة الفرح بنجاح ورضاكم التام.
                 </p>
               </div>

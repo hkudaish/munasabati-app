@@ -400,7 +400,7 @@ export default function OccasionWorkspacePage() {
                   </span>
                   <span className="text-xs text-green-700 font-bold">مؤكدة بالعربون</span>
                 </div>
-                <span className="text-[11px] text-gray-500 mt-2 block">
+                <span className="text-caption2 text-gray-500 mt-2 block">
                   عقود إلكترونية محمية بالكامل
                 </span>
               </div>
@@ -429,7 +429,7 @@ export default function OccasionWorkspacePage() {
                     className="p-4 rounded-2xl border border-saudi-sand-300 bg-saudi-sand-50/50 flex items-start justify-between gap-3"
                   >
                     <div className="space-y-1">
-                      <span className="text-[11px] font-mono text-gray-500 block font-bold">{b.bookingNumber}</span>
+                      <span className="text-caption2 font-mono text-gray-500 block font-bold">{b.bookingNumber}</span>
                       <h5 className="font-bold text-xs text-gray-900">{b.serviceTitleAr}</h5>
                       <span className="text-xs text-gray-600 flex items-center gap-1">
                         المزود: <strong className="text-saudi-green-900">{b.vendorName}</strong>
@@ -505,7 +505,7 @@ export default function OccasionWorkspacePage() {
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-3">
                     <div>
-                      <span className="text-[11px] font-bold text-saudi-gold-600 font-mono">
+                      <span className="text-caption2 font-bold text-saudi-gold-600 font-mono">
                         رقم العقد: {b.bookingNumber}
                       </span>
                       <h4 className="text-sm font-bold text-gray-900">{b.serviceTitleAr}</h4>

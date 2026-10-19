@@ -122,7 +122,7 @@ export const ZatcaInvoiceModal: React.FC<ZatcaInvoiceModalProps> = ({
                   <div className="bg-current rounded-sm"></div>
                 </div>
               </div>
-              <span className="text-[11px] font-mono text-neutral-400 block">
+              <span className="text-caption2 font-mono text-neutral-400 block">
                 ZATCA E-Invoice
               </span>
             </div>

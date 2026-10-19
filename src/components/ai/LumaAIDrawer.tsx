@@ -691,7 +691,7 @@ export default function LumaAIDrawer() {
                 <h3 className="text-lg font-bold font-cairo text-white" id="dlg-6056-1">
                   المساعد الذكي: {adminConfig.aiAssistantNameAr}
                 </h3>
-                <span className="bg-saudi-gold-500/20 text-saudi-gold-300 text-[11px] font-bold px-2 py-0.5 rounded-full border border-saudi-gold-400/40">
+                <span className="bg-saudi-gold-500/20 text-saudi-gold-300 text-caption2 font-bold px-2 py-0.5 rounded-full border border-saudi-gold-400/40">
                   خبير الموردين والتسوق 🇸🇦
                 </span>
               </div>
@@ -784,7 +784,7 @@ export default function LumaAIDrawer() {
                   >
                     <p className="whitespace-pre-line font-tajawal">{msg.text}</p>
                     <span
-                      className={`text-[11px] block mt-1.5 ${
+                      className={`text-caption2 block mt-1.5 ${
                         msg.sender === 'user' ? 'text-gray-300' : 'text-gray-500'
                       }`}
                     >
@@ -884,7 +884,7 @@ export default function LumaAIDrawer() {
                                   {cand.badges.slice(0, 1).map((b, bIdx) => (
                                     <span
                                       key={bIdx}
-                                      className="bg-saudi-gold-100 text-saudi-gold-800 text-[11px] font-bold px-2 py-0.5 rounded-full border border-saudi-gold-300"
+                                      className="bg-saudi-gold-100 text-saudi-gold-800 text-caption2 font-bold px-2 py-0.5 rounded-full border border-saudi-gold-300"
                                     >
                                       {b}
                                     </span>
@@ -897,7 +897,7 @@ export default function LumaAIDrawer() {
                             </div>
 
                             <div className="text-left shrink-0">
-                              <span className="text-[11px] text-gray-500 block">يبدأ من</span>
+                              <span className="text-caption2 text-gray-500 block">يبدأ من</span>
                               <span className="text-sm font-black font-cairo text-saudi-green-900">
                                 {formatSaudiRiyal(cand.primaryService?.price || 0)}
                               </span>
@@ -926,7 +926,7 @@ export default function LumaAIDrawer() {
 
                           {/* Explainability reasons */}
                           <div className="space-y-1">
-                            <span className="text-[11px] font-bold text-saudi-green-900 block">
+                            <span className="text-caption2 font-bold text-saudi-green-900 block">
                               لماذا رشحته لُـمى لك؟
                             </span>
                             <ul className="text-xs text-gray-600 space-y-0.5">
@@ -987,7 +987,7 @@ export default function LumaAIDrawer() {
                     <h5 className="text-xs font-bold text-gray-900">
                       لُـمى تقوم بفحص قواعد بيانات الموردين وحساب أفضل خيار...
                     </h5>
-                    <p className="text-[11px] text-gray-500">
+                    <p className="text-caption2 text-gray-500">
                       التحقق من التوفر والمطابقة مع متطلباتك
                     </p>
                   </div>
@@ -1033,11 +1033,11 @@ export default function LumaAIDrawer() {
 
                     <div className="grid grid-cols-2 gap-2 text-center text-xs">
                       <div className="bg-saudi-sand-100 p-2 rounded-xl">
-                        <span className="text-[11px] text-gray-600 block">الضيوف</span>
+                        <span className="text-caption2 text-gray-600 block">الضيوف</span>
                         <span className="font-bold">{generatedPlan.guestCount} شخص</span>
                       </div>
                       <div className="bg-saudi-sand-100 p-2 rounded-xl">
-                        <span className="text-[11px] text-gray-600 block">الميزانية</span>
+                        <span className="text-caption2 text-gray-600 block">الميزانية</span>
                         <span className="font-bold text-saudi-green-900">
                           {formatSaudiRiyal(generatedPlan.budget)}
                         </span>

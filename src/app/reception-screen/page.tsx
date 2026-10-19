@@ -329,11 +329,11 @@ function ReceptionWelcomeScreenContent() {
                       key={g.id}
                       className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-2xl border border-white/10 flex items-center gap-2 text-xs"
                     >
-                      <div className="w-6 h-6 rounded-full bg-saudi-gold-500 text-saudi-green-950 flex items-center justify-center font-bold text-[11px]">
+                      <div className="w-6 h-6 rounded-full bg-saudi-gold-500 text-saudi-green-950 flex items-center justify-center font-bold text-caption2">
                         ✓
                       </div>
                       <span className="font-bold text-white">{g.name}</span>
-                      <span className="text-[11px] text-saudi-gold-300">({g.tableName || 'طاولة عامة'})</span>
+                      <span className="text-caption2 text-saudi-gold-300">({g.tableName || 'طاولة عامة'})</span>
                     </div>
                   ))}
                 </div>
@@ -349,28 +349,28 @@ function ReceptionWelcomeScreenContent() {
         {/* Hall Attendance Metrics Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
           <div className="bg-black/30 backdrop-blur-md p-3 rounded-2xl border border-white/10">
-            <span className="text-[11px] sm:text-xs text-gray-400 block font-medium">المدعوين الإجمالي</span>
+            <span className="text-caption2 sm:text-xs text-gray-400 block font-medium">المدعوين الإجمالي</span>
             <strong className="text-base sm:text-xl font-black font-cairo text-white">
               {occasionGuests.length} ضيف
             </strong>
           </div>
 
           <div className="bg-black/30 backdrop-blur-md p-3 rounded-2xl border border-saudi-gold-500/30">
-            <span className="text-[11px] sm:text-xs text-saudi-gold-300 block font-medium">الحاضرين في القاعة</span>
+            <span className="text-caption2 sm:text-xs text-saudi-gold-300 block font-medium">الحاضرين في القاعة</span>
             <strong className="text-base sm:text-xl font-black font-cairo text-saudi-gold-300">
               {attendedGuests.length} حاضر
             </strong>
           </div>
 
           <div className="bg-black/30 backdrop-blur-md p-3 rounded-2xl border border-white/10">
-            <span className="text-[11px] sm:text-xs text-gray-400 block font-medium">نسبة الامتلاء</span>
+            <span className="text-caption2 sm:text-xs text-gray-400 block font-medium">نسبة الامتلاء</span>
             <strong className="text-base sm:text-xl font-black font-cairo text-white">
               {attendancePercentage}%
             </strong>
           </div>
 
           <div className="bg-black/30 backdrop-blur-md p-3 rounded-2xl border border-white/10">
-            <span className="text-[11px] sm:text-xs text-gray-400 block font-medium">حصيلة تبريكات العانية</span>
+            <span className="text-caption2 sm:text-xs text-gray-400 block font-medium">حصيلة تبريكات العانية</span>
             <strong className="text-base sm:text-xl font-black font-cairo text-saudi-gold-300">
               {occasionEaniyah.length} إهداءات
             </strong>
@@ -380,7 +380,7 @@ function ReceptionWelcomeScreenContent() {
         {/* Live Congratulatory Blessings Ticker */}
         {occasionEaniyah.length > 0 && (
           <div className="bg-black/40 backdrop-blur-md p-2.5 rounded-2xl border border-saudi-gold-500/30 flex items-center gap-3 overflow-hidden text-xs">
-            <div className="bg-saudi-gold-500 text-saudi-green-950 font-black px-2.5 py-1 rounded-xl text-[11px] shrink-0 flex items-center gap-1 shadow-sm">
+            <div className="bg-saudi-gold-500 text-saudi-green-950 font-black px-2.5 py-1 rounded-xl text-caption2 shrink-0 flex items-center gap-1 shadow-sm">
               <Gift className="w-3.5 h-3.5" />
               <span>شريط التبريكات</span>
             </div>

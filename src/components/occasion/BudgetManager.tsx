@@ -214,7 +214,7 @@ export default function BudgetManager() {
                 <tr key={item.id} className="hover:bg-saudi-sand-50/60 transition">
                   <td className="p-3.5">
                     <span className="font-bold text-gray-900 block">{item.categoryNameAr}</span>
-                    <span className="text-[11px] text-gray-500">{item.categoryId}</span>
+                    <span className="text-caption2 text-gray-500">{item.categoryId}</span>
                   </td>
                   <td className="p-3.5 font-semibold text-gray-700">
                     {formatSAR(item.allocatedAmount)}
@@ -227,18 +227,18 @@ export default function BudgetManager() {
                   </td>
                   <td className="p-3.5">
                     {item.status === 'paid' && (
-                      <span className="inline-flex items-center gap-1 bg-green-100 text-green-800 text-[11px] font-bold px-2 py-0.5 rounded-full">
+                      <span className="inline-flex items-center gap-1 bg-green-100 text-green-800 text-caption2 font-bold px-2 py-0.5 rounded-full">
                         <CheckCircle2 className="w-3 h-3" />
                         مدفوع بالكامل
                       </span>
                     )}
                     {item.status === 'booked' && (
-                      <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 text-[11px] font-bold px-2 py-0.5 rounded-full">
+                      <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 text-caption2 font-bold px-2 py-0.5 rounded-full">
                         تم الحجز (عربون)
                       </span>
                     )}
                     {item.status === 'estimated' && (
-                      <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-700 text-[11px] font-bold px-2 py-0.5 rounded-full">
+                      <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-700 text-caption2 font-bold px-2 py-0.5 rounded-full">
                         تقديري
                       </span>
                     )}

@@ -138,11 +138,11 @@ export default function Footer() {
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
           <p>© 2026 {adminConfig.platformNameAr}. جميع الحقوق محفوظة في المملكة العربية السعودية 🇸🇦</p>
           <div className="flex items-center gap-3">
-            <span className="bg-white/10 px-2 py-0.5 rounded text-[11px] text-gray-300">مدى Mada</span>
-            <span className="bg-white/10 px-2 py-0.5 rounded text-[11px] text-gray-300">Apple Pay</span>
-            <span className="bg-white/10 px-2 py-0.5 rounded text-[11px] text-gray-300">STC Pay</span>
-            <span className="bg-white/10 px-2 py-0.5 rounded text-[11px] text-gray-300">تابي / تمارا</span>
-            <span className="bg-saudi-gold-500/20 text-saudi-gold-300 px-2 py-0.5 rounded text-[11px]">ضريبة 15% ZATCA</span>
+            <span className="bg-white/10 px-2 py-0.5 rounded text-caption2 text-gray-300">مدى Mada</span>
+            <span className="bg-white/10 px-2 py-0.5 rounded text-caption2 text-gray-300">Apple Pay</span>
+            <span className="bg-white/10 px-2 py-0.5 rounded text-caption2 text-gray-300">STC Pay</span>
+            <span className="bg-white/10 px-2 py-0.5 rounded text-caption2 text-gray-300">تابي / تمارا</span>
+            <span className="bg-saudi-gold-500/20 text-saudi-gold-300 px-2 py-0.5 rounded text-caption2">ضريبة 15% ZATCA</span>
           </div>
         </div>
       </div>

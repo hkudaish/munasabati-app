@@ -117,7 +117,7 @@ export default function TasksTimeline() {
 
             <div className="flex items-center gap-2">
               <span
-                className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
+                className={`text-caption2 font-bold px-2.5 py-0.5 rounded-full ${
                   task.priority === 'high'
                     ? 'bg-red-100 text-red-700'
                     : task.priority === 'medium'
@@ -128,7 +128,7 @@ export default function TasksTimeline() {
                 {task.priority === 'high' ? 'أولوية عاجلة' : task.priority === 'medium' ? 'أولوية متوسطة' : 'عادية'}
               </span>
 
-              <span className="bg-saudi-green-50 text-saudi-green-900 text-[11px] font-bold px-2.5 py-0.5 rounded-full">
+              <span className="bg-saudi-green-50 text-saudi-green-900 text-caption2 font-bold px-2.5 py-0.5 rounded-full">
                 قبل {task.dueDaysBefore} يوم
               </span>
             </div>

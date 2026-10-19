@@ -296,7 +296,7 @@ export default function VendorProfilePage() {
             <span className="text-xl font-black font-cairo text-saudi-green-950 block mt-1">
               {vendor.metrics.onTimeRate}% ⏱️
             </span>
-            <span className="text-[11px] text-emerald-700 font-bold">دقة عالية بالمواعيد</span>
+            <span className="text-caption2 text-emerald-700 font-bold">دقة عالية بالمواعيد</span>
           </div>
 
           <div className="bg-white p-4 rounded-2xl border border-saudi-sand-300 shadow-sm text-center">
@@ -304,7 +304,7 @@ export default function VendorProfilePage() {
             <span className="text-xl font-black font-cairo text-saudi-gold-700 block mt-1">
               {vendor.metrics.satisfactionRate}% ⭐
             </span>
-            <span className="text-[11px] text-saudi-gold-800 font-bold">مراجعات ممتازة</span>
+            <span className="text-caption2 text-saudi-gold-800 font-bold">مراجعات ممتازة</span>
           </div>
 
           <div className="bg-white p-4 rounded-2xl border border-saudi-sand-300 shadow-sm text-center">
@@ -312,7 +312,7 @@ export default function VendorProfilePage() {
             <span className="text-xl font-black font-cairo text-saudi-green-950 block mt-1">
               {vendor.metrics.repeatCustomerRate}% 🔄
             </span>
-            <span className="text-[11px] text-gray-500">ولاء وثقة عالية</span>
+            <span className="text-caption2 text-gray-500">ولاء وثقة عالية</span>
           </div>
 
           <div className="bg-white p-4 rounded-2xl border border-saudi-sand-300 shadow-sm text-center">
@@ -320,7 +320,7 @@ export default function VendorProfilePage() {
             <span className="text-xl font-black font-cairo text-saudi-green-950 block mt-1">
               {vendor.metrics.responseTimeMinutes} دقيقة ⚡
             </span>
-            <span className="text-[11px] text-emerald-700 font-bold">تجاوب فوري</span>
+            <span className="text-caption2 text-emerald-700 font-bold">تجاوب فوري</span>
           </div>
         </div>
 
@@ -389,7 +389,7 @@ export default function VendorProfilePage() {
                           {service.featuresAr?.slice(0, 3).map((feat, i) => (
                             <span
                               key={i}
-                              className="text-[11px] px-2 py-0.5 rounded-lg bg-saudi-sand-100 text-gray-700"
+                              className="text-caption2 px-2 py-0.5 rounded-lg bg-saudi-sand-100 text-gray-700"
                             >
                               ✓ {feat}
                             </span>
@@ -400,7 +400,7 @@ export default function VendorProfilePage() {
 
                     <div className="p-5 pt-0 border-t border-saudi-sand-200 mt-4 flex items-center justify-between">
                       <div>
-                        <span className="text-[11px] text-gray-500 block">السعر يبدأ من</span>
+                        <span className="text-caption2 text-gray-500 block">السعر يبدأ من</span>
                         <span className="font-cairo text-base font-black text-saudi-green-900">
                           {formatSaudiRiyal(service.price)}
                         </span>
@@ -540,7 +540,7 @@ export default function VendorProfilePage() {
                         </div>
                         <div>
                           <h4 className="font-bold text-xs text-gray-900">{rev.customerName}</h4>
-                          <span className="text-[11px] text-gray-500">{rev.occasionTypeAr} • {rev.date}</span>
+                          <span className="text-caption2 text-gray-500">{rev.occasionTypeAr} • {rev.date}</span>
                         </div>
                       </div>
                       <div className="flex items-center gap-1 text-xs font-bold text-saudi-gold-700">

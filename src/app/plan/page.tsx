@@ -169,7 +169,7 @@ function PlanWizardContent() {
                       <CheckCircle2 className="w-4 h-4 text-saudi-green-800 shrink-0" />
                     )}
                   </div>
-                  <span className="text-[11px] text-gray-500 line-clamp-1">{occ.descriptionAr}</span>
+                  <span className="text-caption2 text-gray-500 line-clamp-1">{occ.descriptionAr}</span>
                 </button>
               ))}
             </div>
@@ -340,7 +340,7 @@ function PlanWizardContent() {
                     <span className="text-xs font-bold text-gray-900 font-cairo">{v.title}</span>
                     {venueType === v.id && <CheckCircle2 className="w-4 h-4 text-saudi-green-800" />}
                   </div>
-                  <span className="text-[11px] text-gray-500 mt-1">{v.desc}</span>
+                  <span className="text-caption2 text-gray-500 mt-1">{v.desc}</span>
                 </button>
               ))}
             </div>
@@ -402,7 +402,7 @@ function PlanWizardContent() {
                       }`}
                     >
                       <span className="text-xs font-bold block">{t.title}</span>
-                      <span className="text-[11px] text-gray-500 block mt-0.5">{t.desc}</span>
+                      <span className="text-caption2 text-gray-500 block mt-0.5">{t.desc}</span>
                     </button>
                   ))}
                 </div>

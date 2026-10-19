@@ -199,7 +199,7 @@ export default function DigitalEaniyahModal({
                     <Sparkles className="w-4 h-4" />
                     <span>بطاقة عانية مباركة</span>
                   </div>
-                  <span className="text-[11px] font-mono opacity-60">{completedGift.transactionRef}</span>
+                  <span className="text-caption2 font-mono opacity-60">{completedGift.transactionRef}</span>
                 </div>
 
                 <div className="space-y-1">
@@ -214,11 +214,11 @@ export default function DigitalEaniyahModal({
 
                 <div className="flex items-center justify-between pt-2 border-t border-white/15">
                   <div>
-                    <span className="text-[11px] text-gray-300 block">المهدي:</span>
+                    <span className="text-caption2 text-gray-300 block">المهدي:</span>
                     <strong className="text-xs text-white font-bold">{completedGift.senderName}</strong>
                   </div>
                   <div className="text-left">
-                    <span className="text-[11px] text-gray-300 block">قيمة العانية:</span>
+                    <span className="text-caption2 text-gray-300 block">قيمة العانية:</span>
                     <strong className="text-base font-black font-cairo text-saudi-gold-300">
                       {completedGift.isPrivateAmount ? 'عانية شرف (خاص)' : formatSAR(completedGift.amount)}
                     </strong>
@@ -333,7 +333,7 @@ export default function DigitalEaniyahModal({
                       key={idx}
                       type="button"
                       onClick={() => setBlessingMessage(msg)}
-                      className="px-2.5 py-1 bg-saudi-sand-50 hover:bg-saudi-sand-100 text-[11px] text-gray-600 rounded-lg whitespace-nowrap border border-saudi-sand-200 transition"
+                      className="px-2.5 py-1 bg-saudi-sand-50 hover:bg-saudi-sand-100 text-caption2 text-gray-600 rounded-lg whitespace-nowrap border border-saudi-sand-200 transition"
                     >
                       {msg.slice(0, 28)}...
                     </button>
@@ -371,7 +371,7 @@ export default function DigitalEaniyahModal({
                   </div>
                   <div>
                     <span className="text-xs font-bold text-gray-800 block">إخفاء قيمة العانية (عانية سرية)</span>
-                    <span className="text-[11px] text-gray-500">لا يظهر المبلغ في سجل التهاني العام ويصل للمعرس فقط</span>
+                    <span className="text-caption2 text-gray-500">لا يظهر المبلغ في سجل التهاني العام ويصل للمعرس فقط</span>
                   </div>
                 </div>
                 <input
@@ -447,7 +447,7 @@ export default function DigitalEaniyahModal({
                 )}
               </button>
 
-              <div className="flex items-center justify-center gap-2 text-[11px] text-gray-500">
+              <div className="flex items-center justify-center gap-2 text-caption2 text-gray-500">
                 <Lock className="w-3 h-3" />
                 <span>دفع مشفر 100% متوافق مع نظام المدفوعات والبنك المركزي السعودي (SAMA)</span>
               </div>

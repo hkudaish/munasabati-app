@@ -92,7 +92,7 @@ export default function WishlistManager() {
                   alt={gift.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition"
                 />
-                <span className="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white text-[11px] font-bold px-2.5 py-1 rounded-full">
+                <span className="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white text-caption2 font-bold px-2.5 py-1 rounded-full">
                   {gift.category}
                 </span>
 
