@@ -5,11 +5,11 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   const health = await checkDatabaseHealth();
-  return NextResponse.json({
-    status: health.isConnected ? 'connected' : 'offline_fallback',
-    provider: 'PostgreSQL (Prisma 6)',
-    details: health.message,
-    latencyMs: health.latencyMs ?? null,
-    timestamp: new Date().toISOString(),
-  }, { headers: { 'Cache-Control': 'no-store' } });
+  const status = health.isConnected ? 'connected' : 'offline_fallback';
+  const timestamp = new Date().toISOString();
+  // Public endpoint: expose infrastructure detail only outside production.
+  const body = process.env.NODE_ENV === 'production'
+    ? { status, timestamp }
+    : { status, provider: 'PostgreSQL (Prisma 6)', details: health.message, latencyMs: health.latencyMs ?? null, timestamp };
+  return NextResponse.json(body, { headers: { 'Cache-Control': 'no-store' } });
 }
