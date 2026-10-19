@@ -276,7 +276,7 @@ export default function CartPage() {
                         {/* Price & Quantity Controls */}
                         <div className="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-3">
                           <div className="text-left">
-                            <span className="text-base font-black font-cairo text-saudi-green-950 block">
+                            <span className="text-base font-bold font-cairo text-saudi-green-950 block">
                               {formatSaudiRiyal(item.totalPrice)}
                             </span>
                             <span className="text-caption2 text-gray-500">شامل الضريبة 15%</span>
@@ -347,7 +347,7 @@ export default function CartPage() {
                         <p className="text-xs text-gray-500">
                           {saved.vendorName} • باقة {saved.selectedPackage.nameAr}
                         </p>
-                        <span className="text-xs font-black text-saudi-green-900 block mt-0.5">
+                        <span className="text-xs font-bold text-saudi-green-900 block mt-0.5">
                           {formatSaudiRiyal(saved.totalPrice)}
                         </span>
                       </div>

@@ -410,7 +410,7 @@ export default function OMSAdminCommandCenter() {
             <div key={col.id} className="bg-slate-900/60 border border-slate-800 rounded-3xl p-4 flex flex-col h-[680px]">
               <div className={`p-3 rounded-2xl border ${col.color} flex items-center justify-between mb-4`}>
                 <h3 className="font-bold text-xs">{col.titleAr}</h3>
-                <span className="text-xs font-black bg-slate-950/80 px-2 py-0.5 rounded-full">
+                <span className="text-xs font-bold bg-slate-950/80 px-2 py-0.5 rounded-full">
                   {col.items.length}
                 </span>
               </div>

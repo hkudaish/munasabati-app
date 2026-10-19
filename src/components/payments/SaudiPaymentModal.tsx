@@ -149,7 +149,7 @@ export default function SaudiPaymentModal({
                     <span>ضريبة القيمة المضافة (15%):</span>
                     <span>{formatSAR(vat)}</span>
                   </div>
-                  <div className="flex justify-between text-sm font-black text-saudi-green-950 pt-2 border-t border-gray-100">
+                  <div className="flex justify-between text-sm font-bold text-saudi-green-950 pt-2 border-t border-gray-100">
                     <span>المبلغ المسدد إجمالاً:</span>
                     <span>{formatSAR(amountToPay)}</span>
                   </div>
@@ -189,7 +189,7 @@ export default function SaudiPaymentModal({
                 </div>
                 <div className="flex items-center justify-between pt-2 border-t border-gray-100">
                   <span className="font-bold text-gray-800">إجمالي قيمة الخدمة:</span>
-                  <span className="font-black text-sm text-saudi-green-950">{formatSAR(totalAmount)}</span>
+                  <span className="font-bold text-sm text-saudi-green-950">{formatSAR(totalAmount)}</span>
                 </div>
               </div>
 
@@ -207,7 +207,7 @@ export default function SaudiPaymentModal({
                     }`}
                   >
                     <span className="text-xs font-bold block">دفع العربون فقط (30%)</span>
-                    <span className="text-base font-black font-cairo text-saudi-green-950 block mt-1">
+                    <span className="text-base font-bold font-cairo text-saudi-green-950 block mt-1">
                       {formatSAR(depositAmount)}
                     </span>
                     <span className="text-caption2 text-gray-500">والمتبقي قبل الحفل</span>
@@ -223,7 +223,7 @@ export default function SaudiPaymentModal({
                     }`}
                   >
                     <span className="text-xs font-bold block">سداد المبلغ بالكامل</span>
-                    <span className="text-base font-black font-cairo text-saudi-green-950 block mt-1">
+                    <span className="text-base font-bold font-cairo text-saudi-green-950 block mt-1">
                       {formatSAR(totalAmount)}
                     </span>
                     <span className="text-caption2 text-gray-500">خصم وحجز مؤكد 100%</span>

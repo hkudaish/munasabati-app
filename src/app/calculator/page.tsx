@@ -155,7 +155,7 @@ export default function CalculatorPage() {
             {/* Occasion & City Card */}
             <div className="bg-white dark:bg-neutral-900 p-6 rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-4">
               <h2 className="text-base font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs font-black">
+                <span className="w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs font-bold">
                   1
                 </span>
                 نوع المناسبة والمدينة
@@ -201,7 +201,7 @@ export default function CalculatorPage() {
             {/* Guests & Venue Card */}
             <div className="bg-white dark:bg-neutral-900 p-6 rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-5">
               <h2 className="text-base font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs font-black">
+                <span className="w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs font-bold">
                   2
                 </span>
                 عدد الضيوف ومكان الحفل
@@ -214,7 +214,7 @@ export default function CalculatorPage() {
                     <span className="text-xs font-bold text-neutral-700 dark:text-neutral-300">
                       قسم الرجال
                     </span>
-                    <span className="font-mono text-sm font-black text-emerald-600 dark:text-emerald-400">
+                    <span className="font-mono text-sm font-bold text-emerald-600 dark:text-emerald-400">
                       {menGuestCount} ضيف
                     </span>
                   </div>
@@ -234,7 +234,7 @@ export default function CalculatorPage() {
                     <span className="text-xs font-bold text-neutral-700 dark:text-neutral-300">
                       قسم النساء
                     </span>
-                    <span className="font-mono text-sm font-black text-emerald-600 dark:text-emerald-400">
+                    <span className="font-mono text-sm font-bold text-emerald-600 dark:text-emerald-400">
                       {womenGuestCount} ضيفة
                     </span>
                   </div>
@@ -312,7 +312,7 @@ export default function CalculatorPage() {
             {/* Services & Inclusions Checkboxes */}
             <div className="bg-white dark:bg-neutral-900 p-6 rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-4">
               <h2 className="text-base font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs font-black">
+                <span className="w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs font-bold">
                   3
                 </span>
                 الخدمات المشمولة في الحسبة

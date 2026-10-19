@@ -365,7 +365,7 @@ function AdminDashboardContent() {
         <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={() => setIsAddVendorOpen(true)}
-            className="px-4 py-2.5 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-black rounded-xl text-xs flex items-center gap-1.5 shadow-md transition"
+            className="px-4 py-2.5 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md transition"
           >
             <Plus className="w-4 h-4" />
             <span>+ إضافة مورد معتمد</span>
@@ -848,7 +848,7 @@ function AdminDashboardContent() {
                   <div className="border-t border-saudi-sand-200 pt-3 flex items-center justify-between">
                     <div>
                       <span className="text-caption2 text-gray-500 block">السعر:</span>
-                      <strong className="text-sm font-black font-cairo text-saudi-green-950">
+                      <strong className="text-sm font-bold font-cairo text-saudi-green-950">
                         {formatSAR(srv.price)}
                       </strong>
                     </div>
@@ -972,7 +972,7 @@ function AdminDashboardContent() {
                   <div className="flex items-center gap-4 text-xs self-end md:self-auto">
                     <div className="text-left">
                       <span className="text-caption2 text-gray-500 block">إجمالي العقد</span>
-                      <strong className="text-sm font-black font-cairo text-saudi-green-950">
+                      <strong className="text-sm font-bold font-cairo text-saudi-green-950">
                         {formatSAR(b.totalAmount)}
                       </strong>
                     </div>

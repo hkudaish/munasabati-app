@@ -102,7 +102,7 @@ export default function ComparePage() {
           <span className="text-xs sm:text-sm font-bold">{toastMessage}</span>
           <Link
             href="/cart"
-            className="mr-2 px-3 py-1 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-black rounded-lg text-xs transition"
+            className="mr-2 px-3 py-1 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-bold rounded-lg text-xs transition"
           >
             عرض السلة
           </Link>
@@ -257,7 +257,7 @@ export default function ComparePage() {
                 const srv = services.find((s) => s.vendorId === vendor.id);
                 return (
                   <td key={vendor.id} className="p-4 text-center">
-                    <span className="text-base font-black font-cairo text-saudi-green-950 block">
+                    <span className="text-base font-bold font-cairo text-saudi-green-950 block">
                       {formatSaudiRiyal(srv?.price || 0)}
                     </span>
                     <span className="text-caption2 text-gray-500">{srv?.titleAr || 'خدمة مخصصة'}</span>

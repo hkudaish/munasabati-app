@@ -366,7 +366,7 @@ function PlanWizardContent() {
                     type="number"
                     value={budget}
                     onChange={(e) => setBudget(Number(e.target.value))}
-                    className="w-full sm:w-64 px-4 py-3 border border-gray-300 rounded-xl text-base font-black text-saudi-green-950 focus:outline-none focus:border-saudi-gold-500"
+                    className="w-full sm:w-64 px-4 py-3 border border-gray-300 rounded-xl text-base font-bold text-saudi-green-950 focus:outline-none focus:border-saudi-gold-500"
                   />
                   <span className="text-xs font-bold text-gray-500">ريال سعودي</span>
                 </div>
@@ -481,7 +481,7 @@ function PlanWizardContent() {
               </div>
               <div className="flex justify-between border-b border-gray-200 pb-2">
                 <span className="text-gray-500">الميزانية المقدرة:</span>
-                <span className="font-black text-saudi-green-900 text-sm">{formatSAR(budget)}</span>
+                <span className="font-bold text-saudi-green-900 text-sm">{formatSAR(budget)}</span>
               </div>
               <div className="flex justify-between pt-1">
                 <span className="text-gray-500">الخدمات المختارة:</span>
@@ -519,7 +519,7 @@ function PlanWizardContent() {
             <button
               onClick={handleFinishWizard}
               disabled={!coverageReady || isSubmitting}
-              className="px-8 py-3 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-black rounded-xl text-xs sm:text-sm shadow-md flex items-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-8 py-3 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-bold rounded-xl text-xs sm:text-sm shadow-md flex items-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Sparkles className="w-4 h-4 text-saudi-green-950" />
               <span>{isSubmitting ? 'جاري إنشاء المناسبة…' : 'توليد "خطة مناسبتي" وفتح مساحة العمل'}</span>

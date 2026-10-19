@@ -898,7 +898,7 @@ export default function LumaAIDrawer() {
 
                             <div className="text-left shrink-0">
                               <span className="text-caption2 text-gray-500 block">يبدأ من</span>
-                              <span className="text-sm font-black font-cairo text-saudi-green-900">
+                              <span className="text-sm font-bold font-cairo text-saudi-green-900">
                                 {formatSaudiRiyal(cand.primaryService?.price || 0)}
                               </span>
                             </div>

@@ -240,7 +240,7 @@ function ReceptionWelcomeScreenContent() {
           <div className="w-full max-w-4xl bg-gradient-to-b from-[#00382D] to-[#001F18] border-2 border-saudi-gold-400 rounded-3xl p-8 sm:p-14 text-center shadow-[0_0_80px_rgba(197,155,39,0.35)] animate-fadeIn space-y-6 relative overflow-hidden">
             
             {/* Top Ornamental Ribbon */}
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 text-saudi-green-950 px-6 py-2 rounded-full font-black text-xs sm:text-sm shadow-md uppercase tracking-wider">
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 text-saudi-green-950 px-6 py-2 rounded-full font-bold text-xs sm:text-sm shadow-md uppercase tracking-wider">
               <Sparkles className="w-4 h-4" />
               <span>أهلاً وسهلاً ومرحباً بكم في حفلنا المبارك</span>
               <Sparkles className="w-4 h-4" />
@@ -385,7 +385,7 @@ function ReceptionWelcomeScreenContent() {
         {/* Live Congratulatory Blessings Ticker */}
         {occasionEaniyah.length > 0 && (
           <div className="bg-black/40 backdrop-blur-md p-2.5 rounded-2xl border border-saudi-gold-500/30 flex items-center gap-3 overflow-hidden text-xs">
-            <div className="bg-saudi-gold-500 text-saudi-green-950 font-black px-2.5 py-1 rounded-xl text-caption2 shrink-0 flex items-center gap-1 shadow-sm">
+            <div className="bg-saudi-gold-500 text-saudi-green-950 font-bold px-2.5 py-1 rounded-xl text-caption2 shrink-0 flex items-center gap-1 shadow-sm">
               <Gift className="w-3.5 h-3.5" />
               <span>شريط التبريكات</span>
             </div>

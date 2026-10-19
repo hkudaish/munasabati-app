@@ -133,7 +133,7 @@ export default function VendorProfilePage() {
           <span className="text-xs sm:text-sm font-bold">{toastMessage}</span>
           <Link
             href="/cart"
-            className="mr-2 px-3 py-1 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-black rounded-lg text-xs transition"
+            className="mr-2 px-3 py-1 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-bold rounded-lg text-xs transition"
           >
             عرض السلة
           </Link>
@@ -401,7 +401,7 @@ export default function VendorProfilePage() {
                     <div className="p-5 pt-0 border-t border-saudi-sand-200 mt-4 flex items-center justify-between">
                       <div>
                         <span className="text-caption2 text-gray-500 block">السعر يبدأ من</span>
-                        <span className="font-cairo text-base font-black text-saudi-green-900">
+                        <span className="font-cairo text-base font-bold text-saudi-green-900">
                           {formatSaudiRiyal(service.price)}
                         </span>
                       </div>

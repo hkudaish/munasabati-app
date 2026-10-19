@@ -158,7 +158,7 @@ export default function CheckoutPage() {
             <div
               className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs transition ${
                 step === 3
-                  ? 'bg-saudi-gold-500 text-saudi-green-950 font-black shadow-md'
+                  ? 'bg-saudi-gold-500 text-saudi-green-950 font-bold shadow-md'
                   : 'bg-saudi-sand-200 text-gray-600'
               }`}
             >
@@ -365,7 +365,7 @@ export default function CheckoutPage() {
               </div>
               <div className="flex justify-between">
                 <span>العربون المتوقع بعد التأكيد:</span>
-                <span className="font-black text-saudi-green-900 text-base">
+                <span className="font-bold text-saudi-green-900 text-base">
                   {formatSaudiRiyal(
                     paymentOption === 'deposit' ? totals.depositAmount : totals.finalTotal
                   )}
@@ -399,7 +399,7 @@ export default function CheckoutPage() {
             <p className="text-xs sm:text-sm text-gray-600 max-w-lg mx-auto font-tajawal">
               تم حفظ الطلب وإضافته إلى قائمة طلبات الموردين برقم الطلب الموحد:
             </p>
-            <div className="inline-block bg-saudi-sand-100 px-4 py-2 rounded-xl text-sm font-black font-mono text-saudi-green-900 tracking-wider break-all">
+            <div className="inline-block bg-saudi-sand-100 px-4 py-2 rounded-xl text-sm font-bold font-mono text-saudi-green-900 tracking-wider break-all">
               {createdOrderNumber}
             </div>
           </div>

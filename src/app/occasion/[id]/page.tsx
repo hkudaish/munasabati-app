@@ -140,7 +140,7 @@ export default function OccasionWorkspacePage() {
                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                 />
               </svg>
-              <span className="absolute text-xs font-black font-cairo text-saudi-gold-300">
+              <span className="absolute text-xs font-bold font-cairo text-saudi-gold-300">
                 {currentOccasion.readinessPercentage}%
               </span>
             </div>
@@ -443,7 +443,7 @@ export default function OccasionWorkspacePage() {
 
                     <div className="text-left shrink-0">
                       <span className="text-xs text-gray-500 block">الإجمالي:</span>
-                      <span className="text-sm font-black font-cairo text-saudi-green-950">
+                      <span className="text-sm font-bold font-cairo text-saudi-green-950">
                         {formatSAR(b.totalAmount)}
                       </span>
                     </div>

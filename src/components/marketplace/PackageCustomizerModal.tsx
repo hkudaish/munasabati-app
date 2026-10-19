@@ -109,7 +109,7 @@ export default function PackageCustomizerModal({
                 </div>
 
                 <div className="text-left shrink-0">
-                  <span className="text-sm font-black font-cairo text-saudi-green-950 block">
+                  <span className="text-sm font-bold font-cairo text-saudi-green-950 block">
                     {formatSAR(item.pricePortion)}
                   </span>
                   <span className="text-caption2 text-gray-500">سعر البند ضمن الباقة</span>

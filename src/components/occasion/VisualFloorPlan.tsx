@@ -107,7 +107,7 @@ export const VisualFloorPlan: React.FC<VisualFloorPlanProps> = ({
           />
 
           {/* 1. Stage / Kosha Header Section */}
-          <div className="relative z-10 mx-auto w-3/4 max-w-md py-3 px-6 rounded-2xl bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-neutral-950 font-black text-center text-xs sm:text-sm shadow-xl shadow-amber-500/20 border border-amber-300 flex items-center justify-center gap-2">
+          <div className="relative z-10 mx-auto w-3/4 max-w-md py-3 px-6 rounded-2xl bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-neutral-950 font-bold text-center text-xs sm:text-sm shadow-xl shadow-amber-500/20 border border-amber-300 flex items-center justify-center gap-2">
             <Crown className="w-4 h-4" />
             <span>منصة الكوشة الملكية والمسرح الرئيسي</span>
             <Crown className="w-4 h-4" />
@@ -200,7 +200,7 @@ export const VisualFloorPlan: React.FC<VisualFloorPlanProps> = ({
 
                 <div className="text-left font-mono">
                   <span className="text-caption2 text-neutral-400 block">الإشغال</span>
-                  <span className="text-sm font-black text-emerald-600 dark:text-emerald-400">
+                  <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
                     {assignedGuests.length} / {selectedTable.capacity} مقعد
                   </span>
                 </div>

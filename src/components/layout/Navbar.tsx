@@ -155,7 +155,7 @@ function NavbarContent() {
                     className="w-4 h-4 rounded-full object-cover border border-saudi-gold-400"
                   />
                   <span className="font-bold max-w-[85px] sm:max-w-[120px] truncate">{currentUser.name}</span>
-                  <span className={`text-caption2 px-1.5 py-0.2 rounded font-black ${
+                  <span className={`text-caption2 px-1.5 py-0.2 rounded font-bold ${
                     currentUser.role === 'admin'
                       ? 'bg-purple-900/60 text-purple-200'
                       : currentUser.role === 'vendor'
@@ -234,7 +234,7 @@ function NavbarContent() {
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={() => openOnboarding()}
-                  className="bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-black px-2.5 sm:px-3 py-1 rounded-md text-xs transition shadow-sm flex items-center gap-1"
+                  className="bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-bold px-2.5 sm:px-3 py-1 rounded-md text-xs transition shadow-sm flex items-center gap-1"
                 >
                   <UserPlus className="w-3 h-3 text-saudi-green-950" />
                   <span>إنشاء حساب</span>
@@ -291,7 +291,7 @@ function NavbarContent() {
                       pathname.startsWith('/marketplace') ? 'text-saudi-green-800 font-bold bg-saudi-green-50' : 'hover:text-saudi-green-800 hover:bg-gray-50'
                     }`}
                   >
-                    <ShoppingBag className="w-4 h-4 text-saudi-gold-600" />
+                    <ShoppingBag className="w-4 h-4 text-saudi-green-700" />
                     <span>سوق الخدمات</span>
                   </Link>
                   <Link
@@ -300,7 +300,7 @@ function NavbarContent() {
                       pathname.startsWith('/packages') ? 'text-saudi-green-800 font-bold bg-saudi-green-50' : 'hover:text-saudi-green-800 hover:bg-gray-50'
                     }`}
                   >
-                    <Layers className="w-4 h-4 text-saudi-gold-600" />
+                    <Layers className="w-4 h-4 text-saudi-green-700" />
                     <span>الباقات الذكية</span>
                   </Link>
                   <Link
@@ -309,7 +309,7 @@ function NavbarContent() {
                       pathname.startsWith('/calculator') ? 'text-saudi-green-800 font-bold bg-saudi-green-50' : 'hover:text-saudi-green-800 hover:bg-gray-50'
                     }`}
                   >
-                    <Sparkles className="w-4 h-4 text-saudi-gold-600" />
+                    <Sparkles className="w-4 h-4 text-saudi-green-700" />
                     <span>حاسبة التكاليف</span>
                   </Link>
                   <Link
@@ -318,7 +318,7 @@ function NavbarContent() {
                       pathname.startsWith('/rfq') ? 'text-saudi-green-800 font-bold bg-saudi-green-50' : 'hover:text-saudi-green-800 hover:bg-gray-50'
                     }`}
                   >
-                    <FileText className="w-4 h-4 text-saudi-gold-600" />
+                    <FileText className="w-4 h-4 text-saudi-green-700" />
                     <span>عروض الأسعار</span>
                   </Link>
                   <Link
@@ -341,7 +341,7 @@ function NavbarContent() {
                         onClick={(e) => e.currentTarget.closest('details')?.removeAttribute('open')}
                         className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition ${pathname.startsWith('/zaffah') ? 'bg-saudi-green-50 font-bold text-saudi-green-800' : 'hover:bg-gray-50 hover:text-saudi-green-800'}`}
                       >
-                        <Music className="w-4 h-4 text-saudi-gold-600" />
+                        <Music className="w-4 h-4 text-saudi-green-700" />
                         <span>الزفات والفنون</span>
                       </Link>
                       <Link
@@ -349,7 +349,7 @@ function NavbarContent() {
                         onClick={(e) => e.currentTarget.closest('details')?.removeAttribute('open')}
                         className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition ${pathname.startsWith('/inspiration') ? 'bg-saudi-green-50 font-bold text-saudi-green-800' : 'hover:bg-gray-50 hover:text-saudi-green-800'}`}
                       >
-                        <Lightbulb className="w-4 h-4 text-saudi-gold-600" />
+                        <Lightbulb className="w-4 h-4 text-saudi-green-700" />
                         <span>إلهام</span>
                       </Link>
                       <Link
@@ -357,7 +357,7 @@ function NavbarContent() {
                         onClick={(e) => e.currentTarget.closest('details')?.removeAttribute('open')}
                         className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition ${pathname.startsWith('/scan') ? 'bg-saudi-green-50 font-bold text-saudi-green-800' : 'hover:bg-gray-50 hover:text-saudi-green-800'}`}
                       >
-                        <QrCode className="w-4 h-4 text-saudi-gold-600" />
+                        <QrCode className="w-4 h-4 text-saudi-green-700" />
                         <span>ماسح الدخول</span>
                       </Link>
                     </div>
@@ -381,21 +381,21 @@ function NavbarContent() {
                     href="/commerce/orders"
                     className="px-3 py-2 rounded-lg hover:text-saudi-green-800 hover:bg-gray-50 transition flex items-center gap-1"
                   >
-                    <Calendar className="w-4 h-4 text-saudi-gold-600" />
+                    <Calendar className="w-4 h-4 text-saudi-green-700" />
                     <span>طلبات الحجز المباشرة</span>
                   </Link>
                   <Link
                     href="/commerce/orders"
                     className="px-3 py-2 rounded-lg hover:text-saudi-green-800 hover:bg-gray-50 transition flex items-center gap-1"
                   >
-                    <FileText className="w-4 h-4 text-saudi-gold-600" />
+                    <FileText className="w-4 h-4 text-saudi-green-700" />
                     <span>طلبات عروض الأسعار (RFQ)</span>
                   </Link>
                   <Link
                     href="/commerce/manage"
                     className="px-3 py-2 rounded-lg hover:text-saudi-green-800 hover:bg-gray-50 transition flex items-center gap-1"
                   >
-                    <Layers className="w-4 h-4 text-saudi-gold-600" />
+                    <Layers className="w-4 h-4 text-saudi-green-700" />
                     <span>خدماتي وباقاتي</span>
                   </Link>
                   <Link
@@ -426,7 +426,7 @@ function NavbarContent() {
                         : 'hover:text-saudi-green-800 hover:bg-gray-50'
                     }`}
                   >
-                    <ShieldCheck className="w-4 h-4 text-saudi-gold-600" />
+                    <ShieldCheck className="w-4 h-4 text-saudi-green-700" />
                     <span>لوحة الإدارة المركزية</span>
                   </Link>
                   <Link
@@ -437,7 +437,7 @@ function NavbarContent() {
                         : 'hover:text-saudi-green-800 hover:bg-gray-50'
                     }`}
                   >
-                    <TrendingUp className="w-4 h-4 text-saudi-gold-600" />
+                    <TrendingUp className="w-4 h-4 text-saudi-green-700" />
                     <span>إدارة الطلبات (OMS)</span>
                   </Link>
                   <Link
@@ -448,7 +448,7 @@ function NavbarContent() {
                         : 'hover:text-saudi-green-800 hover:bg-gray-50'
                     }`}
                   >
-                    <Store className="w-4 h-4 text-saudi-gold-600" />
+                    <Store className="w-4 h-4 text-saudi-green-700" />
                     <span>الموردين والاعتماد</span>
                   </Link>
                   <Link
@@ -459,7 +459,7 @@ function NavbarContent() {
                         : 'hover:text-saudi-green-800 hover:bg-gray-50'
                     }`}
                   >
-                    <CreditCard className="w-4 h-4 text-saudi-gold-600" />
+                    <CreditCard className="w-4 h-4 text-saudi-green-700" />
                     <span>الحجوزات والمالية</span>
                   </Link>
                   <Link
@@ -470,7 +470,7 @@ function NavbarContent() {
                         : 'hover:text-saudi-green-800 hover:bg-gray-50'
                     }`}
                   >
-                    <Settings className="w-4 h-4 text-saudi-gold-600" />
+                    <Settings className="w-4 h-4 text-saudi-green-700" />
                     <span>إعدادات الكتالوج</span>
                   </Link>
                   <Link
@@ -561,7 +561,7 @@ function NavbarContent() {
                   >
                     <ArrowLeftRight className="w-3.5 h-3.5 text-saudi-gold-600" />
                     <span className="hidden sm:inline">مقارنة</span>
-                    <span className="bg-saudi-gold-500 text-saudi-green-950 text-caption2 font-black w-4 h-4 rounded-full flex items-center justify-center">
+                    <span className="bg-saudi-gold-500 text-saudi-green-950 text-caption2 font-bold w-4 h-4 rounded-full flex items-center justify-center">
                       {comparisonVendorIds.length}
                     </span>
                   </Link>
@@ -576,7 +576,7 @@ function NavbarContent() {
                   <ShoppingBag className="w-4 h-4 text-saudi-green-800" />
                   <span className="hidden sm:inline">السلة</span>
                   {cart.length > 0 && (
-                    <span className="bg-saudi-green-800 text-white text-caption2 font-black w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
+                    <span className="bg-saudi-green-800 text-white text-caption2 font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
                       {cart.reduce((sum, item) => sum + item.quantity, 0)}
                     </span>
                   )}
@@ -585,9 +585,9 @@ function NavbarContent() {
                 {/* AI Assistant Button (لُـمى) */}
                 <FeatureContent id="luma"><button
                   onClick={() => setIsAIOpen(true)}
-                  className="flex items-center gap-1.5 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 px-3 sm:px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black shadow-md shadow-saudi-gold-500/20 hover:scale-[1.02] active:scale-[0.98] transition"
+                  className="flex items-center gap-1.5 bg-white hover:bg-saudi-sand-100 border border-saudi-gold-400 text-saudi-green-900 px-3 sm:px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold shadow-sm transition"
                 >
-                  <Sparkles className="w-4 h-4 text-saudi-green-950 animate-spin-slow" />
+                  <Sparkles className="w-4 h-4 text-saudi-gold-600" />
                   <span className="hidden sm:inline">{adminConfig.aiAssistantNameAr} (الذكاء الاصطناعي)</span>
                   <span className="sm:hidden">لُـمى</span>
                 </button></FeatureContent>
@@ -608,7 +608,7 @@ function NavbarContent() {
               <>
                 <Link
                   href="/vendor"
-                  className="flex items-center gap-1.5 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 px-3 py-2 rounded-xl text-xs sm:text-sm font-black shadow-md transition"
+                  className="flex items-center gap-1.5 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold shadow-md transition"
                 >
                   <PlusCircle className="w-4 h-4" />
                   <span>+ إضافة خدمة جديدة</span>
@@ -684,7 +684,7 @@ function NavbarContent() {
                 setIsMobileMenuOpen(false);
                 openOnboarding();
               }}
-              className="w-full py-2.5 bg-saudi-gold-500 text-saudi-green-950 font-black rounded-xl text-xs shadow"
+              className="w-full py-2.5 bg-saudi-gold-500 text-saudi-green-950 font-bold rounded-xl text-xs shadow"
             >
               تسجيل حساب جديد أو تسجيل الدخول
             </button>

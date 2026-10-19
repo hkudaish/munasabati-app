@@ -263,7 +263,7 @@ export default function EaniyahManager({ occasionId }: EaniyahManagerProps) {
                   </div>
 
                   <div className="text-left">
-                    <span className="text-base font-black font-cairo text-saudi-green-900 block">
+                    <span className="text-base font-bold font-cairo text-saudi-green-900 block">
                       {formatSAR(gift.amount)}
                     </span>
                     <span className={`text-caption2 font-bold px-2 py-0.5 rounded-full border ${badge.bg}`}>

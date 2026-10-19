@@ -206,7 +206,7 @@ export default function DigitalEaniyahModal({
 
                 <div className="space-y-1">
                   <span className="text-xs text-gray-300 block">مقدمة إلى:</span>
-                  <h5 className="text-base font-black font-cairo text-white">{completedGift.recipientTitle}</h5>
+                  <h5 className="text-base font-bold font-cairo text-white">{completedGift.recipientTitle}</h5>
                   <p className="text-xs text-saudi-gold-200">{occasionTitle}</p>
                 </div>
 
@@ -221,7 +221,7 @@ export default function DigitalEaniyahModal({
                   </div>
                   <div className="text-left">
                     <span className="text-caption2 text-gray-300 block">قيمة العانية:</span>
-                    <strong className="text-base font-black font-cairo text-saudi-gold-300">
+                    <strong className="text-base font-bold font-cairo text-saudi-gold-300">
                       {completedGift.isPrivateAmount ? 'عانية شرف (خاص)' : formatSAR(completedGift.amount)}
                     </strong>
                   </div>
@@ -436,7 +436,7 @@ export default function DigitalEaniyahModal({
                 type="button"
                 onClick={handleConfirmGift}
                 disabled={isProcessing}
-                className="w-full py-4 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-black rounded-2xl text-sm flex items-center justify-center gap-2 shadow-lg transition disabled:opacity-50"
+                className="w-full py-4 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-bold rounded-2xl text-sm flex items-center justify-center gap-2 shadow-lg transition disabled:opacity-50"
               >
                 {isProcessing ? (
                   <div className="flex items-center gap-2">

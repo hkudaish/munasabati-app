@@ -32,7 +32,7 @@ export default function PackageCard({ pkg, onBookPackage }: PackageCardProps) {
         />
 
         <div className="absolute top-3 right-3 flex flex-col gap-1.5 items-end">
-          <span className="bg-saudi-gold-500 text-saudi-green-950 text-xs font-black px-3 py-1 rounded-full shadow-md">
+          <span className="bg-saudi-gold-500 text-saudi-green-950 text-xs font-bold px-3 py-1 rounded-full shadow-md">
             {currentPackage.badge}
           </span>
           <span className="bg-saudi-green-900/90 backdrop-blur-md text-white text-xs font-bold px-2.5 py-0.5 rounded-full border border-saudi-gold-400/40">

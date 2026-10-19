@@ -263,7 +263,7 @@ export default function GuestRSVPPage() {
                 <Gift className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="text-xs font-black font-cairo text-saudi-green-950">
+                <h4 className="text-xs font-bold font-cairo text-saudi-green-950">
                   العانية والرفد الرقمي (Digital Eaniyah) 🎁
                 </h4>
                 <p className="text-caption2 text-gray-600">شارك فرحتك بهدية مالية مباركة تصل لصاحب المناسبة</p>
@@ -280,7 +280,7 @@ export default function GuestRSVPPage() {
 
           <button
             onClick={() => setIsEaniyahOpen(true)}
-            className="w-full py-3 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-black rounded-2xl text-xs flex items-center justify-center gap-2 shadow-md transition"
+            className="w-full py-3 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-bold rounded-2xl text-xs flex items-center justify-center gap-2 shadow-md transition"
           >
             <Smartphone className="w-4 h-4" />
             <span>إهداء عانية الآن بضغطة زر 🤍</span>

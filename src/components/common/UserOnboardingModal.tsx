@@ -379,7 +379,7 @@ export default function UserOnboardingModal() {
                     </ul>
                   </div>
 
-                  <button className="mt-5 w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-black text-xs flex items-center justify-center gap-2 shadow-sm transition">
+                  <button className="mt-5 w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition">
                     <span>متابعة كمورد معتمد</span>
                     <ChevronLeft className="w-4 h-4" />
                   </button>
@@ -680,7 +680,7 @@ export default function UserOnboardingModal() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-black text-sm shadow-md transition flex items-center justify-center gap-2"
+                  className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-bold text-sm shadow-md transition flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
                     <span>جاري تسجيل المورد وتفعيل البوابة...</span>

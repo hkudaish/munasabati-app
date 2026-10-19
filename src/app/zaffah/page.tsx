@@ -1167,7 +1167,7 @@ export default function ZaffahPage() {
             >
               <Music className="w-4 h-4" />
               <span>مكتبة الفنون والفرق الشعبية</span>
-              <span className="px-2 py-0.5 rounded-full text-caption2 bg-amber-500 text-neutral-950 font-black">
+              <span className="px-2 py-0.5 rounded-full text-caption2 bg-amber-500 text-neutral-950 font-bold">
                 {FOLK_GENRES.length + FOLK_TROUPES.length}
               </span>
             </button>
@@ -1343,7 +1343,7 @@ export default function ZaffahPage() {
 
                           <div className="absolute bottom-3 right-3 text-white">
                             <span className="text-xs text-amber-300 block font-semibold">{genre.regionAr}</span>
-                            <h3 className="text-base font-black font-cairo">{genre.nameAr}</h3>
+                            <h3 className="text-base font-bold font-cairo">{genre.nameAr}</h3>
                           </div>
                         </div>
 
@@ -1425,7 +1425,7 @@ export default function ZaffahPage() {
                       <div className="p-5 pt-0 border-t border-neutral-100 dark:border-neutral-800/60 mt-2 flex items-center justify-between">
                         <div>
                           <span className="text-caption2 text-neutral-400 block">تبدأ أسعار الفرق من</span>
-                          <span className="font-mono text-base font-black text-emerald-600 dark:text-emerald-400">
+                          <span className="font-mono text-base font-bold text-emerald-600 dark:text-emerald-400">
                             {formatSaudiRiyal(genre.startingPrice)}
                           </span>
                         </div>
@@ -1492,7 +1492,7 @@ export default function ZaffahPage() {
                                 </div>
                               </div>
 
-                              <h3 className="text-base font-black text-neutral-900 dark:text-white truncate font-cairo">
+                              <h3 className="text-base font-bold text-neutral-900 dark:text-white truncate font-cairo">
                                 {troupe.nameAr}
                               </h3>
 
@@ -1568,7 +1568,7 @@ export default function ZaffahPage() {
                         <div className="p-6 pt-0 border-t border-neutral-100 dark:border-neutral-800/60 mt-2 flex items-center justify-between gap-3">
                           <div>
                             <span className="text-caption2 text-neutral-400 block">السعر يبدأ من</span>
-                            <span className="font-mono text-base font-black text-emerald-600 dark:text-emerald-400">
+                            <span className="font-mono text-base font-bold text-emerald-600 dark:text-emerald-400">
                               {formatSaudiRiyal(troupe.startingPrice)}
                             </span>
                           </div>
@@ -1707,7 +1707,7 @@ export default function ZaffahPage() {
                 <button
                   type="submit"
                   disabled={isGenerating}
-                  className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600 text-neutral-950 font-black text-sm shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600 text-neutral-950 font-bold text-sm shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   <Sparkles className="w-4 h-4" />
                   <span>{isGenerating ? 'جاري نظم وتوليد القصيدة...' : 'توليد نص وقصيدة الزفة'}</span>
@@ -1830,7 +1830,7 @@ export default function ZaffahPage() {
                     >
                       <div className="flex items-center justify-between mb-1">
                         <span className="font-bold text-sm text-neutral-900 dark:text-white">{pkg.nameAr}</span>
-                        <span className="font-mono font-black text-emerald-600 dark:text-emerald-400 text-sm">
+                        <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-sm">
                           {formatSaudiRiyal(pkg.price)}
                         </span>
                       </div>

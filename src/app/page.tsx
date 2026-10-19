@@ -139,7 +139,7 @@ export default function HomePage() {
                 <span className="text-xs text-saudi-gold-300 font-bold uppercase tracking-wider">
                   طريقة العرض المخصصة حالياً:
                 </span>
-                <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-black bg-saudi-gold-500 text-saudi-green-950 shadow-sm">
+                <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold bg-saudi-gold-500 text-saudi-green-950 shadow-sm">
                   {currentRole === 'vendor' && 'مورد ومزود خدمات معتمد'}
                   {currentRole === 'admin' && 'إدارة المنصة المركزية'}
                 </span>
@@ -195,7 +195,7 @@ export default function HomePage() {
               <div className="flex flex-wrap items-center gap-3 pt-2">
                 <Link
                   href="/plan"
-                  className="px-6 py-3.5 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-black rounded-2xl text-sm shadow-lg shadow-saudi-gold-500/20 flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition"
+                  className="px-6 py-3.5 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-bold rounded-2xl text-sm shadow-lg shadow-saudi-gold-500/20 flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition"
                 >
                   <PlusCircle className="w-5 h-5 text-saudi-green-950" />
                   <span>+ ابدأ تخطيط مناسبتك</span>
@@ -440,7 +440,7 @@ export default function HomePage() {
                 <div className="pt-2 flex flex-wrap gap-3">
                   <FeatureContent id="luma"><button
                     onClick={() => setIsAIOpen(true)}
-                    className="px-6 py-3 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-black rounded-2xl text-xs sm:text-sm shadow-md flex items-center gap-2 transition"
+                    className="px-6 py-3 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-bold rounded-2xl text-xs sm:text-sm shadow-md flex items-center gap-2 transition"
                   >
                     <Sparkles className="w-4 h-4 text-saudi-green-950" />
                     <span>جرّب التخطيط بالذكاء الاصطناعي مجاناً</span>
@@ -557,7 +557,7 @@ export default function HomePage() {
               <div className="flex flex-wrap items-center gap-3 pt-2">
                 <Link
                   href="/vendor"
-                  className="px-6 py-3.5 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-black rounded-2xl text-sm shadow-lg flex items-center gap-2 transition"
+                  className="px-6 py-3.5 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-bold rounded-2xl text-sm shadow-lg flex items-center gap-2 transition"
                 >
                   <Store className="w-4 h-4 text-saudi-green-950" />
                   <span>الدخول للوحة المورد الكاملة</span>
@@ -629,7 +629,7 @@ export default function HomePage() {
                       </span>
                     </div>
 
-                    <h3 className="font-black text-base text-gray-900 font-cairo">
+                    <h3 className="font-bold text-base text-gray-900 font-cairo">
                       {rfq.occasionTitle}
                     </h3>
 
@@ -775,7 +775,7 @@ export default function HomePage() {
                 <div className="pt-2 flex flex-wrap gap-3">
                   <Link
                     href="/vendor?tab=verification"
-                    className="px-5 py-3 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-black rounded-xl text-xs sm:text-sm transition flex items-center gap-2"
+                    className="px-5 py-3 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-bold rounded-xl text-xs sm:text-sm transition flex items-center gap-2"
                   >
                     <span>توثيق السجل التجاري / العمل الحر</span>
                     <ChevronLeft className="w-4 h-4" />
@@ -870,7 +870,7 @@ export default function HomePage() {
               <div className="flex flex-wrap items-center gap-3 pt-2">
                 <Link
                   href="/admin"
-                  className="px-6 py-3.5 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-black rounded-2xl text-sm shadow-lg flex items-center gap-2 transition"
+                  className="px-6 py-3.5 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-bold rounded-2xl text-sm shadow-lg flex items-center gap-2 transition"
                 >
                   <ShieldCheck className="w-4 h-4 text-saudi-green-950" />
                   <span>فتح لوحة الإدارة المركزية الكاملة</span>
@@ -955,7 +955,7 @@ export default function HomePage() {
                         className="w-12 h-12 rounded-xl object-cover border border-saudi-sand-300"
                       />
                       <div>
-                        <h4 className="font-black text-sm text-gray-900 font-cairo">
+                        <h4 className="font-bold text-sm text-gray-900 font-cairo">
                           {vendor.businessName}
                         </h4>
                         <span className="text-xs text-gray-500">
@@ -1073,7 +1073,7 @@ export default function HomePage() {
           <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="bg-gradient-to-r from-saudi-sand-100 via-white to-saudi-sand-100 border border-saudi-gold-400/30 rounded-2xl p-6 shadow-card flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="space-y-1 text-right">
-                <h4 className="font-black text-base text-saudi-green-950 font-cairo">
+                <h4 className="font-bold text-base text-saudi-green-950 font-cairo">
                   أداة فحص ومعاينة تجربة المستخدمين (Persona Simulator) 🎭
                 </h4>
                 <p className="text-xs text-gray-600 font-tajawal">

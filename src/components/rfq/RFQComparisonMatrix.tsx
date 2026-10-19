@@ -91,7 +91,7 @@ export default function RFQComparisonMatrix({ rfq, onAcceptQuote }: RFQCompariso
 
                   {/* Highlights badge */}
                   {quote.isBestValue && (
-                    <span className="bg-saudi-gold-500 text-saudi-green-950 text-caption2 font-black px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1">
+                    <span className="bg-saudi-gold-500 text-saudi-green-950 text-caption2 font-bold px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1">
                       <Award className="w-3 h-3" />
                       أفضل قيمة
                     </span>

@@ -144,7 +144,7 @@ export default function ServiceCard({ service, onBookNow }: ServiceCardProps) {
         <div className="pt-3 border-t border-saudi-sand-200 flex items-center justify-between">
           <div>
             <span className="text-caption2 text-gray-500 block">السعر شامل الضريبة</span>
-            <span className="text-base font-black font-cairo text-saudi-green-950">
+            <span className="text-base font-bold font-cairo text-saudi-green-950">
               {formatSaudiRiyal(service.price)}
             </span>
           </div>
