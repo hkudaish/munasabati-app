@@ -34,6 +34,12 @@
   crawl before pushing.
 
 ## Database backup
-The only dump in the repo's local `.netlify/` folder is dated 2026-10-17. Before schema changes or this
-removal, take a new one from the production database with `pg_dump --format=custom`, store it outside
-the repo, and test-restore it into a scratch database.
+Take a fresh backup before schema changes or this removal:
+
+```
+npm run db:backup          # read-only pg_dump of production to ~/Backups/munasabati (outside the repo)
+npm run db:verify-backup   # restores the newest dump into a temporary local database, counts rows, drops it
+```
+
+`db:backup` fetches the production connection through the Netlify login on this machine and never prints it.
+The dump contains customer data: keep it private. Last verified backup: 2026-10-19 (62 tables restored).
