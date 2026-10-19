@@ -1046,6 +1046,8 @@ model CommerceService {
   vendorIdReference Vendor? @relation("CommerceService_vendorId", fields: [vendorId], references: [id], onDelete: Restrict)
   CommerceRelationship_serviceId CommerceRelationship[] @relation("CommerceRelationship_serviceId")
   CommerceRelationship_relatedServiceId CommerceRelationship[] @relation("CommerceRelationship_relatedServiceId")
+  @@index([ownerId])
+  @@index([vendorId])
 }
 
 model CommerceOffer {
@@ -1083,6 +1085,7 @@ model CommercePackage {
   CommercePackageVersion_packageId CommercePackageVersion[] @relation("CommercePackageVersion_packageId")
   CommerceOrderItem_packageId CommerceOrderItem[] @relation("CommerceOrderItem_packageId")
   ownerIdReference User @relation("CommercePackage_ownerId", fields: [ownerId], references: [id], onDelete: Restrict)
+  @@index([ownerId])
 }
 
 model CommercePackageItem {
@@ -1092,6 +1095,8 @@ model CommercePackageItem {
   body Json
   packageIdRelation CommercePackage @relation("CommercePackageItem_packageId", fields: [packageId], references: [id], onDelete: Restrict)
   offerIdRelation CommerceOffer @relation("CommercePackageItem_offerId", fields: [offerId], references: [id], onDelete: Restrict)
+  @@index([packageId])
+  @@index([offerId])
 }
 
 model CommercePackageVersion {
