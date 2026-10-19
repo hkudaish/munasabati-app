@@ -1,26 +1,30 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { FileText, Plus, CheckCircle2, Clock, DollarSign, ArrowRight } from 'lucide-react';
 import { useApp } from '@/lib/store';
 import RFQComparisonMatrix from '@/components/rfq/RFQComparisonMatrix';
 import CreateRFQModal from '@/components/rfq/CreateRFQModal';
-import SaudiPaymentModal from '@/components/payments/SaudiPaymentModal';
+import { notify } from '@/lib/notify';
 import { RFQQuote } from '@/lib/types';
 
 export default function RFQHubPage() {
-  const { rfqRequests, acceptRFQQuote, createBooking, activeOccasion } = useApp();
+  const router = useRouter();
+  const { rfqRequests, acceptRFQQuote } = useApp();
 
   const [selectedRFQId, setSelectedRFQId] = useState<string>(rfqRequests[0]?.id || '');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [paymentModalQuote, setPaymentModalQuote] = useState<RFQQuote | null>(null);
 
   const selectedRFQ = rfqRequests.find((r) => r.id === selectedRFQId) || rfqRequests[0];
 
   const handleAcceptQuote = (quote: RFQQuote) => {
     if (!selectedRFQ) return;
     acceptRFQQuote(selectedRFQ.id, quote.id);
-    setPaymentModalQuote(quote);
+    // Orders are created in the commerce checkout, where the server prices every line.
+    // A quote typed in the browser is never turned into an order or a payment here.
+    notify(`تم اعتماد عرض ${quote.vendorName}. أضف خدماته من المتجر لإتمام الطلب؛ الأسعار النهائية يحددها النظام.`, 'success');
+    router.push('/commerce');
   };
 
   return (
@@ -102,40 +106,6 @@ export default function RFQHubPage() {
           onCreated={(newId) => {
             setSelectedRFQId(newId);
             setIsCreateModalOpen(false);
-          }}
-        />
-      )}
-
-      {/* Payment Modal for Accepted Quote */}
-      {paymentModalQuote && selectedRFQ && (
-        <SaudiPaymentModal
-          bookingTitle={`عرض سعر معتمد: ${selectedRFQ.occasionTitle}`}
-          vendorName={paymentModalQuote.vendorName}
-          date={selectedRFQ.date}
-          totalAmount={paymentModalQuote.total}
-          onClose={() => setPaymentModalQuote(null)}
-          onPaymentSuccess={async (method, isDeposit, ref) => {
-            await createBooking({
-              occasionId: activeOccasion?.id,
-              occasionTitle: selectedRFQ.occasionTitle,
-              vendorId: paymentModalQuote.vendorId,
-              vendorName: paymentModalQuote.vendorName,
-              vendorLogo: paymentModalQuote.vendorLogo,
-              serviceTitleAr: `تنفيذ متطلبات RFQ: ${selectedRFQ.occasionTitle}`,
-              date: selectedRFQ.date,
-              cityAr: selectedRFQ.cityAr,
-              customerName: 'سارة العتيبي',
-              customerPhone: '+966501234567',
-              totalAmount: paymentModalQuote.total,
-              depositAmount: Math.round(paymentModalQuote.total * 0.3),
-              remainingAmount: paymentModalQuote.total - Math.round(paymentModalQuote.total * 0.3),
-              depositPaid: isDeposit,
-              isFullyPaid: !isDeposit,
-              paymentMethod: method,
-              status: 'confirmed',
-              cancellationPolicyAr: 'إلغاء مجاني حتى 7 أيام قبل موعد المناسبة.',
-              deliverablesAr: [selectedRFQ.requirementsAr, paymentModalQuote.deliveryTimeAr],
-            });
           }}
         />
       )}
