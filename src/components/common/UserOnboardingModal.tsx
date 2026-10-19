@@ -293,11 +293,11 @@ export default function UserOnboardingModal() {
                     setSelectedRoleForOnboarding('client');
                     setStep('customer_form');
                   }}
-                  className="group relative cursor-pointer rounded-2xl border-2 border-saudi-sand-300 hover:border-saudi-green-800 bg-gradient-to-b from-white to-saudi-sand-50/50 p-5 transition-all duration-200 hover:shadow-xl hover:-translate-y-1 flex flex-col justify-between"
+                  className="group relative cursor-pointer rounded-2xl border-2 border-saudi-sand-300 hover:border-saudi-green-800 bg-gradient-to-b from-white to-saudi-sand-50/50 p-5 transition duration-200 hover:shadow-xl hover:-translate-y-1 flex flex-col justify-between"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <div className="w-12 h-12 rounded-2xl bg-saudi-green-100 text-saudi-green-900 flex items-center justify-center shadow-inner group-hover:scale-110 transition">
+                      <div className="w-12 h-12 rounded-2xl bg-saudi-green-100 text-saudi-green-900 flex items-center justify-center shadow-inner group-hover:scale-105 transition">
                         <Calendar className="w-6 h-6 text-saudi-green-800" />
                       </div>
                       <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-saudi-green-50 text-saudi-green-800 border border-saudi-green-200">
@@ -342,11 +342,11 @@ export default function UserOnboardingModal() {
                     setSelectedRoleForOnboarding('vendor');
                     setStep('vendor_form');
                   }}
-                  className="group relative cursor-pointer rounded-2xl border-2 border-saudi-sand-300 hover:border-saudi-gold-600 bg-gradient-to-b from-white to-amber-50/30 p-5 transition-all duration-200 hover:shadow-xl hover:-translate-y-1 flex flex-col justify-between"
+                  className="group relative cursor-pointer rounded-2xl border-2 border-saudi-sand-300 hover:border-saudi-gold-600 bg-gradient-to-b from-white to-amber-50/30 p-5 transition duration-200 hover:shadow-xl hover:-translate-y-1 flex flex-col justify-between"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <div className="w-12 h-12 rounded-2xl bg-saudi-gold-100 text-saudi-gold-800 flex items-center justify-center shadow-inner group-hover:scale-110 transition">
+                      <div className="w-12 h-12 rounded-2xl bg-saudi-gold-100 text-saudi-gold-800 flex items-center justify-center shadow-inner group-hover:scale-105 transition">
                         <Store className="w-6 h-6 text-saudi-gold-700" />
                       </div>
                       <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-saudi-gold-50 text-saudi-gold-800 border border-saudi-gold-200">

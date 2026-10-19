@@ -266,7 +266,7 @@ export default function CalculatorPage() {
                       key={v.id}
                       type="button"
                       onClick={() => setVenueType(v.id as any)}
-                      className={`p-3 rounded-2xl text-right border transition-all ${
+                      className={`p-3 rounded-2xl text-right border transition ${
                         venueType === v.id
                           ? 'border-emerald-600 bg-emerald-50/50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 shadow-sm'
                           : 'border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/30 text-neutral-700 dark:text-neutral-300 hover:border-neutral-300'
@@ -295,7 +295,7 @@ export default function CalculatorPage() {
                       key={t.id}
                       type="button"
                       onClick={() => setTier(t.id as any)}
-                      className={`p-3 rounded-2xl text-right border transition-all ${
+                      className={`p-3 rounded-2xl text-right border transition ${
                         tier === t.id
                           ? 'border-emerald-600 bg-emerald-50/50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 shadow-sm'
                           : 'border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/30 text-neutral-700 dark:text-neutral-300 hover:border-neutral-300'
@@ -500,7 +500,7 @@ export default function CalculatorPage() {
               <div className="space-y-3 pt-2">
                 <button
                   onClick={handleCreateOccasionFromCalculator}
-                  className="w-full py-4 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-xl shadow-emerald-600/25 transition-all flex items-center justify-center gap-2 group"
+                  className="w-full py-4 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-xl shadow-emerald-600/25 transition flex items-center justify-center gap-2 group"
                 >
                   <span>إنشاء مناسبة بهذه الميزانية</span>
                   <ArrowRight className="w-4 h-4 rotate-180 group-hover:-translate-x-1 transition-transform" />

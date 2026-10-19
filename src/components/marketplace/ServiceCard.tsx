@@ -41,7 +41,7 @@ export default function ServiceCard({ service, onBookNow }: ServiceCardProps) {
   };
 
   return (
-    <div className="bg-white rounded-3xl border border-saudi-sand-300 overflow-hidden shadow-card hover:shadow-xl hover:border-saudi-gold-400/80 transition-all duration-300 flex flex-col justify-between group">
+    <div className="bg-white rounded-3xl border border-saudi-sand-300 overflow-hidden shadow-card hover:shadow-xl hover:border-saudi-gold-400/80 transition duration-300 flex flex-col justify-between group">
       {!allowed&&<p className="p-3 text-xs bg-amber-50 text-amber-900">{geo.data?.selection.cityId?'غير متوفرة في مدينتك':'اختر المدينة للتحقق قبل الحجز'}</p>}
       {/* Image Banner */}
       <div className="relative h-48 w-full bg-gray-100 overflow-hidden">
@@ -50,7 +50,7 @@ export default function ServiceCard({ service, onBookNow }: ServiceCardProps) {
           alt={service.titleAr}
           loading="lazy"
           decoding="async"
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
 
         {/* Favorite toggle button */}

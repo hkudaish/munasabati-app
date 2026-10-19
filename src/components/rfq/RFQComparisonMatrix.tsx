@@ -63,7 +63,7 @@ export default function RFQComparisonMatrix({ rfq, onAcceptQuote }: RFQCompariso
           return (
             <div
               key={quote.id}
-              className={`bg-white rounded-3xl border overflow-hidden shadow-card hover:shadow-xl transition-all flex flex-col justify-between ${
+              className={`bg-white rounded-3xl border overflow-hidden shadow-card hover:shadow-xl transition flex flex-col justify-between ${
                 quote.isBestValue
                   ? 'border-saudi-gold-500 ring-2 ring-saudi-gold-500/20'
                   : 'border-saudi-sand-300'

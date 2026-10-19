@@ -1301,7 +1301,7 @@ export default function ZaffahPage() {
 
             {/* Notification Toast */}
             {cartSuccessNotice && (
-              <div className="p-4 rounded-2xl bg-emerald-600 text-white text-sm font-bold flex items-center justify-between shadow-xl animate-bounce">
+              <div className="p-4 rounded-2xl bg-emerald-600 text-white text-sm font-bold flex items-center justify-between shadow-xl animate-slide-up">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-5 h-5" />
                   <span>{cartSuccessNotice}</span>
@@ -1323,7 +1323,7 @@ export default function ZaffahPage() {
                   return (
                     <div
                       key={genre.id}
-                      className="bg-white dark:bg-neutral-900 rounded-3xl overflow-hidden border border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
+                      className="bg-white dark:bg-neutral-900 rounded-3xl overflow-hidden border border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-xl transition duration-300 flex flex-col justify-between group"
                     >
                       <div>
                         {/* Image Header with Badge */}
@@ -1331,7 +1331,7 @@ export default function ZaffahPage() {
                           <img
                             src={genre.image}
                             alt={genre.nameAr}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-90"
                             loading="lazy"
                             decoding="async"
                           />
@@ -1364,7 +1364,7 @@ export default function ZaffahPage() {
                               <button
                                 type="button"
                                 onClick={() => togglePlay(genre.id, genre.rhythmBpm, genre.id === 'ardah' || genre.id === 'dahha')}
-                                className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
+                                className={`w-9 h-9 rounded-full flex items-center justify-center transition ${
                                   isPlaying
                                     ? 'bg-amber-500 text-neutral-950 shadow-md scale-105 animate-pulse'
                                     : 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 hover:scale-105'
@@ -1383,7 +1383,7 @@ export default function ZaffahPage() {
                                   {[10, 24, 16, 28, 14, 22, 10, 26, 16, 20, 30, 14, 22, 18].map((h, i) => (
                                     <div
                                       key={i}
-                                      className={`w-1 rounded-full transition-all duration-150 ${
+                                      className={`w-1 rounded-full transition duration-150 ${
                                         isPlaying
                                           ? 'bg-amber-500 animate-pulse'
                                           : 'bg-neutral-300 dark:bg-neutral-700'
@@ -1463,7 +1463,7 @@ export default function ZaffahPage() {
                     return (
                       <div
                         key={troupe.id}
-                        className="bg-white dark:bg-neutral-900 rounded-3xl overflow-hidden border border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+                        className="bg-white dark:bg-neutral-900 rounded-3xl overflow-hidden border border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-xl transition duration-300 flex flex-col justify-between"
                       >
                         <div className="p-6 space-y-4">
                           {/* Top Row: Avatar + Title + Badges */}
@@ -1544,7 +1544,7 @@ export default function ZaffahPage() {
                             <button
                               type="button"
                               onClick={() => togglePlay(troupe.id, 92, troupe.genreId === 'ardah')}
-                              className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                              className={`w-8 h-8 rounded-full flex items-center justify-center transition ${
                                 isPlaying
                                   ? 'bg-amber-500 text-neutral-950 shadow-md scale-105'
                                   : 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900'
@@ -1691,7 +1691,7 @@ export default function ZaffahPage() {
                         key={style.id}
                         type="button"
                         onClick={() => setZaffahStyle(style.id as any)}
-                        className={`p-3 rounded-2xl text-right border transition-all ${
+                        className={`p-3 rounded-2xl text-right border transition ${
                           zaffahStyle === style.id
                             ? 'border-amber-500 bg-amber-50/50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200'
                             : 'border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/40 text-neutral-700 dark:text-neutral-300'
@@ -1707,7 +1707,7 @@ export default function ZaffahPage() {
                 <button
                   type="submit"
                   disabled={isGenerating}
-                  className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600 text-neutral-950 font-bold text-sm shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600 text-neutral-950 font-bold text-sm shadow-lg shadow-amber-500/20 transition flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   <Sparkles className="w-4 h-4" />
                   <span>{isGenerating ? 'جاري نظم وتوليد القصيدة...' : 'توليد نص وقصيدة الزفة'}</span>
@@ -1822,7 +1822,7 @@ export default function ZaffahPage() {
                     <div
                       key={pkg.id}
                       onClick={() => setSelectedPackageId(pkg.id)}
-                      className={`p-4 rounded-2xl border cursor-pointer transition-all ${
+                      className={`p-4 rounded-2xl border cursor-pointer transition ${
                         selectedPackageId === pkg.id
                           ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/30'
                           : 'border-neutral-200 dark:border-neutral-800 hover:border-neutral-300'

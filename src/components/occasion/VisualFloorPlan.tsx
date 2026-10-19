@@ -125,7 +125,7 @@ export const VisualFloorPlan: React.FC<VisualFloorPlanProps> = ({
                   key={table.id}
                   type="button"
                   onClick={() => setSelectedTableId(table.id)}
-                  className={`group relative flex flex-col items-center justify-center p-3 rounded-full transition-all duration-300 focus:outline-none ${
+                  className={`group relative flex flex-col items-center justify-center p-3 rounded-full transition duration-300 focus:outline-none ${
                     table.section === 'vip' ? 'w-28 h-28' : 'w-24 h-24'
                   } ${
                     isSelected

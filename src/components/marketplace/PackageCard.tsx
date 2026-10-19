@@ -20,7 +20,7 @@ export default function PackageCard({ pkg, onBookPackage }: PackageCardProps) {
 
   if(geo.data?.summary!=='UNKNOWN'&&!allowed&&geo.data?.snapshot.policy.hideUnavailable)return null;
   return (
-    <div className="bg-white rounded-3xl border border-saudi-sand-300 overflow-hidden shadow-card hover:shadow-xl hover:border-saudi-gold-400 transition-all duration-300 flex flex-col justify-between group">
+    <div className="bg-white rounded-3xl border border-saudi-sand-300 overflow-hidden shadow-card hover:shadow-xl hover:border-saudi-gold-400 transition duration-300 flex flex-col justify-between group">
       {/* Banner with Savings Badge */}
       <div className="relative h-52 w-full bg-gray-100 overflow-hidden">
         <img
@@ -28,7 +28,7 @@ export default function PackageCard({ pkg, onBookPackage }: PackageCardProps) {
           alt={currentPackage.titleAr}
           loading="lazy"
           decoding="async"
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
 
         <div className="absolute top-3 right-3 flex flex-col gap-1.5 items-end">

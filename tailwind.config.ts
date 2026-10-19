@@ -72,8 +72,8 @@ const config: Config = {
         card: "0 10px 30px -10px rgba(0,0,0,0.06), 0 4px 6px -2px rgba(0,0,0,0.02)",
       },
       animation: {
-        "fade-in": "fadeIn 0.3s ease-in-out",
-        "slide-up": "slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+        "fade-in": "fadeIn 0.2s cubic-bezier(0.23, 1, 0.32, 1)",
+        "slide-up": "slideUp 0.3s cubic-bezier(0.23, 1, 0.32, 1)",
         "pulse-slow": "pulse 3s infinite",
       },
       keyframes: {

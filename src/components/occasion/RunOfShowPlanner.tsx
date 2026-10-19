@@ -194,7 +194,7 @@ export const RunOfShowPlanner: React.FC<RunOfShowPlannerProps> = ({ occasion }) 
           <button
             key={tab.id}
             onClick={() => setSelectedRoleFilter(tab.id)}
-            className={`px-3 py-1.5 rounded-xl font-medium shrink-0 transition-all ${
+            className={`px-3 py-1.5 rounded-xl font-medium shrink-0 transition ${
               selectedRoleFilter === tab.id
                 ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 shadow-sm'
                 : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
@@ -224,7 +224,7 @@ export const RunOfShowPlanner: React.FC<RunOfShowPlannerProps> = ({ occasion }) 
           filteredItems.map((item) => (
             <div
               key={item.id}
-              className="relative group bg-white dark:bg-neutral-900 p-5 rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:border-emerald-500/50 hover:shadow-md transition-all"
+              className="relative group bg-white dark:bg-neutral-900 p-5 rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:border-emerald-500/50 hover:shadow-md transition"
             >
               {/* Timeline Dot with Icon */}
               <div className="absolute -right-[37px] top-6 w-8 h-8 rounded-full bg-white dark:bg-neutral-900 border-2 border-emerald-500 flex items-center justify-center shadow-sm">
@@ -264,7 +264,7 @@ export const RunOfShowPlanner: React.FC<RunOfShowPlannerProps> = ({ occasion }) 
 
                   <button
                     onClick={() => deleteRunOfShowItem(item.id)}
-                    className="opacity-0 group-hover:opacity-100 text-neutral-400 hover:text-rose-600 p-1 rounded-lg transition-all"
+                    className="opacity-0 group-hover:opacity-100 text-neutral-400 hover:text-rose-600 p-1 rounded-lg transition"
                     title="حذف الفقرة"
                   >
                     <Trash2 className="w-4 h-4" />

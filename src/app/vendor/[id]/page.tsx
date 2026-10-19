@@ -248,7 +248,7 @@ export default function VendorProfilePage() {
             <div className="flex flex-wrap sm:flex-col items-center sm:items-end gap-2 w-full sm:w-auto">
               <Link
                 href={`/rfq?vendorId=${vendor.id}`}
-                className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-saudi-green-800 hover:bg-saudi-green-900 text-white text-xs sm:text-sm font-bold shadow-lg shadow-saudi-green-900/20 transition-all text-center"
+                className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-saudi-green-800 hover:bg-saudi-green-900 text-white text-xs sm:text-sm font-bold shadow-lg shadow-saudi-green-900/20 transition text-center"
               >
                 <Sparkles className="w-4 h-4 text-saudi-gold-300" />
                 <span>طلب عرض سعر مخصص (RFQ)</span>
@@ -335,7 +335,7 @@ export default function VendorProfilePage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`py-3 px-5 border-b-2 font-bold shrink-0 transition-all ${
+              className={`py-3 px-5 border-b-2 font-bold shrink-0 transition ${
                 activeTab === tab.id
                   ? 'border-saudi-green-800 text-saudi-green-900'
                   : 'border-transparent text-gray-500 hover:text-saudi-green-900'
@@ -358,7 +358,7 @@ export default function VendorProfilePage() {
                 vendorServices.map((service) => (
                   <div
                     key={service.id}
-                    className="bg-white rounded-3xl overflow-hidden border border-saudi-sand-300 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+                    className="bg-white rounded-3xl overflow-hidden border border-saudi-sand-300 shadow-sm hover:shadow-md transition flex flex-col justify-between"
                   >
                     <div>
                       <div className="relative h-44 w-full bg-gray-100 overflow-hidden">
@@ -446,7 +446,7 @@ export default function VendorProfilePage() {
                   <img
                     src={imgUrl}
                     alt={`عمل سابق ${idx + 1}`}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-5">
                     <p className="text-white text-xs font-semibold">

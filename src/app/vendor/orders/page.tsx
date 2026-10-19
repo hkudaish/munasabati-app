@@ -106,7 +106,7 @@ export default function SupplierOrderWorkspace() {
     <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8 font-sans" dir="rtl">
       {/* Toast Alert */}
       {toastMessage && (
-        <div className="fixed top-6 left-6 z-50 bg-emerald-500 text-slate-950 font-bold px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3 animate-bounce">
+        <div className="fixed top-6 left-6 z-50 bg-emerald-500 text-slate-950 font-bold px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3 animate-slide-up">
           <CheckCircle className="w-5 h-5" />
           <span>{toastMessage}</span>
         </div>

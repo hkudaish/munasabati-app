@@ -79,7 +79,7 @@ export default function InspirationPage() {
                 <img
                   src={post.mediaUrl}
                   alt={post.titleAr}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
 
                 <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-black/60 backdrop-blur-md text-white text-caption2 font-bold px-3 py-1 rounded-full">

@@ -139,7 +139,7 @@ export default function CustomerOrderTrackingPage() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8 font-sans" dir="rtl">
       {toastMessage && (
-        <div className="fixed top-6 left-6 z-50 bg-emerald-500 text-slate-950 font-bold px-6 py-3 rounded-xl shadow-2xl animate-bounce">
+        <div className="fixed top-6 left-6 z-50 bg-emerald-500 text-slate-950 font-bold px-6 py-3 rounded-xl shadow-2xl animate-slide-up">
           {toastMessage}
         </div>
       )}
