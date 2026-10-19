@@ -31,7 +31,6 @@ import {
   Check,
   Zap,
 } from 'lucide-react';
-import SaudiPaymentModal from '@/components/payments/SaudiPaymentModal';
 import confetti from 'canvas-confetti';
 
 export default function VendorProfilePage() {
@@ -42,7 +41,6 @@ export default function VendorProfilePage() {
     vendors,
     services,
     reviews,
-    createBooking,
     comparisonVendorIds,
     addToComparison,
     removeFromComparison,
@@ -65,8 +63,6 @@ export default function VendorProfilePage() {
 
   // Active tab
   const [activeTab, setActiveTab] = useState<'services' | 'portfolio' | 'reviews' | 'about'>('services');
-  const [selectedServiceToBook, setSelectedServiceToBook] = useState<any | null>(null);
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   if (!vendor) {
@@ -93,11 +89,6 @@ export default function VendorProfilePage() {
   const avgPunctuality = (vendorReviews.reduce((acc, r) => acc + (r.punctualityRating || 5), 0) / totalReviewsCount).toFixed(1);
   const avgCommunication = (vendorReviews.reduce((acc, r) => acc + (r.communicationRating || 5), 0) / totalReviewsCount).toFixed(1);
   const avgValue = (vendorReviews.reduce((acc, r) => acc + (r.valueRating || 5), 0) / totalReviewsCount).toFixed(1);
-
-  const handleBookService = (service: any) => {
-    setSelectedServiceToBook(service);
-    setIsPaymentModalOpen(true);
-  };
 
   const handleQuickAddToCart = (service: any) => {
     const srvDetails = ensureServiceDetails(service);
@@ -631,43 +622,6 @@ export default function VendorProfilePage() {
           </div>
         )}
       </div>
-
-      {/* Payment Modal if booking directly */}
-      {isPaymentModalOpen && selectedServiceToBook && (
-        <SaudiPaymentModal
-          bookingTitle={selectedServiceToBook.titleAr}
-          vendorName={vendor.businessName}
-          date="2026-10-09"
-          totalAmount={selectedServiceToBook.price}
-          onClose={() => setIsPaymentModalOpen(false)}
-          onPaymentSuccess={async (method, isDeposit) => {
-            await createBooking({
-              occasionId: activeOccasion?.id,
-              occasionTitle: activeOccasion?.title || selectedServiceToBook.titleAr,
-              vendorId: vendor.id,
-              vendorName: vendor.businessName,
-              vendorLogo: vendor.logo,
-              serviceId: selectedServiceToBook.id,
-              serviceTitleAr: selectedServiceToBook.titleAr,
-              date: '2026-10-09',
-              cityAr: vendor.cityNameAr,
-              customerName: 'سارة العتيبي',
-              customerPhone: '+966501234567',
-              totalAmount: selectedServiceToBook.price,
-              depositAmount: Math.round(selectedServiceToBook.price * 0.3),
-              remainingAmount: selectedServiceToBook.price - Math.round(selectedServiceToBook.price * 0.3),
-              depositPaid: isDeposit,
-              isFullyPaid: !isDeposit,
-              paymentMethod: method,
-              status: 'confirmed',
-              cancellationPolicyAr: 'إلغاء مجاني حتى 5 أيام قبل موعد المناسبة.',
-              deliverablesAr: selectedServiceToBook.featuresAr,
-            });
-            setIsPaymentModalOpen(false);
-            router.push('/bookings');
-          }}
-        />
-      )}
     </div>
   );
 }

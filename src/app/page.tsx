@@ -43,7 +43,6 @@ import { useApp } from '@/lib/store';
 import { formatSAR } from '@/lib/utils';
 import ServiceCard from '@/components/marketplace/ServiceCard';
 import PackageCard from '@/components/marketplace/PackageCard';
-import SaudiPaymentModal from '@/components/payments/SaudiPaymentModal';
 import CustomerReviewsShowcase from '@/components/common/CustomerReviewsShowcase';
 import { ServiceItem, SmartPackage, UserRole } from '@/lib/types';
 
@@ -66,19 +65,10 @@ export default function HomePage() {
     setIsAIOpen,
     selectedCity,
     cities,
-    createBooking,
     activeOccasion,
     updateVendorStatus,
     cart,
   } = useApp();
-
-  const [bookingModalItem, setBookingModalItem] = useState<{
-    title: string;
-    vendorName: string;
-    totalAmount: number;
-    serviceId?: string;
-    packageId?: string;
-  } | null>(null);
 
   // Client selected service category filter
   const [clientCategoryFilter, setClientCategoryFilter] = useState<string>('all');
@@ -91,22 +81,13 @@ export default function HomePage() {
 
   const activeCityObj = cities.find((c) => c.id === selectedCity) || {id:'',nameAr:'مدينتك',nameEn:'',regionAr:'',isAvailable:false};
 
+  // Booking happens in the commerce flow (offers, packages, server-priced cart), not in a local modal.
   const handleBookService = (service: ServiceItem) => {
-    setBookingModalItem({
-      title: service.titleAr,
-      vendorName: service.vendorName,
-      totalAmount: service.price,
-      serviceId: service.id,
-    });
+    router.push('/commerce/service/' + encodeURIComponent(service.id));
   };
 
-  const handleBookPackage = (pkg: SmartPackage) => {
-    setBookingModalItem({
-      title: pkg.titleAr,
-      vendorName: 'باقة مناسبتي المتكاملة',
-      totalAmount: pkg.packagePrice,
-      packageId: pkg.id,
-    });
+  const handleBookPackage = (_pkg: SmartPackage) => {
+    router.push('/packages');
   };
 
   // Filtered services for client based on active category
@@ -1098,44 +1079,6 @@ export default function HomePage() {
             </div>
           </section>
         </div>
-      )}
-
-      {/* =========================================================================
-          GLOBAL MODAL: SAUDI PAYMENT MODAL
-      ========================================================================= */}
-      {bookingModalItem && (
-        <SaudiPaymentModal
-          bookingTitle={bookingModalItem.title}
-          vendorName={bookingModalItem.vendorName}
-          date="2026-10-30"
-          totalAmount={bookingModalItem.totalAmount}
-          onClose={() => setBookingModalItem(null)}
-          onPaymentSuccess={async (method, isDeposit, ref) => {
-            await createBooking({
-              occasionId: activeOccasion?.id,
-              occasionTitle: activeOccasion?.title || bookingModalItem.title,
-              vendorId: 'vendor-1',
-              vendorName: bookingModalItem.vendorName,
-              vendorLogo:
-                'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=300&auto=format&fit=crop&q=80',
-              serviceTitleAr: bookingModalItem.title,
-              date: '2026-10-30',
-              cityAr: activeCityObj.nameAr,
-              customerName: currentUser?.name || 'سارة العتيبي',
-              customerPhone: currentUser?.phone || '+966501234567',
-              totalAmount: bookingModalItem.totalAmount,
-              depositAmount: Math.round(bookingModalItem.totalAmount * 0.3),
-              remainingAmount:
-                bookingModalItem.totalAmount - Math.round(bookingModalItem.totalAmount * 0.3),
-              depositPaid: isDeposit,
-              isFullyPaid: !isDeposit,
-              paymentMethod: method,
-              status: 'confirmed',
-              cancellationPolicyAr: 'إلغاء مجاني حتى 5 أيام قبل المناسبة.',
-              deliverablesAr: ['تنفيذ الخدمة حسب المواصفات المتفق عليها'],
-            });
-          }}
-        />
       )}
     </div>
   );
