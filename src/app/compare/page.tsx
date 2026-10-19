@@ -201,7 +201,7 @@ export default function ComparePage() {
                       <h4 className="font-bold text-sm sm:text-base font-cairo text-white">
                         {vendor.businessName}
                       </h4>
-                      <p className="text-[11px] text-gray-300 font-normal">
+                      <p className="text-xs text-gray-300 font-normal">
                         {vendor.categoryNameAr} • {vendor.cityNameAr}
                       </p>
                     </div>
@@ -225,22 +225,22 @@ export default function ComparePage() {
                   <td key={vendor.id} className="p-4 text-center">
                     <div className="flex flex-wrap justify-center gap-1.5">
                       {isLowestPrice && (
-                        <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-300">
+                        <span className="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2 py-0.5 rounded-full border border-emerald-300">
                           الأقل سعراً 💰
                         </span>
                       )}
                       {isHighestRating && (
-                        <span className="bg-saudi-gold-100 text-saudi-gold-900 text-[10px] font-bold px-2 py-0.5 rounded-full border border-saudi-gold-400">
+                        <span className="bg-saudi-gold-100 text-saudi-gold-900 text-[11px] font-bold px-2 py-0.5 rounded-full border border-saudi-gold-400">
                           الأعلى تقييماً ⭐
                         </span>
                       )}
                       {isFastest && (
-                        <span className="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-blue-300">
+                        <span className="bg-blue-100 text-blue-800 text-[11px] font-bold px-2 py-0.5 rounded-full border border-blue-300">
                           الأسرع تجاوباً ⚡
                         </span>
                       )}
                       {vendor.verified && (
-                        <span className="bg-saudi-green-100 text-saudi-green-900 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                        <span className="bg-saudi-green-100 text-saudi-green-900 text-[11px] font-bold px-2 py-0.5 rounded-full">
                           موثق رسمياً ✓
                         </span>
                       )}
@@ -260,7 +260,7 @@ export default function ComparePage() {
                     <span className="text-base font-black font-cairo text-saudi-green-950 block">
                       {formatSaudiRiyal(srv?.price || 0)}
                     </span>
-                    <span className="text-[10px] text-gray-400">{srv?.titleAr || 'خدمة مخصصة'}</span>
+                    <span className="text-[11px] text-gray-500">{srv?.titleAr || 'خدمة مخصصة'}</span>
                   </td>
                 );
               })}
@@ -275,7 +275,7 @@ export default function ComparePage() {
                     <Star className="w-4 h-4 fill-saudi-gold-500 text-saudi-gold-500" />
                     <span>{vendor.rating} / 5</span>
                   </div>
-                  <span className="text-[11px] text-gray-500 block mt-0.5">
+                  <span className="text-xs text-gray-500 block mt-0.5">
                     ({vendor.reviewsCount} مراجعة موثقة)
                   </span>
                 </td>

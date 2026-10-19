@@ -88,7 +88,7 @@ export default function TasksTimeline() {
               <button
                 type="button"
                 className={`p-1 rounded-full transition ${
-                  task.isCompleted ? 'text-green-600' : 'text-gray-400 hover:text-saudi-green-800'
+                  task.isCompleted ? 'text-green-600' : 'text-gray-500 hover:text-saudi-green-800'
                 }`}
               >
                 {task.isCompleted ? (
@@ -106,7 +106,7 @@ export default function TasksTimeline() {
                 >
                   {task.title}
                 </span>
-                <div className="flex items-center gap-2 text-[11px] text-gray-400">
+                <div className="flex items-center gap-2 text-xs text-gray-500">
                   <span className="bg-saudi-sand-100 px-2 py-0.5 rounded text-gray-600 font-medium">
                     {task.category}
                   </span>
@@ -117,7 +117,7 @@ export default function TasksTimeline() {
 
             <div className="flex items-center gap-2">
               <span
-                className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
+                className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
                   task.priority === 'high'
                     ? 'bg-red-100 text-red-700'
                     : task.priority === 'medium'
@@ -128,7 +128,7 @@ export default function TasksTimeline() {
                 {task.priority === 'high' ? 'أولوية عاجلة' : task.priority === 'medium' ? 'أولوية متوسطة' : 'عادية'}
               </span>
 
-              <span className="bg-saudi-green-50 text-saudi-green-900 text-[10px] font-bold px-2.5 py-0.5 rounded-full">
+              <span className="bg-saudi-green-50 text-saudi-green-900 text-[11px] font-bold px-2.5 py-0.5 rounded-full">
                 قبل {task.dueDaysBefore} يوم
               </span>
             </div>
@@ -138,9 +138,9 @@ export default function TasksTimeline() {
 
       {/* Add Task Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fadeIn">
+        <div role="dialog" aria-modal="true" aria-labelledby="dlg-6085-1" className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fadeIn">
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <h4 className="text-base font-bold text-gray-900 font-cairo">
+            <h4 className="text-base font-bold text-gray-900 font-cairo" id="dlg-6085-1">
               إضافة مهمة جديدة للمناسبة
             </h4>
 

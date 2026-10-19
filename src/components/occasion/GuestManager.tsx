@@ -1,4 +1,5 @@
 'use client';
+import { notify } from '@/lib/notify';
 
 import GuestDeliveryControls from './GuestDeliveryControls';
 import InvitationQRCode from '@/components/common/InvitationQRCode';
@@ -110,31 +111,31 @@ export default function GuestManager() {
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         <div className="bg-white p-4 rounded-2xl border border-saudi-sand-300 shadow-sm text-center">
           <Users className="w-5 h-5 mx-auto text-saudi-green-800 mb-1" />
-          <span className="text-[11px] text-gray-500 block">إجمالي المدعوين</span>
+          <span className="text-xs text-gray-500 block">إجمالي المدعوين</span>
           <span className="text-xl font-bold text-gray-900 font-cairo">{stats.total}</span>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-saudi-sand-300 shadow-sm text-center">
           <CheckCircle className="w-5 h-5 mx-auto text-green-600 mb-1" />
-          <span className="text-[11px] text-gray-500 block">المؤكدين (RSVP)</span>
+          <span className="text-xs text-gray-500 block">المؤكدين (RSVP)</span>
           <span className="text-xl font-bold text-green-700 font-cairo">{stats.confirmed}</span>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-saudi-sand-300 shadow-sm text-center">
           <Clock className="w-5 h-5 mx-auto text-amber-600 mb-1" />
-          <span className="text-[11px] text-gray-500 block">بانتظار الرد</span>
+          <span className="text-xs text-gray-500 block">بانتظار الرد</span>
           <span className="text-xl font-bold text-amber-600 font-cairo">{stats.pending}</span>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-saudi-sand-300 shadow-sm text-center">
           <XCircle className="w-5 h-5 mx-auto text-red-500 mb-1" />
-          <span className="text-[11px] text-gray-500 block">المعتذرين</span>
+          <span className="text-xs text-gray-500 block">المعتذرين</span>
           <span className="text-xl font-bold text-red-600 font-cairo">{stats.declined}</span>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-saudi-sand-300 shadow-sm text-center col-span-2 sm:col-span-1">
           <QrCode className="w-5 h-5 mx-auto text-saudi-gold-600 mb-1" />
-          <span className="text-[11px] text-gray-500 block">حضروا بالقاعة</span>
+          <span className="text-xs text-gray-500 block">حضروا بالقاعة</span>
           <span className="text-xl font-bold text-saudi-green-900 font-cairo">{stats.attended}</span>
         </div>
       </div>
@@ -143,7 +144,7 @@ export default function GuestManager() {
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-saudi-sand-300 shadow-sm">
         {/* Search */}
         <div className="relative w-full sm:w-72">
-          <Search className="w-4 h-4 text-gray-400 absolute right-3 top-2.5" />
+          <Search className="w-4 h-4 text-gray-500 absolute right-3 top-2.5" />
           <input
             type="text"
             value={searchQuery}
@@ -223,7 +224,7 @@ export default function GuestManager() {
             <tbody className="divide-y divide-gray-100">
               {filteredGuests.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="p-8 text-center text-gray-400">
+                  <td colSpan={6} className="p-8 text-center text-gray-500">
                     لا يوجد مدعوين مطابقين للبحث. اضغط "+ إضافة مدعو" للبدء.
                   </td>
                 </tr>
@@ -232,14 +233,14 @@ export default function GuestManager() {
                   <tr key={guest.id} className="hover:bg-saudi-sand-50/60 transition">
                     <td className="p-3.5">
                       <span className="font-bold text-gray-900 block">{guest.name}</span>
-                      <span className="text-[10px] text-gray-500 dir-ltr inline-block">{guest.phone}</span>
+                      <span className="text-[11px] text-gray-500 dir-ltr inline-block">{guest.phone}</span>
                     </td>
                     <td className="p-3.5">
-                      <span className="bg-saudi-sand-100 text-saudi-green-900 text-[10px] font-bold px-2 py-0.5 rounded-md">
+                      <span className="bg-saudi-sand-100 text-saudi-green-900 text-[11px] font-bold px-2 py-0.5 rounded-md">
                         {guest.category === 'women' ? 'نساء' : guest.category === 'men' ? 'رجال' : 'عائلة'}
                       </span>
                       {guest.familyGroup && (
-                        <span className="text-[10px] text-gray-400 block mt-0.5">{guest.familyGroup}</span>
+                        <span className="text-[11px] text-gray-500 block mt-0.5">{guest.familyGroup}</span>
                       )}
                     </td>
                     <td className="p-3.5 font-bold text-gray-700">
@@ -249,31 +250,31 @@ export default function GuestManager() {
                       {guest.tableName ? (
                         <span className="font-semibold text-saudi-green-800">{guest.tableName}</span>
                       ) : (
-                        <span className="text-gray-400 italic">غير محدد</span>
+                        <span className="text-gray-500 italic">غير محدد</span>
                       )}
                     </td>
                     <td className="p-3.5">
                       <div className="flex items-center gap-1.5">
                         {guest.status === 'confirmed' && (
-                          <span className="bg-green-100 text-green-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                          <span className="bg-green-100 text-green-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
                             <CheckCircle className="w-3 h-3" />
                             مؤكد الحضور
                           </span>
                         )}
                         {guest.status === 'attended' && (
-                          <span className="bg-saudi-green-900 text-saudi-gold-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                          <span className="bg-saudi-green-900 text-saudi-gold-300 text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
                             <QrCode className="w-3 h-3" />
                             حضر بالقاعة
                           </span>
                         )}
                         {guest.status === 'invited' && (
-                          <span className="bg-amber-100 text-amber-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                          <span className="bg-amber-100 text-amber-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
                             <Clock className="w-3 h-3" />
                             بانتظار الرد
                           </span>
                         )}
                         {guest.status === 'declined' && (
-                          <span className="bg-red-100 text-red-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                          <span className="bg-red-100 text-red-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
                             <XCircle className="w-3 h-3" />
                             اعتذر
                           </span>
@@ -283,7 +284,7 @@ export default function GuestManager() {
                         <select
                           value={guest.status}
                           onChange={(e) => updateGuestStatus(guest.id, e.target.value as any)}
-                          className="text-[10px] bg-transparent border border-gray-200 rounded px-1 py-0.5 text-gray-600"
+                          className="text-[11px] bg-transparent border border-gray-200 rounded px-1 py-0.5 text-gray-600"
                         >
                           <option value="invited">دعوة</option>
                           <option value="confirmed">تأكيد</option>
@@ -300,7 +301,7 @@ export default function GuestManager() {
                           href={generateWhatsAppMessage(guest)}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg flex items-center gap-1 text-[11px] font-bold px-2.5 shadow-sm transition"
+                          className="p-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg flex items-center gap-1 text-xs font-bold px-2.5 shadow-sm transition"
                           title="إرسال الدعوة بالواتساب"
                         >
                           <MessageSquare className="w-3.5 h-3.5" />
@@ -319,7 +320,7 @@ export default function GuestManager() {
                         {/* Delete */}
                         <button
                           onClick={() => deleteGuest(guest.id)}
-                          className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50"
+                          className="p-1.5 text-gray-500 hover:text-red-600 rounded-lg hover:bg-red-50"
                           title="حذف"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -336,9 +337,9 @@ export default function GuestManager() {
 
       {/* Add Guest Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fadeIn">
+        <div role="dialog" aria-modal="true" aria-labelledby="dlg-2299-1" className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fadeIn">
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <h4 className="text-base font-bold text-gray-900 font-cairo">
+            <h4 className="text-base font-bold text-gray-900 font-cairo" id="dlg-2299-1">
               إضافة مدعو جديد
             </h4>
 
@@ -426,15 +427,15 @@ export default function GuestManager() {
 
       {/* QR Code Pass Modal */}
       {activeQRModalGuest && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
+        <div role="dialog" aria-modal="true" aria-labelledby="dlg-2299-2" className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
           <div className="bg-gradient-to-b from-saudi-green-950 to-saudi-green-900 text-white rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4 border border-saudi-gold-500/40 text-center relative overflow-hidden">
             <div className="absolute top-0 right-0 left-0 h-2 bg-gold-gradient" />
 
             <div className="space-y-1">
-              <span className="text-[10px] font-bold text-saudi-gold-400 uppercase tracking-widest">
+              <span className="text-[11px] font-bold text-saudi-gold-400 uppercase tracking-widest">
                 بطاقة دخول المناسبة (VIP Pass)
               </span>
-              <h4 className="text-lg font-bold font-cairo text-white">
+              <h4 className="text-lg font-bold font-cairo text-white" id="dlg-2299-2">
                 {activeOccasion.title}
               </h4>
               <p className="text-xs text-saudi-sand-200">{activeOccasion.date}</p>
@@ -443,19 +444,19 @@ export default function GuestManager() {
             {/* Scannable invitation QR; the gate verifies the code against its guest list. */}
             <div className="bg-white p-4 rounded-2xl inline-block shadow-lg my-2">
               <InvitationQRCode value={createInvitationLink(getInvitationOrigin(activeOccasion.shareOrigin), activeOccasion, activeQRModalGuest.qrCode)} className="w-64 h-64 max-w-full mx-auto" />
-              <span className="text-[10px] font-mono text-gray-600 block mt-2">{activeQRModalGuest.qrCode}</span>
+              <span className="text-[11px] font-mono text-gray-600 block mt-2">{activeQRModalGuest.qrCode}</span>
             </div>
 
             <div className="space-y-1 text-xs">
               <span className="font-bold text-saudi-gold-300 text-sm block">
                 {activeQRModalGuest.name}
               </span>
-              <p className="text-gray-300 text-[11px]">
+              <p className="text-gray-300 text-xs">
                 {activeQRModalGuest.category === 'women' ? 'قسم النساء' : 'قسم الرجال'}
                 {activeQRModalGuest.companionCount > 0 && ` • مرافقين: +${activeQRModalGuest.companionCount}`}
               </p>
               {activeQRModalGuest.tableName && (
-                <p className="text-saudi-gold-400 font-bold text-[11px]">
+                <p className="text-saudi-gold-400 font-bold text-xs">
                   {activeQRModalGuest.tableName}
                 </p>
               )}
@@ -473,18 +474,18 @@ export default function GuestManager() {
 
       {/* Bulk Import / Export Modal */}
       {isImportExportOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
+        <div role="dialog" aria-modal="true" aria-labelledby="dlg-2299-3" className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5 border border-saudi-sand-300">
             <div className="flex items-center justify-between border-b border-gray-100 pb-3">
               <div className="flex items-center gap-2">
                 <FileSpreadsheet className="w-5 h-5 text-emerald-600" />
-                <h4 className="text-base font-bold text-gray-900 font-cairo">
+                <h4 className="text-base font-bold text-gray-900 font-cairo" id="dlg-2299-3">
                   استيراد وتصدير قائمة المدعوين (Excel / CSV)
                 </h4>
               </div>
               <button
                 onClick={() => setIsImportExportOpen(false)}
-                className="text-gray-400 hover:text-gray-600 text-sm font-bold"
+                className="text-gray-500 hover:text-gray-600 text-sm font-bold"
               >
                 ✕
               </button>
@@ -495,7 +496,7 @@ export default function GuestManager() {
               <span className="font-bold text-xs text-gray-800 block">
                 تصدير القائمة الحالية ({occasionGuests.length} مدعو)
               </span>
-              <p className="text-[11px] text-gray-500">
+              <p className="text-xs text-gray-500">
                 تحميل ملف CSV يتضمن الأسماء، أرقام الجوال، حالة الـ RSVP، ورقم الطاولة.
               </p>
               <button
@@ -558,7 +559,7 @@ export default function GuestManager() {
                   }
                   setImportText('');
                   setIsImportExportOpen(false);
-                  alert(`تم استيراد ${count} ضيف بنجاح!`);
+                  notify(`تم استيراد ${count} ضيف بنجاح!`, "success");
                 }}
                 className="w-full py-2.5 bg-saudi-green-800 hover:bg-saudi-green-900 text-white rounded-xl text-xs font-bold transition shadow-sm"
               >
@@ -571,18 +572,18 @@ export default function GuestManager() {
 
       {/* Smart WhatsApp Batch Dispatcher Modal */}
       {isWhatsAppDispatcherOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
+        <div role="dialog" aria-modal="true" aria-labelledby="dlg-2299-4" className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
           <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-5 border border-saudi-sand-300 max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-gray-100 pb-3">
               <div className="flex items-center gap-2">
                 <MessageSquare className="w-5 h-5 text-emerald-600" />
-                <h4 className="text-base font-bold text-gray-900 font-cairo">
+                <h4 className="text-base font-bold text-gray-900 font-cairo" id="dlg-2299-4">
                   مُرسل رسائل الواتساب الذكية للمدعوين
                 </h4>
               </div>
               <button
                 onClick={() => setIsWhatsAppDispatcherOpen(false)}
-                className="text-gray-400 hover:text-gray-600 text-sm font-bold"
+                className="text-gray-500 hover:text-gray-600 text-sm font-bold"
               >
                 ✕
               </button>
@@ -607,9 +608,9 @@ export default function GuestManager() {
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-gray-900">{guest.name}</span>
-                        <span className="text-[10px] text-gray-500 dir-ltr font-mono">{guest.phone}</span>
+                        <span className="text-[11px] text-gray-500 dir-ltr font-mono">{guest.phone}</span>
                       </div>
-                      <span className="text-[10px] text-emerald-700 font-medium mt-0.5 block">
+                      <span className="text-[11px] text-emerald-700 font-medium mt-0.5 block">
                         كود: {guest.qrCode} • {guest.status === 'confirmed' ? '✓ مؤكد الحضور' : 'بانتظار الرد'}
                       </span>
                     </div>
@@ -622,7 +623,7 @@ export default function GuestManager() {
                           setCopiedBatchIndex(idx);
                           setTimeout(() => setCopiedBatchIndex(null), 2000);
                         }}
-                        className="px-2.5 py-1.5 rounded-xl bg-white border border-gray-200 text-gray-700 hover:bg-gray-100 text-[11px] font-semibold transition flex items-center gap-1"
+                        className="px-2.5 py-1.5 rounded-xl bg-white border border-gray-200 text-gray-700 hover:bg-gray-100 text-xs font-semibold transition flex items-center gap-1"
                       >
                         {copiedBatchIndex === idx ? <Check className="w-3 h-3 text-green-600" /> : <Copy className="w-3 h-3" />}
                         <span>{copiedBatchIndex === idx ? 'تم النسخ' : 'نسخ النص'}</span>
@@ -632,7 +633,7 @@ export default function GuestManager() {
                         href={`https://wa.me/${cleanPhone}?text=${encodeURIComponent(personalizedMsg)}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold shadow-sm transition flex items-center gap-1"
+                        className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition flex items-center gap-1"
                       >
                         <Send className="w-3 h-3" />
                         <span>إرسال واتساب</span>

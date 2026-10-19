@@ -53,7 +53,7 @@ export const VendorWalletModal: React.FC<VendorWalletModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
+    <div role="dialog" aria-modal="true" aria-labelledby="dlg-9907-1" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
       <div className="relative w-full max-w-lg bg-white dark:bg-neutral-900 rounded-3xl shadow-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50">
@@ -62,7 +62,7 @@ export const VendorWalletModal: React.FC<VendorWalletModalProps> = ({
               <Wallet className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="font-bold text-neutral-900 dark:text-white text-base">
+              <h3 className="font-bold text-neutral-900 dark:text-white text-base" id="dlg-9907-1">
                 محفظة المستحقات والتحويل البنكي
               </h3>
               <p className="text-xs text-neutral-400">{vendorName}</p>
@@ -90,7 +90,7 @@ export const VendorWalletModal: React.FC<VendorWalletModalProps> = ({
             {/* Balance Cards Matrix */}
             <div className="grid grid-cols-2 gap-3">
               <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-900 dark:text-emerald-200">
-                <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 block mb-1">
+                <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 block mb-1">
                   الرصيد المتاح للسحب
                 </span>
                 <span className="font-mono text-xl font-black text-emerald-600 dark:text-emerald-400">
@@ -99,7 +99,7 @@ export const VendorWalletModal: React.FC<VendorWalletModalProps> = ({
               </div>
 
               <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/40 border border-neutral-200 dark:border-neutral-700 text-neutral-800 dark:text-neutral-200">
-                <span className="text-[11px] font-semibold text-neutral-400 block mb-1">
+                <span className="text-xs font-semibold text-neutral-400 block mb-1">
                   مبالغ قيد الضمان (Escrow)
                 </span>
                 <span className="font-mono text-xl font-bold text-neutral-700 dark:text-neutral-300">
@@ -175,7 +175,7 @@ export const VendorWalletModal: React.FC<VendorWalletModalProps> = ({
                 />
               </div>
 
-              <div className="flex items-center gap-2 p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/60 text-[11px] text-emerald-800 dark:text-emerald-300">
+              <div className="flex items-center gap-2 p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/60 text-xs text-emerald-800 dark:text-emerald-300">
                 <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-600" />
                 <span>التحويلات البنكية تتم فورياً عبر نظام المدفوعات الفورية السعودي (سريع SARIE).</span>
               </div>

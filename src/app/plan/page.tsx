@@ -169,7 +169,7 @@ function PlanWizardContent() {
                       <CheckCircle2 className="w-4 h-4 text-saudi-green-800 shrink-0" />
                     )}
                   </div>
-                  <span className="text-[10px] text-gray-400 line-clamp-1">{occ.descriptionAr}</span>
+                  <span className="text-[11px] text-gray-500 line-clamp-1">{occ.descriptionAr}</span>
                 </button>
               ))}
             </div>
@@ -262,7 +262,7 @@ function PlanWizardContent() {
                   onChange={(e) => setGuestCount(Number(e.target.value))}
                   className="w-full max-w-md mx-auto accent-saudi-green-800 cursor-pointer"
                 />
-                <div className="flex justify-between text-[11px] text-gray-400 max-w-md mx-auto">
+                <div className="flex justify-between text-xs text-gray-500 max-w-md mx-auto">
                   <span>10 أشخاص (جلسة خاصة)</span>
                   <span>100 شخص</span>
                   <span>500 شخص (قاعة كبرى)</span>
@@ -340,7 +340,7 @@ function PlanWizardContent() {
                     <span className="text-xs font-bold text-gray-900 font-cairo">{v.title}</span>
                     {venueType === v.id && <CheckCircle2 className="w-4 h-4 text-saudi-green-800" />}
                   </div>
-                  <span className="text-[10px] text-gray-500 mt-1">{v.desc}</span>
+                  <span className="text-[11px] text-gray-500 mt-1">{v.desc}</span>
                 </button>
               ))}
             </div>
@@ -402,7 +402,7 @@ function PlanWizardContent() {
                       }`}
                     >
                       <span className="text-xs font-bold block">{t.title}</span>
-                      <span className="text-[10px] text-gray-500 block mt-0.5">{t.desc}</span>
+                      <span className="text-[11px] text-gray-500 block mt-0.5">{t.desc}</span>
                     </button>
                   ))}
                 </div>

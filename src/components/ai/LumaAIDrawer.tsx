@@ -678,7 +678,7 @@ export default function LumaAIDrawer() {
   if (!isAIOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm animate-fadeIn">
+    <div role="dialog" aria-modal="true" aria-labelledby="dlg-6056-1" className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm animate-fadeIn">
       <div className="w-full max-w-2xl h-full bg-white shadow-2xl flex flex-col overflow-hidden animate-slideUp">
         {/* Header */}
         <div className="bg-gradient-to-r from-saudi-green-950 via-saudi-green-900 to-saudi-green-800 text-white p-4 sm:p-5 flex items-center justify-between border-b border-saudi-gold-500/30">
@@ -688,10 +688,10 @@ export default function LumaAIDrawer() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-lg font-bold font-cairo text-white">
+                <h3 className="text-lg font-bold font-cairo text-white" id="dlg-6056-1">
                   المساعد الذكي: {adminConfig.aiAssistantNameAr}
                 </h3>
-                <span className="bg-saudi-gold-500/20 text-saudi-gold-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-saudi-gold-400/40">
+                <span className="bg-saudi-gold-500/20 text-saudi-gold-300 text-[11px] font-bold px-2 py-0.5 rounded-full border border-saudi-gold-400/40">
                   خبير الموردين والتسوق 🇸🇦
                 </span>
               </div>
@@ -737,7 +737,7 @@ export default function LumaAIDrawer() {
             <Link
               href="/cart"
               onClick={() => setIsAIOpen(false)}
-              className="mr-auto flex items-center gap-1 bg-white/10 hover:bg-white/20 text-saudi-gold-300 px-2.5 py-1 rounded-lg text-[11px] font-bold transition"
+              className="mr-auto flex items-center gap-1 bg-white/10 hover:bg-white/20 text-saudi-gold-300 px-2.5 py-1 rounded-lg text-xs font-bold transition"
             >
               <ShoppingBag className="w-3 h-3" />
               <span>السلة ({cart.reduce((s, i) => s + i.quantity, 0)})</span>
@@ -784,8 +784,8 @@ export default function LumaAIDrawer() {
                   >
                     <p className="whitespace-pre-line font-tajawal">{msg.text}</p>
                     <span
-                      className={`text-[10px] block mt-1.5 ${
-                        msg.sender === 'user' ? 'text-gray-300' : 'text-gray-400'
+                      className={`text-[11px] block mt-1.5 ${
+                        msg.sender === 'user' ? 'text-gray-300' : 'text-gray-500'
                       }`}
                     >
                       {msg.timestamp}
@@ -810,10 +810,10 @@ export default function LumaAIDrawer() {
                               <h5 className="font-bold text-xs text-gray-900">
                                 {idx + 1}. {c.vendor.businessName}
                               </h5>
-                              <div className="flex items-center gap-1 text-[11px] text-saudi-gold-600 font-bold">
+                              <div className="flex items-center gap-1 text-xs text-saudi-gold-600 font-bold">
                                 <Star className="w-3 h-3 fill-current" />
                                 <span>{c.vendor.rating}</span>
-                                <span className="text-gray-400">({c.vendor.reviewsCount})</span>
+                                <span className="text-gray-500">({c.vendor.reviewsCount})</span>
                               </div>
                             </div>
                           </div>
@@ -838,7 +838,7 @@ export default function LumaAIDrawer() {
                           <div className="flex gap-2">
                             <button
                               onClick={() => handleQuickAddService(c)}
-                              className="flex-1 py-2 bg-saudi-green-800 hover:bg-saudi-green-900 text-white font-bold rounded-xl text-[11px] flex items-center justify-center gap-1 transition"
+                              className="flex-1 py-2 bg-saudi-green-800 hover:bg-saudi-green-900 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1 transition"
                             >
                               <ShoppingBag className="w-3 h-3 text-saudi-gold-300" />
                               <span>أضف للسلة</span>
@@ -884,20 +884,20 @@ export default function LumaAIDrawer() {
                                   {cand.badges.slice(0, 1).map((b, bIdx) => (
                                     <span
                                       key={bIdx}
-                                      className="bg-saudi-gold-100 text-saudi-gold-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-saudi-gold-300"
+                                      className="bg-saudi-gold-100 text-saudi-gold-800 text-[11px] font-bold px-2 py-0.5 rounded-full border border-saudi-gold-300"
                                     >
                                       {b}
                                     </span>
                                   ))}
                                 </div>
-                                <p className="text-[11px] text-gray-500">
+                                <p className="text-xs text-gray-500">
                                   {cand.vendor.categoryNameAr} • {cand.vendor.cityNameAr} (حي {cand.vendor.neighborhood})
                                 </p>
                               </div>
                             </div>
 
                             <div className="text-left shrink-0">
-                              <span className="text-[10px] text-gray-400 block">يبدأ من</span>
+                              <span className="text-[11px] text-gray-500 block">يبدأ من</span>
                               <span className="text-sm font-black font-cairo text-saudi-green-900">
                                 {formatSaudiRiyal(cand.primaryService?.price || 0)}
                               </span>
@@ -918,7 +918,7 @@ export default function LumaAIDrawer() {
                                 <span>{cand.vendor.rating}</span>
                               </div>
                               <span className="text-gray-300">|</span>
-                              <span className="text-gray-500 text-[11px]">
+                              <span className="text-gray-500 text-xs">
                                 {cand.vendor.completedBookingsCount}+ حجز
                               </span>
                             </div>
@@ -926,10 +926,10 @@ export default function LumaAIDrawer() {
 
                           {/* Explainability reasons */}
                           <div className="space-y-1">
-                            <span className="text-[10px] font-bold text-saudi-green-900 block">
+                            <span className="text-[11px] font-bold text-saudi-green-900 block">
                               لماذا رشحته لُـمى لك؟
                             </span>
-                            <ul className="text-[11px] text-gray-600 space-y-0.5">
+                            <ul className="text-xs text-gray-600 space-y-0.5">
                               {cand.reasonsAr.map((reason, rIdx) => (
                                 <li key={rIdx} className="flex items-center gap-1.5">
                                   <CheckCircle2 className="w-3 h-3 text-saudi-green-600 shrink-0" />
@@ -987,7 +987,7 @@ export default function LumaAIDrawer() {
                     <h5 className="text-xs font-bold text-gray-900">
                       لُـمى تقوم بفحص قواعد بيانات الموردين وحساب أفضل خيار...
                     </h5>
-                    <p className="text-[10px] text-gray-400">
+                    <p className="text-[11px] text-gray-500">
                       التحقق من التوفر والمطابقة مع متطلباتك
                     </p>
                   </div>
@@ -1033,11 +1033,11 @@ export default function LumaAIDrawer() {
 
                     <div className="grid grid-cols-2 gap-2 text-center text-xs">
                       <div className="bg-saudi-sand-100 p-2 rounded-xl">
-                        <span className="text-[10px] text-gray-400 block">الضيوف</span>
+                        <span className="text-[11px] text-gray-600 block">الضيوف</span>
                         <span className="font-bold">{generatedPlan.guestCount} شخص</span>
                       </div>
                       <div className="bg-saudi-sand-100 p-2 rounded-xl">
-                        <span className="text-[10px] text-gray-400 block">الميزانية</span>
+                        <span className="text-[11px] text-gray-600 block">الميزانية</span>
                         <span className="font-bold text-saudi-green-900">
                           {formatSaudiRiyal(generatedPlan.budget)}
                         </span>
@@ -1083,7 +1083,7 @@ export default function LumaAIDrawer() {
                     setInputQuery(prompt);
                     handleShoppingQuery(prompt);
                   }}
-                  className="whitespace-nowrap bg-saudi-sand-100 hover:bg-saudi-green-50 text-gray-700 hover:text-saudi-green-900 text-[11px] px-2.5 py-1.5 rounded-xl border border-saudi-sand-300 transition shrink-0"
+                  className="whitespace-nowrap bg-saudi-sand-100 hover:bg-saudi-green-50 text-gray-700 hover:text-saudi-green-900 text-xs px-2.5 py-1.5 rounded-xl border border-saudi-sand-300 transition shrink-0"
                 >
                   {prompt}
                 </button>

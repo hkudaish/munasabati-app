@@ -15,7 +15,7 @@ export default function GuestDeliveryControls({ guest }: { guest: Guest }) {
     } catch (e) { setNotice(e instanceof Error ? e.message : 'تعذر الإرسال'); }
     finally { setBusy(false); }
   }
-  return <details className="text-[11px] min-w-32"><summary className="cursor-pointer underline">إرسال عبر القنوات</summary><div className="space-y-2 p-2 bg-white border rounded-lg">
+  return <details className="text-xs min-w-32"><summary className="cursor-pointer underline">إرسال عبر القنوات</summary><div className="space-y-2 p-2 bg-white border rounded-lg">
     <select aria-label="قناة الإرسال" disabled={busy} value={channel} onChange={e => { setChannel(e.target.value); requestKey.current = null; }} className="border p-1 rounded"><option value="whatsapp">واتساب</option><option value="sms">رسالة نصية</option><option value="email" disabled={!guest.email}>بريد إلكتروني</option></select>
     <button disabled={busy || !!guest.revokedAt} onClick={() => void send()} className="block rounded bg-green-900 text-white p-2">إرسال الدعوة</button>
     <button disabled={busy} className="underline" onClick={async () => { try { const d = await requestJSON(`/api/guests/${guest.id}/send`); setNotice(d.deliveries.map((r: any) => `${r.channel}: ${{ ACCEPTED: 'مقبولة لدى المزود', PENDING: 'قيد المعالجة', UNKNOWN: 'غير معروفة', FAILED: 'فشل' }[r.status as string]} (${new Date(r.createdAt).toLocaleString('ar-SA-u-nu-latn')})`).join('؛ ') || 'لا توجد محاولات إرسال'); } catch (e) { setNotice(e instanceof Error ? e.message : 'تعذر قراءة السجل'); } }}>سجل الإرسال</button>

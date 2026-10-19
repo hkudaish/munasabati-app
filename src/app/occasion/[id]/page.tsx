@@ -147,7 +147,7 @@ export default function OccasionWorkspacePage() {
 
             <div className="space-y-0.5 text-xs">
               <span className="text-saudi-gold-300 font-bold block">جاهزية المناسبة</span>
-              <span className="text-gray-300 block text-[11px]">
+              <span className="text-gray-300 block text-xs">
                 {daysRemaining > 0 ? `متبقي ${daysRemaining} يوماً على الموعد` : 'موعد المناسبة اليوم! 🎉'}
               </span>
             </div>
@@ -332,7 +332,7 @@ export default function OccasionWorkspacePage() {
                   <span className="text-xl font-bold font-cairo text-saudi-green-950">
                     {formatSAR(totalSpent)}
                   </span>
-                  <span className="text-xs text-gray-400">من {formatSAR(currentOccasion.budget)}</span>
+                  <span className="text-xs text-gray-500">من {formatSAR(currentOccasion.budget)}</span>
                 </div>
                 <div className="w-full bg-gray-100 h-1.5 rounded-full mt-2 overflow-hidden">
                   <div
@@ -354,7 +354,7 @@ export default function OccasionWorkspacePage() {
                   <span className="text-xl font-bold font-cairo text-green-700">
                     {confirmedGuestsCount} مؤكد
                   </span>
-                  <span className="text-xs text-gray-400">من {occasionGuests.length} مسجل</span>
+                  <span className="text-xs text-gray-500">من {occasionGuests.length} مسجل</span>
                 </div>
                 <div className="w-full bg-gray-100 h-1.5 rounded-full mt-2 overflow-hidden">
                   <div
@@ -376,7 +376,7 @@ export default function OccasionWorkspacePage() {
                   <span className="text-xl font-bold font-cairo text-saudi-green-950">
                     {completedTasksCount} مهمة
                   </span>
-                  <span className="text-xs text-gray-400">من {occasionTasks.length} متبقية</span>
+                  <span className="text-xs text-gray-500">من {occasionTasks.length} متبقية</span>
                 </div>
                 <div className="w-full bg-gray-100 h-1.5 rounded-full mt-2 overflow-hidden">
                   <div
@@ -400,7 +400,7 @@ export default function OccasionWorkspacePage() {
                   </span>
                   <span className="text-xs text-green-700 font-bold">مؤكدة بالعربون</span>
                 </div>
-                <span className="text-[10px] text-gray-400 mt-2 block">
+                <span className="text-[11px] text-gray-500 mt-2 block">
                   عقود إلكترونية محمية بالكامل
                 </span>
               </div>
@@ -429,12 +429,12 @@ export default function OccasionWorkspacePage() {
                     className="p-4 rounded-2xl border border-saudi-sand-300 bg-saudi-sand-50/50 flex items-start justify-between gap-3"
                   >
                     <div className="space-y-1">
-                      <span className="text-[10px] font-mono text-gray-400 block font-bold">{b.bookingNumber}</span>
+                      <span className="text-[11px] font-mono text-gray-500 block font-bold">{b.bookingNumber}</span>
                       <h5 className="font-bold text-xs text-gray-900">{b.serviceTitleAr}</h5>
                       <span className="text-xs text-gray-600 flex items-center gap-1">
                         المزود: <strong className="text-saudi-green-900">{b.vendorName}</strong>
                       </span>
-                      <div className="pt-2 flex items-center gap-2 text-[11px]">
+                      <div className="pt-2 flex items-center gap-2 text-xs">
                         <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded-full font-bold">
                           تم سداد العربون ({formatSAR(b.depositAmount)})
                         </span>
@@ -442,7 +442,7 @@ export default function OccasionWorkspacePage() {
                     </div>
 
                     <div className="text-left shrink-0">
-                      <span className="text-xs text-gray-400 block">الإجمالي:</span>
+                      <span className="text-xs text-gray-500 block">الإجمالي:</span>
                       <span className="text-sm font-black font-cairo text-saudi-green-950">
                         {formatSAR(b.totalAmount)}
                       </span>
@@ -505,7 +505,7 @@ export default function OccasionWorkspacePage() {
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-3">
                     <div>
-                      <span className="text-[10px] font-bold text-saudi-gold-600 font-mono">
+                      <span className="text-[11px] font-bold text-saudi-gold-600 font-mono">
                         رقم العقد: {b.bookingNumber}
                       </span>
                       <h4 className="text-sm font-bold text-gray-900">{b.serviceTitleAr}</h4>
@@ -517,26 +517,26 @@ export default function OccasionWorkspacePage() {
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs text-gray-600">
                     <div>
-                      <span className="text-gray-400 block">المزود المعتمد:</span>
+                      <span className="text-gray-500 block">المزود المعتمد:</span>
                       <strong className="text-gray-900">{b.vendorName}</strong>
                     </div>
                     <div>
-                      <span className="text-gray-400 block">المبلغ الإجمالي:</span>
+                      <span className="text-gray-500 block">المبلغ الإجمالي:</span>
                       <strong className="text-saudi-green-950 font-cairo">{formatSAR(b.totalAmount)}</strong>
                     </div>
                     <div>
-                      <span className="text-gray-400 block">العربون المسدد:</span>
+                      <span className="text-gray-500 block">العربون المسدد:</span>
                       <strong className="text-green-700">{formatSAR(b.depositAmount)}</strong>
                     </div>
                     <div>
-                      <span className="text-gray-400 block">المتبقي عند التنفيذ:</span>
+                      <span className="text-gray-500 block">المتبقي عند التنفيذ:</span>
                       <strong className="text-amber-700">{formatSAR(b.remainingAmount)}</strong>
                     </div>
                   </div>
 
                   <div className="space-y-1 bg-saudi-sand-50 p-3 rounded-xl text-xs">
                     <span className="font-bold text-gray-700 block">المخرجات والالتزامات المتفق عليها:</span>
-                    <ul className="list-disc list-inside text-gray-600 space-y-0.5 text-[11px]">
+                    <ul className="list-disc list-inside text-gray-600 space-y-0.5 text-xs">
                       {b.deliverablesAr.map((d, idx) => (
                         <li key={idx}>{d}</li>
                       ))}

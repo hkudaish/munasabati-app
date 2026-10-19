@@ -92,7 +92,7 @@ export default function WishlistManager() {
                   alt={gift.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition"
                 />
-                <span className="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full">
+                <span className="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white text-[11px] font-bold px-2.5 py-1 rounded-full">
                   {gift.category}
                 </span>
 
@@ -101,7 +101,7 @@ export default function WishlistManager() {
                     <CheckCircle2 className="w-8 h-8 text-saudi-gold-400 mb-1" />
                     <span className="text-xs font-bold">تم الإهداء بالكامل! ✨</span>
                     {gift.giftedBy && (
-                      <span className="text-[11px] text-saudi-gold-200 mt-0.5">من: {gift.giftedBy}</span>
+                      <span className="text-xs text-saudi-gold-200 mt-0.5">من: {gift.giftedBy}</span>
                     )}
                   </div>
                 )}
@@ -117,7 +117,7 @@ export default function WishlistManager() {
 
                 {gift.allowContributions && (
                   <div className="space-y-1.5 pt-1">
-                    <div className="flex items-center justify-between text-[11px] text-gray-500">
+                    <div className="flex items-center justify-between text-xs text-gray-500">
                       <span>تم جمع: {formatSAR(gift.contributedAmount)}</span>
                       <span>{percentage}%</span>
                     </div>
@@ -147,9 +147,9 @@ export default function WishlistManager() {
 
       {/* Add Gift Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fadeIn">
+        <div role="dialog" aria-modal="true" aria-labelledby="dlg-5650-1" className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fadeIn">
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <h4 className="text-base font-bold text-gray-900 font-cairo">
+            <h4 className="text-base font-bold text-gray-900 font-cairo" id="dlg-5650-1">
               إضافة طلب هدية أو خدمة لقائمة الهدايا
             </h4>
 
@@ -229,9 +229,9 @@ export default function WishlistManager() {
 
       {/* Contribute Modal */}
       {contributeModalGift && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fadeIn">
+        <div role="dialog" aria-modal="true" aria-labelledby="dlg-5650-2" className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fadeIn">
           <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4">
-            <h4 className="text-base font-bold text-gray-900 font-cairo">
+            <h4 className="text-base font-bold text-gray-900 font-cairo" id="dlg-5650-2">
               المساهمة في إهداء المناسبة 🎁
             </h4>
             <p className="text-xs text-gray-500">

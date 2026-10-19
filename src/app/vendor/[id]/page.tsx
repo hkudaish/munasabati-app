@@ -226,7 +226,7 @@ export default function VendorProfilePage() {
                   <div className="flex items-center gap-1 text-saudi-gold-700 font-bold">
                     <Star className="w-4 h-4 fill-saudi-gold-500 text-saudi-gold-500" />
                     <span>{vendor.rating}</span>
-                    <span className="text-gray-400 font-normal">
+                    <span className="text-gray-500 font-normal">
                       ({vendor.reviewsCount || vendorReviews.length} تقييم موثق)
                     </span>
                   </div>
@@ -268,7 +268,7 @@ export default function VendorProfilePage() {
           <div className="pt-4 border-t border-saudi-sand-200 flex flex-wrap items-center gap-3">
             {vendor.crNumber && (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-saudi-sand-100 text-gray-700 text-xs font-mono">
-                <FileText className="w-3.5 h-3.5 text-gray-500" />
+                <FileText className="w-3.5 h-3.5 text-gray-600" />
                 سجل تجاري: {vendor.crNumber}
               </span>
             )}
@@ -292,35 +292,35 @@ export default function VendorProfilePage() {
         {/* Vendor Extended Metrics Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div className="bg-white p-4 rounded-2xl border border-saudi-sand-300 shadow-sm text-center">
-            <span className="text-[11px] text-gray-500 block">نسبة الالتزام بالموعد</span>
+            <span className="text-xs text-gray-500 block">نسبة الالتزام بالموعد</span>
             <span className="text-xl font-black font-cairo text-saudi-green-950 block mt-1">
               {vendor.metrics.onTimeRate}% ⏱️
             </span>
-            <span className="text-[10px] text-emerald-700 font-bold">دقة عالية بالمواعيد</span>
+            <span className="text-[11px] text-emerald-700 font-bold">دقة عالية بالمواعيد</span>
           </div>
 
           <div className="bg-white p-4 rounded-2xl border border-saudi-sand-300 shadow-sm text-center">
-            <span className="text-[11px] text-gray-500 block">معدل رضا العملاء</span>
+            <span className="text-xs text-gray-500 block">معدل رضا العملاء</span>
             <span className="text-xl font-black font-cairo text-saudi-gold-700 block mt-1">
               {vendor.metrics.satisfactionRate}% ⭐
             </span>
-            <span className="text-[10px] text-saudi-gold-800 font-bold">مراجعات ممتازة</span>
+            <span className="text-[11px] text-saudi-gold-800 font-bold">مراجعات ممتازة</span>
           </div>
 
           <div className="bg-white p-4 rounded-2xl border border-saudi-sand-300 shadow-sm text-center">
-            <span className="text-[11px] text-gray-500 block">العملاء المتكررون</span>
+            <span className="text-xs text-gray-500 block">العملاء المتكررون</span>
             <span className="text-xl font-black font-cairo text-saudi-green-950 block mt-1">
               {vendor.metrics.repeatCustomerRate}% 🔄
             </span>
-            <span className="text-[10px] text-gray-400">ولاء وثقة عالية</span>
+            <span className="text-[11px] text-gray-500">ولاء وثقة عالية</span>
           </div>
 
           <div className="bg-white p-4 rounded-2xl border border-saudi-sand-300 shadow-sm text-center">
-            <span className="text-[11px] text-gray-500 block">سرعة الرد</span>
+            <span className="text-xs text-gray-500 block">سرعة الرد</span>
             <span className="text-xl font-black font-cairo text-saudi-green-950 block mt-1">
               {vendor.metrics.responseTimeMinutes} دقيقة ⚡
             </span>
-            <span className="text-[10px] text-emerald-700 font-bold">تجاوب فوري</span>
+            <span className="text-[11px] text-emerald-700 font-bold">تجاوب فوري</span>
           </div>
         </div>
 
@@ -368,7 +368,7 @@ export default function VendorProfilePage() {
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                         {service.badge && (
-                          <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[11px] font-bold bg-saudi-green-800 text-white shadow-sm">
+                          <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-bold bg-saudi-green-800 text-white shadow-sm">
                             {service.badge}
                           </span>
                         )}
@@ -389,7 +389,7 @@ export default function VendorProfilePage() {
                           {service.featuresAr?.slice(0, 3).map((feat, i) => (
                             <span
                               key={i}
-                              className="text-[10px] px-2 py-0.5 rounded-lg bg-saudi-sand-100 text-gray-700"
+                              className="text-[11px] px-2 py-0.5 rounded-lg bg-saudi-sand-100 text-gray-700"
                             >
                               ✓ {feat}
                             </span>
@@ -400,7 +400,7 @@ export default function VendorProfilePage() {
 
                     <div className="p-5 pt-0 border-t border-saudi-sand-200 mt-4 flex items-center justify-between">
                       <div>
-                        <span className="text-[10px] text-gray-400 block">السعر يبدأ من</span>
+                        <span className="text-[11px] text-gray-500 block">السعر يبدأ من</span>
                         <span className="font-cairo text-base font-black text-saudi-green-900">
                           {formatSaudiRiyal(service.price)}
                         </span>
@@ -540,7 +540,7 @@ export default function VendorProfilePage() {
                         </div>
                         <div>
                           <h4 className="font-bold text-xs text-gray-900">{rev.customerName}</h4>
-                          <span className="text-[10px] text-gray-400">{rev.occasionTypeAr} • {rev.date}</span>
+                          <span className="text-[11px] text-gray-500">{rev.occasionTypeAr} • {rev.date}</span>
                         </div>
                       </div>
                       <div className="flex items-center gap-1 text-xs font-bold text-saudi-gold-700">
@@ -570,13 +570,13 @@ export default function VendorProfilePage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-saudi-sand-200 text-xs">
               <div className="space-y-1">
-                <span className="text-gray-400 block">نطاق التغطية الجغرافية:</span>
+                <span className="text-gray-500 block">نطاق التغطية الجغرافية:</span>
                 <span className="font-bold text-gray-900">
                   كافة أحياء {vendor.cityNameAr} وضواحيها
                 </span>
               </div>
               <div className="space-y-1">
-                <span className="text-gray-400 block">متوسط مدة التجهيز المسبق:</span>
+                <span className="text-gray-500 block">متوسط مدة التجهيز المسبق:</span>
                 <span className="font-bold text-gray-900">
                   يتطلب الحجز قبل 3 أيام على الأقل
                 </span>
@@ -611,10 +611,10 @@ export default function VendorProfilePage() {
                     />
                     <div>
                       <h4 className="font-bold text-xs text-gray-900 font-cairo">{rel.businessName}</h4>
-                      <div className="flex items-center gap-1 text-[11px] text-saudi-gold-600 font-bold">
+                      <div className="flex items-center gap-1 text-xs text-saudi-gold-600 font-bold">
                         <Star className="w-3 h-3 fill-current" />
                         <span>{rel.rating}</span>
-                        <span className="text-gray-400 font-normal">({rel.reviewsCount})</span>
+                        <span className="text-gray-500 font-normal">({rel.reviewsCount})</span>
                       </div>
                     </div>
                   </div>

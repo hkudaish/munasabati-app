@@ -41,6 +41,7 @@ export default function CartPage() {
     services,
   } = useApp();
 
+  const [confirmingClear, setConfirmingClear] = useState(false);
   const [couponInput, setCouponInput] = useState('');
   const [couponError, setCouponError] = useState<string | null>(null);
   const [couponSuccess, setCouponSuccess] = useState<string | null>(null);
@@ -101,17 +102,32 @@ export default function CartPage() {
         </div>
 
         {cart.length > 0 && (
-          <button
-            onClick={() => {
-              if (confirm('هل أنت متأكد من رغبتك في إفراغ السلة بالكامل؟')) {
-                clearCart();
-              }
-            }}
-            className="text-xs text-red-600 hover:text-red-700 font-bold flex items-center gap-1 self-start sm:self-center transition"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-            <span>إفراغ السلة</span>
-          </button>
+          confirmingClear ? (
+            <div role="alertdialog" aria-label="تأكيد إفراغ السلة" className="flex items-center gap-2 self-start sm:self-center text-xs font-bold">
+              <span className="text-slate-700">إفراغ السلة بالكامل؟</span>
+              <button
+                onClick={() => { clearCart(); setConfirmingClear(false); }}
+                className="rounded-lg bg-red-600 px-3 py-1.5 text-white hover:bg-red-700 transition"
+              >
+                إفراغ السلة
+              </button>
+              <button
+                autoFocus
+                onClick={() => setConfirmingClear(false)}
+                className="rounded-lg border border-saudi-sand-300 px-3 py-1.5 text-slate-700 hover:bg-saudi-sand-100 transition"
+              >
+                إلغاء
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setConfirmingClear(true)}
+              className="text-xs text-red-600 hover:text-red-700 font-bold flex items-center gap-1 self-start sm:self-center transition"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>إفراغ السلة</span>
+            </button>
+          )
         )}
       </div>
 
@@ -173,7 +189,7 @@ export default function CartPage() {
                         {group.vendorName}
                         <ShieldCheck className="w-4 h-4 text-saudi-green-700" />
                       </h4>
-                      <span className="text-[11px] text-gray-500">
+                      <span className="text-xs text-gray-600">
                         {group.items.length} {group.items.length === 1 ? 'خدمة مختارة' : 'خدمات'} من هذا المورد
                       </span>
                     </div>
@@ -237,7 +253,7 @@ export default function CartPage() {
                           {/* Selected Add-ons list if any */}
                           {item.selectedAddons && item.selectedAddons.length > 0 && (
                             <div className="bg-saudi-sand-50 p-2.5 rounded-xl text-xs space-y-1 mt-2">
-                              <span className="font-bold text-gray-700 block text-[11px]">
+                              <span className="font-bold text-gray-700 block text-xs">
                                 الإضافات الملحقة (+):
                               </span>
                               {item.selectedAddons.map((addon) => {
@@ -260,7 +276,7 @@ export default function CartPage() {
                             <span className="text-base font-black font-cairo text-saudi-green-950 block">
                               {formatSaudiRiyal(item.totalPrice)}
                             </span>
-                            <span className="text-[10px] text-gray-400">شامل الضريبة 15%</span>
+                            <span className="text-[11px] text-gray-500">شامل الضريبة 15%</span>
                           </div>
 
                           {/* Quantity Stepper */}
@@ -325,7 +341,7 @@ export default function CartPage() {
                         <h5 className="font-bold text-xs sm:text-sm text-gray-900">
                           {saved.serviceTitleAr}
                         </h5>
-                        <p className="text-[11px] text-gray-500">
+                        <p className="text-xs text-gray-500">
                           {saved.vendorName} • باقة {saved.selectedPackage.nameAr}
                         </p>
                         <span className="text-xs font-black text-saudi-green-900 block mt-0.5">
@@ -360,7 +376,7 @@ export default function CartPage() {
                 <div className="bg-emerald-50 border border-emerald-200 p-3 rounded-2xl flex items-center justify-between text-xs">
                   <div>
                     <span className="font-bold text-emerald-800 block">{appliedCoupon.code}</span>
-                    <span className="text-[10px] text-emerald-600">{appliedCoupon.descriptionAr}</span>
+                    <span className="text-[11px] text-emerald-600">{appliedCoupon.descriptionAr}</span>
                   </div>
                   <button
                     onClick={removeCoupon}
@@ -387,18 +403,18 @@ export default function CartPage() {
                     </button>
                   </div>
                   {couponError && (
-                    <p className="text-[11px] text-red-600 flex items-center gap-1">
+                    <p className="text-xs text-red-600 flex items-center gap-1">
                       <AlertCircle className="w-3 h-3" />
                       <span>{couponError}</span>
                     </p>
                   )}
                   {couponSuccess && (
-                    <p className="text-[11px] text-emerald-600 flex items-center gap-1">
+                    <p className="text-xs text-emerald-600 flex items-center gap-1">
                       <CheckCircle2 className="w-3 h-3" />
                       <span>{couponSuccess}</span>
                     </p>
                   )}
-                  <p className="text-[10px] text-gray-400">
+                  <p className="text-[11px] text-gray-500">
                     جرب كود الترحيب: <span className="font-bold text-gray-600">MUNASABATI10</span> (خصم 10%)
                   </p>
                 </form>
@@ -431,7 +447,7 @@ export default function CartPage() {
                   </div>
                 )}
 
-                <div className="flex justify-between text-[11px] text-gray-500">
+                <div className="flex justify-between text-xs text-gray-500">
                   <span>ضريبة القيمة المضافة ZATCA (15% مشمولة):</span>
                   <span>{formatSaudiRiyal(totals.taxAmount)}</span>
                 </div>
@@ -449,7 +465,7 @@ export default function CartPage() {
                     <span className="font-bold text-saudi-green-900">عربون التأكيد اليوم (30%):</span>
                     <span className="font-black text-saudi-green-950">{formatSaudiRiyal(totals.depositAmount)}</span>
                   </div>
-                  <div className="flex justify-between text-[11px] text-gray-500">
+                  <div className="flex justify-between text-xs text-gray-500">
                     <span>المتبقي عند التنفيذ الميداني:</span>
                     <span>{formatSaudiRiyal(totals.remainingAmount)}</span>
                   </div>
@@ -467,10 +483,10 @@ export default function CartPage() {
               </button>
 
               <div className="text-center space-y-1 pt-1">
-                <span className="text-[10px] text-gray-400 block">
+                <span className="text-[11px] text-gray-500 block">
                   🔒 دفع إلكتروني آمن معتمد من البنك المركزي السعودي (SAMA)
                 </span>
-                <span className="text-[10px] text-saudi-green-800 font-bold block">
+                <span className="text-[11px] text-saudi-green-800 font-bold block">
                   🛡️ عقد إلكتروني موحد يضمن حقوق الطرفين وسياسة إلغاء مرنة
                 </span>
               </div>

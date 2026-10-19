@@ -1,4 +1,5 @@
 'use client';
+import { notify } from '@/lib/notify';
 
 import React, { useState } from 'react';
 import Link from 'next/link';
@@ -96,7 +97,7 @@ export default function CheckoutPage() {
           origin: { y: 0.6 },
         });
       } catch {}
-    } catch (error) { setIsSubmitting(false); alert(error instanceof Error ? error.message : 'تعذر تأكيد الطلب'); }
+    } catch (error) { setIsSubmitting(false); notify(error instanceof Error ? error.message : 'تعذر تأكيد الطلب'); }
   };
 
   return (
@@ -127,12 +128,12 @@ export default function CheckoutPage() {
               className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs transition ${
                 step >= 1
                   ? 'bg-saudi-green-800 text-white shadow-md'
-                  : 'bg-saudi-sand-200 text-gray-500'
+                  : 'bg-saudi-sand-200 text-gray-600'
               }`}
             >
               1
             </div>
-            <span className="text-[11px] font-bold text-gray-800">بيانات المناسبة</span>
+            <span className="text-xs font-bold text-gray-800">بيانات المناسبة</span>
           </div>
 
           {/* Step 2 Node */}
@@ -141,12 +142,12 @@ export default function CheckoutPage() {
               className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs transition ${
                 step >= 2
                   ? 'bg-saudi-green-800 text-white shadow-md'
-                  : 'bg-saudi-sand-200 text-gray-500'
+                  : 'bg-saudi-sand-200 text-gray-600'
               }`}
             >
               2
             </div>
-            <span className="text-[11px] font-bold text-gray-800">مراجعة الطلب</span>
+            <span className="text-xs font-bold text-gray-800">مراجعة الطلب</span>
           </div>
 
           {/* Step 3 Node */}
@@ -155,12 +156,12 @@ export default function CheckoutPage() {
               className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs transition ${
                 step === 3
                   ? 'bg-saudi-gold-500 text-saudi-green-950 font-black shadow-md'
-                  : 'bg-saudi-sand-200 text-gray-500'
+                  : 'bg-saudi-sand-200 text-gray-600'
               }`}
             >
               3
             </div>
-            <span className="text-[11px] font-bold text-gray-800">تسجيل الطلب</span>
+            <span className="text-xs font-bold text-gray-800">تسجيل الطلب</span>
           </div>
         </div>
       </div>
@@ -368,7 +369,7 @@ export default function CheckoutPage() {
                 </span>
               </div>
               {paymentOption === 'deposit' && (
-                <div className="flex justify-between text-[11px] text-gray-500 pt-1">
+                <div className="flex justify-between text-xs text-gray-500 pt-1">
                   <span>المتبقي عند التنفيذ:</span>
                   <span>{formatSaudiRiyal(totals.remainingAmount)}</span>
                 </div>

@@ -1,4 +1,5 @@
 'use client';
+import { notify } from '@/lib/notify';
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -399,7 +400,7 @@ function AdminDashboardContent() {
           <span className="text-2xl font-black font-cairo text-saudi-green-950 block">
             {formatSAR(adminConfig.totalGMV)}
           </span>
-          <span className="text-[11px] text-green-700 font-semibold block">+24% نمو ربع سنوي</span>
+          <span className="text-xs text-green-700 font-semibold block">+24% نمو ربع سنوي</span>
         </div>
 
         {/* Platform Net Revenue */}
@@ -411,7 +412,7 @@ function AdminDashboardContent() {
           <span className="text-2xl font-black font-cairo text-saudi-gold-700 block">
             {formatSAR(platformRevenue)}
           </span>
-          <span className="text-[11px] text-gray-400 block">ضريبة 15% ZATCA محتسبة</span>
+          <span className="text-xs text-gray-500 block">ضريبة 15% ZATCA محتسبة</span>
         </div>
 
         {/* Total Bookings */}
@@ -423,7 +424,7 @@ function AdminDashboardContent() {
           <span className="text-2xl font-black font-cairo text-saudi-green-950 block">
             {adminConfig.totalBookings.toLocaleString('ar-SA-u-nu-latn')} حجز
           </span>
-          <span className="text-[11px] text-gray-400 block">{bookings.length} حجوزات نشطة حالياً</span>
+          <span className="text-xs text-gray-500 block">{bookings.length} حجوزات نشطة حالياً</span>
         </div>
 
         {/* Customer Satisfaction & Vendors */}
@@ -435,7 +436,7 @@ function AdminDashboardContent() {
           <span className="text-2xl font-black font-cairo text-saudi-gold-700 block">
             ★ 4.96 / 5.0
           </span>
-          <span className="text-[11px] text-saudi-green-800 font-bold block">
+          <span className="text-xs text-saudi-green-800 font-bold block">
             {vendors.length} مورد مسجل بالمملكة
           </span>
         </div>
@@ -658,7 +659,7 @@ function AdminDashboardContent() {
 
               <div className="flex items-center gap-3 w-full sm:w-auto">
                 <div className="relative flex-1 sm:w-64">
-                  <Search className="w-4 h-4 text-gray-400 absolute right-3 top-3" />
+                  <Search className="w-4 h-4 text-gray-500 absolute right-3 top-3" />
                   <input
                     type="text"
                     value={vendorSearch}
@@ -702,7 +703,7 @@ function AdminDashboardContent() {
                         <img src={v.logo} alt={v.businessName} className="w-8 h-8 rounded-xl object-cover" />
                         <div>
                           <span>{v.businessName}</span>
-                          <span className="block text-[10px] text-gray-400 font-normal">{v.contactPhone}</span>
+                          <span className="block text-[11px] text-gray-500 font-normal">{v.contactPhone}</span>
                         </div>
                       </td>
                       <td className="p-3.5 text-gray-600">
@@ -714,12 +715,12 @@ function AdminDashboardContent() {
                       <td className="p-3.5 font-bold text-saudi-gold-700">★ {v.rating} ({v.reviewsCount})</td>
                       <td className="p-3.5">
                         {v.verified ? (
-                          <span className="bg-green-100 text-green-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 w-fit">
+                          <span className="bg-green-100 text-green-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 w-fit">
                             <CheckCircle2 className="w-3 h-3" />
                             موثق رسمي 🇸🇦
                           </span>
                         ) : (
-                          <span className="bg-amber-100 text-amber-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 w-fit">
+                          <span className="bg-amber-100 text-amber-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 w-fit">
                             <Clock className="w-3 h-3" />
                             قيد المراجعة
                           </span>
@@ -729,7 +730,7 @@ function AdminDashboardContent() {
                         <div className="flex items-center justify-center gap-2">
                           <button
                             onClick={() => updateVendorStatus(v.id, v.status === 'active' ? 'suspended' : 'active', v.verified)}
-                            className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition ${
+                            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition ${
                               v.status === 'active'
                                 ? 'bg-amber-50 text-amber-800 hover:bg-amber-100'
                                 : 'bg-green-50 text-green-800 hover:bg-green-100'
@@ -740,7 +741,7 @@ function AdminDashboardContent() {
 
                           <button
                             onClick={() => updateVendorStatus(v.id, v.status, !v.verified)}
-                            className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition ${
+                            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition ${
                               v.verified
                                 ? 'bg-red-50 text-red-700 hover:bg-red-100'
                                 : 'bg-saudi-green-800 text-white hover:bg-saudi-green-900'
@@ -751,7 +752,7 @@ function AdminDashboardContent() {
 
                           <Link
                             href={`/vendor/${v.id}`}
-                            className="p-1 text-gray-400 hover:text-saudi-green-800 transition"
+                            className="p-1 text-gray-500 hover:text-saudi-green-800 transition"
                             title="معاينة الملف العام"
                           >
                             <ExternalLink className="w-4 h-4" />
@@ -759,7 +760,7 @@ function AdminDashboardContent() {
 
                           <button
                             onClick={() => deleteVendor(v.id)}
-                            className="p-1 text-gray-400 hover:text-red-600 transition"
+                            className="p-1 text-gray-500 hover:text-red-600 transition"
                             title="حذف المورد"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -789,7 +790,7 @@ function AdminDashboardContent() {
 
               <div className="flex items-center gap-3 w-full sm:w-auto">
                 <div className="relative flex-1 sm:w-64">
-                  <Search className="w-4 h-4 text-gray-400 absolute right-3 top-3" />
+                  <Search className="w-4 h-4 text-gray-500 absolute right-3 top-3" />
                   <input
                     type="text"
                     value={serviceSearch}
@@ -832,12 +833,12 @@ function AdminDashboardContent() {
                       <h5 className="font-bold text-xs text-saudi-green-950 font-cairo leading-snug">
                         {srv.titleAr}
                       </h5>
-                      <span className="text-[10px] bg-saudi-green-100 text-saudi-green-800 font-bold px-2 py-0.5 rounded-md shrink-0">
+                      <span className="text-[11px] bg-saudi-green-100 text-saudi-green-800 font-bold px-2 py-0.5 rounded-md shrink-0">
                         {srv.categoryNameAr}
                       </span>
                     </div>
-                    <p className="text-[11px] text-gray-500 line-clamp-2">{srv.descriptionAr}</p>
-                    <div className="text-[11px] text-gray-600 flex items-center gap-2">
+                    <p className="text-xs text-gray-500 line-clamp-2">{srv.descriptionAr}</p>
+                    <div className="text-xs text-gray-600 flex items-center gap-2">
                       <span>المزود: <strong>{srv.vendorName}</strong></span>
                       <span>•</span>
                       <span>{srv.cityNameAr}</span>
@@ -846,7 +847,7 @@ function AdminDashboardContent() {
 
                   <div className="border-t border-saudi-sand-200 pt-3 flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] text-gray-400 block">السعر:</span>
+                      <span className="text-[11px] text-gray-500 block">السعر:</span>
                       <strong className="text-sm font-black font-cairo text-saudi-green-950">
                         {formatSAR(srv.price)}
                       </strong>
@@ -860,13 +861,13 @@ function AdminDashboardContent() {
                             updateService(srv.id, { price: Number(newPrice) });
                           }
                         }}
-                        className="px-2.5 py-1 bg-white border border-gray-300 hover:border-saudi-gold-400 rounded-lg text-[11px] font-bold text-gray-700 transition"
+                        className="px-2.5 py-1 bg-white border border-gray-300 hover:border-saudi-gold-400 rounded-lg text-xs font-bold text-gray-700 transition"
                       >
                         تعديل السعر
                       </button>
                       <button
                         onClick={() => deleteService(srv.id)}
-                        className="p-1 text-gray-400 hover:text-red-600 transition"
+                        className="p-1 text-gray-500 hover:text-red-600 transition"
                         title="حذف الخدمة"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -900,7 +901,7 @@ function AdminDashboardContent() {
                   if (value === null) return;
                   const price = Number(value.replace(/,/g, '').trim());
                   if (!value.trim() || !Number.isFinite(price) || price <= 0) {
-                    alert('يرجى إدخال سعر صالح أكبر من 0.');
+                    notify('يرجى إدخال سعر صالح أكبر من 0.');
                     return;
                   }
                   updatePackage(pkg.id, { packagePrice: price, savings: Math.max(0, pkg.originalPrice - price) });
@@ -948,15 +949,15 @@ function AdminDashboardContent() {
                       <span className="text-xs font-mono font-bold text-saudi-gold-600">
                         {b.bookingNumber}
                       </span>
-                      <span className="bg-saudi-green-100 text-saudi-green-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full">
+                      <span className="bg-saudi-green-100 text-saudi-green-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full">
                         {b.status === 'confirmed' ? 'مؤكد بالعربون' : b.status === 'completed' ? 'مكتمل' : b.status}
                       </span>
                       {b.payoutReleased ? (
-                        <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full font-mono">
+                        <span className="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2 py-0.5 rounded-full font-mono">
                           صُرف للمورد ({b.payoutRef})
                         </span>
                       ) : (
-                        <span className="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                        <span className="bg-amber-100 text-amber-800 text-[11px] font-bold px-2 py-0.5 rounded-full">
                           محتجز في الضمان 🛡️
                         </span>
                       )}
@@ -970,7 +971,7 @@ function AdminDashboardContent() {
 
                   <div className="flex items-center gap-4 text-xs self-end md:self-auto">
                     <div className="text-left">
-                      <span className="text-[10px] text-gray-400 block">إجمالي العقد</span>
+                      <span className="text-[11px] text-gray-500 block">إجمالي العقد</span>
                       <strong className="text-sm font-black font-cairo text-saudi-green-950">
                         {formatSAR(b.totalAmount)}
                       </strong>
@@ -993,7 +994,7 @@ function AdminDashboardContent() {
 
                     <button
                       onClick={() => refundBooking(b.id)}
-                      className="text-gray-400 hover:text-red-600 p-1 text-xs font-bold"
+                      className="text-gray-500 hover:text-red-600 p-1 text-xs font-bold"
                       title="إلغاء واسترجاع"
                     >
                       إلغاء
@@ -1024,7 +1025,7 @@ function AdminDashboardContent() {
                   className="bg-saudi-sand-50/60 rounded-2xl p-5 border border-saudi-sand-200 space-y-3"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono text-gray-400 font-bold">#{occ.id}</span>
+                    <span className="text-[11px] font-mono text-gray-500 font-bold">#{occ.id}</span>
                     <span className="text-xs font-bold bg-saudi-green-100 text-saudi-green-800 px-2.5 py-0.5 rounded-full">
                       جاهزية: {occ.readinessPercentage}%
                     </span>
@@ -1100,15 +1101,15 @@ function AdminDashboardContent() {
                       <div>
                         <div className="flex items-center gap-2">
                           <h5 className="font-bold text-xs text-gray-900">{rev.customerName}</h5>
-                          <span className="text-[10px] text-gray-400">({rev.customerCityAr} - {rev.occasionTypeAr})</span>
+                          <span className="text-[11px] text-gray-500">({rev.customerCityAr} - {rev.occasionTypeAr})</span>
                           {rev.featured && (
-                            <span className="bg-saudi-gold-100 text-saudi-gold-900 text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
+                            <span className="bg-saudi-gold-100 text-saudi-gold-900 text-[11px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
                               <Star className="w-3 h-3 fill-saudi-gold-500" />
                               مميز في الواجهة
                             </span>
                           )}
                         </div>
-                        <span className="text-[11px] text-saudi-green-800 font-semibold">
+                        <span className="text-xs text-saudi-green-800 font-semibold">
                           تقييم المورد: <strong>{rev.vendorName}</strong>
                         </span>
                       </div>
@@ -1130,7 +1131,7 @@ function AdminDashboardContent() {
                       </button>
                       <button
                         onClick={() => deleteReview(rev.id)}
-                        className="p-1 text-gray-400 hover:text-red-600 transition"
+                        className="p-1 text-gray-500 hover:text-red-600 transition"
                         title="حذف التقييم"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -1172,7 +1173,7 @@ function AdminDashboardContent() {
                   ) : (
                     <button
                       onClick={() => setReplyingReviewId(rev.id)}
-                      className="text-[11px] font-bold text-saudi-green-800 hover:text-saudi-green-950 flex items-center gap-1"
+                      className="text-xs font-bold text-saudi-green-800 hover:text-saudi-green-950 flex items-center gap-1"
                     >
                       <MessageSquare className="w-3 h-3" />
                       <span>إضافة رد رسمي على التقييم</span>
@@ -1204,8 +1205,8 @@ function AdminDashboardContent() {
                 >
                   <div>
                     <h5 className="font-bold text-xs text-gray-900">{city.nameAr}</h5>
-                    <span className="text-[10px] text-gray-400 block">{city.regionAr}</span>
-                    <span className="text-[10px] text-saudi-green-800 font-semibold block mt-1">
+                    <span className="text-[11px] text-gray-500 block">{city.regionAr}</span>
+                    <span className="text-[11px] text-saudi-green-800 font-semibold block mt-1">
                       {city.neighborhoods.length} أحياء مغطاة
                     </span>
                   </div>
@@ -1366,7 +1367,7 @@ function AdminDashboardContent() {
                     onChange={(e) => updateRankingWeights({ ratingWeight: parseInt(e.target.value, 10) })}
                     className="w-full accent-saudi-green-800 cursor-pointer"
                   />
-                  <span className="text-[10px] text-gray-400 block">أهمية النجوم والمراجعات الموثقة</span>
+                  <span className="text-[11px] text-gray-500 block">أهمية النجوم والمراجعات الموثقة</span>
                 </div>
 
                 {/* Price weight */}
@@ -1384,7 +1385,7 @@ function AdminDashboardContent() {
                     onChange={(e) => updateRankingWeights({ priceWeight: parseInt(e.target.value, 10) })}
                     className="w-full accent-saudi-green-800 cursor-pointer"
                   />
-                  <span className="text-[10px] text-gray-400 block">أفضلية الأسعار المناسبة للميزانية</span>
+                  <span className="text-[11px] text-gray-500 block">أفضلية الأسعار المناسبة للميزانية</span>
                 </div>
 
                 {/* Availability weight */}
@@ -1402,7 +1403,7 @@ function AdminDashboardContent() {
                     onChange={(e) => updateRankingWeights({ availabilityWeight: parseInt(e.target.value, 10) })}
                     className="w-full accent-saudi-green-800 cursor-pointer"
                   />
-                  <span className="text-[10px] text-gray-400 block">التوفر في تاريخ ووقت المناسبة</span>
+                  <span className="text-[11px] text-gray-500 block">التوفر في تاريخ ووقت المناسبة</span>
                 </div>
 
                 {/* Completed orders weight */}
@@ -1420,7 +1421,7 @@ function AdminDashboardContent() {
                     onChange={(e) => updateRankingWeights({ ordersWeight: parseInt(e.target.value, 10) })}
                     className="w-full accent-saudi-green-800 cursor-pointer"
                   />
-                  <span className="text-[10px] text-gray-400 block">عدد المناسبات المنجزة بنجاح</span>
+                  <span className="text-[11px] text-gray-500 block">عدد المناسبات المنجزة بنجاح</span>
                 </div>
 
                 {/* Distance weight */}
@@ -1438,7 +1439,7 @@ function AdminDashboardContent() {
                     onChange={(e) => updateRankingWeights({ distanceWeight: parseInt(e.target.value, 10) })}
                     className="w-full accent-saudi-green-800 cursor-pointer"
                   />
-                  <span className="text-[10px] text-gray-400 block">موقع المورد ونطاق التغطية بالحي</span>
+                  <span className="text-[11px] text-gray-500 block">موقع المورد ونطاق التغطية بالحي</span>
                 </div>
 
                 {/* Response speed weight */}
@@ -1456,7 +1457,7 @@ function AdminDashboardContent() {
                     onChange={(e) => updateRankingWeights({ responseSpeedWeight: parseInt(e.target.value, 10) })}
                     className="w-full accent-saudi-green-800 cursor-pointer"
                   />
-                  <span className="text-[10px] text-gray-400 block">الرد بالدقائق على رسائل العملاء</span>
+                  <span className="text-[11px] text-gray-500 block">الرد بالدقائق على رسائل العملاء</span>
                 </div>
 
                 {/* Verification weight */}
@@ -1474,7 +1475,7 @@ function AdminDashboardContent() {
                     onChange={(e) => updateRankingWeights({ verificationWeight: parseInt(e.target.value, 10) })}
                     className="w-full accent-saudi-green-800 cursor-pointer"
                   />
-                  <span className="text-[10px] text-gray-400 block">سجل تجاري / وثيقة عمل حر معتمدة</span>
+                  <span className="text-[11px] text-gray-500 block">سجل تجاري / وثيقة عمل حر معتمدة</span>
                 </div>
 
                 {/* On-time rate weight */}
@@ -1492,7 +1493,7 @@ function AdminDashboardContent() {
                     onChange={(e) => updateRankingWeights({ onTimeWeight: parseInt(e.target.value, 10) })}
                     className="w-full accent-saudi-green-800 cursor-pointer"
                   />
-                  <span className="text-[10px] text-gray-400 block">نسبة الحضور والتجهيز بالوقت المحدد</span>
+                  <span className="text-[11px] text-gray-500 block">نسبة الحضور والتجهيز بالوقت المحدد</span>
                 </div>
               </div>
             </div>
@@ -1502,13 +1503,13 @@ function AdminDashboardContent() {
 
       {/* Modal: Add Vendor */}
       {isAddVendorOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
+        <div role="dialog" aria-modal="true" aria-labelledby="dlg-5557-1" className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl border border-saudi-sand-300">
             <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-              <h4 className="text-base font-bold text-saudi-green-950 font-cairo">
+              <h4 className="text-base font-bold text-saudi-green-950 font-cairo" id="dlg-5557-1">
                 إضافة واعتماد مورد سعودي جديد 🇸🇦
               </h4>
-              <button onClick={() => setIsAddVendorOpen(false)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setIsAddVendorOpen(false)} className="text-gray-500 hover:text-gray-600">
                 ✕
               </button>
             </div>
@@ -1603,13 +1604,13 @@ function AdminDashboardContent() {
 
       {/* Modal: Add Service */}
       {isAddServiceOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
+        <div role="dialog" aria-modal="true" aria-labelledby="dlg-5557-2" className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl border border-saudi-sand-300">
             <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-              <h4 className="text-base font-bold text-saudi-green-950 font-cairo">
+              <h4 className="text-base font-bold text-saudi-green-950 font-cairo" id="dlg-5557-2">
                 إضافة خدمة جديدة لسوق المناسبات 🛍️
               </h4>
-              <button onClick={() => setIsAddServiceOpen(false)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setIsAddServiceOpen(false)} className="text-gray-500 hover:text-gray-600">
                 ✕
               </button>
             </div>

@@ -146,13 +146,13 @@ export const VisualFloorPlan: React.FC<VisualFloorPlanProps> = ({
                     {table.name}
                   </span>
 
-                  <span className={`text-[10px] font-mono font-bold mt-0.5 ${
+                  <span className={`text-[11px] font-mono font-bold mt-0.5 ${
                     isFull ? 'text-rose-400' : 'text-emerald-400'
                   }`}>
                     {assignedCount} / {table.capacity}
                   </span>
 
-                  <span className="text-[9px] text-neutral-400">
+                  <span className="text-[11px] text-neutral-400">
                     {table.section === 'vip' ? 'VIP' : table.section === 'men' ? 'رجال' : 'نساء'}
                   </span>
                 </button>
@@ -188,7 +188,7 @@ export const VisualFloorPlan: React.FC<VisualFloorPlanProps> = ({
                       {selectedTable.name}
                     </h4>
                     {selectedTable.section === 'vip' && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300">
+                      <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300">
                         طاولة VIP
                       </span>
                     )}
@@ -199,7 +199,7 @@ export const VisualFloorPlan: React.FC<VisualFloorPlanProps> = ({
                 </div>
 
                 <div className="text-left font-mono">
-                  <span className="text-[10px] text-neutral-400 block">الإشغال</span>
+                  <span className="text-[11px] text-neutral-400 block">الإشغال</span>
                   <span className="text-sm font-black text-emerald-600 dark:text-emerald-400">
                     {assignedGuests.length} / {selectedTable.capacity} مقعد
                   </span>
@@ -227,7 +227,7 @@ export const VisualFloorPlan: React.FC<VisualFloorPlanProps> = ({
                           <span className="font-bold text-neutral-900 dark:text-white block">
                             {guest.name}
                           </span>
-                          <span className="text-[10px] text-neutral-400 font-mono">
+                          <span className="text-[11px] text-neutral-400 font-mono">
                             {guest.companionCount > 0 ? `+ ${guest.companionCount} مرافقين` : 'بدون مرافق'}
                           </span>
                         </div>
@@ -270,7 +270,7 @@ export const VisualFloorPlan: React.FC<VisualFloorPlanProps> = ({
                           type="button"
                           disabled={assignedGuests.length >= selectedTable.capacity}
                           onClick={() => onAssignGuest(guest.id, selectedTable.id)}
-                          className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] disabled:opacity-40"
+                          className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs disabled:opacity-40"
                         >
                           + تعيين
                         </button>
@@ -290,10 +290,10 @@ export const VisualFloorPlan: React.FC<VisualFloorPlanProps> = ({
 
       {/* Add Table Modal */}
       {isAddTableOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div role="dialog" aria-modal="true" aria-labelledby="dlg-8376-1" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="w-full max-w-md bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-base text-neutral-900 dark:text-white">
+              <h3 className="font-bold text-base text-neutral-900 dark:text-white" id="dlg-8376-1">
                 إضافة طاولة جديدة إلى المخطط
               </h3>
               <button

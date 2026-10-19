@@ -43,7 +43,7 @@ export default function CreateRFQModal({ onClose, onCreated }: CreateRFQModalPro
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
+    <div role="dialog" aria-modal="true" aria-labelledby="dlg-6080-1" className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
       <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto animate-slideUp">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-100 pb-3">
@@ -52,15 +52,15 @@ export default function CreateRFQModal({ onClose, onCreated }: CreateRFQModalPro
               <FileText className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-base font-bold font-cairo text-gray-900">
+              <h3 className="text-base font-bold font-cairo text-gray-900" id="dlg-6080-1">
                 طلب عروض أسعار من الموردين (RFQ)
               </h3>
-              <p className="text-[11px] text-gray-500">
+              <p className="text-xs text-gray-500">
                 اطرح متطلباتك واستقبل عروضاً موحدة ومفصلة للمقارنة واختيار الأنسب.
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="p-1.5 text-gray-400 hover:text-gray-700 rounded-lg">
+          <button onClick={onClose} className="p-1.5 text-gray-500 hover:text-gray-700 rounded-lg">
             <X className="w-5 h-5" />
           </button>
         </div>

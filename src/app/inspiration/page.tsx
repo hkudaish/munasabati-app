@@ -82,7 +82,7 @@ export default function InspirationPage() {
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
 
-                <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full">
+                <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-black/60 backdrop-blur-md text-white text-[11px] font-bold px-3 py-1 rounded-full">
                   <MapPin className="w-3 h-3 text-saudi-gold-400" />
                   <span>{post.cityNameAr} • {post.occasionTypeNameAr}</span>
                 </div>
@@ -110,7 +110,7 @@ export default function InspirationPage() {
                   {/* Hash Tags */}
                   <div className="flex flex-wrap gap-1.5 pt-1">
                     {post.tags.map((tag, idx) => (
-                      <span key={idx} className="text-[10px] font-bold text-saudi-gold-700 bg-saudi-gold-50 px-2 py-0.5 rounded-md">
+                      <span key={idx} className="text-[11px] font-bold text-saudi-gold-700 bg-saudi-gold-50 px-2 py-0.5 rounded-md">
                         #{tag}
                       </span>
                     ))}
@@ -118,7 +118,7 @@ export default function InspirationPage() {
 
                   {/* Tagged Vendors */}
                   <div className="space-y-1.5 pt-3 border-t border-saudi-sand-200 mt-3">
-                    <span className="text-[11px] font-bold text-gray-700 block">
+                    <span className="text-xs font-bold text-gray-700 block">
                       الموردين المنفذين لهذا العمل:
                     </span>
                     {post.taggedVendors.map((v, idx) => (

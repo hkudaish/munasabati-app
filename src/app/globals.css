@@ -91,3 +91,76 @@ body {
     display: none !important;
   }
 }
+
+/* Apple HIG foundations (apple-design skill): accessibility defaults */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+:focus-visible {
+  outline: 2px solid var(--saudi-green);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.bg-hero-pattern :focus-visible,
+.bg-emerald-gradient :focus-visible,
+.glassmorphism-dark :focus-visible {
+  outline-color: #E2C076;
+}
+
+/* Comfortable pointer/touch targets on coarse pointers (44pt default) */
+@media (pointer: coarse) {
+  button:not([data-compact]),
+  [role='button']:not([data-compact]),
+  select {
+    min-height: 44px;
+  }
+  input:not([type='checkbox']):not([type='radio']) {
+    min-height: 44px;
+  }
+}
+
+/* Reduced transparency: replace blur with solid surfaces */
+@media (prefers-reduced-transparency: reduce) {
+  .glassmorphism {
+    background: #FFFFFF;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .glassmorphism-dark {
+    background: #00332A;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* Increased contrast */
+@media (prefers-contrast: more) {
+  body { color: #0F172A; }
+  .glassmorphism { background: #FFFFFF; border-color: #1E293B; }
+}
+
+/* Reduced motion: motion is never the only carrier of meaning */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Tailwind's outline-none removes the only keyboard focus indicator; keep a visible one. */
+:where(a, button, input, select, textarea, summary, [role='button'], [tabindex]):focus-visible {
+  outline-style: solid !important;
+  outline-width: 2px !important;
+  outline-color: var(--saudi-green) !important;
+  outline-offset: 2px;
+}
+.bg-hero-pattern :where(a, button, input, select, textarea):focus-visible,
+.bg-emerald-gradient :where(a, button, input, select, textarea):focus-visible,
+.glassmorphism-dark :where(a, button, input, select, textarea):focus-visible {
+  outline-color: #E2C076 !important;
+}

@@ -66,11 +66,11 @@ export default function VendorCard({ vendor: rawVendor, primaryService, viewMode
               >
                 {vendor.businessName}
               </Link>
-              <span className="bg-saudi-sand-100 text-saudi-green-900 text-[10px] font-bold px-2 py-0.5 rounded-full">
+              <span className="bg-saudi-sand-100 text-saudi-green-900 text-[11px] font-bold px-2 py-0.5 rounded-full">
                 {vendor.categoryNameAr}
               </span>
               {vendor.featured && (
-                <span className="bg-saudi-gold-100 text-saudi-gold-900 text-[10px] font-bold px-2 py-0.5 rounded-full border border-saudi-gold-300">
+                <span className="bg-saudi-gold-100 text-saudi-gold-900 text-[11px] font-bold px-2 py-0.5 rounded-full border border-saudi-gold-300">
                   مميز ✨
                 </span>
               )}
@@ -84,7 +84,7 @@ export default function VendorCard({ vendor: rawVendor, primaryService, viewMode
               <span className="flex items-center gap-1 text-saudi-gold-700 font-bold">
                 <Star className="w-3.5 h-3.5 fill-saudi-gold-500 text-saudi-gold-500" />
                 <span>{vendor.rating}</span>
-                <span className="text-gray-400 font-normal">({vendor.reviewsCount} تقييم)</span>
+                <span className="text-gray-500 font-normal">({vendor.reviewsCount} تقييم)</span>
               </span>
               <span className="text-gray-300">•</span>
               <span className="flex items-center gap-1">
@@ -108,7 +108,7 @@ export default function VendorCard({ vendor: rawVendor, primaryService, viewMode
         {/* Pricing & Actions */}
         <div className="flex sm:flex-col items-center sm:items-end justify-between w-full md:w-auto gap-3 shrink-0 pt-3 md:pt-0 border-t md:border-t-0 border-gray-100">
           <div className="text-left">
-            <span className="text-[10px] text-gray-400 block">يبدأ من</span>
+            <span className="text-[11px] text-gray-500 block">يبدأ من</span>
             <span className="text-base sm:text-lg font-black font-cairo text-saudi-green-950 block">
               {formatSaudiRiyal(primaryService?.price || 1500)}
             </span>
@@ -120,7 +120,7 @@ export default function VendorCard({ vendor: rawVendor, primaryService, viewMode
               className={`p-2 rounded-xl border transition ${
                 isFavorite
                   ? 'border-rose-300 bg-rose-50 text-rose-600'
-                  : 'border-saudi-sand-300 hover:bg-saudi-sand-50 text-gray-400'
+                  : 'border-saudi-sand-300 hover:bg-saudi-sand-50 text-gray-500'
               }`}
               title="المفضلة"
             >
@@ -201,20 +201,20 @@ export default function VendorCard({ vendor: rawVendor, primaryService, viewMode
         {/* Category & Verified tag */}
         <div className="absolute top-3 right-3 flex flex-col gap-1 items-end">
           {vendor.verified && (
-            <span className="bg-saudi-green-900/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-saudi-gold-400/30 flex items-center gap-1 shadow-sm">
+            <span className="bg-saudi-green-900/90 backdrop-blur-md text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-saudi-gold-400/30 flex items-center gap-1 shadow-sm">
               <ShieldCheck className="w-3 h-3 text-saudi-gold-400" />
               <span>موثق رسمياً</span>
             </span>
           )}
           {vendor.featured && (
-            <span className="bg-saudi-gold-500 text-saudi-green-950 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+            <span className="bg-saudi-gold-500 text-saudi-green-950 text-[11px] font-bold px-2 py-0.5 rounded-full shadow-sm">
               مورد مختار ✨
             </span>
           )}
         </div>
 
         {/* City Indicator */}
-        <div className="absolute bottom-2.5 right-3 flex items-center gap-1 bg-black/60 backdrop-blur-md text-white text-[10px] font-medium px-2 py-0.5 rounded-md">
+        <div className="absolute bottom-2.5 right-3 flex items-center gap-1 bg-black/60 backdrop-blur-md text-white text-[11px] font-medium px-2 py-0.5 rounded-md">
           <MapPin className="w-3 h-3 text-saudi-gold-400" />
           <span>{vendor.cityNameAr}</span>
         </div>
@@ -239,7 +239,7 @@ export default function VendorCard({ vendor: rawVendor, primaryService, viewMode
               >
                 {vendor.businessName}
               </Link>
-              <span className="text-[11px] text-gray-500 font-medium">
+              <span className="text-xs text-gray-500 font-medium">
                 {vendor.categoryNameAr}
               </span>
             </div>
@@ -254,15 +254,15 @@ export default function VendorCard({ vendor: rawVendor, primaryService, viewMode
             <div className="flex items-center gap-1 text-saudi-gold-700 font-bold">
               <Star className="w-3.5 h-3.5 fill-saudi-gold-500 text-saudi-gold-500" />
               <span>{vendor.rating}</span>
-              <span className="text-gray-400 text-[10px] font-normal">({vendor.reviewsCount})</span>
+              <span className="text-gray-500 text-[11px] font-normal">({vendor.reviewsCount})</span>
             </div>
             <span className="text-gray-300">|</span>
-            <div className="flex items-center gap-1 text-gray-600 text-[11px]">
+            <div className="flex items-center gap-1 text-gray-600 text-xs">
               <Clock className="w-3 h-3 text-saudi-green-700" />
               <span>خلال {vendor.responseTimeMinutes} د</span>
             </div>
             <span className="text-gray-300">|</span>
-            <div className="text-[11px] font-bold text-emerald-700">
+            <div className="text-xs font-bold text-emerald-700">
               {vendor.completedBookingsCount}+ حجز
             </div>
           </div>
@@ -271,7 +271,7 @@ export default function VendorCard({ vendor: rawVendor, primaryService, viewMode
         {/* Pricing & CTA */}
         <div className="pt-3 border-t border-saudi-sand-200 flex items-center justify-between">
           <div>
-            <span className="text-[10px] text-gray-400 block">يبدأ من</span>
+            <span className="text-[11px] text-gray-500 block">يبدأ من</span>
             <span className="text-base font-black font-cairo text-saudi-green-950">
               {formatSaudiRiyal(primaryService?.price || 1500)}
             </span>

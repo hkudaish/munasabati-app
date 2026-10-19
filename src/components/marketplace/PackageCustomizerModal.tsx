@@ -44,7 +44,7 @@ export default function PackageCustomizerModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
+    <div role="dialog" aria-modal="true" aria-labelledby="dlg-2492-1" className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
       <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl animate-slideUp">
         {/* Header */}
         <div className="bg-saudi-green-900 text-white p-5 flex items-center justify-between border-b border-saudi-gold-500/30">
@@ -53,7 +53,7 @@ export default function PackageCustomizerModal({
               <Sliders className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold font-cairo text-white">
+              <h3 className="text-base font-bold font-cairo text-white" id="dlg-2492-1">
                 تخصيص الباقة: {pkg.titleAr}
               </h3>
               <p className="text-xs text-gray-300">
@@ -95,13 +95,13 @@ export default function PackageCustomizerModal({
                         {item.categoryName}
                       </span>
                       {!item.customizable && (
-                        <span className="text-[10px] text-gray-400">(بند أساسي لا يمكن إزالته)</span>
+                        <span className="text-[11px] text-gray-500">(بند أساسي لا يمكن إزالته)</span>
                       )}
                     </div>
                     <h5 className="text-xs sm:text-sm font-bold text-gray-900">
                       {item.serviceName}
                     </h5>
-                    <p className="text-[11px] text-gray-500 flex items-center gap-1">
+                    <p className="text-xs text-gray-500 flex items-center gap-1">
                       <Store className="w-3 h-3 text-saudi-green-700" />
                       <span>المزود: {item.vendorName}</span>
                     </p>
@@ -112,7 +112,7 @@ export default function PackageCustomizerModal({
                   <span className="text-sm font-black font-cairo text-saudi-green-950 block">
                     {formatSAR(item.pricePortion)}
                   </span>
-                  <span className="text-[10px] text-gray-400">سعر البند ضمن الباقة</span>
+                  <span className="text-[11px] text-gray-500">سعر البند ضمن الباقة</span>
                 </div>
               </div>
             ))}
@@ -122,7 +122,7 @@ export default function PackageCustomizerModal({
         {/* Footer & Total */}
         <div className="p-5 bg-white border-t border-saudi-sand-200 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            <span className="text-xs text-gray-400 block">إجمالي السعر بعد التخصيص:</span>
+            <span className="text-xs text-gray-500 block">إجمالي السعر بعد التخصيص:</span>
             <span className="text-2xl font-black font-cairo text-saudi-green-950">
               {formatSAR(calculatedPackagePrice)}
             </span>

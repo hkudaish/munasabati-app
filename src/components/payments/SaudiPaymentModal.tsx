@@ -1,4 +1,5 @@
 'use client';
+import { notify } from '@/lib/notify';
 
 import React, { useState } from 'react';
 import {
@@ -71,11 +72,11 @@ export default function SaudiPaymentModal({
         // fallback
       }
 
-    } catch (error) { setIsProcessing(false); alert(error instanceof Error ? error.message : 'تعذر إتمام العملية'); }
+    } catch (error) { setIsProcessing(false); notify(error instanceof Error ? error.message : 'تعذر إتمام العملية'); }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
+    <div role="dialog" aria-modal="true" aria-labelledby="dlg-1957-1" className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
       <div className="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl animate-slideUp flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="bg-gradient-to-r from-saudi-green-950 to-saudi-green-900 text-white p-5 flex items-center justify-between border-b border-saudi-gold-500/30">
@@ -84,10 +85,10 @@ export default function SaudiPaymentModal({
               <Lock className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold font-cairo text-white">
+              <h3 className="text-base font-bold font-cairo text-white" id="dlg-1957-1">
                 بوابة الدفع الآمنة (Saudi Secure Pay)
               </h3>
-              <span className="text-[10px] text-saudi-gold-300">
+              <span className="text-[11px] text-saudi-gold-300">
                 مشفرة ومتوافقة مع هيئة الزكاة والضريبة والجمارك (ZATCA) 🇸🇦
               </span>
             </div>
@@ -122,9 +123,9 @@ export default function SaudiPaymentModal({
                 <div className="flex items-center justify-between border-b border-gray-100 pb-2">
                   <div>
                     <span className="font-bold text-gray-900 block">{bookingTitle}</span>
-                    <span className="text-[10px] text-gray-400">المزود: {vendorName}</span>
+                    <span className="text-[11px] text-gray-500">المزود: {vendorName}</span>
                   </div>
-                  <span className="bg-green-100 text-green-800 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                  <span className="bg-green-100 text-green-800 text-[11px] font-bold px-2 py-0.5 rounded-full">
                     مؤكد ومضمون
                   </span>
                 </div>
@@ -149,7 +150,7 @@ export default function SaudiPaymentModal({
                     <span>{formatSAR(amountToPay)}</span>
                   </div>
                   {paymentType === 'deposit' && (
-                    <div className="flex justify-between text-[11px] text-amber-700 bg-amber-50 p-2 rounded-lg mt-2">
+                    <div className="flex justify-between text-xs text-amber-700 bg-amber-50 p-2 rounded-lg mt-2">
                       <span>المتبقي عند إتمام المناسبة:</span>
                       <span className="font-bold">{formatSAR(totalAmount - depositAmount)}</span>
                     </div>
@@ -205,7 +206,7 @@ export default function SaudiPaymentModal({
                     <span className="text-base font-black font-cairo text-saudi-green-950 block mt-1">
                       {formatSAR(depositAmount)}
                     </span>
-                    <span className="text-[10px] text-gray-500">والمتبقي قبل الحفل</span>
+                    <span className="text-[11px] text-gray-500">والمتبقي قبل الحفل</span>
                   </button>
 
                   <button
@@ -221,7 +222,7 @@ export default function SaudiPaymentModal({
                     <span className="text-base font-black font-cairo text-saudi-green-950 block mt-1">
                       {formatSAR(totalAmount)}
                     </span>
-                    <span className="text-[10px] text-gray-500">خصم وحجز مؤكد 100%</span>
+                    <span className="text-[11px] text-gray-500">خصم وحجز مؤكد 100%</span>
                   </button>
                 </div>
               </div>
@@ -240,7 +241,7 @@ export default function SaudiPaymentModal({
                     }`}
                   >
                     <span className="text-xs font-bold">بطاقة مدى Mada</span>
-                    <span className="text-[9px] text-gray-400">بطاقات البنوك السعودية</span>
+                    <span className="text-[11px] text-gray-500">بطاقات البنوك السعودية</span>
                   </button>
 
                   <button
@@ -253,7 +254,7 @@ export default function SaudiPaymentModal({
                     }`}
                   >
                     <span className="text-xs font-bold">Apple Pay</span>
-                    <span className="text-[9px] text-gray-400">دفع بضغطة واحدة</span>
+                    <span className="text-[11px] text-gray-500">دفع بضغطة واحدة</span>
                   </button>
 
                   <button
@@ -266,7 +267,7 @@ export default function SaudiPaymentModal({
                     }`}
                   >
                     <span className="text-xs font-bold">STC Pay</span>
-                    <span className="text-[9px] text-gray-400">المحفظة الرقمية</span>
+                    <span className="text-[11px] text-gray-500">المحفظة الرقمية</span>
                   </button>
                 </div>
               </div>
@@ -275,7 +276,7 @@ export default function SaudiPaymentModal({
               {(selectedMethod === 'mada' || selectedMethod === 'visa_mastercard') && (
                 <div className="space-y-2.5 bg-white p-4 rounded-2xl border border-gray-200">
                   <div>
-                    <label className="block text-[11px] font-bold text-gray-700 mb-1">رقم بطاقة مدى / الائتمان</label>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">رقم بطاقة مدى / الائتمان</label>
                     <input
                       type="text"
                       value={cardNumber}
@@ -287,7 +288,7 @@ export default function SaudiPaymentModal({
 
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="block text-[11px] font-bold text-gray-700 mb-1">تاريخ الانتهاء</label>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">تاريخ الانتهاء</label>
                       <input
                         type="text"
                         value={cardExpiry}
@@ -298,7 +299,7 @@ export default function SaudiPaymentModal({
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-bold text-gray-700 mb-1">رمز الأمان (CVV)</label>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">رمز الأمان (CVV)</label>
                       <input
                         type="password"
                         maxLength={4}

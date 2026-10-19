@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Tajawal, Cairo } from 'next/font/google';
 import './globals.css';
 import { AppProvider } from '@/lib/store';
@@ -14,6 +14,7 @@ import MobileBottomNav from '@/components/layout/MobileBottomNav';
 import Footer from '@/components/layout/Footer';
 import LumaAIDrawer from '@/components/ai/LumaAIDrawer';
 import UserOnboardingModal from '@/components/common/UserOnboardingModal';
+import Toaster from '@/components/common/Toaster';
 
 const tajawal = Tajawal({
   subsets: ['arabic'],
@@ -35,6 +36,13 @@ export const metadata: Metadata = {
   keywords: ['مناسبتي', 'تخطيط مناسبات', 'كوشة بالرياض', 'ضيافة سعودية', 'قهوجيين', 'حفلات تخرج', 'زواج', 'ملكة', 'عروض أسعار'],
 };
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: '#004D3F',
+};
+
 export default async function RootLayout({
   children,
 }: {
@@ -52,6 +60,7 @@ export default async function RootLayout({
           </main>
           <SiteChrome><FeatureContent id="luma"><LumaAIDrawer /></FeatureContent></SiteChrome>
           <UserOnboardingModal />
+          <Toaster />
           <SiteChrome><MobileBottomNav /><Footer /></SiteChrome>
         </AppProvider></FeatureProvider></GeoProvider>
       </body>

@@ -31,10 +31,10 @@ export default function RFQComparisonMatrix({ rfq, onAcceptQuote }: RFQCompariso
       <div className="bg-white p-6 rounded-3xl border border-saudi-sand-300 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="bg-saudi-gold-100 text-saudi-gold-900 text-[10px] font-bold px-2.5 py-0.5 rounded-full">
+            <span className="bg-saudi-gold-100 text-saudi-gold-900 text-[11px] font-bold px-2.5 py-0.5 rounded-full">
               طلب تسعير #{rfq.id}
             </span>
-            <span className="text-xs text-gray-400">• {rfq.cityAr} • {rfq.date}</span>
+            <span className="text-xs text-gray-500">• {rfq.cityAr} • {rfq.date}</span>
           </div>
           <h3 className="text-lg font-bold text-saudi-green-950 font-cairo">
             {rfq.occasionTitle} ({rfq.occasionTypeAr})
@@ -45,11 +45,11 @@ export default function RFQComparisonMatrix({ rfq, onAcceptQuote }: RFQCompariso
         </div>
 
         <div className="bg-saudi-sand-50 border border-saudi-sand-300 p-4 rounded-2xl text-center shrink-0">
-          <span className="text-[10px] text-gray-400 block">الميزانية المستهدفة</span>
+          <span className="text-[11px] text-gray-500 block">الميزانية المستهدفة</span>
           <span className="text-xl font-black font-cairo text-saudi-green-900">
             {formatSAR(rfq.budget)}
           </span>
-          <span className="text-[10px] text-saudi-gold-600 font-bold block mt-0.5">
+          <span className="text-[11px] text-saudi-gold-600 font-bold block mt-0.5">
             وصلك {rfq.quotes.length} عروض متنافسة
           </span>
         </div>
@@ -82,7 +82,7 @@ export default function RFQComparisonMatrix({ rfq, onAcceptQuote }: RFQCompariso
                       <h4 className="text-xs font-bold text-gray-900 line-clamp-1">
                         {quote.vendorName}
                       </h4>
-                      <div className="flex items-center gap-1 text-[10px] text-gray-500">
+                      <div className="flex items-center gap-1 text-[11px] text-gray-500">
                         <Star className="w-3 h-3 fill-saudi-gold-500 text-saudi-gold-500" />
                         <span>{quote.rating} تقييم</span>
                       </div>
@@ -91,13 +91,13 @@ export default function RFQComparisonMatrix({ rfq, onAcceptQuote }: RFQCompariso
 
                   {/* Highlights badge */}
                   {quote.isBestValue && (
-                    <span className="bg-saudi-gold-500 text-saudi-green-950 text-[10px] font-black px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1">
+                    <span className="bg-saudi-gold-500 text-saudi-green-950 text-[11px] font-black px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1">
                       <Award className="w-3 h-3" />
                       أفضل قيمة
                     </span>
                   )}
                   {quote.isFastest && (
-                    <span className="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <span className="bg-blue-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
                       <Zap className="w-3 h-3" />
                       الأسرع تسليماً
                     </span>
@@ -106,7 +106,7 @@ export default function RFQComparisonMatrix({ rfq, onAcceptQuote }: RFQCompariso
 
                 {/* Total Price Box */}
                 <div className="bg-saudi-sand-50 p-3.5 rounded-2xl border border-saudi-sand-300 text-center">
-                  <span className="text-[10px] text-gray-400 block">إجمالي العرض النهائي (شامل 15% ضريبة)</span>
+                  <span className="text-[11px] text-gray-500 block">إجمالي العرض النهائي (شامل 15% ضريبة)</span>
                   <span className="text-2xl font-black font-cairo text-saudi-green-950">
                     {formatSAR(quote.total)}
                   </span>
@@ -137,7 +137,7 @@ export default function RFQComparisonMatrix({ rfq, onAcceptQuote }: RFQCompariso
                 {/* Timing */}
                 <div className="space-y-1">
                   <span className="font-bold text-gray-700 block">موعد التسليم والجاهزية:</span>
-                  <p className="text-gray-500 text-[11px] leading-relaxed">
+                  <p className="text-gray-500 text-xs leading-relaxed">
                     {quote.deliveryTimeAr}
                   </p>
                 </div>
@@ -145,7 +145,7 @@ export default function RFQComparisonMatrix({ rfq, onAcceptQuote }: RFQCompariso
                 {/* Notes */}
                 <div className="space-y-1">
                   <span className="font-bold text-gray-700 block">ملاحظات والتزامات المورد:</span>
-                  <p className="text-gray-500 text-[11px] leading-relaxed bg-saudi-sand-50 p-2.5 rounded-xl">
+                  <p className="text-gray-500 text-xs leading-relaxed bg-saudi-sand-50 p-2.5 rounded-xl">
                     "{quote.notesAr}"
                   </p>
                 </div>
@@ -153,11 +153,11 @@ export default function RFQComparisonMatrix({ rfq, onAcceptQuote }: RFQCompariso
                 {/* Optional Items */}
                 {quote.optionalItems && quote.optionalItems.length > 0 && (
                   <div className="space-y-1 pt-1">
-                    <span className="font-bold text-saudi-gold-700 block text-[11px]">
+                    <span className="font-bold text-saudi-gold-700 block text-xs">
                       إضافات اختيارية مقترحة:
                     </span>
                     {quote.optionalItems.map((opt, idx) => (
-                      <div key={idx} className="flex items-center justify-between text-[11px] text-gray-600">
+                      <div key={idx} className="flex items-center justify-between text-xs text-gray-600">
                         <span>+ {opt.title}</span>
                         <span className="font-bold text-saudi-green-900">{formatSAR(opt.price)}</span>
                       </div>

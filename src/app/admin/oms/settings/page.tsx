@@ -1,4 +1,5 @@
 'use client';
+import { notify } from '@/lib/notify';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -59,10 +60,10 @@ export default function OMSAutomationSettingsPage() {
         setToastMessage('تم حفظ وتحديث قواعد وإعدادات الأتمتة بنجاح');
         setSettings(data.settings);
       } else {
-        alert(data.errorAr || 'فشل حفظ الإعدادات');
+        notify(data.errorAr || 'فشل حفظ الإعدادات');
       }
     } catch (e) {
-      alert('حدث خطأ أثناء حفظ التعديلات');
+      notify('حدث خطأ أثناء حفظ التعديلات');
     } finally {
       setSaving(false);
       setTimeout(() => setToastMessage(null), 4000);

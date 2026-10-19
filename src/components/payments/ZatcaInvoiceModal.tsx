@@ -42,7 +42,7 @@ export const ZatcaInvoiceModal: React.FC<ZatcaInvoiceModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
+    <div role="dialog" aria-modal="true" aria-labelledby="dlg-374-1" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
       <div className="relative w-full max-w-2xl bg-white dark:bg-neutral-900 rounded-3xl shadow-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-200">
         {/* Modal Header Actions (Not printed) */}
         <div className="flex items-center justify-between p-4 px-6 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/80 print:hidden">
@@ -51,7 +51,7 @@ export const ZatcaInvoiceModal: React.FC<ZatcaInvoiceModalProps> = ({
               <FileText className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="font-bold text-neutral-900 dark:text-white text-base">
+              <h3 className="font-bold text-neutral-900 dark:text-white text-base" id="dlg-374-1">
                 فاتورة ضريبية مبسطة (ZATCA)
               </h3>
               <p className="text-xs text-neutral-500">متوافقة مع متطلبات الفوترة الإلكترونية بالمملكة</p>
@@ -122,7 +122,7 @@ export const ZatcaInvoiceModal: React.FC<ZatcaInvoiceModalProps> = ({
                   <div className="bg-current rounded-sm"></div>
                 </div>
               </div>
-              <span className="text-[10px] font-mono text-neutral-400 block">
+              <span className="text-[11px] font-mono text-neutral-400 block">
                 ZATCA E-Invoice
               </span>
             </div>
@@ -224,7 +224,7 @@ export const ZatcaInvoiceModal: React.FC<ZatcaInvoiceModalProps> = ({
                       <div className="font-bold text-neutral-900 dark:text-white">
                         {booking.serviceTitleAr}
                       </div>
-                      <div className="text-[11px] text-neutral-500 mt-0.5">
+                      <div className="text-xs text-neutral-500 mt-0.5">
                         حجز خدمة معتمدة عبر منصة مناسبتـي
                       </div>
                     </td>
@@ -275,7 +275,7 @@ export const ZatcaInvoiceModal: React.FC<ZatcaInvoiceModalProps> = ({
           </div>
 
           {/* Footer Notice */}
-          <div className="border-t border-neutral-200 dark:border-neutral-800 pt-4 text-center space-y-1 text-[11px] text-neutral-400">
+          <div className="border-t border-neutral-200 dark:border-neutral-800 pt-4 text-center space-y-1 text-xs text-neutral-400">
             <div className="flex items-center justify-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold">
               <ShieldCheck className="w-4 h-4" />
               فاتورة إلكترونية معتمدة تصدر آلياً من منصة مناسبتـي

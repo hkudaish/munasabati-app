@@ -1,4 +1,5 @@
 'use client';
+import { notify } from '@/lib/notify';
 
 import { formatSAR } from '@/lib/utils';
 
@@ -78,10 +79,10 @@ export default function SupplierOrderWorkspace() {
         setProofNotes('');
         fetchOrders();
       } else {
-        alert(data.error || data.errorAr || 'فشل تنفيذ الإجراء');
+        notify(data.error || data.errorAr || 'فشل تنفيذ الإجراء');
       }
     } catch (e) {
-      alert('خطأ أثناء التواصل مع السيرفر');
+      notify('خطأ أثناء التواصل مع السيرفر');
     } finally {
       setIsProcessing(false);
       setTimeout(() => setToastMessage(null), 4000);
@@ -189,9 +190,9 @@ export default function SupplierOrderWorkspace() {
       {/* Orders List Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {loading ? (
-          <div className="col-span-full text-center py-12 text-slate-500">جاري تحميل طلباتك...</div>
+          <div className="col-span-full text-center py-12 text-slate-400">جاري تحميل طلباتك...</div>
         ) : filtered.length === 0 ? (
-          <div className="col-span-full text-center py-12 bg-slate-900 rounded-3xl border border-slate-800 text-slate-500">
+          <div className="col-span-full text-center py-12 bg-slate-900 rounded-3xl border border-slate-800 text-slate-400">
             لا توجد طلبات حواها هذا القسم حالياً
           </div>
         ) : (
@@ -202,7 +203,7 @@ export default function SupplierOrderWorkspace() {
             >
               <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                 <span className="font-mono text-xs font-bold text-amber-400">{sub.bookingNumber}</span>
-                <span className="text-[11px] bg-slate-950 px-3 py-1 rounded-full text-slate-300 font-bold">
+                <span className="text-xs bg-slate-950 px-3 py-1 rounded-full text-slate-300 font-bold">
                   {sub.omsStatus}
                 </span>
               </div>
@@ -280,10 +281,10 @@ export default function SupplierOrderWorkspace() {
 
       {/* Upload / Reject Modal */}
       {selectedSuborder && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div role="dialog" aria-modal="true" aria-labelledby="dlg-424-1" className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
           <div className="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-6">
             <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-              <h3 className="font-bold text-white text-base">إجراء على الطلب: {selectedSuborder.sub.bookingNumber}</h3>
+              <h3 className="font-bold text-white text-base" id="dlg-424-1">إجراء على الطلب: {selectedSuborder.sub.bookingNumber}</h3>
               <button
                 onClick={() => setSelectedSuborder(null)}
                 className="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center text-sm font-bold"

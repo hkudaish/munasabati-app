@@ -119,14 +119,14 @@ export default function TableSeatingPlanner() {
                   </div>
                   <div>
                     <h5 className="font-bold text-sm text-gray-900 font-cairo">{table.name}</h5>
-                    <span className="text-[10px] text-gray-400">
+                    <span className="text-[11px] text-gray-500">
                       {table.section === 'vip' ? 'طاولة كبار الشخصيات VIP' : table.section === 'women' ? 'قسم النساء' : 'قسم الرجال'}
                     </span>
                   </div>
                 </div>
 
                 <span
-                  className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
+                  className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${
                     isFull
                       ? 'bg-red-100 text-red-700'
                       : 'bg-saudi-green-100 text-saudi-green-800'
@@ -146,20 +146,20 @@ export default function TableSeatingPlanner() {
 
               {/* Assigned guests chips */}
               <div className="space-y-1.5 min-h-[70px]">
-                <span className="text-[10px] font-bold text-gray-400 block">الضيوف المخصصون:</span>
+                <span className="text-[11px] font-bold text-gray-500 block">الضيوف المخصصون:</span>
                 {assignedGuestsList.length === 0 ? (
-                  <p className="text-[11px] text-gray-400 italic">لا يوجد ضيوف مخصصون بعد على هذه الطاولة.</p>
+                  <p className="text-xs text-gray-500 italic">لا يوجد ضيوف مخصصون بعد على هذه الطاولة.</p>
                 ) : (
                   <div className="flex flex-wrap gap-1.5">
                     {assignedGuestsList.map((g) => (
                       <span
                         key={g.id}
-                        className="bg-saudi-sand-100 border border-saudi-sand-300 text-gray-800 text-[11px] font-medium px-2 py-1 rounded-lg flex items-center gap-1"
+                        className="bg-saudi-sand-100 border border-saudi-sand-300 text-gray-800 text-xs font-medium px-2 py-1 rounded-lg flex items-center gap-1"
                       >
                         <span>{g.name}</span>
                         <button
                           onClick={() => assignGuestToTable(g.id, '')}
-                          className="text-gray-400 hover:text-red-600 mr-0.5"
+                          className="text-gray-500 hover:text-red-600 mr-0.5"
                           title="إلغاء التخصيص"
                         >
                           <X className="w-3 h-3" />
@@ -202,9 +202,9 @@ export default function TableSeatingPlanner() {
 
       {/* Add Table Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fadeIn">
+        <div role="dialog" aria-modal="true" aria-labelledby="dlg-6398-1" className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fadeIn">
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <h4 className="text-base font-bold text-gray-900 font-cairo">
+            <h4 className="text-base font-bold text-gray-900 font-cairo" id="dlg-6398-1">
               إضافة طاولة جديدة
             </h4>
 

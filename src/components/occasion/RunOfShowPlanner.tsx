@@ -240,7 +240,7 @@ export const RunOfShowPlanner: React.FC<RunOfShowPlannerProps> = ({ occasion }) 
                   <span className="text-xs text-neutral-400 font-mono">
                     ({item.durationMinutes} دقيقة)
                   </span>
-                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/50 dark:border-emerald-800/50">
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/50 dark:border-emerald-800/50">
                     {item.responsibleRoleAr}
                   </span>
                 </div>
@@ -310,10 +310,10 @@ export const RunOfShowPlanner: React.FC<RunOfShowPlannerProps> = ({ occasion }) 
 
       {/* Add Item Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
+        <div role="dialog" aria-modal="true" aria-labelledby="dlg-4755-1" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
           <div className="relative w-full max-w-lg bg-white dark:bg-neutral-900 rounded-3xl shadow-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between p-5 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50">
-              <h3 className="font-bold text-neutral-900 dark:text-white text-base">
+              <h3 className="font-bold text-neutral-900 dark:text-white text-base" id="dlg-4755-1">
                 إضافة فقرة جديدة لجدول يوم المناسبة
               </h3>
               <button

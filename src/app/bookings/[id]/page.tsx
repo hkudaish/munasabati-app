@@ -1,4 +1,5 @@
 'use client';
+import { notify } from '@/lib/notify';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
@@ -83,7 +84,7 @@ export default function CustomerOrderTrackingPage() {
         fetchOrder();
       } else { setToastMessage(data.error || data.errorAr || 'تعذر تحديث الطلب'); }
     } catch (e) {
-      alert('حدث خطأ أثناء اعتماد الاستلام');
+      notify('حدث خطأ أثناء اعتماد الاستلام');
     }
   };
 
@@ -108,7 +109,7 @@ export default function CustomerOrderTrackingPage() {
         fetchOrder();
       } else { setToastMessage(data.error || data.errorAr || 'تعذر تحديث الطلب'); }
     } catch (e) {
-      alert('حدث خطأ أثناء تسجيل الشكوى');
+      notify('حدث خطأ أثناء تسجيل الشكوى');
     }
   };
 
@@ -184,25 +185,25 @@ export default function CustomerOrderTrackingPage() {
             <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center space-y-1">
               <CheckCircle2 className="w-5 h-5 text-emerald-400 mx-auto" />
               <div className="text-xs font-bold text-white">1. حالة الدفع</div>
-              <div className="text-[10px] text-slate-500">{masterOrder.paymentStatus === 'PAID' ? 'تم تأكيد الدفع' : 'لم يتم تأكيد الدفع'}</div>
+              <div className="text-[11px] text-slate-500">{masterOrder.paymentStatus === 'PAID' ? 'تم تأكيد الدفع' : 'لم يتم تأكيد الدفع'}</div>
             </div>
 
             <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center space-y-1">
               <Clock className="w-5 h-5 text-amber-400 mx-auto" />
               <div className="text-xs font-bold text-white">2. توجيه الموردين</div>
-              <div className="text-[10px] text-amber-400 font-semibold">جارية المتابعة</div>
+              <div className="text-[11px] text-amber-400 font-semibold">جارية المتابعة</div>
             </div>
 
             <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center space-y-1">
               <Building2 className="w-5 h-5 text-slate-500 mx-auto" />
               <div className="text-xs font-bold text-slate-400">3. التنفيذ والعمل</div>
-              <div className="text-[10px] text-slate-500">بانتظار الاكتمال</div>
+              <div className="text-[11px] text-slate-500">بانتظار الاكتمال</div>
             </div>
 
             <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center space-y-1">
               <ShieldCheck className="w-5 h-5 text-slate-500 mx-auto" />
               <div className="text-xs font-bold text-slate-400">4. التسليم والاعتماد</div>
-              <div className="text-[10px] text-slate-500">فترة المراجعة</div>
+              <div className="text-[11px] text-slate-500">فترة المراجعة</div>
             </div>
           </div>
         </div>

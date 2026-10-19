@@ -1,4 +1,5 @@
 'use client';
+import { notify } from '@/lib/notify';
 
 import { formatSAR } from '@/lib/utils';
 
@@ -111,10 +112,10 @@ export default function OMSAdminCommandCenter() {
         setActionNote('');
         fetchOMSData();
       } else {
-        alert(data.error || data.errorAr || 'فشل تنفيذ الإجراء');
+        notify(data.error || data.errorAr || 'فشل تنفيذ الإجراء');
       }
     } catch (e) {
-      alert('خطأ في الاتصال بالسيرفر');
+      notify('خطأ في الاتصال بالسيرفر');
     } finally {
       setIsProcessing(false);
       setTimeout(() => setToastMessage(null), 4000);
@@ -218,7 +219,7 @@ export default function OMSAdminCommandCenter() {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-2xl md:text-3xl font-black text-white">مركز التحكم التشغيلي للطلبات</h1>
-              <span className="bg-amber-500/20 text-amber-400 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-amber-500/30">
+              <span className="bg-amber-500/20 text-amber-400 text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-amber-500/30">
                 OMS v2.0
               </span>
             </div>
@@ -282,7 +283,7 @@ export default function OMSAdminCommandCenter() {
             <FileText className="w-4 h-4 text-blue-400" />
           </div>
           <div className="text-2xl font-black text-white">{totalOrders}</div>
-          <div className="text-[10px] text-slate-500 mt-1">خدمات مسجلة بالمنصة</div>
+          <div className="text-[11px] text-slate-500 mt-1">خدمات مسجلة بالمنصة</div>
         </div>
 
         <div className="bg-amber-950/30 border border-amber-500/30 rounded-2xl p-4">
@@ -291,7 +292,7 @@ export default function OMSAdminCommandCenter() {
             <Clock className="w-4 h-4 text-amber-400" />
           </div>
           <div className="text-2xl font-black text-amber-300">{awaitingVendorCount}</div>
-          <div className="text-[10px] text-amber-400/70 mt-1">مهلة التثبيت جارية</div>
+          <div className="text-[11px] text-amber-400/70 mt-1">مهلة التثبيت جارية</div>
         </div>
 
         <div className="bg-blue-950/30 border border-blue-500/30 rounded-2xl p-4">
@@ -300,7 +301,7 @@ export default function OMSAdminCommandCenter() {
             <Activity className="w-4 h-4 text-blue-400" />
           </div>
           <div className="text-2xl font-black text-blue-300">{inProgressCount}</div>
-          <div className="text-[10px] text-blue-400/70 mt-1">تجهيز العمل القائم</div>
+          <div className="text-[11px] text-blue-400/70 mt-1">تجهيز العمل القائم</div>
         </div>
 
         <div className="bg-rose-950/40 border border-rose-500/40 rounded-2xl p-4">
@@ -309,7 +310,7 @@ export default function OMSAdminCommandCenter() {
             <AlertTriangle className="w-4 h-4 text-rose-400" />
           </div>
           <div className="text-2xl font-black text-rose-300">{delayedCount}</div>
-          <div className="text-[10px] text-rose-400/70 mt-1">تدخل العمليات الفوري</div>
+          <div className="text-[11px] text-rose-400/70 mt-1">تدخل العمليات الفوري</div>
         </div>
 
         <div className="bg-purple-950/30 border border-purple-500/30 rounded-2xl p-4">
@@ -318,7 +319,7 @@ export default function OMSAdminCommandCenter() {
             <AlertOctagon className="w-4 h-4 text-purple-400" />
           </div>
           <div className="text-2xl font-black text-purple-300">{disputedCount}</div>
-          <div className="text-[10px] text-purple-400/70 mt-1">تحت التحقيق</div>
+          <div className="text-[11px] text-purple-400/70 mt-1">تحت التحقيق</div>
         </div>
 
         <div className="bg-emerald-950/30 border border-emerald-500/30 rounded-2xl p-4">
@@ -327,7 +328,7 @@ export default function OMSAdminCommandCenter() {
             <CheckCircle className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="text-2xl font-black text-emerald-300">{completedCount}</div>
-          <div className="text-[10px] text-emerald-400/70 mt-1">تم إغلاقها بنجاح</div>
+          <div className="text-[11px] text-emerald-400/70 mt-1">تم إغلاقها بنجاح</div>
         </div>
       </div>
 
@@ -432,21 +433,21 @@ export default function OMSAdminCommandCenter() {
                       >
                         <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
                           <span className="font-mono text-xs font-bold text-amber-400">{sub.bookingNumber}</span>
-                          <span className="text-[10px] text-slate-400">{master.cityNameAr}</span>
+                          <span className="text-[11px] text-slate-400">{master.cityNameAr}</span>
                         </div>
 
                         <div>
                           <h4 className="font-bold text-white text-xs">{sub.vendorName}</h4>
-                          <p className="text-[11px] text-slate-400 mt-0.5">العميل: {master.customerName}</p>
+                          <p className="text-xs text-slate-400 mt-0.5">العميل: {master.customerName}</p>
                         </div>
 
                         {/* Items Summary */}
-                        <div className="text-[10px] text-slate-400 bg-slate-900/60 p-2 rounded-xl border border-slate-800/50">
+                        <div className="text-[11px] text-slate-400 bg-slate-900/60 p-2 rounded-xl border border-slate-800/50">
                           {sub.items.map((i) => i.serviceTitleAr).join(' • ')}
                         </div>
 
                         {/* SLA Indicator */}
-                        <div className="flex items-center justify-between text-[10px] pt-1">
+                        <div className="flex items-center justify-between text-[11px] pt-1">
                           <span className="text-slate-400">الإجمالي: <strong className="text-white">{formatSAR(sub.totalAmount)}</strong></span>
                           {sub.isDelayed ? (
                             <span className="text-rose-400 font-bold flex items-center gap-1">
@@ -504,23 +505,23 @@ export default function OMSAdminCommandCenter() {
                       >
                         <td className="p-4 font-mono">
                           <div className="font-bold text-white">{sub.bookingNumber}</div>
-                          <div className="text-[10px] text-slate-500">الرئيسي: {master.orderNumber}</div>
+                          <div className="text-[11px] text-slate-500">الرئيسي: {master.orderNumber}</div>
                         </td>
 
                         <td className="p-4">
                           <div className="font-semibold text-white">{master.customerName}</div>
-                          <div className="text-[10px] text-slate-400">{master.customerPhone} | {master.cityNameAr}</div>
-                          <div className="text-[10px] text-amber-400">{master.eventDate}</div>
+                          <div className="text-[11px] text-slate-400">{master.customerPhone} | {master.cityNameAr}</div>
+                          <div className="text-[11px] text-amber-400">{master.eventDate}</div>
                         </td>
 
                         <td className="p-4">
                           <div className="font-semibold text-amber-300">{sub.vendorName}</div>
-                          <div className="text-[10px] text-slate-400">إجمالي الحجز: {formatSAR(sub.totalAmount)}</div>
+                          <div className="text-[11px] text-slate-400">إجمالي الحجز: {formatSAR(sub.totalAmount)}</div>
                         </td>
 
                         <td className="p-4">
                           <span
-                            className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold ${
+                            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
                               sub.omsStatus === 'AWAITING_ACCEPTANCE'
                                 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
                                 : sub.omsStatus === 'IN_PROGRESS'
@@ -538,22 +539,22 @@ export default function OMSAdminCommandCenter() {
 
                         <td className="p-4">
                           <div className="text-white font-medium">{sub.nextAction}</div>
-                          <div className="text-[10px] text-slate-400">المسؤول: {sub.assignedRole}</div>
+                          <div className="text-[11px] text-slate-400">المسؤول: {sub.assignedRole}</div>
                         </td>
 
                         <td className="p-4">
                           {sub.isDelayed ? (
-                            <span className="inline-flex items-center gap-1 text-rose-400 font-bold text-[11px]">
+                            <span className="inline-flex items-center gap-1 text-rose-400 font-bold text-xs">
                               <AlertTriangle className="w-3.5 h-3.5" />
                               متأخر عن SLA
                             </span>
                           ) : sub.isAtRisk ? (
-                            <span className="inline-flex items-center gap-1 text-amber-400 font-bold text-[11px]">
+                            <span className="inline-flex items-center gap-1 text-amber-400 font-bold text-xs">
                               <Clock className="w-3.5 h-3.5" />
                               مهدد بالتأخير
                             </span>
                           ) : (
-                            <span className="text-emerald-400 text-[11px]">ضمن المهلة المحددة</span>
+                            <span className="text-emerald-400 text-xs">ضمن المهلة المحددة</span>
                           )}
                         </td>
 
@@ -582,11 +583,11 @@ export default function OMSAdminCommandCenter() {
 
       {/* Action Drawer Modal */}
       {selectedSuborder && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div role="dialog" aria-modal="true" aria-labelledby="dlg-7453-1" className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
           <div className="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-3xl p-6 shadow-2xl space-y-6">
             <div className="flex items-center justify-between border-b border-slate-800 pb-4">
               <div>
-                <h3 className="text-lg font-bold text-white">التدخل التشغيلي للطلب: {selectedSuborder.suborder.bookingNumber}</h3>
+                <h3 className="text-lg font-bold text-white" id="dlg-7453-1">التدخل التشغيلي للطلب: {selectedSuborder.suborder.bookingNumber}</h3>
                 <p className="text-xs text-slate-400">المورد: {selectedSuborder.suborder.vendorName} | العميل: {selectedSuborder.master.customerName}</p>
               </div>
               <button

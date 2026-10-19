@@ -98,12 +98,12 @@ export default function GateScannerPage() {
       {/* Live Entrance Counter */}
       <div className="bg-white p-5 rounded-3xl border border-saudi-sand-300 shadow-sm flex items-center justify-between">
         <div className="space-y-0.5">
-          <span className="text-[11px] font-bold text-gray-400 block">المناسبة الحالية:</span>
+          <span className="text-xs font-bold text-gray-500 block">المناسبة الحالية:</span>
           <h3 className="text-sm font-bold text-saudi-green-900 font-cairo">{activeOccasion.title}</h3>
         </div>
 
         <div className="text-left bg-saudi-sand-50 px-4 py-2 rounded-2xl border border-saudi-sand-300">
-          <span className="text-[10px] text-gray-400 block">إجمالي الحضور بالقاعة</span>
+          <span className="text-[11px] text-gray-500 block">إجمالي الحضور بالقاعة</span>
           <span className="text-xl font-black font-cairo text-saudi-green-950">
             {attendedCount} / {occasionGuests.length} ضيوف
           </span>
@@ -116,7 +116,7 @@ export default function GateScannerPage() {
           {/* Animated Scanner Laser Line */}
           <div className="absolute inset-x-4 top-1/2 h-0.5 bg-gradient-to-r from-transparent via-saudi-gold-400 to-transparent animate-pulse" />
           <QrCode className="w-24 h-24 text-saudi-gold-300/80" />
-          <span className="text-[11px] text-gray-300 mt-3 font-medium">
+          <span className="text-xs text-gray-300 mt-3 font-medium">
             امسح الرمز بقارئ هاتفك ثم الصق الرابط أدناه
           </span>
         </div>
@@ -147,7 +147,7 @@ export default function GateScannerPage() {
 
           {/* Quick Demo QR buttons */}
           <div className="space-y-1 text-right">
-            <span className="text-[10px] text-saudi-gold-300 font-bold block">
+            <span className="text-[11px] text-saudi-gold-300 font-bold block">
               💡 اضغط لتجربة فحص بطاقات المدعوين التجريبية:
             </span>
             <div className="flex flex-wrap gap-1.5">
@@ -155,7 +155,7 @@ export default function GateScannerPage() {
                 <button
                   key={g.id}
                   onClick={() => handleScanCode(g.qrCode)}
-                  className="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-white rounded-lg text-[10px] font-mono transition"
+                  className="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-white rounded-lg text-[11px] font-mono transition"
                 >
                   {g.name} ({g.qrCode})
                 </button>

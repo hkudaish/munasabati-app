@@ -76,7 +76,7 @@ function NavbarContent() {
           <div className="flex items-center gap-2 sm:gap-4">
             {/* Visual Segmented Role Switcher matching reference image */}
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <span className="text-gray-300 text-[11px] sm:text-xs font-medium hidden md:inline">عرض بصفتك:</span>
+              <span className="text-gray-300 text-xs sm:text-xs font-medium hidden md:inline">عرض بصفتك:</span>
               <div className="bg-saudi-green-950/90 p-0.5 rounded-lg border border-saudi-gold-500/30 flex items-center gap-0.5 sm:gap-1 shadow-inner">
                 {/* 1. Customer Option */}
                 <button
@@ -86,7 +86,7 @@ function NavbarContent() {
                       router.push('/');
                     }
                   }}
-                  className={`px-2 sm:px-3 py-1 rounded-md text-[11px] font-bold transition flex items-center gap-1 ${
+                  className={`px-2 sm:px-3 py-1 rounded-md text-xs font-bold transition flex items-center gap-1 ${
                     currentRole === 'client'
                       ? 'bg-saudi-gold-500 text-saudi-green-950 shadow-sm'
                       : 'text-gray-300 hover:text-white hover:bg-white/5'
@@ -104,7 +104,7 @@ function NavbarContent() {
                       router.push('/vendor');
                     }
                   }}
-                  className={`px-2 sm:px-3 py-1 rounded-md text-[11px] font-bold transition flex items-center gap-1.5 ${
+                  className={`px-2 sm:px-3 py-1 rounded-md text-xs font-bold transition flex items-center gap-1.5 ${
                     currentRole === 'vendor'
                       ? 'bg-saudi-gold-500 text-saudi-green-950 shadow-sm'
                       : 'text-gray-300 hover:text-white hover:bg-white/5'
@@ -123,7 +123,7 @@ function NavbarContent() {
                       router.push('/admin');
                     }
                   }}
-                  className={`px-2 sm:px-3 py-1 rounded-md text-[11px] font-bold transition flex items-center gap-1.5 ${
+                  className={`px-2 sm:px-3 py-1 rounded-md text-xs font-bold transition flex items-center gap-1.5 ${
                     currentRole === 'admin'
                       ? 'bg-saudi-gold-500 text-saudi-green-950 shadow-sm'
                       : 'text-gray-300 hover:text-white hover:bg-white/5'
@@ -149,7 +149,7 @@ function NavbarContent() {
                     className="w-4 h-4 rounded-full object-cover border border-saudi-gold-400"
                   />
                   <span className="font-bold max-w-[85px] sm:max-w-[120px] truncate">{currentUser.name}</span>
-                  <span className={`text-[9px] px-1.5 py-0.2 rounded font-black ${
+                  <span className={`text-[11px] px-1.5 py-0.2 rounded font-black ${
                     currentUser.role === 'admin'
                       ? 'bg-purple-900/60 text-purple-200'
                       : currentUser.role === 'vendor'
@@ -168,9 +168,9 @@ function NavbarContent() {
                   >
                     <div className="px-4 py-2 border-b border-gray-100">
                       <p className="font-bold text-gray-900 text-xs">{currentUser.name}</p>
-                      <p className="text-[11px] text-gray-500">{currentUser.phone || currentUser.email}</p>
+                      <p className="text-xs text-gray-500">{currentUser.phone || currentUser.email}</p>
                       <div className="mt-1.5 flex items-center gap-1">
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-saudi-sand-100 text-saudi-green-900">
+                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-saudi-sand-100 text-saudi-green-900">
                           {currentUser.hasSystemAccess ? '🛡️ مدير النظام' : currentUser.role === 'admin'
                             ? '🛡️ حساب إداري'
                             : currentUser.role === 'vendor'
@@ -228,14 +228,14 @@ function NavbarContent() {
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={() => openOnboarding()}
-                  className="bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-black px-2.5 sm:px-3 py-1 rounded-md text-[11px] transition shadow-sm flex items-center gap-1"
+                  className="bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-black px-2.5 sm:px-3 py-1 rounded-md text-xs transition shadow-sm flex items-center gap-1"
                 >
                   <UserPlus className="w-3 h-3 text-saudi-green-950" />
                   <span>إنشاء حساب</span>
                 </button>
                 <button
                   onClick={() => openOnboarding()}
-                  className="text-gray-300 hover:text-white px-2 py-1 rounded text-[11px] font-bold transition flex items-center gap-1"
+                  className="text-gray-300 hover:text-white px-2 py-1 rounded text-xs font-bold transition flex items-center gap-1"
                 >
                   <LogIn className="w-3 h-3" />
                   <span className="hidden sm:inline">تسجيل الدخول</span>
@@ -259,7 +259,7 @@ function NavbarContent() {
                 <span className="text-2xl font-black tracking-tight text-saudi-green-900 font-cairo">
                   {adminConfig.platformNameAr}
                 </span>
-                <span className="text-[10px] -mt-1 text-saudi-gold-600 font-medium">
+                <span className="text-[11px] -mt-1 text-saudi-gold-600 font-medium">
                   {adminConfig.taglineAr}
                 </span>
               </div>
@@ -397,7 +397,7 @@ function NavbarContent() {
                     href="/marketplace"
                     className="px-3 py-2 rounded-lg hover:text-saudi-green-800 hover:bg-gray-50 transition flex items-center gap-1 text-gray-500"
                   >
-                    <ShoppingBag className="w-4 h-4 text-gray-400" />
+                    <ShoppingBag className="w-4 h-4 text-gray-500" />
                     <span>استعراض السوق كعميل</span>
                   </Link>
                 </>
@@ -491,7 +491,7 @@ function NavbarContent() {
                         <span className="text-xs font-bold text-gray-900 line-clamp-1 max-w-[130px]">
                           {activeOccasion?.title}
                         </span>
-                        <span className="text-[10px] text-saudi-green-700 font-semibold">
+                        <span className="text-[11px] text-saudi-green-700 font-semibold">
                           جاهزية: {activeOccasion?.readinessPercentage}%
                         </span>
                       </div>
@@ -503,7 +503,7 @@ function NavbarContent() {
                         className="absolute left-0 mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 p-2 z-50 animate-fadeIn"
                         onClick={() => setIsOccasionDropdownOpen(false)}
                       >
-                        <div className="text-[11px] font-bold text-gray-400 px-3 py-1 border-b border-gray-100">
+                        <div className="text-xs font-bold text-gray-500 px-3 py-1 border-b border-gray-100">
                           مناسباتك الحالية ({occasions.length})
                         </div>
                         <div className="max-h-60 overflow-y-auto divide-y divide-gray-50 my-1">
@@ -520,9 +520,9 @@ function NavbarContent() {
                             >
                               <div>
                                 <p className="font-bold text-gray-900">{occ.title}</p>
-                                <p className="text-[10px] text-gray-500">{occ.cityNameAr} • {occ.date}</p>
+                                <p className="text-[11px] text-gray-500">{occ.cityNameAr} • {occ.date}</p>
                               </div>
-                              <span className="text-[11px] font-bold text-saudi-green-800 bg-saudi-green-100 px-2 py-0.5 rounded-full">
+                              <span className="text-xs font-bold text-saudi-green-800 bg-saudi-green-100 px-2 py-0.5 rounded-full">
                                 {occ.readinessPercentage}%
                               </span>
                             </button>
@@ -549,7 +549,7 @@ function NavbarContent() {
                   >
                     <ArrowLeftRight className="w-3.5 h-3.5 text-saudi-gold-600" />
                     <span className="hidden sm:inline">مقارنة</span>
-                    <span className="bg-saudi-gold-500 text-saudi-green-950 text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center">
+                    <span className="bg-saudi-gold-500 text-saudi-green-950 text-[11px] font-black w-4 h-4 rounded-full flex items-center justify-center">
                       {comparisonVendorIds.length}
                     </span>
                   </Link>
@@ -564,7 +564,7 @@ function NavbarContent() {
                   <ShoppingBag className="w-4 h-4 text-saudi-green-800" />
                   <span className="hidden sm:inline">السلة</span>
                   {cart.length > 0 && (
-                    <span className="bg-saudi-green-800 text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
+                    <span className="bg-saudi-green-800 text-white text-[11px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
                       {cart.reduce((sum, item) => sum + item.quantity, 0)}
                     </span>
                   )}
@@ -650,7 +650,7 @@ function NavbarContent() {
                 />
                 <div>
                   <p className="font-bold text-xs text-gray-900">{currentUser.name}</p>
-                  <p className="text-[10px] text-gray-500">
+                  <p className="text-[11px] text-gray-600">
                     {currentUser.hasSystemAccess ? 'مدير النظام' : currentUser.role === 'admin' ? 'مشرف المنصة' : currentUser.role === 'vendor' ? 'مورد معتمد' : 'صاحب مناسبة'}
                   </p>
                 </div>
@@ -659,7 +659,7 @@ function NavbarContent() {
               <Link href="/settings/channels" className="text-xs underline text-saudi-green-900">إعدادات إرسال الدعوات</Link>
               <button
                 onClick={logoutUser}
-                className="text-[11px] text-red-600 font-bold p-1 hover:bg-white rounded"
+                className="text-xs text-red-600 font-bold p-1 hover:bg-white rounded"
               >
                 خروج
               </button>

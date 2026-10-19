@@ -1,4 +1,5 @@
 'use client';
+import { notify } from '@/lib/notify';
 
 import { formatSAR } from '@/lib/utils';
 
@@ -1210,7 +1211,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const addToComparison = (vendorId: string): boolean => {
     if (comparisonVendorIds.includes(vendorId)) return true;
     if (comparisonVendorIds.length >= 4) {
-      alert('الحد الأقصى للمقارنة هو 4 موردين في نفس الوقت.');
+      notify('الحد الأقصى للمقارنة هو 4 موردين في نفس الوقت.');
       return false;
     }
     setComparisonVendorIds((prev) => [...prev, vendorId]);

@@ -35,12 +35,12 @@ export default function PackageCard({ pkg, onBookPackage }: PackageCardProps) {
           <span className="bg-saudi-gold-500 text-saudi-green-950 text-xs font-black px-3 py-1 rounded-full shadow-md">
             {currentPackage.badge}
           </span>
-          <span className="bg-saudi-green-900/90 backdrop-blur-md text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-saudi-gold-400/40">
+          <span className="bg-saudi-green-900/90 backdrop-blur-md text-white text-xs font-bold px-2.5 py-0.5 rounded-full border border-saudi-gold-400/40">
             توفير {formatSAR(currentPackage.savings)} 🔥
           </span>
         </div>
 
-        <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md text-white text-[11px] font-bold px-2.5 py-1 rounded-lg">
+        <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md text-white text-xs font-bold px-2.5 py-1 rounded-lg">
           تكفي {currentPackage.guestCount} شخص
         </div>
       </div>
@@ -49,7 +49,7 @@ export default function PackageCard({ pkg, onBookPackage }: PackageCardProps) {
       <div className="p-5 space-y-4 flex-1 flex flex-col justify-between">
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-saudi-gold-600 bg-saudi-gold-50 px-2 py-0.5 rounded-md border border-saudi-gold-200">
+            <span className="text-xs font-bold text-saudi-gold-600 bg-saudi-gold-50 px-2 py-0.5 rounded-md border border-saudi-gold-200">
               مناسبة: {currentPackage.occasionTypeNameAr}
             </span>
             <div className="flex items-center gap-1 text-xs font-bold text-gray-700">

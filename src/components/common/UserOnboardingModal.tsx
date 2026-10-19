@@ -223,7 +223,7 @@ export default function UserOnboardingModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-md animate-fadeIn">
+    <div role="dialog" aria-modal="true" aria-labelledby="dlg-9634-1" className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-md animate-fadeIn">
       {/* Modal Card */}
       <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-saudi-sand-300 overflow-hidden max-h-[92vh] flex flex-col">
         {/* Header Ribbon */}
@@ -244,7 +244,7 @@ export default function UserOnboardingModal() {
             <span>منصة مناسبتـي الرقمية 🇸🇦</span>
           </div>
 
-          <h2 className="text-xl sm:text-2xl font-black font-cairo text-white">
+          <h2 className="text-xl sm:text-2xl font-black font-cairo text-white" id="dlg-9634-1">
             {step === 'select_role' && 'اختر نوع الحساب للانطلاق'}
             {step === 'customer_form' && 'إنشاء حساب صاحب المناسبة 🎉'}
             {step === 'vendor_form' && 'تسجيل منشأة أو مورد جديد 🏪'}
@@ -300,7 +300,7 @@ export default function UserOnboardingModal() {
                       <div className="w-12 h-12 rounded-2xl bg-saudi-green-100 text-saudi-green-900 flex items-center justify-center shadow-inner group-hover:scale-110 transition">
                         <Calendar className="w-6 h-6 text-saudi-green-800" />
                       </div>
-                      <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-saudi-green-50 text-saudi-green-800 border border-saudi-green-200">
+                      <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-saudi-green-50 text-saudi-green-800 border border-saudi-green-200">
                         صاحب المناسبة
                       </span>
                     </div>
@@ -349,7 +349,7 @@ export default function UserOnboardingModal() {
                       <div className="w-12 h-12 rounded-2xl bg-saudi-gold-100 text-saudi-gold-800 flex items-center justify-center shadow-inner group-hover:scale-110 transition">
                         <Store className="w-6 h-6 text-saudi-gold-700" />
                       </div>
-                      <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-saudi-gold-50 text-saudi-gold-800 border border-saudi-gold-200">
+                      <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-saudi-gold-50 text-saudi-gold-800 border border-saudi-gold-200">
                         مورد / مزود خدمة
                       </span>
                     </div>

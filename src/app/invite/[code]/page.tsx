@@ -106,7 +106,7 @@ export default function GuestRSVPPage() {
             </div>
 
             <div className="space-y-1">
-              <span className="text-[11px] font-bold text-saudi-gold-300 uppercase tracking-widest block">
+              <span className="text-xs font-bold text-saudi-gold-300 uppercase tracking-widest block">
                 دعوة خاصة لحضور
               </span>
               <h1 className="text-xl sm:text-2xl font-black font-cairo text-white">
@@ -131,7 +131,7 @@ export default function GuestRSVPPage() {
 
             <button
               onClick={handleAddToCalendar}
-              className="text-[11px] font-bold text-saudi-gold-300 hover:text-white underline inline-flex items-center gap-1 transition"
+              className="text-xs font-bold text-saudi-gold-300 hover:text-white underline inline-flex items-center gap-1 transition"
             >
               <Calendar className="w-3.5 h-3.5" />
               <span>إضافة المناسبة إلى تقويم الجوال (Google / Apple)</span>
@@ -160,10 +160,10 @@ export default function GuestRSVPPage() {
                     {/* QR Pass Box */}
                     <div className="bg-saudi-sand-50 p-4 rounded-2xl border border-saudi-sand-300 inline-block shadow-inner">
                       <InvitationQRCode value={qrLink} className="w-64 h-64 mx-auto" />
-                      <span className="text-[10px] font-mono text-gray-600 block mt-2 font-bold">
+                      <span className="text-[11px] font-mono text-gray-600 block mt-2 font-bold">
                         {inviteCode || 'MUN-RSVP-PASS'}
                       </span>
-                      <span className="text-[10px] font-bold text-saudi-green-800 block mt-1">
+                      <span className="text-[11px] font-bold text-saudi-green-800 block mt-1">
                         الضيف: {guestName}
                       </span>
                     </div>
@@ -246,7 +246,7 @@ export default function GuestRSVPPage() {
                     disabled={submitting || !linkedGuest} onClick={() => void handleRSVP('declined')}
                     className="py-3 bg-saudi-sand-100 hover:bg-saudi-sand-200 text-gray-700 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 transition"
                   >
-                    <XCircle className="w-4 h-4 text-gray-400" />
+                    <XCircle className="w-4 h-4 text-gray-500" />
                     <span>أعتذر عن الحضور</span>
                   </button>
                 </div>
@@ -266,10 +266,10 @@ export default function GuestRSVPPage() {
                 <h4 className="text-xs font-black font-cairo text-saudi-green-950">
                   العانية والرفد الرقمي (Digital Eaniyah) 🎁
                 </h4>
-                <p className="text-[10px] text-gray-600">شارك فرحتك بهدية مالية مباركة تصل فوراً</p>
+                <p className="text-[11px] text-gray-600">شارك فرحتك بهدية مالية مباركة تصل فوراً</p>
               </div>
             </div>
-            <span className="text-[10px] font-bold text-saudi-green-900 bg-white px-2 py-0.5 rounded-full border border-saudi-gold-300 shadow-sm">
+            <span className="text-[11px] font-bold text-saudi-green-900 bg-white px-2 py-0.5 rounded-full border border-saudi-gold-300 shadow-sm">
               Apple Pay / مدى
             </span>
           </div>
@@ -295,7 +295,7 @@ export default function GuestRSVPPage() {
                 <MessageSquare className="w-3.5 h-3.5 text-saudi-gold-600" />
                 <span>سجل التهاني والتبريكات المباشر</span>
               </span>
-              <span className="text-[10px] font-bold text-saudi-gold-600">
+              <span className="text-[11px] font-bold text-saudi-gold-600">
                 {occasionEaniyah.length} مباركين
               </span>
             </div>
@@ -303,20 +303,20 @@ export default function GuestRSVPPage() {
             <div className="space-y-2.5 max-h-48 overflow-y-auto pr-1">
               {occasionEaniyah.slice(0, 3).map((g) => (
                 <div key={g.id} className="p-3 bg-saudi-sand-50 rounded-2xl border border-saudi-sand-200 text-right space-y-1">
-                  <div className="flex items-center justify-between text-[11px]">
+                  <div className="flex items-center justify-between text-xs">
                     <strong className="text-saudi-green-950 font-bold">{g.senderName}</strong>
                     <span className="text-saudi-gold-600 font-bold">
                       {g.isPrivateAmount ? 'عانية شرف' : formatSAR(g.amount)}
                     </span>
                   </div>
-                  <p className="text-[10px] text-gray-600 italic">"{g.blessingMessage}"</p>
+                  <p className="text-[11px] text-gray-600 italic">"{g.blessingMessage}"</p>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        <div className="text-center text-[10px] text-gray-400">
+        <div className="text-center text-[11px] text-gray-500">
           منصة مناسبتـي 🇸🇦 • المنصة السعودية لإدارة وتنظيم المناسبات
         </div>
 

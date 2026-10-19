@@ -99,7 +99,7 @@ export default function BudgetManager() {
               {formatSAR(activeOccasion.budget)}
             </span>
           </div>
-          <span className="text-[11px] text-gray-400 mt-1 block">
+          <span className="text-xs text-gray-500 mt-1 block">
             الميزانية المخططة للمناسبة
           </span>
         </div>
@@ -142,7 +142,7 @@ export default function BudgetManager() {
               {formatSAR(remainingBudget)}
             </span>
           </div>
-          <span className="text-[11px] text-gray-400 mt-1 block">
+          <span className="text-xs text-gray-500 mt-1 block">
             {remainingBudget >= 0 ? 'رصيد آمن متاح للصرف' : 'تجاوز في الميزانية المقررة'}
           </span>
         </div>
@@ -214,7 +214,7 @@ export default function BudgetManager() {
                 <tr key={item.id} className="hover:bg-saudi-sand-50/60 transition">
                   <td className="p-3.5">
                     <span className="font-bold text-gray-900 block">{item.categoryNameAr}</span>
-                    <span className="text-[10px] text-gray-400">{item.categoryId}</span>
+                    <span className="text-[11px] text-gray-500">{item.categoryId}</span>
                   </td>
                   <td className="p-3.5 font-semibold text-gray-700">
                     {formatSAR(item.allocatedAmount)}
@@ -223,22 +223,22 @@ export default function BudgetManager() {
                     {item.spentAmount > 0 ? formatSAR(item.spentAmount) : '—'}
                   </td>
                   <td className="p-3.5 text-gray-600">
-                    {item.vendorName || <span className="text-gray-400 italic">لم يحدد بعد</span>}
+                    {item.vendorName || <span className="text-gray-500 italic">لم يحدد بعد</span>}
                   </td>
                   <td className="p-3.5">
                     {item.status === 'paid' && (
-                      <span className="inline-flex items-center gap-1 bg-green-100 text-green-800 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                      <span className="inline-flex items-center gap-1 bg-green-100 text-green-800 text-[11px] font-bold px-2 py-0.5 rounded-full">
                         <CheckCircle2 className="w-3 h-3" />
                         مدفوع بالكامل
                       </span>
                     )}
                     {item.status === 'booked' && (
-                      <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                      <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 text-[11px] font-bold px-2 py-0.5 rounded-full">
                         تم الحجز (عربون)
                       </span>
                     )}
                     {item.status === 'estimated' && (
-                      <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                      <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-700 text-[11px] font-bold px-2 py-0.5 rounded-full">
                         تقديري
                       </span>
                     )}
@@ -270,9 +270,9 @@ export default function BudgetManager() {
 
       {/* Add / Edit Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fadeIn">
+        <div role="dialog" aria-modal="true" aria-labelledby="dlg-3324-1" className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fadeIn">
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <h4 className="text-base font-bold text-gray-900 font-cairo">
+            <h4 className="text-base font-bold text-gray-900 font-cairo" id="dlg-3324-1">
               {editingItem ? 'تعديل بند الميزانية' : 'إضافة بند ميزانية جديد'}
             </h4>
 

@@ -136,7 +136,7 @@ export default function HomePage() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[11px] text-saudi-gold-300 font-bold uppercase tracking-wider">
+                <span className="text-xs text-saudi-gold-300 font-bold uppercase tracking-wider">
                   طريقة العرض المخصصة حالياً:
                 </span>
                 <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-black bg-saudi-gold-500 text-saudi-green-950 shadow-sm">
@@ -160,7 +160,7 @@ export default function HomePage() {
 
           {/* Quick role changer shortcut */}
           <div className="flex items-center gap-1.5 self-end md:self-center shrink-0 bg-black/30 p-1 rounded-xl border border-white/10">
-            <span className="text-[11px] text-gray-300 px-2 font-medium">تبديل المنظور:</span>
+            <span className="text-xs text-gray-300 px-2 font-medium">تبديل المنظور:</span>
             <button
               onClick={() => switchRole('client')}
               className={`px-2.5 py-1 rounded-lg text-xs font-bold transition ${
@@ -300,7 +300,7 @@ export default function HomePage() {
               <div className="bg-gradient-to-r from-saudi-sand-100 via-white to-saudi-sand-100 border border-saudi-gold-400/30 rounded-2xl p-5 shadow-card flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-saudi-green-800 text-white">
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-saudi-green-800 text-white">
                       مناسبتك الحالية قيد التجهيز
                     </span>
                     <h3 className="text-base sm:text-lg font-black font-cairo text-saudi-green-950">
@@ -320,7 +320,7 @@ export default function HomePage() {
                       <DollarSign className="w-3.5 h-3.5 text-saudi-gold-600" />
                       الميزانية: {formatSAR(activeOccasion.budget)}
                     </span>
-                    <span className="text-gray-400">•</span>
+                    <span className="text-gray-500">•</span>
                     <span className="text-saudi-gold-700 font-bold">
                       جاهزية التجهيزات: {activeOccasion.readinessPercentage}%
                     </span>
@@ -387,7 +387,7 @@ export default function HomePage() {
                       {occ.nameAr}
                     </span>
                   </div>
-                  <div className="p-2.5 text-[10px] text-gray-500 leading-tight">
+                  <div className="p-2.5 text-[11px] text-gray-500 leading-tight">
                     {occ.descriptionAr}
                   </div>
                 </Link>
@@ -578,7 +578,7 @@ export default function HomePage() {
                   <div className="text-2xl font-black text-white font-cairo">
                     {bookings.filter((b) => b.status === 'confirmed').length}
                   </div>
-                  <span className="text-[10px] text-saudi-gold-300">مؤكدة وجاهزة للتنفيذ</span>
+                  <span className="text-[11px] text-saudi-gold-300">مؤكدة وجاهزة للتنفيذ</span>
                 </div>
 
                 <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10">
@@ -589,7 +589,7 @@ export default function HomePage() {
                   <div className="text-2xl font-black text-saudi-gold-300 font-cairo">
                     {openRFQs.length}
                   </div>
-                  <span className="text-[10px] text-gray-300">طلبات عملاء بانتظار عروضك</span>
+                  <span className="text-[11px] text-gray-300">طلبات عملاء بانتظار عروضك</span>
                 </div>
 
                 <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10">
@@ -600,7 +600,7 @@ export default function HomePage() {
                   <div className="text-2xl font-black text-white font-cairo">
                     4.9 / 5.0
                   </div>
-                  <span className="text-[10px] text-green-300">موثق بالسجل التجاري ✔</span>
+                  <span className="text-[11px] text-green-300">موثق بالسجل التجاري ✔</span>
                 </div>
 
                 <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10">
@@ -611,7 +611,7 @@ export default function HomePage() {
                   <div className="text-2xl font-black text-white font-cairo">
                     15 دقيقة
                   </div>
-                  <span className="text-[10px] text-saudi-gold-300">أعلى من متوسط السوق</span>
+                  <span className="text-[11px] text-saudi-gold-300">أعلى من متوسط السوق</span>
                 </div>
               </div>
 
@@ -683,7 +683,7 @@ export default function HomePage() {
                 >
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-saudi-green-50 text-saudi-green-900 border border-saudi-green-200">
+                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-saudi-green-50 text-saudi-green-900 border border-saudi-green-200">
                         {rfq.occasionTypeAr}
                       </span>
                       <span className="text-xs font-bold text-saudi-gold-700">
@@ -716,7 +716,7 @@ export default function HomePage() {
                   </div>
 
                   <div className="pt-2 flex items-center justify-between">
-                    <span className="text-[11px] text-gray-400">
+                    <span className="text-xs text-gray-500">
                       العروض المقدمة: <strong className="text-gray-700">{rfq.quotesCount}</strong>
                     </span>
                     <Link
@@ -780,7 +780,7 @@ export default function HomePage() {
                 >
                   <div className="relative h-44 w-full bg-gray-100">
                     <img src={srv.images[0]} alt={srv.titleAr} className="w-full h-full object-cover" />
-                    <span className="absolute top-2.5 right-2.5 bg-saudi-green-900/80 backdrop-blur-md text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                    <span className="absolute top-2.5 right-2.5 bg-saudi-green-900/80 backdrop-blur-md text-white text-[11px] font-bold px-2 py-0.5 rounded-full">
                       {srv.categoryNameAr}
                     </span>
                     <span className="absolute bottom-2.5 right-2.5 bg-black/70 backdrop-blur-md text-saudi-gold-300 text-xs font-bold px-2.5 py-1 rounded-lg">
@@ -889,7 +889,7 @@ export default function HomePage() {
                   <div className="text-2xl font-black text-white font-cairo">
                     {vendors.length}
                   </div>
-                  <span className="text-[10px] text-green-300">
+                  <span className="text-[11px] text-green-300">
                     {vendors.filter((v) => v.verified).length} مورد موثق رسمياً
                   </span>
                 </div>
@@ -902,7 +902,7 @@ export default function HomePage() {
                   <div className="text-2xl font-black text-saudi-gold-300 font-cairo">
                     {formatSAR(totalBookingsAmount)}
                   </div>
-                  <span className="text-[10px] text-gray-300">{bookings.length} معاملة منجزة</span>
+                  <span className="text-[11px] text-gray-300">{bookings.length} معاملة منجزة</span>
                 </div>
 
                 <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10">
@@ -913,7 +913,7 @@ export default function HomePage() {
                   <div className="text-2xl font-black text-amber-300 font-cairo">
                     {pendingVendors.length}
                   </div>
-                  <span className="text-[10px] text-amber-200">بانتظار تدقيق السجل</span>
+                  <span className="text-[11px] text-amber-200">بانتظار تدقيق السجل</span>
                 </div>
 
                 <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10">
@@ -924,7 +924,7 @@ export default function HomePage() {
                   <div className="text-2xl font-black text-white font-cairo">
                     {services.length + packages.length}
                   </div>
-                  <span className="text-[10px] text-saudi-gold-300">عبر {cities.length} مدن</span>
+                  <span className="text-[11px] text-saudi-gold-300">عبر {cities.length} مدن</span>
                 </div>
               </div>
 
@@ -1020,7 +1020,7 @@ export default function HomePage() {
                         <h4 className="font-black text-sm text-gray-900 font-cairo">
                           {vendor.businessName}
                         </h4>
-                        <span className="text-[11px] text-gray-500">
+                        <span className="text-xs text-gray-500">
                           {vendor.categoryNameAr} • {vendor.cityNameAr}
                         </span>
                       </div>
@@ -1103,7 +1103,7 @@ export default function HomePage() {
                         </td>
                         <td className="p-3.5 font-bold text-gray-900">
                           {b.occasionTitle}
-                          <span className="block text-[10px] text-gray-500 font-normal">
+                          <span className="block text-[11px] text-gray-500 font-normal">
                             {b.serviceTitleAr}
                           </span>
                         </td>
@@ -1111,7 +1111,7 @@ export default function HomePage() {
                         <td className="p-3.5 text-saudi-green-800 font-bold">{b.vendorName}</td>
                         <td className="p-3.5 font-black text-gray-900">{formatSAR(b.totalAmount)}</td>
                         <td className="p-3.5">
-                          <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-800">
+                          <span className="inline-block px-2 py-0.5 rounded-full text-[11px] font-bold bg-green-100 text-green-800">
                             {b.status === 'confirmed' ? 'مؤكد بالضمان' : b.status}
                           </span>
                         </td>

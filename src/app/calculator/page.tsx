@@ -273,7 +273,7 @@ export default function CalculatorPage() {
                       }`}
                     >
                       <div className="font-bold text-xs">{v.label}</div>
-                      <div className="text-[10px] text-neutral-500 mt-0.5">{v.desc}</div>
+                      <div className="text-[11px] text-neutral-500 mt-0.5">{v.desc}</div>
                     </button>
                   ))}
                 </div>
@@ -302,7 +302,7 @@ export default function CalculatorPage() {
                       }`}
                     >
                       <div className="font-bold text-xs">{t.label}</div>
-                      <div className="text-[10px] text-neutral-500 mt-0.5">{t.badge}</div>
+                      <div className="text-[11px] text-neutral-500 mt-0.5">{t.badge}</div>
                     </button>
                   ))}
                 </div>
@@ -330,7 +330,7 @@ export default function CalculatorPage() {
                     <Utensils className="w-4 h-4 text-emerald-600" />
                     <div>
                       <div className="text-xs font-bold text-neutral-900 dark:text-white">بوفيه العشاء والذبائح</div>
-                      <div className="text-[10px] text-neutral-500">{formatSaudiRiyal(cateringCost)}</div>
+                      <div className="text-[11px] text-neutral-500">{formatSaudiRiyal(cateringCost)}</div>
                     </div>
                   </div>
                 </label>
@@ -346,7 +346,7 @@ export default function CalculatorPage() {
                     <Coffee className="w-4 h-4 text-amber-600" />
                     <div>
                       <div className="text-xs font-bold text-neutral-900 dark:text-white">الضيافة والقهوة والصبابين</div>
-                      <div className="text-[10px] text-neutral-500">{formatSaudiRiyal(hospitalityCost)}</div>
+                      <div className="text-[11px] text-neutral-500">{formatSaudiRiyal(hospitalityCost)}</div>
                     </div>
                   </div>
                 </label>
@@ -362,7 +362,7 @@ export default function CalculatorPage() {
                     <Sparkles className="w-4 h-4 text-purple-600" />
                     <div>
                       <div className="text-xs font-bold text-neutral-900 dark:text-white">الكوشة والتنسيق والورد</div>
-                      <div className="text-[10px] text-neutral-500">{formatSaudiRiyal(koshaCost)}</div>
+                      <div className="text-[11px] text-neutral-500">{formatSaudiRiyal(koshaCost)}</div>
                     </div>
                   </div>
                 </label>
@@ -378,7 +378,7 @@ export default function CalculatorPage() {
                     <Camera className="w-4 h-4 text-indigo-600" />
                     <div>
                       <div className="text-xs font-bold text-neutral-900 dark:text-white">التصوير الفوتوغرافي والفيديو</div>
-                      <div className="text-[10px] text-neutral-500">{formatSaudiRiyal(photoCost)}</div>
+                      <div className="text-[11px] text-neutral-500">{formatSaudiRiyal(photoCost)}</div>
                     </div>
                   </div>
                 </label>
@@ -394,7 +394,7 @@ export default function CalculatorPage() {
                     <Music className="w-4 h-4 text-rose-600" />
                     <div>
                       <div className="text-xs font-bold text-neutral-900 dark:text-white">العرضة أو الدي جي والصوتيات</div>
-                      <div className="text-[10px] text-neutral-500">{formatSaudiRiyal(musicCost)}</div>
+                      <div className="text-[11px] text-neutral-500">{formatSaudiRiyal(musicCost)}</div>
                     </div>
                   </div>
                 </label>
@@ -410,7 +410,7 @@ export default function CalculatorPage() {
                     <ShieldCheck className="w-4 h-4 text-teal-600" />
                     <div>
                       <div className="text-xs font-bold text-neutral-900 dark:text-white">بطاقات الدعوة الرقمية وQR</div>
-                      <div className="text-[10px] text-neutral-500">{formatSaudiRiyal(invitesCost)}</div>
+                      <div className="text-[11px] text-neutral-500">{formatSaudiRiyal(invitesCost)}</div>
                     </div>
                   </div>
                 </label>
@@ -431,7 +431,7 @@ export default function CalculatorPage() {
                   </div>
                 </div>
                 <div className="text-left">
-                  <span className="text-[11px] text-neutral-400 block mb-0.5">التكلفة لكل ضيف</span>
+                  <span className="text-xs text-neutral-400 block mb-0.5">التكلفة لكل ضيف</span>
                   <div className="text-base font-bold font-mono text-neutral-800 dark:text-neutral-200">
                     {formatSaudiRiyal(costPerGuest)}
                   </div>

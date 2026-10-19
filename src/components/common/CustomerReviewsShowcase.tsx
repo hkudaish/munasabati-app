@@ -114,21 +114,21 @@ export default function CustomerReviewsShowcase({
                 <Star className="w-5 h-5 fill-saudi-gold-400" />
                 <span className="text-3xl font-black font-cairo text-white">{avgRating}</span>
               </div>
-              <span className="text-[11px] text-gray-300 block mt-0.5">من 5.0 نقاط</span>
+              <span className="text-xs text-gray-300 block mt-0.5">من 5.0 نقاط</span>
             </div>
 
             <div className="text-center px-3 border-l border-white/15">
               <span className="text-2xl font-black font-cairo text-saudi-gold-300 block">
                 99.4%
               </span>
-              <span className="text-[11px] text-gray-300 block mt-0.5">نسبة رضا العملاء</span>
+              <span className="text-xs text-gray-300 block mt-0.5">نسبة رضا العملاء</span>
             </div>
 
             <div className="text-center px-3">
               <span className="text-2xl font-black font-cairo text-white block">
                 +4,200
               </span>
-              <span className="text-[11px] text-gray-300 block mt-0.5">مناسبة ناجحة 🇸🇦</span>
+              <span className="text-xs text-gray-300 block mt-0.5">مناسبة ناجحة 🇸🇦</span>
             </div>
           </div>
         </div>
@@ -200,7 +200,7 @@ export default function CustomerReviewsShowcase({
                       <h4 className="text-sm font-bold text-saudi-green-950 font-cairo">
                         {rev.customerName}
                       </h4>
-                      <div className="flex items-center gap-1 text-[11px] text-gray-500">
+                      <div className="flex items-center gap-1 text-xs text-gray-500">
                         <MapPin className="w-3 h-3 text-saudi-gold-600" />
                         <span>{rev.customerCityAr}</span>
                         <span>•</span>
@@ -220,7 +220,7 @@ export default function CustomerReviewsShowcase({
 
                 {/* Verified Badge */}
                 {rev.isVerifiedBooking && (
-                  <div className="inline-flex items-center gap-1.5 bg-saudi-green-50 border border-saudi-green-200 text-saudi-green-800 px-2.5 py-0.5 rounded-full text-[10px] font-bold">
+                  <div className="inline-flex items-center gap-1.5 bg-saudi-green-50 border border-saudi-green-200 text-saudi-green-800 px-2.5 py-0.5 rounded-full text-[11px] font-bold">
                     <CheckCircle2 className="w-3 h-3 text-saudi-green-700" />
                     <span>حجز ودفع موثوق عبر مناسبتـي 🇸🇦</span>
                   </div>
@@ -233,7 +233,7 @@ export default function CustomerReviewsShowcase({
                 </p>
 
                 {/* 4 Criteria Micro-Ratings */}
-                <div className="grid grid-cols-2 gap-2 text-[10px] text-gray-500 pt-1">
+                <div className="grid grid-cols-2 gap-2 text-[11px] text-gray-500 pt-1">
                   <div className="flex items-center justify-between bg-gray-50 px-2 py-1 rounded-lg">
                     <span>جودة الخدمة:</span>
                     <strong className="text-saudi-green-900 font-mono">★ {rev.qualityRating}</strong>
@@ -254,7 +254,7 @@ export default function CustomerReviewsShowcase({
 
                 {/* Vendor Reply if present */}
                 {rev.vendorReplyAr && (
-                  <div className="bg-saudi-green-50/80 p-3 rounded-xl border border-saudi-green-200 text-[11px] text-saudi-green-950 space-y-1">
+                  <div className="bg-saudi-green-50/80 p-3 rounded-xl border border-saudi-green-200 text-xs text-saudi-green-950 space-y-1">
                     <span className="font-bold flex items-center gap-1 text-saudi-green-900">
                       <MessageSquare className="w-3 h-3 text-saudi-gold-600" />
                       رد المزود ({rev.vendorName}):
@@ -270,13 +270,13 @@ export default function CustomerReviewsShowcase({
                   href={matchedVendor ? `/vendor/${matchedVendor.id}` : `/marketplace`}
                   className="font-bold text-saudi-green-800 hover:text-saudi-green-950 transition flex items-center gap-1.5"
                 >
-                  <span className="text-[11px] text-gray-400">المزود:</span>
+                  <span className="text-xs text-gray-500">المزود:</span>
                   <span className="underline decoration-saudi-gold-400 underline-offset-2">
                     {rev.vendorName}
                   </span>
                 </Link>
 
-                <span className="text-[10px] text-gray-400 font-mono">{rev.date}</span>
+                <span className="text-[11px] text-gray-500 font-mono">{rev.date}</span>
               </div>
             </div>
           );

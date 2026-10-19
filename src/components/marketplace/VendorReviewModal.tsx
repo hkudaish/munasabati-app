@@ -108,7 +108,7 @@ export const VendorReviewModal: React.FC<VendorReviewModalProps> = ({
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
+    <div role="dialog" aria-modal="true" aria-labelledby="dlg-6251-1" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
       <div className="relative w-full max-w-lg bg-white dark:bg-neutral-900 rounded-3xl shadow-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50">
@@ -117,7 +117,7 @@ export const VendorReviewModal: React.FC<VendorReviewModalProps> = ({
               <Star className="w-5 h-5 fill-amber-500" />
             </div>
             <div>
-              <h3 className="font-bold text-neutral-900 dark:text-white text-base">
+              <h3 className="font-bold text-neutral-900 dark:text-white text-base" id="dlg-6251-1">
                 تقييم تجربة الخدمة
               </h3>
               <p className="text-xs text-neutral-500">{booking.vendorName}</p>
