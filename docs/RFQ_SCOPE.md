@@ -74,13 +74,24 @@ that already exists. If vendors' availability should be checked during quoting, 
 - With the `rfq` flag off or the city unavailable, pages and APIs refuse cleanly.
 - Existing suites still pass; a new `test:rfq` runs against an isolated schema like the commerce suites.
 
-## Open questions for the owner
-1. **Who is invited?** The customer picks vendors, the platform auto-matches by category and city, or both?
-2. **Commission and fees:** does the platform fee apply to private-offer orders exactly as to catalog offers?
-3. **Availability:** must a vendor's calendar be checked while quoting, or only at confirmation?
-4. **Quote lifetime defaults:** how long does an RFQ stay open and how long is a quote valid?
-5. **Changes after acceptance:** is a re-quote allowed, or does the customer cancel and start again?
-6. **Existing demo data:** drop it, or migrate any stored local RFQs? (They are not on the server today.)
+## Decisions so far (owner, 2026-10-20)
+- **Quote lifetime:** one week by default, customizable (per RFQ and by the vendor when quoting, within an
+  admin-set maximum). `closesAt`/`validUntil` therefore default to now + 7 days and are editable fields.
+- **Platform fees:** apply as for catalog offers, managed and customizable. Private-offer orders use the same
+  commission engine and the same admin controls; a per-vendor or per-RFQ override is allowed only through the
+  existing admin-managed fee settings, never from the vendor or customer side.
+- **Who is invited:** answered as "common people, friends, family members, etc."; this needs one
+  clarification (see below) before the data model is final.
+
+## Still open
+1. **Who is invited, exactly?** Which of these did you mean?
+   - (a) the customer shares the RFQ with friends and family so they can view and weigh in on the quotes
+     (collaborative decision); vendors are still chosen separately;
+   - (b) any registered person may create an RFQ, and vendors are matched automatically by category and city;
+   - (c) the RFQ is addressed to people rather than vendors (a different product from quotes).
+2. **Availability:** must a vendor's calendar be checked while quoting, or only at confirmation?
+3. **Changes after acceptance:** is a re-quote allowed, or does the customer cancel and start again?
+4. **Existing demo data:** drop it, or migrate any stored local RFQs? (They are not on the server today.)
 
 ## Risks
 - **Scope creep into negotiation** (counter-offers, chat). Keep v1 to submit, compare, accept.
