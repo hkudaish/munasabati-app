@@ -84,12 +84,27 @@ async function describeSchema(tx, schema, exclude) {
   return { info, order, fingerprint };
 }
 
-async function readTable(tx, schema, table, info) {
-  const orderBy = info.pk.map(q).join(', ');
-  const rows = await tx.$queryRawUnsafe(`SELECT to_jsonb(t) AS j FROM ${q(schema)}.${q(table)} t ORDER BY ${orderBy}`);
-  return rows.map(r => r.j);
-}
 const rowKey = (row, pk) => JSON.stringify(pk.map(c => row[c]));
+
+/**
+ * Reads many tables per round trip (UNION ALL, tagged by table name). Each query costs one network round trip, so over
+ * a slow link this is the difference between 70 seconds and a few. Rows come back sorted by primary key for stable files.
+ */
+async function readTables(tx, schema, tables, info, perQuery = 20) {
+  const rows = Object.fromEntries(tables.map(t => [t, []]));
+  for (let i = 0; i < tables.length; i += perQuery) {
+    const batch = tables.slice(i, i + perQuery);
+    const sql = batch.map(t => `SELECT ${"'" + t.replace(/'/g, "''") + "'"}::text AS t, to_jsonb(x) AS j FROM ${q(schema)}.${q(t)} x`).join(' UNION ALL ');
+    for (const r of await tx.$queryRawUnsafe(sql)) rows[r.t].push(r.j);
+  }
+  for (const t of tables) {
+    const pk = info[t].pk;
+    const keyed = rows[t].map(row => [rowKey(row, pk), row]);
+    keyed.sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
+    rows[t] = keyed.map(k => k[1]);
+  }
+  return rows;
+}
 
 /** One consistent, read-only snapshot of all included tables, hashed row by row. */
 async function takeSnapshot(prisma, schema, exclude) {
@@ -97,11 +112,8 @@ async function takeSnapshot(prisma, schema, exclude) {
     await tx.$executeRawUnsafe('SET TRANSACTION READ ONLY');
     await tx.$executeRawUnsafe(`SET LOCAL TIME ZONE 'UTC'`); // identical timestamp text on every run and server
     const { info, order, fingerprint } = await describeSchema(tx, schema, exclude);
-    const rows = {}, hashes = {};
-    for (const t of order) {
-      rows[t] = await readTable(tx, schema, t, info[t]);
-      hashes[t] = new Map(rows[t].map(r => [rowKey(r, info[t].pk), sha256(stable(r))]));
-    }
+    const rows = await readTables(tx, schema, order, info), hashes = {};
+    for (const t of order) hashes[t] = new Map(rows[t].map(r => [rowKey(r, info[t].pk), sha256(stable(r))]));
     return { info, order, fingerprint, rows, hashes };
   }, { isolationLevel: 'RepeatableRead', timeout: 600000, maxWait: 60000 });
 }
@@ -150,15 +162,19 @@ function withLock(dir, fn) {
 }
 
 /** Creates a full or incremental backup. Returns { manifest, changed } */
-async function createBackup({ url, schema = 'public', dir, type, exclude = DEFAULT_EXCLUDE, force = false, label = '' }) {
+async function createBackup({ url, schema = 'public', dir, type, exclude = DEFAULT_EXCLUDE, force = false, label = '', onStep = () => {} }) {
   const key = encryptionKey();
+  onStep('key-ready');
   return withLock(dir, async () => {
     const manifests = readManifests(dir);
     const parent = type === 'incremental' ? manifests[manifests.length - 1] : null;
     if (type === 'incremental' && !parent) throw new Error('There is no backup to build on. Run a full backup first.');
+    onStep('lock-held');
     const prisma = openDb(url);
     try {
+      onStep('snapshot-begin');
       const snap = await takeSnapshot(prisma, schema, exclude);
+      onStep('snapshot-done');
       if (parent && parent.schemaFingerprint !== snap.fingerprint && !force) throw new Error('The database structure changed since the last backup. Take a new full backup (or pass --force).');
       if (parent && !!parent.encrypted !== !!key && !force) throw new Error('Encryption setting differs from the previous backup in this chain. Use the same BACKUP_ENCRYPTION_KEY or start a new full backup.');
       const parentState = parent ? readState(dir, parent, key) : null;
@@ -188,6 +204,7 @@ async function createBackup({ url, schema = 'public', dir, type, exclude = DEFAU
       fs.writeFileSync(path.join(dir, dataName), data);
       fs.writeFileSync(path.join(dir, stateName), stateFile);
       fs.writeFileSync(manifestPath(dir, id), JSON.stringify(manifest, null, 2)); // manifest last: a crash leaves no half backup
+      onStep('files-written');
       return { manifest, changed: upserts + deletes };
     } finally { await prisma.$disconnect(); }
   });

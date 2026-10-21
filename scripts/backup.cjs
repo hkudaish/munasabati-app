@@ -55,11 +55,14 @@ async function connectionUrl(forRestore) {
 function record(entry) {
   try { fs.mkdirSync(root, { recursive: true }); fs.appendFileSync(logFile, JSON.stringify({ at: new Date().toISOString(), target, ...entry }) + '\n'); } catch { /* logging must never break a backup */ }
 }
+// BACKUP_TRACE=1 appends each stage to backup.log: use it to see where a scheduled run stops.
+const trace = step => { if (process.env.BACKUP_TRACE) record({ trace: step }); };
 const mb = n => (n / 1024).toFixed(1) + ' KB';
 const ask = question => new Promise(resolve => { const rl = readline.createInterface({ input: process.stdin, output: process.stdout }); rl.question(question, a => { rl.close(); resolve(a); }); });
 
 async function main() {
-  loadEnv(); // BACKUP_ENCRYPTION_KEY and DATABASE_URL come from .env for every command
+  loadEnv();
+  trace('start ' + command); // BACKUP_ENCRYPTION_KEY and DATABASE_URL come from .env for every command
   if (command === 'keygen') {
     console.log('Add this line to your .env (and keep a copy somewhere safe; without it encrypted backups cannot be read):\n');
     console.log('BACKUP_ENCRYPTION_KEY=' + randomBytes(32).toString('base64'));
@@ -94,10 +97,11 @@ Backups go to ${engine.defaultRoot()} (override with BACKUP_DIR or --dir). Set B
 
   if (command === 'auto') {
     const url = await connectionUrl();
+    trace('url-resolved');
     const policy = { ...engine.DEFAULT_POLICY, fullEveryDays: Number(flag('full-every-days') || engine.DEFAULT_POLICY.fullEveryDays), keepChains: Number(flag('keep') || engine.DEFAULT_POLICY.keepChains) };
     const decision = engine.nextAutoType(dir, policy);
     let result;
-    try { result = await engine.createBackup({ url, schema, dir, type: decision.type, label: 'auto' }); }
+    try { result = await engine.createBackup({ url, schema, dir, type: decision.type, label: 'auto', onStep: trace }); }
     catch (e) {
       // a structure change or a key change cannot continue the chain: begin a new one instead of failing silently
       if (decision.type === 'incremental' && /structure changed|Encryption setting/.test(e.message)) result = await engine.createBackup({ url, schema, dir, type: 'full', label: 'auto (new chain: ' + e.message.split('.')[0] + ')' });

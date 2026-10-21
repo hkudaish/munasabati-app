@@ -62,6 +62,12 @@ Hourly by default (`-EveryMinutes 30` for more often). A missed run starts as so
 Linux/macOS: `0 * * * * cd /path/to/repo && node scripts/backup.cjs auto --target production`.
 A machine that is always on (a small server) is better than a laptop for production backups.
 
+## Troubleshooting a scheduled run
+`backup.log` (in the backup folder) has one JSON line per run. Set `BACKUP_TRACE=1` to also log each stage
+(`start`, `url-resolved`, `snapshot-begin`, `snapshot-done`, `files-written`), which shows where a slow or stuck run
+is. A production run takes about 20 seconds from a slow connection (tables are read in a few batched requests, not
+one request per table). A run that is killed halfway leaves a `.lock` file; it is ignored after 6 hours, or delete it.
+
 ## Restore
 Restores are deliberately limited to **local** databases; production is recovered by restoring locally, checking the
 result, and then loading it with the database provider's tools.
