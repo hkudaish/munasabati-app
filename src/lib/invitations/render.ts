@@ -1,22 +1,8 @@
 import { qrSvg } from './qr';
 import { CardDesign, SIZES } from './catalog';
-const escape = (s: string) => s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[c]!));
-function wrap(text: string, count: number): string[] {
-  const lines: string[] = [];
-  for (const paragraph of text.split('\n')) {
-    let line = '';
-    for (const token of paragraph.split(/\s+/)) {
-      for (let start = 0; start < token.length; start += count) {
-        const word = token.slice(start, start + count);
-        if (line && line.length + word.length + 1 > count) { lines.push(line); line = word; }
-        else line += `${line ? ' ' : ''}${word}`;
-      }
-    }
-    if (line) lines.push(line);
-  }
-  return lines;
-}
+import { escape, layoutSvg, wrap } from './layouts';
 export function cardSvg(d: CardDesign, qrValue = ''): string {
+  if (d.layout && d.layout !== 'classic') return layoutSvg(d, qrValue);
   const size = SIZES[d.size], h = 600 * size.height / size.width;
   const center = h / 2, x = d.align === 'right' ? 510 : 300;
   const anchor = d.align === 'right' ? 'end' : 'middle';

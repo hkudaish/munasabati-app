@@ -1,9 +1,12 @@
-export const OCCASIONS = { wedding: 'زواج', engagement: 'خطوبة وملكة', graduation: 'تخرج', birthday: 'عيد ميلاد', family: 'لقاء عائلي', formal: 'مناسبة رسمية' } as const;
+export const OCCASIONS = { wedding: 'زواج', engagement: 'خطوبة وملكة', nikah: 'عقد قران', graduation: 'تخرج', newborn: 'مولود جديد', birthday: 'عيد ميلاد', family: 'لقاء عائلي', formal: 'مناسبة رسمية' } as const;
+export const AUDIENCES = { men: 'رجال', women: 'نساء', general: 'عام' } as const;
+export const LAYOUTS = { classic: 'كلاسيكي', 'royal-frame': 'إطار ملكي', 'arch-window': 'نافذة قوس', 'band-header': 'شريط علوي', 'monogram-circle': 'شعار دائري', 'side-panel': 'لوحة جانبية', 'floral-corners': 'زوايا زهرية', 'star-medallion': 'ميدالية نجمية', envelope: 'مظروف', 'ribbon-banner': 'شريط احتفالي', calligraphy: 'خط عربي', 'info-rows': 'بيانات مرتبة', 'split-half': 'لوحتان' } as const;
 export const STYLES = { luxury: 'فاخر', floral: 'زهري', minimal: 'بسيط', modern: 'عصري', heritage: 'تراثي' } as const;
 export const MOTIFS = { arch: 'قوس', botanical: 'أوراق وزهور', stars: 'نجوم', confetti: 'قصاصات احتفالية', geometric: 'هندسي', none: 'بدون زخارف' } as const;
 export const SIZES = { portrait: { label: 'رقمية · 1080 × 1350', width: 1080, height: 1350 }, square: { label: 'مربعة · 1080 × 1080', width: 1080, height: 1080 }, story: { label: 'قصة · 1080 × 1920', width: 1080, height: 1920 }, a5: { label: 'طباعة A5 · 148 × 210 مم', width: 1748, height: 2480 } } as const;
 export type OccasionKind = keyof typeof OCCASIONS;
 export interface CardDesign {
+  layout: keyof typeof LAYOUTS; invocation: string; host: string; groom: string; bride: string; hijri: string; address: string; rsvpBy: string; contact: string;
   opening: string; title: string; closing: string; date: string; time: string; venue: string;
   background: string; foreground: string; accent: string; image: string;
   font: 'serif' | 'sans-serif'; motif: keyof typeof MOTIFS; size: keyof typeof SIZES;
@@ -11,11 +14,12 @@ export interface CardDesign {
 }
 export interface InviteTemplate {
   id: string; name: string; occasion: OccasionKind; style: keyof typeof STYLES;
-  color: 'فاتح' | 'داكن' | 'ملون'; design: CardDesign; ownerId: string;
+  color: 'فاتح' | 'داكن' | 'ملون'; audience?: keyof typeof AUDIENCES; design: CardDesign; ownerId: string;
   status: 'private' | 'pending' | 'published' | 'rejected' | 'archived'; version: number;
   updatedAt: string; reviewNote?: string;
 }
 export const DEFAULT_DESIGN: CardDesign = {
+  layout: 'classic', invocation: '', host: '', groom: '', bride: '', hijri: '', address: '', rsvpBy: '', contact: '',
   opening: 'بكل الحب والسرور، ندعوكم لمشاركتنا', title: 'وبحضوركم تكتمل فرحتنا', closing: 'نتطلع إلى لقائكم ومشاركتكم أجمل اللحظات',
   date: '', time: '', venue: '', background: '#fbf5ea', foreground: '#403629', accent: '#a77b38', image: '',
   font: 'serif', motif: 'arch', size: 'portrait', align: 'center', titleSize: 46, offset: 0, imageOpacity: 0.2,
@@ -48,6 +52,8 @@ export function occasionKind(id: string): OccasionKind {
   if (id === 'engagement' || id === 'melka' || id === 'melkah') return 'engagement';
   if (id === 'corporate_opening' || id === 'national_day') return 'formal';
   if (id === 'henna_night') return 'wedding';
+  if (id === 'nikah' || id === 'katb_kitab') return 'nikah';
+  if (id === 'newborn') return 'newborn';
   return Object.hasOwn(OCCASIONS, id) ? id as OccasionKind : 'family';
 }
 export function validateDesign(value: unknown): CardDesign {
@@ -62,6 +68,12 @@ export function validateDesign(value: unknown): CardDesign {
     if (typeof d[key] !== 'string' || !/^#[0-9a-f]{6}$/i.test(d[key] as string)) throw new Error('الألوان غير صالحة');
     result[key] = d[key] as string;
   }
+  for (const key of ['invocation', 'host', 'groom', 'bride', 'hijri', 'address', 'rsvpBy', 'contact'] as const) {
+    if (d[key] === undefined) continue;
+    if (typeof d[key] !== 'string' || (d[key] as string).length > (key === 'invocation' ? 80 : 160)) throw new Error('النصوص مفقودة أو تتجاوز الطول المسموح');
+    result[key] = d[key] as string;
+  }
+  if (d.layout !== undefined) { if (!(typeof d.layout === 'string' && Object.hasOwn(LAYOUTS, d.layout))) throw new Error('تخطيط غير مدعوم'); result.layout = d.layout as CardDesign['layout']; }
   if (d.font !== 'serif' && d.font !== 'sans-serif') throw new Error('خط غير مدعوم');
   if (!(typeof d.motif === 'string' && Object.hasOwn(MOTIFS, d.motif)) || !(typeof d.size === 'string' && Object.hasOwn(SIZES, d.size))) throw new Error('المقاس أو الزخرفة غير مدعوم');
   if (d.align !== 'center' && d.align !== 'right') throw new Error('محاذاة غير صالحة');
@@ -76,7 +88,8 @@ export function validateTemplate(value: unknown): InviteTemplate {
   if (!value || typeof value !== 'object') throw new Error('قالب غير صالح');
   const t = value as InviteTemplate;
   if (typeof t.id !== 'string' || typeof t.ownerId !== 'string' || typeof t.name !== 'string' || !t.name.trim() || t.name.length > 80 || !Object.hasOwn(OCCASIONS, t.occasion) || !Object.hasOwn(STYLES, t.style) || !['فاتح', 'داكن', 'ملون'].includes(t.color) || !['private', 'pending', 'published', 'rejected', 'archived'].includes(t.status) || !Number.isInteger(t.version) || t.version < 1 || typeof t.updatedAt !== 'string') throw new Error('بيانات القالب غير صالحة');
-  return { id: t.id, ownerId: t.ownerId, name: t.name, occasion: t.occasion, style: t.style, color: t.color, status: t.status, version: t.version, updatedAt: t.updatedAt, design: validateDesign(t.design), reviewNote: typeof t.reviewNote === 'string' ? t.reviewNote.slice(0, 240) : undefined };
+  if (t.audience !== undefined && !(typeof t.audience === 'string' && Object.hasOwn(AUDIENCES, t.audience))) throw new Error('بيانات القالب غير صالحة');
+  return { id: t.id, ownerId: t.ownerId, name: t.name, ...(t.audience ? { audience: t.audience } : {}), occasion: t.occasion, style: t.style, color: t.color, status: t.status, version: t.version, updatedAt: t.updatedAt, design: validateDesign(t.design), reviewNote: typeof t.reviewNote === 'string' ? t.reviewNote.slice(0, 240) : undefined };
 }
 export function contrastRatio(a: string, b: string) {
   const luminance = (hex: string) => {
@@ -85,4 +98,19 @@ export function contrastRatio(a: string, b: string) {
   };
   const x = luminance(a), y = luminance(b);
   return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
+}
+
+const MONTHS = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+export interface DateParts { day: string; month: string; year: string }
+/** Day / month / year of an ISO date (2027-06-12); null for free text. */
+export function dateParts(value: string): DateParts | null {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(value.trim());
+  if (!m || Number(m[2]) < 1 || Number(m[2]) > 12) return null;
+  return { day: String(Number(m[3])), month: MONTHS[Number(m[2]) - 1], year: m[1] };
+}
+/** Umm al-Qura date in Arabic for an ISO date; empty when it cannot be worked out. */
+export function hijriOf(iso: string): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso.trim());
+  if (!m) return '';
+  try { return new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura-nu-arab', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3])))); } catch { return ''; }
 }

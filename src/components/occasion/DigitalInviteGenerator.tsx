@@ -3,7 +3,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Heart, Search, Sparkles, Download, Copy, Save, Upload, Share2, Palette, Printer, Archive, Check, X } from 'lucide-react';
 import { useApp } from '@/lib/store';
-import { BUILTIN_TEMPLATES, CardDesign, InviteTemplate, MOTIFS, OCCASIONS, OccasionKind, SIZES, STYLES, contrastRatio, occasionKind, validateDesign, validateTemplate } from '@/lib/invitations/catalog';
+import { AUDIENCES, BUILTIN_TEMPLATES, CardDesign, InviteTemplate, LAYOUTS, MOTIFS, OCCASIONS, OccasionKind, SIZES, STYLES, contrastRatio, hijriOf, occasionKind, validateDesign, validateTemplate } from '@/lib/invitations/catalog';
+import { COLLECTIONS, LIBRARY_TEMPLATES, LibraryTemplate, startingDesign, thumbnailDesign } from '@/lib/invitations/library';
 import InvitationQRCode from '@/components/common/InvitationQRCode';
 import { getInvitationOrigin, normalizeInvitationOrigin } from '@/lib/invitations/link';
 import { qrSvg } from '@/lib/invitations/qr';
@@ -12,6 +13,8 @@ import { cardSvg, downloadFile, pngBlob, printCard } from '@/lib/invitations/ren
 import { requestJSON } from '@/lib/api-client';
 import Link from 'next/link';
 const statusNames = { private: 'خاص', pending: 'بانتظار المراجعة', published: 'منشور', rejected: 'يحتاج تعديلاً', archived: 'مؤرشف' };
+const libraryOf = (t: InviteTemplate): LibraryTemplate | undefined => LIBRARY_TEMPLATES.find(l => l.id === t.id);
+const cardOf = (t: InviteTemplate): CardDesign => { const l = libraryOf(t); return l ? thumbnailDesign(l) : t.design; };
 const fieldClass = 'w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-saudi-green-700';
 function Preview({ design, small = false, qrValue = '' }: { design: CardDesign; small?: boolean; qrValue?: string }) {
   return <div className={small ? 'h-40 overflow-hidden rounded-xl [&_svg]:h-full [&_svg]:w-full' : 'overflow-hidden rounded-2xl shadow-xl [&_svg]:h-auto [&_svg]:w-full'} dangerouslySetInnerHTML={{ __html: cardSvg(design, qrValue) }} />;
@@ -36,8 +39,11 @@ function InvitationStudio() {
   const [saveStatus, setSaveStatus] = useState('');
   const [conflicted, setConflicted] = useState(false);
   const initialKind = occasionKind(occasion.occasionTypeId);
-  const initialTemplate = BUILTIN_TEMPLATES.find(t => t.occasion === initialKind)!;
-  const [design, setDesign] = useState<CardDesign>({ ...initialTemplate.design, title: occasion.title, date: occasion.date, time: occasion.time || '', venue: occasion.venueName || occasion.cityNameAr });
+  const initialTemplate: InviteTemplate = LIBRARY_TEMPLATES.find(t => t.occasion === initialKind) ?? BUILTIN_TEMPLATES.find(t => t.occasion === initialKind) ?? BUILTIN_TEMPLATES[0];
+  const eventFields = (): Partial<CardDesign> => ({ title: occasion.title, date: occasion.date, hijri: hijriOf(occasion.date), time: occasion.time || '', venue: occasion.venueName || occasion.cityNameAr });
+  const [design, setDesign] = useState<CardDesign>({ ...initialTemplate.design, ...eventFields() });
+  const [activeId, setActiveId] = useState<string>(initialTemplate.id);
+  const [audience, setAudience] = useState('');
   const [records, setRecords] = useState<InviteTemplate[]>([]);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [ready, setReady] = useState(false);
@@ -101,7 +107,7 @@ function InvitationStudio() {
   const selectTemplate = (t: InviteTemplate) => {
     if (!canEdit) { setNotice('سجّل الدخول لتخصيص القوالب وحفظها.'); return; }
     const own = t.ownerId === userId && t.status !== 'published' && t.status !== 'pending' && t.status !== 'archived';
-    setDesign({ ...t.design, ...(t.ownerId === 'system' ? { title: occasion.title, date: occasion.date, time: occasion.time || '', venue: occasion.venueName || occasion.cityNameAr } : {}) });
+    setDesign(t.ownerId === 'system' ? startingDesign(t as LibraryTemplate, eventFields()) : t.design); setActiveId(t.id);
     setName(own ? t.name : `نسخة من ${t.name}`); setEditingId(own ? t.id : null); setTemplateKind(t.occasion); setTemplateStyle(t.style);
     setNotice(own ? 'فتحت تصميمك للتعديل.' : 'نسخة مستقلة جاهزة للتخصيص.');
   };
@@ -161,16 +167,17 @@ function InvitationStudio() {
     try { rsvpUrl = occasion.shareCode ? `${normalizeInvitationOrigin(shareOrigin)}/invite/${occasion.shareCode}` : ''; }
     catch { linkError = 'تعذر تجهيز رابط الدعوة؛ راجع طول العنوان والتاريخ والوقت والموقع.'; }
   }
-  const templates = [...BUILTIN_TEMPLATES, ...records];
+  const templates: InviteTemplate[] = [...LIBRARY_TEMPLATES, ...BUILTIN_TEMPLATES, ...records];
+  const active = LIBRARY_TEMPLATES.find(t => t.id === activeId);
   const visible = templates.filter(t => {
     const inTab = tab === 'manage' ? isAdmin && t.ownerId !== 'system' : tab === 'mine' ? t.ownerId === userId : tab === 'favorites' ? favorites.includes(t.id) && (t.status === 'published' || t.ownerId === userId) : t.status === 'published';
-    return inTab && (tab === 'manage' || t.status !== 'archived') && (!kind || t.occasion === kind) && (!style || t.style === style) && (!color || t.color === color) && t.name.includes(search.trim());
+    return inTab && (tab === 'manage' || t.status !== 'archived') && (!kind || t.occasion === kind) && (!style || t.style === style) && (!color || t.color === color) && (!audience || t.audience === audience) && (t.name.includes(search.trim()) || !!libraryOf(t)?.nameEn.toLowerCase().includes(search.trim().toLowerCase()));
   });
-  const suggestions = BUILTIN_TEMPLATES.filter(t => t.occasion === templateKind);
+  const suggestions = [...LIBRARY_TEMPLATES, ...BUILTIN_TEMPLATES].filter(t => t.occasion === templateKind).slice(0, 8);
   if (!ready) return <div className="p-6" role="status">{notice || 'جارٍ تحميل مكتبة التصاميم…'}{notice && <button onClick={() => window.location.reload()} className="mx-3 underline">إعادة المحاولة</button>}</div>;
   return <div className="space-y-6" dir="rtl">
     <div className="rounded-3xl bg-gradient-to-l from-saudi-green-950 to-saudi-green-800 p-6 text-white flex flex-wrap items-center justify-between gap-4">
-      <div><span className="text-xs text-saudi-gold-300">مساحة إبداعك</span><h3 className="text-xl font-bold mt-1">كل مناسبة تستحق دعوة تليق بها</h3><p className="text-sm text-white/80 mt-2">18 قالباً منسّقاً · تخصيص مرن · معاينة وتصدير</p></div><Palette className="h-10 w-10 text-saudi-gold-300" />
+      <div><span className="text-xs text-saudi-gold-300">مساحة إبداعك</span><h3 className="text-xl font-bold mt-1">كل مناسبة تستحق دعوة تليق بها</h3><p className="text-sm text-white/80 mt-2">{LIBRARY_TEMPLATES.length + BUILTIN_TEMPLATES.length} قالباً منسّقاً · دعوات للرجال والنساء · تخصيص مرن · معاينة وتصدير</p></div><Palette className="h-10 w-10 text-saudi-gold-300" />
     </div>
     <p className="text-xs text-gray-600">التصاميم والمفضلة والدعوات محفوظة في قاعدة البيانات. رابط البطاقة العام للعرض؛ تأكيد الحضور متاح عبر رابط الضيف الشخصي من قائمة المدعوين.</p>
     <div className="flex flex-wrap gap-4 text-xs"><span role="status">{saveStatus}</span><Link className="underline text-green-900" href="/settings/channels">إعدادات واتساب والرسائل والبريد</Link><button className="underline" onClick={() => { lastSaved.current = ''; setDesign(d => ({ ...d })); }}>إعادة محاولة حفظ المسودة</button></div>
@@ -182,17 +189,18 @@ function InvitationStudio() {
         </div>
         {canEdit && <label className="flex items-center gap-2 cursor-pointer rounded-xl border px-3 py-2 text-sm"><Upload size={16} /> استيراد قالب JSON<input aria-label="استيراد قالب JSON" type="file" accept=".json,application/json" className="sr-only" onChange={e => { void importTemplate(e.target.files?.[0]); e.target.value = ''; }} /></label>}
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         <Field label="البحث"><div className="relative"><Search className="absolute left-2 top-3 text-gray-500" size={16} /><input className={fieldClass} placeholder="اسم القالب" value={search} onChange={e => setSearch(e.target.value)} /></div></Field>
         <Field label="المناسبة"><select className={fieldClass} value={kind} onChange={e => setKind(e.target.value as OccasionKind | '')}><option value="">كل المناسبات</option>{Object.entries(OCCASIONS).map(([id, label]) => <option key={id} value={id}>{label}</option>)}</select></Field>
+        <Field label="الفئة"><select className={fieldClass} value={audience} onChange={e => setAudience(e.target.value)}><option value="">رجال ونساء</option>{Object.entries(AUDIENCES).map(([id, label]) => <option key={id} value={id}>{label}</option>)}</select></Field>
         <Field label="الأسلوب"><select className={fieldClass} value={style} onChange={e => setStyle(e.target.value)}><option value="">كل الأساليب</option>{Object.entries(STYLES).map(([id, label]) => <option key={id} value={id}>{label}</option>)}</select></Field>
         <Field label="الألوان"><select className={fieldClass} value={color} onChange={e => setColor(e.target.value)}><option value="">كل الألوان</option>{['فاتح', 'داكن', 'ملون'].map(c => <option key={c}>{c}</option>)}</select></Field>
       </div>
       <p className="text-xs text-gray-500">{visible.length} قالب متاح</p>
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 max-h-[560px] overflow-y-auto p-1">
         {visible.map(t => <article key={t.id} className="rounded-2xl border border-gray-200 p-2 space-y-2">
-          <button className="w-full hover:opacity-90 focus-visible:ring-2 focus-visible:ring-saudi-green-800 rounded-xl" onClick={() => selectTemplate(t)} aria-label={`اختيار ${t.name}`}><Preview design={t.design} small /></button>
-          <div className="flex items-start justify-between gap-1"><div><h4 className="font-bold text-sm break-words">{t.name}</h4><p className="text-xs text-gray-500">{OCCASIONS[t.occasion]} · {STYLES[t.style]}</p></div><button disabled={!canEdit} aria-label={`إضافة ${t.name} إلى المفضلة`} aria-pressed={favorites.includes(t.id)} onClick={() => void run(async () => { const selected = !favorites.includes(t.id); await requestJSON('/api/invitation-studio', 'POST', { action: 'favorite', templateId: t.id, selected }); setFavorites(f => selected ? [...f, t.id] : f.filter(id => id !== t.id)); })} className="p-2 rounded-lg hover:bg-rose-50 disabled:opacity-40"><Heart size={16} className={favorites.includes(t.id) ? 'fill-rose-500 text-rose-500' : 'text-gray-500'} /></button></div>
+          <button className="w-full hover:opacity-90 focus-visible:ring-2 focus-visible:ring-saudi-green-800 rounded-xl" onClick={() => selectTemplate(t)} aria-label={`اختيار ${t.name}`}><Preview design={cardOf(t)} small /></button>
+          <div className="flex items-start justify-between gap-1"><div><h4 className="font-bold text-sm break-words">{t.name}</h4><p className="text-xs text-gray-500">{OCCASIONS[t.occasion]} · {STYLES[t.style]}{t.audience ? ` · ${AUDIENCES[t.audience]}` : ''}</p>{libraryOf(t) && <p className="text-caption2 text-gray-400"><span dir="ltr">{libraryOf(t)!.nameEn}</span> · {COLLECTIONS[libraryOf(t)!.collection]}</p>}</div><button disabled={!canEdit} aria-label={`إضافة ${t.name} إلى المفضلة`} aria-pressed={favorites.includes(t.id)} onClick={() => void run(async () => { const selected = !favorites.includes(t.id); await requestJSON('/api/invitation-studio', 'POST', { action: 'favorite', templateId: t.id, selected }); setFavorites(f => selected ? [...f, t.id] : f.filter(id => id !== t.id)); })} className="p-2 rounded-lg hover:bg-rose-50 disabled:opacity-40"><Heart size={16} className={favorites.includes(t.id) ? 'fill-rose-500 text-rose-500' : 'text-gray-500'} /></button></div>
           {t.ownerId !== 'system' && <p className="text-xs text-gray-500">{statusNames[t.status]} · الإصدار {t.version}</p>}
           {t.reviewNote && <p className="text-xs text-amber-800">ملاحظة المراجعة: {t.reviewNote}</p>}
           <button disabled={!canEdit} onClick={() => selectTemplate(t)} className="w-full bg-saudi-sand-100 rounded-lg py-2 text-xs disabled:opacity-40">{t.ownerId === userId && ['private', 'rejected'].includes(t.status) ? 'فتح وتعديل' : 'استخدام نسخة'}</button>
@@ -210,12 +218,26 @@ function InvitationStudio() {
         <fieldset disabled={!canEdit} className="space-y-4 disabled:opacity-60">
           <Field label="اسم التصميم في المكتبة"><input className={fieldClass} maxLength={80} value={name} onChange={e => setName(e.target.value)} /></Field>
           <div className="grid grid-cols-2 gap-3"><Field label="نوع المناسبة"><select className={fieldClass} value={templateKind} onChange={e => setTemplateKind(e.target.value as OccasionKind)}>{Object.entries(OCCASIONS).map(([id, label]) => <option key={id} value={id}>{label}</option>)}</select></Field><Field label="تصنيف الأسلوب"><select className={fieldClass} value={templateStyle} onChange={e => setTemplateStyle(e.target.value as InviteTemplate['style'])}>{Object.entries(STYLES).map(([id, label]) => <option key={id} value={id}>{label}</option>)}</select></Field></div>
-          <div className="rounded-2xl bg-saudi-sand-50 p-3 space-y-2"><p className="text-xs font-bold flex items-center gap-1"><Sparkles size={15} /> تنسيقات مقترحة لـ{OCCASIONS[templateKind]}</p><div className="flex flex-wrap gap-2">{suggestions.map(t => <button key={t.id} title={t.name} aria-label={`تطبيق ألوان وزخارف ${t.name}`} onClick={() => { patch({ background: t.design.background, foreground: t.design.foreground, accent: t.design.accent, motif: t.design.motif, image: '' }); setTemplateStyle(t.style); }} className="flex items-center gap-1 rounded-lg border bg-white px-2 py-1.5 text-xs">{[t.design.background, t.design.accent].map((c, i) => <span key={i} style={{ background: c }} className="w-3 h-3 rounded-full border" />)}{t.name}</button>)}</div><p className="text-xs text-gray-500">اقتراحات منسّقة حسب المناسبة؛ تطبّق الألوان والزخارف مع الاحتفاظ بنصوصك.</p></div>
+          <div className="rounded-2xl bg-saudi-sand-50 p-3 space-y-2"><p className="text-xs font-bold flex items-center gap-1"><Sparkles size={15} /> تنسيقات مقترحة لـ{OCCASIONS[templateKind]}</p><div className="flex flex-wrap gap-2">{suggestions.map(t => <button key={t.id} title={t.name} aria-label={`تطبيق ألوان وزخارف ${t.name}`} onClick={() => { patch({ background: t.design.background, foreground: t.design.foreground, accent: t.design.accent, motif: t.design.motif, image: '' }); setTemplateStyle(t.style); }} className="flex items-center gap-1 rounded-lg border bg-white px-2 py-1.5 text-xs">{[t.design.background, t.design.accent].map((c, i) => <span key={i} style={{ background: c }} className="w-3 h-3 rounded-full border" />)}{t.name}</button>)}</div><p className="text-xs text-gray-500">اقتراحات منسّقة حسب المناسبة؛ تطبّق الألوان والزخارف مع الاحتفاظ بنصوصك.</p>
+            {active && <div className="space-y-2 border-t pt-2"><p className="text-xs font-bold">ألوان {active.name}</p><div className="flex flex-wrap gap-2">{active.palettes.map(pal => <button key={pal.name} type="button" aria-label={`تطبيق لوحة ${pal.name}`} onClick={() => patch({ background: pal.background, foreground: pal.foreground, accent: pal.accent })} className="flex items-center gap-1 rounded-lg border bg-white px-2 py-1.5 text-xs">{[pal.background, pal.accent, pal.foreground].map((c, i) => <span key={i} style={{ background: c }} className="w-3 h-3 rounded-full border" />)}{pal.name}</button>)}</div>
+              <button type="button" onClick={() => { patch({ layout: active.design.layout, motif: active.design.motif, font: active.design.font, size: active.design.size, titleSize: active.design.titleSize, align: active.design.align, background: active.design.background, foreground: active.design.foreground, accent: active.design.accent, imageOpacity: active.design.imageOpacity }); setNotice('أُعيد مظهر القالب الأصلي؛ بقيت بياناتك ونصوصك كما هي.'); }} className="text-xs underline">استعادة مظهر القالب الأصلي (دون فقدان بياناتك)</button></div>}</div>
+          <div className="rounded-2xl border border-saudi-sand-300 p-3 space-y-3"><p className="text-xs font-bold">بيانات الدعوة · تظهر مباشرة في المعاينة، والحقول الفارغة تختفي من البطاقة</p>
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="اسم العريس"><input className={fieldClass} maxLength={160} value={design.groom} onChange={e => patch({ groom: e.target.value })} /></Field>
+              <Field label="اسم العروس"><input className={fieldClass} maxLength={160} value={design.bride} onChange={e => patch({ bride: e.target.value })} /></Field>
+              <Field label="الداعي / العائلة"><input className={fieldClass} maxLength={160} value={design.host} onChange={e => patch({ host: e.target.value })} /></Field>
+              <Field label="البسملة أو عبارة الافتتاح"><input className={fieldClass} maxLength={80} value={design.invocation} onChange={e => patch({ invocation: e.target.value })} /></Field>
+              <Field label="التاريخ الهجري"><div className="flex gap-2"><input className={fieldClass} maxLength={160} value={design.hijri} onChange={e => patch({ hijri: e.target.value })} /><button type="button" className="shrink-0 rounded-xl border px-2 text-xs" onClick={() => { const value = hijriOf(design.date); if (value) patch({ hijri: value }); else setNotice('اكتب التاريخ الميلادي بصيغة 2027-06-12 ليُحوَّل تلقائياً.'); }}>تلقائي</button></div></Field>
+              <Field label="العنوان التفصيلي"><input className={fieldClass} maxLength={160} value={design.address} onChange={e => patch({ address: e.target.value })} /></Field>
+              <Field label="آخر موعد لتأكيد الحضور"><input className={fieldClass} maxLength={160} value={design.rsvpBy} placeholder="2027-06-01" onChange={e => patch({ rsvpBy: e.target.value })} /></Field>
+              <Field label="للتواصل"><input className={fieldClass} dir="ltr" maxLength={160} value={design.contact} onChange={e => patch({ contact: e.target.value })} /></Field>
+            </div></div>
           {(['opening', 'title', 'closing', 'venue'] as const).map(key => <Field key={key} label={{ opening: 'عبارة الدعوة', title: 'العنوان وأسماء المحتفى بهم', closing: 'عبارة الختام', venue: 'الموقع والقاعة' }[key]}><textarea rows={key === 'opening' ? 2 : 1} className={fieldClass} maxLength={key === 'title' ? 100 : 240} value={design[key]} onChange={e => patch({ [key]: e.target.value })} /></Field>)}
           <div className="grid grid-cols-2 gap-3"><Field label="التاريخ"><input className={fieldClass} maxLength={80} value={design.date} onChange={e => patch({ date: e.target.value })} /></Field><Field label="الوقت"><input className={fieldClass} maxLength={80} value={design.time} onChange={e => patch({ time: e.target.value })} /></Field></div>
           <div className="grid grid-cols-3 gap-3">{(['background', 'foreground', 'accent'] as const).map(key => <Field key={key} label={{ background: 'الخلفية', foreground: 'النص', accent: 'العنوان والزخارف' }[key]}><input type="color" className="w-full h-10 rounded-lg border cursor-pointer" value={design[key]} onChange={e => patch({ [key]: e.target.value })} /></Field>)}</div>
           {(contrastRatio(design.background, design.foreground) < 4.5 || contrastRatio(design.background, design.accent) < 3) && <p className="text-xs text-amber-800">تباين الألوان منخفض؛ اختر نصاً وعنواناً أوضح أو طبّق تنسيقاً مقترحاً.</p>}
           <div className="grid grid-cols-2 gap-3"><Field label="الخط"><select className={fieldClass} value={design.font} onChange={e => patch({ font: e.target.value as CardDesign['font'] })}><option value="serif">كلاسيكي — Serif</option><option value="sans-serif">عصري — Sans Serif</option></select></Field><Field label="الزخارف"><select className={fieldClass} value={design.motif} onChange={e => patch({ motif: e.target.value as CardDesign['motif'] })}>{Object.entries(MOTIFS).map(([id, label]) => <option key={id} value={id}>{label}</option>)}</select></Field></div>
+          <Field label="تخطيط البطاقة"><select className={fieldClass} value={design.layout} onChange={e => patch({ layout: e.target.value as CardDesign['layout'] })}>{Object.entries(LAYOUTS).map(([id, label]) => <option key={id} value={id}>{label}</option>)}</select></Field>
           <div className="grid grid-cols-2 gap-3"><Field label="محاذاة النص"><select className={fieldClass} value={design.align} onChange={e => patch({ align: e.target.value as CardDesign['align'] })}><option value="center">وسط</option><option value="right">يمين</option></select></Field><Field label="المقاس"><select className={fieldClass} value={design.size} onChange={e => patch({ size: e.target.value as CardDesign['size'] })}>{Object.entries(SIZES).map(([id, value]) => <option key={id} value={id}>{value.label}</option>)}</select></Field></div>
           <Field label={`حجم العنوان · ${design.titleSize}`}><input type="range" min={26} max={64} value={design.titleSize} onChange={e => patch({ titleSize: Number(e.target.value) })} className="w-full accent-green-800" /></Field>
           <Field label="توزيع مجموعة النصوص عمودياً"><input type="range" min={-80} max={80} value={design.offset} onChange={e => patch({ offset: Number(e.target.value) })} className="w-full accent-green-800" /></Field>

@@ -10,7 +10,8 @@ const { BUILTIN_TEMPLATES, DEFAULT_DESIGN, OCCASIONS, SIZES, validateDesign, val
 const { cardSvg } = require('../src/lib/invitations/render.ts');
 assert.equal(BUILTIN_TEMPLATES.length, 18);
 assert.equal(new Set(BUILTIN_TEMPLATES.map(t => t.id)).size, 18);
-for (const kind of Object.keys(OCCASIONS)) assert.equal(BUILTIN_TEMPLATES.filter(t => t.occasion === kind).length, 3);
+for (const kind of new Set(BUILTIN_TEMPLATES.map(t => t.occasion))) assert.equal(BUILTIN_TEMPLATES.filter(t => t.occasion === kind).length, 3);
+assert.equal(new Set(BUILTIN_TEMPLATES.map(t => t.occasion)).size, 6);
 for (const template of BUILTIN_TEMPLATES) {
   assert.deepEqual(validateTemplate(JSON.parse(JSON.stringify(template))), { ...template, reviewNote: undefined });
   assert(contrastRatio(template.design.background, template.design.foreground) >= 4.5);

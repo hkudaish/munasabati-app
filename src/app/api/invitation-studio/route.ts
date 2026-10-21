@@ -4,6 +4,7 @@ import { api, body, HttpError, integer, text } from '@/lib/server/http';
 import { requireUser } from '@/lib/server/auth';
 import { ownOccasion } from '@/lib/server/invitations';
 import { BUILTIN_TEMPLATES, validateDesign, validateTemplate } from '@/lib/invitations/catalog';
+import { LIBRARY_TEMPLATES } from '@/lib/invitations/library';
 import { normalizeInvitationOrigin } from '@/lib/invitations/link';
 const isAdmin = (role: string) => ['ADMIN', 'SUPER_ADMIN'].includes(role);
 async function templates(userId: string, role: string) {
@@ -30,7 +31,7 @@ export const POST = api(async request => {
   }
   if (d.action === 'favorite') {
     const templateId = text(d.templateId, 100, true);
-    if (!BUILTIN_TEMPLATES.some(t => t.id === templateId) && !await prisma.invitationTemplate.findFirst({ where: { id: templateId, OR: [{ ownerId: user.id }, { status: 'published' }] } })) throw new HttpError(404, 'القالب غير متاح');
+    if (!BUILTIN_TEMPLATES.some(t => t.id === templateId) && !LIBRARY_TEMPLATES.some(t => t.id === templateId) && !await prisma.invitationTemplate.findFirst({ where: { id: templateId, OR: [{ ownerId: user.id }, { status: 'published' }] } })) throw new HttpError(404, 'القالب غير متاح');
     if (d.selected === true) await prisma.invitationFavorite.upsert({ where: { userId_templateId: { userId: user.id, templateId } }, create: { userId: user.id, templateId }, update: {} });
     else await prisma.invitationFavorite.deleteMany({ where: { userId: user.id, templateId } });
     return { success: true };
