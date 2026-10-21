@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import PasswordInput from '@/components/common/PasswordInput';
 import { useRouter } from 'next/navigation';
 import { useApp } from '@/lib/store';
 import {
@@ -534,8 +535,7 @@ export default function UserOnboardingModal() {
 
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-bold text-gray-700 mb-1">تعيين كلمة المرور</label>
-                  <input
-                    type="password"
+                  <PasswordInput
                     required minLength={12} maxLength={128} autoComplete="new-password"
                     value={customerData.password}
                     onChange={(e) => setCustomerData({ ...customerData, password: e.target.value })}
@@ -714,7 +714,7 @@ export default function UserOnboardingModal() {
               </div>
 
               <div className="pt-2">
-                <label className="block text-xs font-bold">كلمة المرور (12 حرفاً على الأقل)<input type="password" required minLength={12} maxLength={128} autoComplete="new-password" value={vendorData.password} onChange={e => setVendorData({ ...vendorData, password: e.target.value })} className="w-full rounded-xl border p-3 mt-1" /></label>
+                <label className="block text-xs font-bold">كلمة المرور (12 حرفاً على الأقل)<PasswordInput required minLength={12} maxLength={128} autoComplete="new-password" value={vendorData.password} onChange={e => setVendorData({ ...vendorData, password: e.target.value })} className="w-full rounded-xl border p-3 mt-1" /></label>
                 <button
                   type="submit"
                   disabled={isSubmitting}
@@ -770,8 +770,7 @@ export default function UserOnboardingModal() {
 
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1">كلمة المرور</label>
-                  <input
-                    type="password"
+                  <PasswordInput
                     required
                     autoComplete="current-password"
                     value={loginPassword}
