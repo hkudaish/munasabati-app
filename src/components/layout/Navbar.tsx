@@ -5,6 +5,7 @@ import { FeatureContent } from '@/components/system/FeatureProvider';
 import React, { useState, Suspense } from 'react';
 import Link from '@/components/system/FeatureLink';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useCartGate } from '@/lib/shopper-gate';
 import { useApp } from '@/lib/store';
 import {
   Sparkles,
@@ -63,6 +64,7 @@ function NavbarContent() {
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  const cartGate = useCartGate();
   const activeCityObj = cities.find((c) => c.id === selectedCity) || cities[0];
   // Role switching is for accounts that actually hold more than one role.
   const canUseVendor = !!currentUser && (currentUser.role === 'vendor' || !!currentUser.vendorId);
@@ -570,6 +572,7 @@ function NavbarContent() {
                 {/* Shopping Cart Button */}
                 <Link
                   href="/commerce/cart"
+                  onClick={(e) => cartGate(e, '/commerce/cart')}
                   className="relative flex items-center gap-1.5 bg-saudi-sand-100 hover:bg-saudi-sand-200 text-saudi-green-950 px-2.5 sm:px-3 py-2 rounded-xl text-xs font-bold border border-saudi-sand-300 transition"
                   title="سلة الحجوزات"
                 >
@@ -709,7 +712,7 @@ function NavbarContent() {
               </Link>
               <Link
                 href="/commerce/cart"
-                onClick={() => setIsMobileMenuOpen(false)}
+                onClick={(e) => { setIsMobileMenuOpen(false); cartGate(e, '/commerce/cart'); }}
                 className="flex items-center justify-between py-2 text-sm font-bold text-saudi-green-900"
               >
                 <span className="flex items-center gap-2">

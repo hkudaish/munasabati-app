@@ -37,6 +37,8 @@ export default function UserOnboardingModal() {
     setIsOnboardingOpen,
     onboardingInitialRole,
     setOnboardingInitialRole,
+    onboardingGate,
+    setOnboardingGate,
     registerCustomer,
     registerVendor,
     loginUser,
@@ -46,7 +48,7 @@ export default function UserOnboardingModal() {
   } = useApp();
 
   // Active step: 'select_role' | 'customer_form' | 'vendor_form' | 'login' | 'success'
-  const [step, setStep] = useState<'select_role' | 'customer_form' | 'vendor_form' | 'login' | 'success'>('select_role');
+  const [step, setStep] = useState<'gate' | 'select_role' | 'customer_form' | 'vendor_form' | 'login' | 'success'>('select_role');
   const [selectedRoleForOnboarding, setSelectedRoleForOnboarding] = useState<'client' | 'vendor'>('client');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -91,7 +93,10 @@ export default function UserOnboardingModal() {
   useEffect(() => {
     if (isOnboardingOpen) {
       setErrorMessage('');
-      if (onboardingInitialRole === 'vendor') {
+      if (onboardingGate) {
+        setSelectedRoleForOnboarding('client');
+        setStep('gate');
+      } else if (onboardingInitialRole === 'vendor') {
         setSelectedRoleForOnboarding('vendor');
         setStep('vendor_form');
       } else if (onboardingInitialRole === 'client') {
@@ -101,7 +106,7 @@ export default function UserOnboardingModal() {
         setStep('select_role');
       }
     }
-  }, [isOnboardingOpen, onboardingInitialRole]);
+  }, [isOnboardingOpen, onboardingInitialRole, onboardingGate]);
 
   if (!isOnboardingOpen && !permissionNotice?.open) return null;
 
@@ -216,8 +221,10 @@ export default function UserOnboardingModal() {
   };
 
   const handleFinishSuccess = () => {
-    const dest = successInfo?.redirectPath || '/';
+    // Signed in mid-shopping: go back to where the shopper was instead of the home page.
+    const dest = onboardingGate?.returnTo || successInfo?.redirectPath || '/';
     setIsOnboardingOpen(false);
+    setOnboardingGate(null);
     clearPermissionNotice();
     router.push(dest);
   };
@@ -231,6 +238,7 @@ export default function UserOnboardingModal() {
           <button
             onClick={() => {
               setIsOnboardingOpen(false);
+              setOnboardingGate(null);
               clearPermissionNotice();
             }}
             className="absolute left-4 top-4 p-2 text-gray-300 hover:text-white rounded-full bg-white/10 hover:bg-white/20 transition"
@@ -245,6 +253,7 @@ export default function UserOnboardingModal() {
           </div>
 
           <h2 className="text-xl sm:text-2xl font-black font-cairo text-white" id="dlg-9634-1">
+            {step === 'gate' && 'سجّل الدخول أو أنشئ حساباً للمتابعة'}
             {step === 'select_role' && 'اختر نوع الحساب للانطلاق'}
             {step === 'customer_form' && 'إنشاء حساب صاحب المناسبة 🎉'}
             {step === 'vendor_form' && 'تسجيل منشأة أو مورد جديد 🏪'}
@@ -253,6 +262,7 @@ export default function UserOnboardingModal() {
           </h2>
 
           <p className="text-xs sm:text-sm text-gray-300 mt-1">
+            {step === 'gate' && 'تصفّح الخدمات متاح للجميع. نحتاج حسابك فقط لحفظ السلة وإتمام طلبك، ولن تفقد اختياراتك.'}
             {step === 'select_role' && 'سواء كنت تخطط لاحتفال فاخر أو تقدم خدمات احترافية، نوفر لك تجربة مخصصة بالكامل.'}
             {step === 'customer_form' && 'احجز أفضل الموردين والقاعات ونظّم ميزانيتك وبطاقات دعواتك في مكان واحد.'}
             {step === 'vendor_form' && 'انضم إلى شبكة الموردين المعتمدين في المملكة واستقبل طلبات الحجز وعروض الأسعار.'}
@@ -280,6 +290,34 @@ export default function UserOnboardingModal() {
             <div className="bg-red-50 border border-red-200 text-red-800 rounded-2xl p-3.5 text-xs sm:text-sm flex items-center gap-2">
               <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
               <span>{errorMessage}</span>
+            </div>
+          )}
+
+          {/* STEP 0: Shopping gate (sign in or sign up before the cart) */}
+          {step === 'gate' && (
+            <div className="space-y-3">
+              <button
+                type="button"
+                autoFocus
+                onClick={() => setStep('login')}
+                className="w-full rounded-2xl bg-saudi-green-800 hover:bg-saudi-green-900 px-5 py-3.5 text-sm font-bold text-white transition"
+              >
+                تسجيل الدخول
+              </button>
+              <button
+                type="button"
+                onClick={() => { setSelectedRoleForOnboarding('client'); setStep('customer_form'); }}
+                className="w-full rounded-2xl border-2 border-saudi-green-800 bg-white hover:bg-saudi-green-50 px-5 py-3.5 text-sm font-bold text-saudi-green-900 transition"
+              >
+                إنشاء حساب جديد
+              </button>
+              <button
+                type="button"
+                onClick={() => { setIsOnboardingOpen(false); setOnboardingGate(null); }}
+                className="w-full rounded-2xl px-5 py-2.5 text-sm font-bold text-gray-600 hover:bg-saudi-sand-100 transition"
+              >
+                متابعة التسوق دون حساب
+              </button>
             </div>
           )}
 
@@ -781,7 +819,7 @@ export default function UserOnboardingModal() {
                   onClick={handleFinishSuccess}
                   className="px-8 py-3.5 bg-saudi-green-800 hover:bg-saudi-green-900 text-white font-bold rounded-2xl text-sm shadow-lg transition"
                 >
-                  الانتقال إلى لوحة التحكم الآن ←
+                  {onboardingGate ? 'متابعة التسوق ←' : 'الانتقال إلى لوحة التحكم الآن ←'}
                 </button>
               </div>
             </div>

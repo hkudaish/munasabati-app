@@ -86,7 +86,10 @@ interface AppContextType {
   setIsOnboardingOpen: (open: boolean) => void;
   onboardingInitialRole: 'client' | 'vendor' | null;
   setOnboardingInitialRole: (role: 'client' | 'vendor' | null) => void;
-  openOnboarding: (role?: 'client' | 'vendor') => void;
+  openOnboarding: (role?: 'client' | 'vendor', options?: { gate?: boolean; returnTo?: string }) => void;
+  /** Set when sign-in was requested mid-shopping: show the sign-in/sign-up prompt, then return to `returnTo`. */
+  onboardingGate: { returnTo?: string } | null;
+  setOnboardingGate: (gate: { returnTo?: string } | null) => void;
   registerCustomer: (payload: CustomerRegistrationPayload) => Promise<{ success: boolean; user?: UserProfile; error?: string }>;
   registerVendor: (payload: VendorRegistrationPayload) => Promise<{ success: boolean; user?: UserProfile; error?: string }>;
   loginUser: (identifier: string, requestedRole?: UserRole, password?: string) => Promise<{ success: boolean; user?: UserProfile; error?: string }>;
@@ -269,6 +272,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const accountRef = useRef<string | null>(null);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(false);
   const [onboardingInitialRole, setOnboardingInitialRole] = useState<'client' | 'vendor' | null>(null);
+  const [onboardingGate, setOnboardingGate] = useState<{ returnTo?: string } | null>(null);
   const [permissionNotice, setPermissionNotice] = useState<{ open: boolean; targetRole: UserRole | null; messageAr: string } | null>(null);
 
   const [occasions, setOccasions] = useState<Occasion[]>([]);
@@ -459,7 +463,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     catch (error) { setDatabaseError(error instanceof Error ? error.message : 'تعذر الحفظ في قاعدة البيانات'); return false; }
   }
 
-  const openOnboarding = (role?: 'client' | 'vendor') => {
+  const openOnboarding = (role?: 'client' | 'vendor', options?: { gate?: boolean; returnTo?: string }) => {
+    setOnboardingGate(options?.gate ? { returnTo: options.returnTo } : null);
     setOnboardingInitialRole(role || null);
     setIsOnboardingOpen(true);
   };
@@ -1251,6 +1256,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         onboardingInitialRole,
         setOnboardingInitialRole,
         openOnboarding,
+        onboardingGate,
+        setOnboardingGate,
         registerCustomer,
         registerVendor,
         loginUser,
