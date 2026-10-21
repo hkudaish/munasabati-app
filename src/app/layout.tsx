@@ -16,6 +16,7 @@ import LumaAIDrawer from '@/components/ai/LumaAIDrawer';
 import UserOnboardingModal from '@/components/common/UserOnboardingModal';
 import Toaster from '@/components/common/Toaster';
 import ImageFallback from '@/components/common/ImageFallback';
+import SessionBoundary from '@/components/system/SessionBoundary';
 
 const tajawal = Tajawal({
   subsets: ['arabic'],
@@ -60,9 +61,9 @@ export default async function RootLayout({
         <GeoProvider initial={location}><FeatureProvider initial={features}><AppProvider>
           <SiteChrome><Navbar /><CoverageNotice /></SiteChrome>
           <main className="flex-1">
-            {children}
+            <SessionBoundary>{children}</SessionBoundary>
           </main>
-          <SiteChrome><FeatureContent id="luma"><LumaAIDrawer /></FeatureContent></SiteChrome>
+          <SiteChrome><FeatureContent id="luma"><SessionBoundary><LumaAIDrawer /></SessionBoundary></FeatureContent></SiteChrome>
           <UserOnboardingModal />
           <Toaster />
           <ImageFallback />

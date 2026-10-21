@@ -22,7 +22,14 @@ const nextConfig = {
   typescript: { tsconfigPath: process.env.NEXT_TEST_TSCONFIG || 'tsconfig.json' },
   reactStrictMode: true,
   async headers() {
-    return [{ source: '/:path*', headers: [
+    // Pages behind a sign-in are never stored by the browser or its back/forward cache, so Back after
+    // a sign-out cannot show a stale dashboard.
+    const protectedPaths = ['/admin', '/system-admin', '/bookings', '/occasion', '/settings', '/reception-screen', '/scan', '/commerce/orders', '/commerce/manage', '/vendor/catalog', '/vendor/orders'];
+    const noStore = [
+      { source: '/vendor', headers: [{ key: 'Cache-Control', value: 'no-store, max-age=0' }] },
+      ...protectedPaths.flatMap(path => [path, path + '/:path*']).map(source => ({ source, headers: [{ key: 'Cache-Control', value: 'no-store, max-age=0' }] })),
+    ];
+    return [...noStore, { source: '/:path*', headers: [
       { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
       { key: 'X-Content-Type-Options', value: 'nosniff' },
       { key: 'Content-Security-Policy', value: contentSecurityPolicy },

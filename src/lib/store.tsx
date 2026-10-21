@@ -67,6 +67,8 @@ import {
 } from './utils';
 import { useGeo } from '@/components/geo/GeoProvider';
 import { requestJSON } from './api-client';
+import { useRouter, usePathname } from 'next/navigation';
+import { broadcastAuth, subscribeAuth, isProtectedPath, isRevokePending, revokeServerSession, revokeWithRecovery } from './auth-session';
 import { DEFAULT_RANKING_WEIGHTS } from './ranking-engine';
 
 interface AppContextType {
@@ -94,6 +96,10 @@ interface AppContextType {
   registerVendor: (payload: VendorRegistrationPayload) => Promise<{ success: boolean; user?: UserProfile; error?: string }>;
   loginUser: (identifier: string, requestedRole?: UserRole, password?: string) => Promise<{ success: boolean; user?: UserProfile; error?: string }>;
   logoutUser: () => void;
+  /** True once the server has answered whether anyone is signed in (safe to guard protected pages). */
+  authReady: boolean;
+  /** Increments on every sign-out; components keyed on it start fresh with no previous-account state. */
+  signOutEpoch: number;
   switchRole: (role: UserRole) => { allowed: boolean; messageAr?: string };
   permissionNotice: { open: boolean; targetRole: UserRole | null; messageAr: string } | null;
   clearPermissionNotice: () => void;
@@ -261,6 +267,8 @@ const STORAGE_KEY = 'munasabati_state_v1';
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [currentRole, setCurrentRole] = useState<'client' | 'vendor' | 'admin'>('client');
   const geo=useGeo();
+  const router = useRouter();
+  const pathname = usePathname();
   const preview=!!geo.data?.preview || (typeof window!=='undefined' && window.location.pathname.startsWith('/coverage-preview/'));
   const selectedCity=geo.data?.selection.cityId||'';
   const setSelectedCity=(id:string)=>{void geo.chooseCity(id).catch(()=>{});};
@@ -272,6 +280,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const accountRef = useRef<string | null>(null);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(false);
   const [onboardingInitialRole, setOnboardingInitialRole] = useState<'client' | 'vendor' | null>(null);
+  const [authReady, setAuthReady] = useState(false);
+  const [signOutEpoch, setSignOutEpoch] = useState(0);
+  const quietRedirect = useRef(false);
   const [onboardingGate, setOnboardingGate] = useState<{ returnTo?: string } | null>(null);
   const [permissionNotice, setPermissionNotice] = useState<{ open: boolean; targetRole: UserRole | null; messageAr: string } | null>(null);
 
@@ -414,10 +425,23 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   // The server session is authoritative; browser profiles are never credentials.
   useEffect(() => {
-    if(preview){setCurrentUser(geo.data?.preview?.visitorType==='guest'?null:{id:'preview-user',name:'مستخدم المعاينة',phone:'',role:'client'});return;}
-    requestJSON('/api/auth/session').then(data => {
-      setCurrentUser(data.user); if (data.user) setCurrentRole(data.user.role);
-    }).catch(error => setDatabaseError(error.message));
+    if(preview){setCurrentUser(geo.data?.preview?.visitorType==='guest'?null:{id:'preview-user',name:'مستخدم المعاينة',phone:'',role:'client'});setAuthReady(true);return;}
+    let cancelled = false;
+    (async () => {
+      // A sign-out whose server revoke never finished is completed first; the UI stays signed out meanwhile.
+      if (isRevokePending() && !(await revokeServerSession())) {
+        if (!cancelled) { setCurrentUser(null); setCurrentRole('client'); setAuthReady(true); }
+        revokeWithRecovery();
+        return;
+      }
+      try {
+        const data = await requestJSON('/api/auth/session');
+        if (cancelled) return;
+        setCurrentUser(data.user); if (data.user) setCurrentRole(data.user.role);
+        setAuthReady(true);
+      } catch (error) { if (!cancelled) setDatabaseError(error instanceof Error ? error.message : 'تعذر التحقق من الجلسة'); }
+    })();
+    return () => { cancelled = true; };
   }, [preview, geo.data?.preview?.visitorType]);
   const authenticatedUserId = currentUser?.id;
   useEffect(() => {
@@ -526,6 +550,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
       setCurrentUser(userProfile);
       setCurrentRole('client');
+      setAuthReady(true);
+      broadcastAuth('login');
       if (payload.cityId) setSelectedCity(payload.cityId);
 
       if (payload.upcomingOccasionType) {
@@ -574,6 +600,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
       setCurrentUser(userProfile);
       setCurrentRole('vendor');
+      setAuthReady(true);
+      broadcastAuth('login');
       if (payload.cityId) setSelectedCity(payload.cityId);
 
 
@@ -603,6 +631,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
       setCurrentUser(userProfile);
       setCurrentRole(userProfile.role);
+      setAuthReady(true);
+      broadcastAuth('login');
       if (userProfile.cityId) setSelectedCity(userProfile.cityId);
 
 
@@ -612,12 +642,75 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const logoutUser = () => {
-    void databaseAction(async () => {
-      await requestJSON('/api/auth/logout', 'POST', {});
-      accountRef.current = null; setCurrentUser(null); setCurrentRole('client'); setOccasions([]); setGuests([]);
-    });
+  // Everything tied to the signed-in account goes back to its signed-out value. Public catalog data stays.
+  const resetUserState = () => {
+    accountRef.current = null;
+    setCurrentUser(null); setCurrentRole('client');
+    setOccasions([]); setGuests([]); setBookings([]); setMultiVendorOrders([]); setActiveOccasionId('');
+    setBudgetItems(INITIAL_BUDGET_ITEMS); setTasks(INITIAL_TASKS); setRunOfShowItems(INITIAL_RUN_OF_SHOW_ITEMS);
+    setWishlistGifts(INITIAL_WISHLIST); setEaniyahGifts(INITIAL_EANIYAH_GIFTS); setRfqRequests(INITIAL_RFQS); setTables(INITIAL_TABLES);
+    setCart([]); setSavedForLater([]); setAppliedCoupon(null);
+    setFavoriteVendorIds(['vendor-1', 'vendor-3']); setFavoriteServiceIds(['srv-1']); setComparisonVendorIds([]);
+    setIsOnboardingOpen(false); setOnboardingGate(null); setOnboardingInitialRole(null); setPermissionNotice(null);
+    setIsAIOpen(false); setDatabaseError('');
+    try {
+      localStorage.removeItem(STORAGE_KEY); localStorage.removeItem('munasabati_active_role_v2');
+      sessionStorage.removeItem('munasabati_pending_checkout'); sessionStorage.removeItem('booking-selection');
+    } catch { /* storage unavailable */ }
+    setSignOutEpoch(epoch => epoch + 1);
   };
+
+  const applySignedOut = (options: { broadcast: boolean; redirect: boolean }) => {
+    resetUserState();
+    setAuthReady(true);
+    if (options.broadcast) broadcastAuth('logout');
+    if (options.redirect) {
+      quietRedirect.current = true;
+      if (isProtectedPath(window.location.pathname)) router.replace('/'); else router.refresh();
+    }
+  };
+  const signedOutRef = useRef(applySignedOut);
+  signedOutRef.current = applySignedOut;
+
+  // Same path for administrators, vendors and customers: the screen changes first, the server catches up.
+  const logoutUser = () => {
+    applySignedOut({ broadcast: true, redirect: true });
+    revokeWithRecovery(() => notify('تم تسجيل خروجك على هذا الجهاز. تعذّر إنهاء الجلسة على الخادم الآن وسنعيد المحاولة تلقائياً.', 'info'));
+  };
+
+  // Another tab signed out (or in): follow it without a reload.
+  useEffect(() => {
+    if (preview) return;
+    return subscribeAuth(signal => {
+      if (signal === 'logout') { signedOutRef.current({ broadcast: false, redirect: true }); return; }
+      requestJSON('/api/auth/session').then(data => {
+        if (data.user) { setCurrentUser(data.user); setCurrentRole(data.user.role); setAuthReady(true); }
+      }).catch(() => {});
+    });
+  }, [preview]);
+
+  // Coming back to the page (Back button, restored tab, regained focus): confirm the session is still alive.
+  useEffect(() => {
+    if (preview || !authenticatedUserId) return;
+    let last = 0;
+    const check = () => {
+      if (Date.now() - last < 2000) return;
+      last = Date.now();
+      requestJSON('/api/auth/session').then(data => { if (!data.user) signedOutRef.current({ broadcast: false, redirect: true }); }).catch(() => {});
+    };
+    const onPageShow = (event: PageTransitionEvent) => { if (event.persisted) check(); };
+    const onVisible = () => { if (document.visibilityState === 'visible') check(); };
+    window.addEventListener('pageshow', onPageShow); document.addEventListener('visibilitychange', onVisible); window.addEventListener('focus', check);
+    return () => { window.removeEventListener('pageshow', onPageShow); document.removeEventListener('visibilitychange', onVisible); window.removeEventListener('focus', check); };
+  }, [authenticatedUserId, preview]);
+
+  // Protected pages are never shown without an account (also on Back after sign-out or a typed/bookmarked URL).
+  useEffect(() => {
+    if (preview || !authReady || currentUser) return;
+    if (!isProtectedPath(pathname)) { quietRedirect.current = false; return; }
+    if (!quietRedirect.current) notify('سجّل الدخول للوصول إلى هذه الصفحة.', 'info');
+    router.replace('/');
+  }, [authReady, currentUser, pathname, preview, router]);
 
   const activeOccasion = occasions.find((o) => o.id === activeOccasionId) || occasions[0];
 
@@ -1262,6 +1355,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         registerVendor,
         loginUser,
         logoutUser,
+        authReady,
+        signOutEpoch,
         switchRole,
         permissionNotice,
         clearPermissionNotice,
