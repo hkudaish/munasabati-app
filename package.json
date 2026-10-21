@@ -21,6 +21,7 @@
     "backup:verify": "node scripts/backup.cjs verify",
     "backup:restore": "node scripts/backup.cjs restore",
     "test:backup": "node scripts/test-backup.cjs",
+    "test:backup-admin": "node scripts/test-backup-admin.cjs",
     "test:invitations": "node scripts/test-invitations.cjs",
     "test:invitation-db": "node scripts/test-invitation-database.cjs",
     "test:channels": "node scripts/test-channel-providers.cjs",
@@ -38,6 +39,7 @@
     "test:service-commerce-rules": "node scripts/test-service-commerce-rules.cjs"
   },
   "dependencies": {
+    "@netlify/blobs": "^10.7.13",
     "@netlify/database": "^2.0.1",
     "@prisma/client": "^6.19.3",
     "canvas-confetti": "^1.9.4",

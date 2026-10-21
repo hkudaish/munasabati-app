@@ -61,3 +61,7 @@ next-env.d.ts
 /.next-md3-*/
 /.md3-test-tsconfig-*.json
 /.md3-build-tsconfig.json
+
+# Isolated backup admin test
+/.next-backup-test-*/
+/.backup-test-tsconfig-*.json

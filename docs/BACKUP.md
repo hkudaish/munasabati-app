@@ -26,6 +26,38 @@ Example from the local database: full backup 550 rows / 39 KB; after a real purc
 reservations, finance entries) the incremental held 126 changes in 11 KB; restoring the chain into a fresh database
 gave 673 rows, identical to the live database.
 
+## Admin page: backups in the cloud, with a safe restore
+**Administration > النسخ الاحتياطي** (`/admin/backups`, also in the account menu) manages backups kept on Netlify
+(Netlify Blobs, private to the site), independent of your computer.
+
+- **Hourly and automatic.** A Netlify scheduled function (`netlify/functions/backup-schedule.mjs`) calls the app every
+  hour; the app takes a full or incremental backup, verifies it and prunes old chains, exactly like `backup:auto`.
+  The page shows the health (OK / late / stopped), the newest backup, storage, encryption and the schedule, and warns
+  when the key or the schedule is not configured.
+- **Back up now, verify.** Super administrators can run a backup immediately and verify any backup.
+- **Restore = preview, request, approval.**
+  1. *Preview* compares a backup with the live data and changes nothing: how many rows would come back, disappear or
+     revert, per table.
+  2. A **super administrator requests** the restore (typing `RESTORE`).
+  3. A **different administrator approves** it (typing `RESTORE`) within 30 minutes. Nobody can approve their own request.
+  4. A safety backup of the current data is taken first, then everything is replaced in one transaction, re-read and
+     verified row by row. If anything fails nothing changes.
+- **After a restore** every session is revoked (everyone signs in again). The administration **audit log is preserved**:
+  entries written after the backup are kept, so a restore can never erase the record of what happened.
+- Every action (run, verify, preview, request, approve, cancel, result) is written to the audit log.
+- The command line still works for your local copy; restores of the live site go through this page.
+
+### One-time cloud setup (Netlify site settings > Environment variables)
+| Variable | Value |
+|---|---|
+| `BACKUP_ENCRYPTION_KEY` | the same key as in your `.env` (`node scripts/backup.cjs keygen`). Without it the live site refuses to create backups. |
+| `BACKUP_CRON_TOKEN` | a long random string; the scheduled function sends it so only Netlify can trigger the hourly run. |
+Then deploy. The page shows "schedule: hourly" once both are set. Keep the key in a password manager as well.
+
+Limits: a backup run must finish within the host's function time limit (about 26 seconds); this database takes about
+one second there. When the data grows far beyond that, use the provider's point-in-time recovery or move the run to a
+background function.
+
 ## Setup (once)
 ```
 node scripts/backup.cjs keygen        # prints BACKUP_ENCRYPTION_KEY=...
@@ -69,8 +101,8 @@ is. A production run takes about 20 seconds from a slow connection (tables are r
 one request per table). A run that is killed halfway leaves a `.lock` file; it is ignored after 6 hours, or delete it.
 
 ## Restore
-Restores are deliberately limited to **local** databases; production is recovered by restoring locally, checking the
-result, and then loading it with the database provider's tools.
+The command line restores only into **local** databases. The live site is restored from the admin page (preview, request,
+second administrator's approval); the command line can also restore a copy locally to inspect it.
 ```
 # 1. an empty local database with the same structure (createdb restore_check, then apply the repo's schema)
 DATABASE_URL=postgresql://.../restore_check npx prisma db push

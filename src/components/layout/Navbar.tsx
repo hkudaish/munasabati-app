@@ -218,6 +218,7 @@ function NavbarContent() {
                       </button>
 
                       {currentUser.hasSystemAccess && <Link href="/system-admin" className="block px-3 py-2 text-xs font-bold text-amber-800 hover:bg-amber-50 rounded-xl">مدير النظام</Link>}
+                      {(currentUser.hasAdminAccess || currentUser.hasSystemAccess || currentUser.role === 'admin') && <Link href="/admin/backups" onClick={() => setIsUserDropdownOpen(false)} className="block px-3 py-2 text-xs font-bold text-saudi-green-900 hover:bg-gray-50 rounded-xl">النسخ الاحتياطي</Link>}
                       {currentUser.hasSystemAccess && <Link href="/system-admin/geography" className="block px-3 py-2 text-xs text-emerald-900">الدول والمدن والخدمات</Link>}
                       <Link href="/settings/channels" onClick={() => setIsUserDropdownOpen(false)} className="block px-3 py-2 text-xs font-bold text-saudi-green-900 hover:bg-gray-50 rounded-xl">إعدادات إرسال الدعوات</Link>
                       <Link href="/settings/invitations-data" onClick={() => setIsUserDropdownOpen(false)} className="block px-3 py-2 text-xs text-gray-600 hover:bg-gray-50 rounded-xl">نقل الدعوات السابقة</Link>
