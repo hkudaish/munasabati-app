@@ -234,7 +234,7 @@ function ReceptionWelcomeScreenContent() {
       </header>
 
       {/* 2. Main Center Display: Dynamic VIP Welcome or Ambient Showcase */}
-      <main className="relative z-10 flex-1 flex items-center justify-center py-6 sm:py-10">
+      <div className="relative z-10 flex-1 flex items-center justify-center py-6 sm:py-10">
         {activeWelcomeGuest ? (
           /* VIP Announcement Banner (Triggered when guest checks in) */
           <div className="w-full max-w-4xl bg-gradient-to-b from-[#00382D] to-[#001F18] border-2 border-saudi-gold-400 rounded-3xl p-8 sm:p-14 text-center shadow-[0_0_80px_rgba(197,155,39,0.35)] animate-fadeIn space-y-6 relative overflow-hidden">
@@ -346,7 +346,7 @@ function ReceptionWelcomeScreenContent() {
             )}
           </div>
         )}
-      </main>
+      </div>
 
       {/* 3. Bottom Live Metrics & Congratulatory Blessings Ticker */}
       <footer className="relative z-10 space-y-4 pt-4 border-t border-saudi-gold-500/20">

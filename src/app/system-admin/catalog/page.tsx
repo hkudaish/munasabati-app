@@ -8,7 +8,7 @@ export default function CatalogAdminPage() {
   const load=useCallback(async()=>setData(await requestJSON('/api/system-admin/catalog')),[]);
   useEffect(()=>{void load().catch(e=>setNotice(e.message));},[load]);
   const field=(key:string,value:unknown)=>setEditor((previous:any)=>({...previous,[key]:value}));
-  return <main dir="rtl" className="max-w-6xl mx-auto p-4 sm:p-8 space-y-6"><div className="flex flex-wrap justify-between gap-3"><h1 className="text-2xl font-black">التصنيفات الفرعية والفنانون</h1><Link href="/system-admin" className="underline">مدير النظام</Link></div>
+  return <div dir="rtl" className="max-w-6xl mx-auto p-4 sm:p-8 space-y-6"><div className="flex flex-wrap justify-between gap-3"><h1 className="text-2xl font-black">التصنيفات الفرعية والفنانون</h1><Link href="/system-admin" className="underline">مدير النظام</Link></div>
     <p className="text-sm text-gray-600">قائمة الأسماء للتصنيف والاختيار. خدمات الحجز يضيفها المورد المعتمد، ولا تنشأ تلقائياً من هذه القائمة.</p>
     {notice&&<p role="status" className="border bg-amber-50 p-4 rounded-xl">{notice}</p>}
     {data&&<><div className="flex gap-3"><button className="bg-emerald-800 text-white rounded-xl p-3" onClick={()=>setEditor({entity:'subcategory',id:'',nameAr:'',categoryId:data.categories[0]?.id,kind:'standard',artistKind:null,isActive:true,sortOrder:0})}>+ تصنيف فرعي</button><button className="border rounded-xl p-3" onClick={()=>setEditor({entity:'artist',id:'',nameAr:'',kind:'male',enabled:true,sortOrder:0})}>+ فنان / فنانة</button></div>
@@ -21,5 +21,5 @@ export default function CatalogAdminPage() {
       </form>}
       {[['التصنيفات الفرعية','subcategory',data.subcategories],['الفنانون والفنانات','artist',data.artists]].map(([title,entity,rows]:any)=><section key={entity} className="bg-white rounded-2xl border p-5 space-y-3"><h2 className="font-bold text-lg">{title}</h2><div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">{rows.map((row:any)=><button key={row.id} className="text-right border rounded-xl p-3" onClick={()=>setEditor({...row,entity,existing:true})}><strong>{row.nameAr}</strong><span className="block text-xs text-gray-500">{entity==='subcategory'?data.categories.find((c:any)=>c.id===row.categoryId)?.nameAr:row.kind==='male'?'فنانون':'فنانات'} • {(row.isActive??row.enabled)?'مفعّل':'معطّل'}</span></button>)}</div></section>)}
     </>}
-  </main>;
+  </div>;
 }

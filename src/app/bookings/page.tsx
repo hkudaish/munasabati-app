@@ -24,7 +24,7 @@ export default function BookingsPage() {
   }, []);
   useEffect(() => { setOrders([]); void load(); return cancelPending; }, [load, cancelPending, currentUser?.id]);
   const shown = orders.filter(o => tab === 'all' || (tab === 'completed' ? ['COMPLETED','CLOSED'].includes(o.omsStatus) : !['COMPLETED','CLOSED','CANCELLED'].includes(o.omsStatus)));
-  return <main className="max-w-5xl mx-auto px-4 py-10 space-y-6" dir="rtl">
+  return <div className="max-w-5xl mx-auto px-4 py-10 space-y-6" dir="rtl">
     <div className="flex flex-wrap items-center justify-between gap-4">
       <div><h1 className="text-3xl font-black text-saudi-green-950 font-cairo">طلباتي وحجوزاتي</h1><p className="mt-2 text-sm text-gray-600">تابع رد كل مورد وتنفيذ الخدمات المرتبطة بمناسبتك.</p></div>
       <button onClick={() => void load()} disabled={loading} className="btn-secondary flex items-center gap-2"><RefreshCw size={16} className={loading ? 'animate-spin' : ''} />تحديث</button>
@@ -39,5 +39,5 @@ export default function BookingsPage() {
       <Link href={`/bookings/${order.id}`} className="flex items-center gap-2 text-saudi-green-800 font-bold text-sm">تفاصيل الطلب ومتابعة الخدمات<ChevronLeft size={16}/></Link>
     </article>)}
     {orders.length >= 200 && <p className="text-sm text-gray-500">تظهر أحدث 200 طلب.</p>}
-  </main>;
+  </div>;
 }

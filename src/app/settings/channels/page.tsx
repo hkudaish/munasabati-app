@@ -23,7 +23,7 @@ export default function ChannelSettingsPage() {
     catch (e) { setNotice(e instanceof Error ? e.message : 'تعذر الحفظ'); } finally { setBusy(false); }
   }
   function patch(channel: string, value: any) { setSettings(prev => ({ ...prev, [channel]: { ...prev[channel], ...value } })); }
-  return <main dir="rtl" className="max-w-4xl mx-auto p-6 space-y-6">
+  return <div dir="rtl" className="max-w-4xl mx-auto p-6 space-y-6">
     <div className="flex gap-4 text-sm"><Link href="/" className="underline">الرئيسية</Link><Link href="/settings/invitations-data" className="underline">نقل الدعوات السابقة</Link></div><h1 className="text-2xl font-bold">إعدادات قنوات إرسال الدعوات</h1>
     <p className="text-sm text-gray-600">هذه الإعدادات خاصة بحسابك. المفاتيح مشفّرة على الخادم ولا تُعرض بعد الحفظ. ترك خانة المفتاح فارغة يحافظ على المفتاح الحالي.</p>
     {notice && <p role="status" className="rounded-xl border bg-amber-50 p-3">{notice}</p>}
@@ -38,5 +38,5 @@ export default function ChannelSettingsPage() {
         {settings[channel]?.hasSecret && <button type="button" disabled={busy} className="text-red-700 underline" onClick={async () => { setBusy(true); try { await requestJSON('/api/channel-settings', 'DELETE', { channel }); await load(); setNotice('تم حذف ربط القناة'); } catch (e) { setNotice(e instanceof Error ? e.message : 'تعذر الحذف'); } finally { setBusy(false); } }}>حذف الربط</button>}</div>
       </form>)}
     </>}
-  </main>;
+  </div>;
 }

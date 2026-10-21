@@ -13,6 +13,7 @@
     "db:backup": "node scripts/backup-production.cjs",
     "db:verify-backup": "node scripts/verify-backup.cjs",
     "admin:reset-password": "node scripts/reset-admin-password.cjs",
+    "db:seed-sample": "node scripts/seed-sample-data.cjs",
     "test:invitations": "node scripts/test-invitations.cjs",
     "test:invitation-db": "node scripts/test-invitation-database.cjs",
     "test:channels": "node scripts/test-channel-providers.cjs",
