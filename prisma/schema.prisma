@@ -469,6 +469,7 @@ model Occasion {
 
   guests              Guest[]
   orders              MultiVendorOrder[]
+  floorPlan           OccasionFloorPlan?
 
   @@index([cityId])
   @@index([date])
@@ -1201,4 +1202,12 @@ model CommerceRelationship {
   @@unique([serviceId,relatedServiceId,kind])
   serviceIdReference CommerceService @relation("CommerceRelationship_serviceId", fields: [serviceId], references: [id], onDelete: Restrict)
   relatedServiceIdReference CommerceService @relation("CommerceRelationship_relatedServiceId", fields: [relatedServiceId], references: [id], onDelete: Restrict)
+}
+
+model OccasionFloorPlan {
+  occasionId String   @id
+  layout     Json
+  version    Int      @default(1)
+  updatedAt  DateTime @default(now()) @updatedAt @db.Timestamptz(3)
+  occasion   Occasion @relation(fields: [occasionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }

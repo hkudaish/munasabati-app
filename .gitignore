@@ -65,3 +65,7 @@ next-env.d.ts
 # Isolated backup admin test
 /.next-backup-test-*/
 /.backup-test-tsconfig-*.json
+
+# Isolated floor plan test
+/.next-fp-test-*/
+/.fp-test-tsconfig-*.json

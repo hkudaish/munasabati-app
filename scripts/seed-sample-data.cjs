@@ -120,6 +120,15 @@ async function ensureUser(data) {
   // customers
   for (const c of CUSTOMERS) { const r = await ensureUser({ name: c.name, email: c.email, phone: c.phone, role: 'CLIENT', cityId: c.cityId }); if (r.created) summary.customers++; }
 
+  // a sample occasion with guests, so the hall seating plan can be tried straight away
+  const noura = await prisma.user.findFirst({ where: { email: 'noura' + DOMAIN } });
+  if (noura && !(await prisma.occasion.findUnique({ where: { id: 'sample-occasion-grad' } }))) {
+    await prisma.occasion.create({ data: { id: 'sample-occasion-grad', userId: noura.id, title: 'حفل تخرج نورة', occasionTypeId: 'graduation', occasionTypeNameAr: 'حفل تخرج', cityId: 'riyadh', date: '2027-06-12', time: '20:00', guestCount: 40, guestsSection: 'women', venueType: 'hall', venueName: 'قاعة اللؤلؤة' } });
+    const names = [['منى القحطاني', 'women'], ['سارة الشمري', 'women'], ['هيفاء الدوسري', 'women'], ['ريم العتيبي', 'women'], ['لمى الحربي', 'women'], ['أمل المطيري', 'women'], ['جواهر السبيعي', 'women'], ['العنود الغامدي', 'women'], ['وفاء الزهراني', 'women'], ['خالد العتيبي', 'men'], ['فهد الشمري', 'men'], ['سلطان الدوسري', 'men'], ['أحمد الحربي', 'family'], ['عائلة المطيري', 'family'], ['عائلة الغامدي', 'family']];
+    for (const [i, [name, category]] of names.entries()) await prisma.guest.create({ data: { id: 'sample-guest-' + (i + 1), occasionId: 'sample-occasion-grad', name, phone: '05520010' + String(i).padStart(2, '0'), category, companionCount: category === 'family' ? 3 : i % 4 === 0 ? 1 : 0, status: i === 14 ? 'declined' : i % 3 === 0 ? 'confirmed' : 'invited', qrCode: 'SAMPLE-QR-' + (i + 1) } });
+    summary.occasions = 1; summary.guests = names.length;
+  }
+
   // vendors + their catalog
   const offerIds = {};
   for (const v of VENDORS) {

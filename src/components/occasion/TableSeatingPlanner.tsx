@@ -1,272 +1,85 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Armchair, Plus, Users, UserCheck, X, Sparkles } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { Armchair, X } from 'lucide-react';
 import { useApp } from '@/lib/store';
-import { SeatingTable } from '@/lib/types';
-
-import { VisualFloorPlan } from './VisualFloorPlan';
+import { SECTION_LABEL, SHAPE_LABEL, SIZE_LABEL, seatedGuestIds, seatsOf } from '@/lib/floor-plan';
+import FloorPlanEditor from './FloorPlanEditor';
+import { seatGuestAtTable, unseatGuest, useFloorPlan } from './useFloorPlan';
 
 export default function TableSeatingPlanner() {
-  const { activeOccasion, tables, addTable, guests, assignGuestToTable } = useApp();
-
+  const { activeOccasion, guests, assignGuestToTable } = useApp();
+  const plan = useFloorPlan(activeOccasion?.id);
   const [viewMode, setViewMode] = useState<'canvas' | 'grid'>('canvas');
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [tableName, setTableName] = useState('');
-  const [capacity, setCapacity] = useState('10');
-  const [section, setSection] = useState<'women' | 'men' | 'vip' | 'general'>('women');
-
-  const [selectedTable, setSelectedTable] = useState<SeatingTable | null>(null);
+  const occasionGuests = useMemo(() => guests.filter(g => g.occasionId === activeOccasion?.id), [guests, activeOccasion?.id]);
 
   if (!activeOccasion) return null;
-
-  const occasionTables = tables.filter((t) => t.occasionId === activeOccasion.id);
-  const occasionGuests = guests.filter((g) => g.occasionId === activeOccasion.id);
-  const unassignedGuests = occasionGuests.filter((g) => !g.tableId);
-
-  const handleAddTable = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!tableName.trim()) return;
-
-    addTable({
-      occasionId: activeOccasion.id,
-      name: tableName,
-      capacity: Number(capacity) || 10,
-      section,
-      assignedGuestIds: [],
-    });
-
-    setTableName('');
-    setCapacity('10');
-    setIsAddModalOpen(false);
-  };
+  const { layout } = plan;
+  const seated = seatedGuestIds(layout);
+  const unseated = occasionGuests.filter(g => g.status !== 'declined' && !seated.has(g.id));
+  const byId = new Map(occasionGuests.map(g => [g.id, g]));
 
   return (
     <div className="space-y-6">
-      {/* Top Header & View Switcher */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-5 rounded-2xl border border-saudi-sand-300 shadow-sm">
+      <div className="flex flex-col justify-between gap-3 rounded-2xl border border-saudi-sand-300 bg-white p-5 shadow-sm sm:flex-row sm:items-center">
         <div>
-          <h4 className="text-base font-bold text-gray-900 font-cairo flex items-center gap-2">
-            <Armchair className="w-5 h-5 text-saudi-gold-600" />
-            <span>مخطط توزيع الطاولات والمقاعد ({occasionTables.length} طاولات)</span>
+          <h4 className="flex items-center gap-2 font-cairo text-base font-bold text-gray-900">
+            <Armchair className="h-5 w-5 text-saudi-gold-600" aria-hidden="true" />
+            <span>مخطط توزيع الطاولات والمقاعد ({layout.tables.length} طاولات)</span>
           </h4>
-          <p className="text-xs text-gray-500 mt-1">
-            خصص مقاعد الضيوف لتنظيم استقبال القاعة وتوجيه المدعوين بسهولة.
-          </p>
+          <p className="mt-1 text-xs text-gray-600">رتّب القاعة بالسحب والإفلات، ثم وزّع الضيوف على المقاعد لتنظيم الاستقبال وتوجيه المدعوين بسهولة.</p>
         </div>
-
-        <div className="flex items-center gap-2">
-          {/* Mode Switcher */}
-          <div className="flex items-center p-1 bg-saudi-sand-100 rounded-xl border border-saudi-sand-300 text-xs font-bold">
-            <button
-              onClick={() => setViewMode('canvas')}
-              className={`px-3 py-1.5 rounded-lg transition ${
-                viewMode === 'canvas'
-                  ? 'bg-saudi-green-800 text-white shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              المخطط البصري (2D)
-            </button>
-            <button
-              onClick={() => setViewMode('grid')}
-              className={`px-3 py-1.5 rounded-lg transition ${
-                viewMode === 'grid'
-                  ? 'bg-saudi-green-800 text-white shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              العرض المجدول
-            </button>
-          </div>
-
-          <button
-            onClick={() => setIsAddModalOpen(true)}
-            className="flex items-center gap-1.5 bg-saudi-green-800 hover:bg-saudi-green-900 text-white px-4 py-2 rounded-xl text-xs font-bold shrink-0 shadow-sm transition"
-          >
-            <Plus className="w-4 h-4 text-saudi-gold-400" />
-            <span>+ إضافة طاولة</span>
-          </button>
+        <div className="flex items-center rounded-xl border border-saudi-sand-300 bg-saudi-sand-100 p-1 text-xs font-bold" role="tablist" aria-label="طريقة العرض">
+          {(['canvas', 'grid'] as const).map(mode => (
+            <button key={mode} role="tab" aria-selected={viewMode === mode} onClick={() => setViewMode(mode)}
+              className={`rounded-lg px-3 py-1.5 transition ${viewMode === mode ? 'bg-saudi-green-800 text-white shadow-sm' : 'text-gray-700 hover:text-gray-900'}`}>
+              {mode === 'canvas' ? 'المخطط البصري (2D)' : 'العرض المجدول'}
+            </button>))}
         </div>
       </div>
 
       {viewMode === 'canvas' ? (
-        <VisualFloorPlan
-          tables={occasionTables}
-          guests={occasionGuests}
-          onAssignGuest={(guestId, tableId) => assignGuestToTable(guestId, tableId)}
-          onAddTable={(newT) => addTable(newT)}
-        />
+        <FloorPlanEditor plan={plan} guests={occasionGuests} assign={assignGuestToTable} />
       ) : (
-        /* Tables Grid */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {occasionTables.map((table) => {
-          const assignedGuestsList = occasionGuests.filter((g) => g.tableId === table.id);
-          const isFull = assignedGuestsList.length >= table.capacity;
-
-          return (
-            <div
-              key={table.id}
-              className={`bg-white rounded-2xl p-5 border transition shadow-sm space-y-4 ${
-                isFull ? 'border-saudi-green-300 bg-saudi-sand-50/40' : 'border-saudi-sand-300 hover:border-saudi-gold-400'
-              }`}
-            >
-              {/* Table Header */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 rounded-xl bg-saudi-gold-100 text-saudi-gold-800 flex items-center justify-center font-bold">
-                    <Armchair className="w-5 h-5" />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {layout.tables.length === 0 && <p className="col-span-full rounded-2xl border border-saudi-sand-300 bg-white p-6 text-center text-sm text-gray-600">لا توجد طاولات بعد. أضف طاولات من «المخطط البصري».</p>}
+          {layout.tables.map(table => {
+            const chairs = seatsOf(layout, table.id), onTable = chairs.map(c => (c.guestId ? byId.get(c.guestId) : undefined)).filter(Boolean) as typeof occasionGuests;
+            const isFull = chairs.length > 0 && onTable.length >= chairs.length;
+            return (
+              <div key={table.id} className={`space-y-4 rounded-2xl border bg-white p-5 shadow-sm transition ${isFull ? 'border-saudi-green-300 bg-saudi-sand-50/40' : 'border-saudi-sand-300 hover:border-saudi-gold-400'}`}>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-saudi-gold-100 font-bold text-saudi-gold-800"><Armchair className="h-5 w-5" aria-hidden="true" /></div>
+                    <div>
+                      <h5 className="font-cairo text-sm font-bold text-gray-900">{table.name}</h5>
+                      <span className="text-caption2 text-gray-600">{SHAPE_LABEL[table.shape]} · {SIZE_LABEL[table.size]} · {SECTION_LABEL[table.section]}</span>
+                    </div>
                   </div>
-                  <div>
-                    <h5 className="font-bold text-sm text-gray-900 font-cairo">{table.name}</h5>
-                    <span className="text-caption2 text-gray-500">
-                      {table.section === 'vip' ? 'طاولة كبار الشخصيات VIP' : table.section === 'women' ? 'قسم النساء' : 'قسم الرجال'}
-                    </span>
-                  </div>
+                  <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${isFull ? 'bg-red-100 text-red-700' : 'bg-saudi-green-100 text-saudi-green-800'}`}>{onTable.length} / {chairs.length} مقاعد</span>
                 </div>
-
-                <span
-                  className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${
-                    isFull
-                      ? 'bg-red-100 text-red-700'
-                      : 'bg-saudi-green-100 text-saudi-green-800'
-                  }`}
-                >
-                  {assignedGuestsList.length} / {table.capacity} مقاعد
-                </span>
-              </div>
-
-              {/* Progress bar */}
-              <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
-                <div
-                  className={`h-full ${isFull ? 'bg-red-500' : 'bg-saudi-green-700'}`}
-                  style={{ width: `${Math.min(100, (assignedGuestsList.length / table.capacity) * 100)}%` }}
-                />
-              </div>
-
-              {/* Assigned guests chips */}
-              <div className="space-y-1.5 min-h-[70px]">
-                <span className="text-caption2 font-bold text-gray-500 block">الضيوف المخصصون:</span>
-                {assignedGuestsList.length === 0 ? (
-                  <p className="text-xs text-gray-500 italic">لا يوجد ضيوف مخصصون بعد على هذه الطاولة.</p>
-                ) : (
-                  <div className="flex flex-wrap gap-1.5">
-                    {assignedGuestsList.map((g) => (
-                      <span
-                        key={g.id}
-                        className="bg-saudi-sand-100 border border-saudi-sand-300 text-gray-800 text-xs font-medium px-2 py-1 rounded-lg flex items-center gap-1"
-                      >
-                        <span>{g.name}</span>
-                        <button
-                          onClick={() => assignGuestToTable(g.id, '')}
-                          className="text-gray-500 hover:text-red-600 mr-0.5"
-                          title="إلغاء التخصيص"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Quick Assign Guest button */}
-              {!isFull && unassignedGuests.length > 0 && (
-                <div className="pt-2 border-t border-gray-100">
-                  <select
-                    onChange={(e) => {
-                      if (e.target.value) {
-                        assignGuestToTable(e.target.value, table.id);
-                        e.target.value = '';
-                      }
-                    }}
-                    className="w-full text-xs p-2 bg-saudi-sand-50 border border-gray-200 rounded-xl text-saudi-green-900 font-medium focus:outline-none focus:border-saudi-gold-500"
-                    defaultValue=""
-                  >
-                    <option value="" disabled>
-                      + تعيين ضيف على هذه الطاولة...
-                    </option>
-                    {unassignedGuests.map((g) => (
-                      <option key={g.id} value={g.id}>
-                        {g.name} ({g.category === 'women' ? 'نساء' : 'رجال'})
-                      </option>
-                    ))}
-                  </select>
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100"><div className={`h-full ${isFull ? 'bg-red-500' : 'bg-saudi-green-700'}`} style={{ width: `${chairs.length ? Math.min(100, (onTable.length / chairs.length) * 100) : 0}%` }} /></div>
+                <div className="min-h-[70px] space-y-1.5">
+                  <span className="block text-caption2 font-bold text-gray-600">الضيوف المخصصون:</span>
+                  {onTable.length === 0 ? <p className="text-xs italic text-gray-600">لا يوجد ضيوف مخصصون بعد على هذه الطاولة.</p> : (
+                    <div className="flex flex-wrap gap-1.5">
+                      {onTable.map(g => (
+                        <span key={g.id} className="flex items-center gap-1 rounded-lg border border-saudi-sand-300 bg-saudi-sand-100 px-2 py-1 text-xs font-medium text-gray-800">
+                          <span>{g.name}</span>
+                          <button onClick={() => unseatGuest(plan, assignGuestToTable, g.id)} className="text-gray-600 hover:text-red-600" aria-label={`إلغاء تخصيص ${g.name}`}><X className="h-3 w-3" aria-hidden="true" /></button>
+                        </span>))}
+                    </div>)}
                 </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-      )}
-
-      {/* Add Table Modal */}
-      {isAddModalOpen && (
-        <div role="dialog" aria-modal="true" aria-labelledby="dlg-6398-1" className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fadeIn">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <h4 className="text-base font-bold text-gray-900 font-cairo" id="dlg-6398-1">
-              إضافة طاولة جديدة
-            </h4>
-
-            <form onSubmit={handleAddTable} className="space-y-3">
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">اسم / رقم الطاولة</label>
-                <input
-                  type="text"
-                  value={tableName}
-                  onChange={(e) => setTableName(e.target.value)}
-                  placeholder="مثال: طاولة أهل العروس، طاولة رقم 4..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-xl text-xs focus:outline-none focus:border-saudi-gold-500"
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">سعة المقاعد</label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="30"
-                    value={capacity}
-                    onChange={(e) => setCapacity(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-xl text-xs focus:outline-none focus:border-saudi-gold-500"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">القسم</label>
-                  <select
-                    value={section}
-                    onChange={(e) => setSection(e.target.value as any)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-xl text-xs focus:outline-none focus:border-saudi-gold-500"
-                  >
-                    <option value="women">قسم النساء</option>
-                    <option value="men">قسم الرجال</option>
-                    <option value="vip">كبار الشخصيات VIP</option>
-                    <option value="general">عام / عائلي</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
-                <button
-                  type="button"
-                  onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 text-xs font-bold text-gray-600 hover:bg-gray-100 rounded-xl"
-                >
-                  إلغاء
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 bg-saudi-green-800 hover:bg-saudi-green-900 text-white text-xs font-bold rounded-xl"
-                >
-                  حفظ الطاولة
-                </button>
-              </div>
-            </form>
-          </div>
+                {!isFull && unseated.length > 0 && chairs.length > 0 && (
+                  <div className="border-t border-gray-100 pt-2">
+                    <select aria-label={`تعيين ضيف على ${table.name}`} defaultValue="" onChange={e => { if (e.target.value) { seatGuestAtTable(plan, assignGuestToTable, e.target.value, table.id); e.target.value = ''; } }}
+                      className="w-full rounded-xl border border-gray-200 bg-saudi-sand-50 p-2 text-xs font-medium text-saudi-green-900 focus:border-saudi-gold-500 focus:outline-none">
+                      <option value="" disabled>+ تعيين ضيف على هذه الطاولة...</option>
+                      {unseated.map(g => <option key={g.id} value={g.id}>{g.name} ({g.category === 'women' ? 'نساء' : g.category === 'men' ? 'رجال' : 'عائلة'})</option>)}
+                    </select>
+                  </div>)}
+              </div>);
+          })}
         </div>
       )}
     </div>

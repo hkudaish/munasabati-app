@@ -130,7 +130,7 @@ interface AppContextType {
 
   tables: SeatingTable[];
   addTable: (table: Omit<SeatingTable, 'id'>) => void;
-  assignGuestToTable: (guestId: string, tableId: string) => void;
+  assignGuestToTable: (guestId: string, tableId: string, tableName?: string) => void;
 
   budgetItems: BudgetItem[];
   addBudgetItem: (item: Omit<BudgetItem, 'id'>) => void;
@@ -854,10 +854,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setTables((prev) => [...prev, { ...tableData, id }]);
   };
 
-  const assignGuestToTable = (guestId: string, tableId: string) => {
+  const assignGuestToTable = (guestId: string, tableId: string, tableName?: string) => {
     void databaseAction(async () => {
       const table = tables.find(t => t.id === tableId);
-      const result = await requestJSON(`/api/guests/${guestId}`, 'PATCH', { tableId, tableName: table?.name || '' });
+      const result = await requestJSON(`/api/guests/${guestId}`, 'PATCH', { tableId, tableName: tableName ?? table?.name ?? '' });
       setGuests(prev => prev.map(g => g.id === guestId ? result.guest : g));
       setTables(prev => prev.map(t => ({ ...t, assignedGuestIds: t.id === tableId ? [...t.assignedGuestIds.filter(id => id !== guestId), guestId] : t.assignedGuestIds.filter(id => id !== guestId) })));
     });
