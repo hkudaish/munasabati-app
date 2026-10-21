@@ -1,6 +1,6 @@
 # RFQ (request for quotes): scope
 
-**Status:** scoping only, nothing built. Effort figures are my estimates, not measurements.
+**Status:** scoped and decided; ready to start phase 1. Nothing built yet. Effort figures are my estimates, not measurements.
 
 ## Where things stand
 - `/rfq` is a browser-only demo. Requests, quotes and vendors live in client state (`store.rfqRequests`,
@@ -37,6 +37,9 @@ it must not create a parallel order system.
    one per viewer per quote. The owner sees the tally and comments; viewers never see each other's contact
    details.
 6. **Acceptance** (single transaction, idempotent, **owner only**):
+   - re-check the vendor's availability for the event date with the existing conflict check
+     (`calendarAndConflict`, under the same locks as bookings); if the slot is gone, refuse with a clear message
+     and mark that quote `UNAVAILABLE` so the customer can pick another;
    - mark the quote `ACCEPTED`, the others `DECLINED`, the RFQ `AWARDED`;
    - create a **private `CommerceOffer` version** from the accepted quote, visible only to that customer,
      expiring at `validUntil`, never listed in the catalog;
@@ -68,7 +71,7 @@ that already exists. If vendors' availability should be checked during quoting, 
 ## Work breakdown
 | Phase | Deliverable | Rough effort |
 |---|---|---|
-| 0. Decisions | Answer the open questions below | 0.5 day |
+| 0. Decisions | Done (all questions answered, see below) | 0 days |
 | 1. Data and rules | Migration, `Rfq`/`RfqInvitation`/`RfqQuote`, state machine, pure rules + unit tests | 3–4 days |
 | 2. API | Create/list/close RFQ, invite, submit/withdraw quote, accept (with private-offer creation) | 3–4 days |
 | 3. Vendor UI | Inbox of invitations, quote form, quote status; reuse vendor portal layout | 3 days |
@@ -100,10 +103,24 @@ that already exists. If vendors' availability should be checked during quoting, 
   can view the quotes and give their opinion. Vendors are still chosen separately (customer-picked or matched
   by category and city). Only the RFQ owner can accept a quote or close the RFQ.
 
-## Still open
-1. **Availability:** must a vendor's calendar be checked while quoting, or only at confirmation?
-2. **Changes after acceptance:** is a re-quote allowed, or does the customer cancel and start again?
-3. **Existing demo data:** drop it, or migrate any stored local RFQs? (They are not on the server today.)
+## Remaining questions: answered (recommendations adopted 2026-10-21)
+1. **Availability: check at confirmation, not while quoting.**
+   Quoting is many-to-one and costs the vendor nothing; holding a calendar slot for every invited vendor would
+   block resources for quotes that are never accepted. Quotes carry the wording "subject to availability".
+   The authoritative check happens when the owner accepts, inside the acceptance transaction (see step 6 above),
+   which is also where double-booking is actually prevented. A vendor may optionally see an informational
+   "you appear free on that date" hint while quoting; it never reserves anything.
+2. **After acceptance: no re-quote. Cancel and start again; before acceptance, vendors can replace their quote.**
+   - While the RFQ is open a vendor may withdraw or submit a replacement quote (a new immutable version; the
+     old one is kept for the record). The owner sees the latest.
+   - Once accepted, the quote is final: it becomes a private offer version and is never edited. If plans change,
+     the customer cancels under the existing cancellation and refund policy and opens a new RFQ. This keeps the
+     order, payment and settlement records consistent with exactly what was agreed.
+3. **Demo data: drop it.**
+   The sample RFQs exist only in the browser (`INITIAL_RFQS`, the "كوشة وفرح لتنسيق الحفلات" quotes) and show
+   invented vendors and prices to real visitors. They are removed when the server feature ships, replaced by an
+   empty state with a "request quotes" action. Nothing needs migrating because no RFQ is stored on the server.
+   Until then the demo stays visible; it can be hidden immediately behind an empty state if you prefer.
 
 ## Risks
 - **Scope creep into negotiation** (counter-offers, chat). Keep v1 to submit, compare, accept.
