@@ -136,3 +136,4 @@
 يمكن الرد على التقييمات المعتمدة فقط => You can only reply to approved reviews
 يمكن تمييز التقييمات المعتمدة فقط => Only approved reviews can be featured
 تعذر إتمام الطلب => Could not complete the request
+يلزم الاعتراف بزيادة السعر أولاً => You must acknowledge the price increase first

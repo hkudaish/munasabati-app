@@ -1132,6 +1132,8 @@ model CommerceCart {
   version Int @default(1)
   updatedAt DateTime @default(now()) @db.Timestamptz(3)
   userIdReference User @relation("CommerceCart_userId", fields: [userId], references: [id], onDelete: Restrict)
+  lastActivityAt DateTime @default(now()) @db.Timestamptz(3)
+  locale String @default("ar")
 }
 
 model CommerceOrder {
@@ -1332,4 +1334,128 @@ model PublicStatsConfig {
   period String @default("ALL")
   version Int @default(1)
   updatedAt DateTime @default(now()) @db.Timestamptz(3)
+}
+
+// ---- booking drafts, cart price history, outbox and notifications (netlify/database/migrations/202610230001_*.sql adds the CHECKs, composite FKs, partial index and immutability triggers) ----
+model BookingDraft {
+  id               String    @id
+  userId           String?
+  guestTokenHash   String?
+  serviceId        String
+  status           String    @default("IN_PROGRESS")
+  currentStep      String    @default("configure")
+  version          Int       @default(0)
+  schemaVersion    Int       @default(1)
+  latestSnapshotId String?
+  cartLineId       String?
+  lastActivityAt   DateTime  @default(now()) @db.Timestamptz(3)
+  expiresAt        DateTime? @db.Timestamptz(3)
+  createdAt        DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime  @default(now()) @db.Timestamptz(3)
+  @@index([userId, status])
+  @@index([guestTokenHash])
+  @@index([serviceId])
+}
+
+model BookingSnapshot {
+  id                 String   @id
+  draftId            String
+  versionNumber      Int
+  data               Json
+  hash               String
+  changedFields      Json     @default("[]")
+  previousSnapshotId String?
+  createdBy          String?
+  createdAt          DateTime @default(now()) @db.Timestamptz(3)
+  @@unique([draftId, versionNumber], map: "BookingSnapshot_draft_version_key")
+  @@unique([id, draftId], map: "BookingSnapshot_id_draft_key")
+}
+
+model CartPriceSnapshot {
+  id             String   @id
+  userId         String
+  lineId         String
+  currency       String   @default("SAR")
+  totalHalala    BigInt
+  breakdown      Json
+  pricingVersion Int      @default(1)
+  createdAt      DateTime @default(now()) @db.Timestamptz(3)
+  @@index([userId, lineId, createdAt], map: "CartPriceSnapshot_user_line_idx")
+}
+
+model CartPriceChange {
+  id                 String    @id
+  userId             String
+  lineId             String
+  previousSnapshotId String
+  newSnapshotId      String    @unique
+  direction          String
+  differenceHalala   BigInt
+  differencePercent  Decimal?  @db.Decimal(12, 4)
+  reasonCode         String
+  detectedAt         DateTime  @default(now()) @db.Timestamptz(3)
+  acknowledgedAt     DateTime? @db.Timestamptz(3)
+  @@index([userId, acknowledgedAt], map: "CartPriceChange_user_idx")
+}
+
+model DomainOutbox {
+  id               String    @id
+  aggregateType    String
+  aggregateId      String
+  aggregateVersion Int       @default(0)
+  eventType        String
+  payload          Json
+  occurredAt       DateTime  @default(now()) @db.Timestamptz(3)
+  publishedAt      DateTime? @db.Timestamptz(3)
+  status           String    @default("PENDING")
+  retryCount       Int       @default(0)
+  nextAttemptAt    DateTime  @default(now()) @db.Timestamptz(3)
+  lastError        String?
+  @@index([status, nextAttemptAt], map: "DomainOutbox_status_next_idx")
+}
+
+model CartNotificationSetting {
+  id        String   @id
+  body      Json
+  version   Int      @default(1)
+  updatedAt DateTime @default(now()) @db.Timestamptz(3)
+}
+
+model NotificationPreference {
+  userId    String
+  channel   String
+  enabled   Boolean
+  updatedAt DateTime @default(now()) @db.Timestamptz(3)
+  @@id([userId, channel])
+}
+
+model NotificationJob {
+  id            String    @id
+  outboxEventId String?
+  userId        String
+  lineId        String?
+  template      String
+  channel       String
+  status        String    @default("PENDING")
+  scheduledAt   DateTime  @default(now()) @db.Timestamptz(3)
+  sentAt        DateTime? @db.Timestamptz(3)
+  retryCount    Int       @default(0)
+  dedupKey      String
+  payload       Json      @default("{}")
+  lastError     String?
+  createdAt     DateTime  @default(now()) @db.Timestamptz(3)
+  @@unique([dedupKey], map: "NotificationJob_dedupKey_key")
+  @@index([status, scheduledAt], map: "NotificationJob_status_scheduled_idx")
+  @@index([userId], map: "NotificationJob_userId_idx")
+}
+
+model NotificationAttempt {
+  id                String   @id
+  jobId             String
+  provider          String
+  providerMessageId String?
+  status            String
+  errorCode         String?
+  attemptedAt       DateTime @default(now()) @db.Timestamptz(3)
+  @@index([jobId], map: "NotificationAttempt_jobId_idx")
 }
