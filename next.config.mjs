@@ -29,7 +29,10 @@ const nextConfig = {
       { source: '/vendor', headers: [{ key: 'Cache-Control', value: 'no-store, max-age=0' }] },
       ...protectedPaths.flatMap(path => [path, path + '/:path*']).map(source => ({ source, headers: [{ key: 'Cache-Control', value: 'no-store, max-age=0' }] })),
     ];
-    return [...noStore, { source: '/:path*', headers: [
+    // A second layer besides robots.txt and the page's own robots tag: private areas are never indexed, even when someone links to them.
+    const privateAreas = ['/admin', '/system-admin', '/system-setup', '/vendor', '/cart', '/checkout', '/commerce/cart', '/commerce/orders', '/commerce/manage', '/bookings', '/occasion', '/settings', '/invite', '/scan', '/reception-screen', '/coverage-preview', '/compare'];
+    const noIndex = privateAreas.flatMap(path => [path, path + '/:path*']).map(source => ({ source, headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] }));
+    return [...noStore, ...noIndex, { source: '/:path*', headers: [
       { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
       { key: 'X-Content-Type-Options', value: 'nosniff' },
       { key: 'Content-Security-Policy', value: contentSecurityPolicy },

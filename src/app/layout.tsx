@@ -1,4 +1,10 @@
 import type { Metadata, Viewport } from 'next';
+import { getLocale, getPaths } from '@/lib/i18n/server';
+import { EN } from '@/lib/i18n/dictionary';
+import LocaleProvider from '@/components/i18n/LocaleProvider';
+import { buildMetadata } from '@/lib/seo/metadata';
+import JsonLd from '@/components/seo/JsonLd';
+import { siteUrl, SITE_NAME } from '@/lib/site';
 import { Tajawal, Cairo } from 'next/font/google';
 import './globals.css';
 import { AppProvider } from '@/lib/store';
@@ -19,24 +25,24 @@ import ImageFallback from '@/components/common/ImageFallback';
 import SessionBoundary from '@/components/system/SessionBoundary';
 
 const tajawal = Tajawal({
-  subsets: ['arabic'],
+  subsets: ['arabic', 'latin'],
   weight: ['300', '400', '500', '700', '800', '900'],
   variable: '--font-tajawal',
   display: 'swap',
 });
 
 const cairo = Cairo({
-  subsets: ['arabic'],
+  subsets: ['arabic', 'latin'],
   weight: ['300', '400', '500', '600', '700', '800', '900'],
   variable: '--font-cairo',
   display: 'swap',
 });
 
-export const metadata: Metadata = {
-  title: 'مناسبتـي | منصة التخطيط الذكي وحجز المناسبات والاحتفالات السعودية',
-  description: 'خططها. احجزها. اعزمهم. احتفل. المنصة السعودية الأولى لتنظيم وحجز كافة خدمات وباقات المناسبات والأعراس والتخرج بالذكاء الاصطناعي.',
-  keywords: ['مناسبتي', 'تخطيط مناسبات', 'كوشة بالرياض', 'ضيافة سعودية', 'قهوجيين', 'حفلات تخرج', 'زواج', 'ملكة', 'عروض أسعار'],
-};
+/** Title, description, canonical and language alternates, robots, Open Graph and Twitter cards for the page and language being served. */
+export async function generateMetadata(): Promise<Metadata> {
+  const { innerPath } = getPaths();
+  return buildMetadata({ path: innerPath, locale: getLocale() });
+}
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -55,9 +61,15 @@ export default async function RootLayout({
     geoContext({ layout: true }).catch(() => null),
     featureStatesForLayout().catch(() => defaultFeatures().map(f => ({ ...f, enabled: false, visible: false }))),
   ]);
+  const locale = getLocale(), { innerPath } = getPaths(), base = siteUrl();
   return (
-    <html lang="ar" dir="rtl" className={`${tajawal.variable} ${cairo.variable}`}>
+    <html lang={locale} dir={locale === 'en' ? 'ltr' : 'rtl'} className={`${tajawal.variable} ${cairo.variable}`}>
       <body className="min-h-screen flex flex-col bg-[#FAF7F2] text-[#1E293B] antialiased selection:bg-saudi-gold-400 selection:text-saudi-green-950">
+        {innerPath === '/' && <JsonLd data={[
+          { '@context': 'https://schema.org', '@type': 'Organization', '@id': base + '/#organization', name: SITE_NAME.ar, alternateName: SITE_NAME.en, url: base, logo: base + '/icon-512.png', areaServed: { '@type': 'Country', name: 'Saudi Arabia' }, description: locale === 'en' ? 'Saudi Arabia’s smart platform to plan and book events.' : 'المنصة السعودية لتخطيط وحجز المناسبات.' },
+          { '@context': 'https://schema.org', '@type': 'WebSite', '@id': base + '/#website', url: base, name: SITE_NAME[locale], inLanguage: ['ar-SA', 'en'], publisher: { '@id': base + '/#organization' }, potentialAction: { '@type': 'SearchAction', target: { '@type': 'EntryPoint', urlTemplate: base + (locale === 'en' ? '/en' : '') + '/commerce?q={search_term_string}' }, 'query-input': 'required name=search_term_string' } },
+        ]} />}
+        <LocaleProvider locale={locale} dictionary={locale === 'en' ? EN : undefined}>
         <GeoProvider initial={location}><FeatureProvider initial={features}><AppProvider>
           <SiteChrome><Navbar /><CoverageNotice /></SiteChrome>
           <main className="flex-1">
@@ -69,6 +81,7 @@ export default async function RootLayout({
           <ImageFallback />
           <SiteChrome><MobileBottomNav /><Footer /></SiteChrome>
         </AppProvider></FeatureProvider></GeoProvider>
+        </LocaleProvider>
       </body>
     </html>
   );
