@@ -98,7 +98,7 @@ function processFile(file) {
       if (/&\w+;/.test(core)) manual.push({ line: line(node), why: 'entity in text', text: core.slice(0, 60) });
       else {
         const comp = component(node);
-        if (comp && allowed(comp)) { const key = norm(core); keys.push(key); needHook.add(comp.node); edits.push({ start: node.getStart() + lead, end: node.getStart() + raw.length - trail, text: `{${fn}(${quote(key)})}` }); handled.add(node); }
+        if (comp && allowed(comp)) { const key = norm(core); keys.push(key); needHook.add(comp.node); edits.push({ start: node.pos + lead, end: node.pos + raw.length - trail, text: `{${fn}(${quote(key)})}` }); /* node.pos includes the leading whitespace that getStart() skips */ handled.add(node); }
         else if (!comp) manual.push({ line: line(node), why: 'outside a component', text: core.slice(0, 60) });
       }
     } else if (ts.isJsxAttribute(node) && node.initializer && DISPLAY_ATTRS.has(node.name.getText())) {
@@ -148,10 +148,9 @@ function processFile(file) {
     edits.sort((a, b) => b.start - a.start || b.end - a.end).forEach(e => { out = out.slice(0, e.start) + e.text + out.slice(e.end); });
     const importLine = isClient ? "import { useT } from '@/components/i18n/LocaleProvider';" : "import { getT } from '@/lib/i18n/server';";
     if (!out.includes(importLine)) {
-      const imports = [...out.matchAll(/^import .*$/gm)];
-      const last = imports.length ? imports[imports.length - 1] : null;
-      out = last ? out.slice(0, last.index + last[0].length) + '\n' + importLine + out.slice(last.index + last[0].length) : importLine + '\n' + out;
-      // an import statement that spans several lines would be cut; re-check below by compiling
+      // after the last import declaration of the ORIGINAL file (every edit lies below the imports, so the offset is unchanged)
+      const imports = sf.statements.filter(ts.isImportDeclaration), end = imports.length ? imports[imports.length - 1].getEnd() : 0;
+      out = out.slice(0, end) + (end ? '\n' : '') + importLine + (end ? '' : '\n') + out.slice(end);
     }
     fs.writeFileSync(file, out);
   }

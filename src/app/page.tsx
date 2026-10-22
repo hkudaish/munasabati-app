@@ -46,9 +46,12 @@ import PackageCard from '@/components/marketplace/PackageCard';
 import CustomerReviewsShowcase from '@/components/common/CustomerReviewsShowcase';
 import PublicStatistics from '@/components/common/PublicStatistics';
 import { ServiceItem, SmartPackage, UserRole } from '@/lib/types';
+import { useT, useLocale, usePick } from '@/components/i18n/LocaleProvider';
 
 export default function HomePage() {
+  const t = useT(); const pick = usePick();
   const router = useRouter();
+  const { localize } = useLocale();
   const {
     currentRole,
     currentUser,
@@ -80,15 +83,15 @@ export default function HomePage() {
   // Admin approval toast simulation
   const [adminActionNotice, setAdminActionNotice] = useState<string | null>(null);
 
-  const activeCityObj = cities.find((c) => c.id === selectedCity) || {id:'',nameAr:'مدينتك',nameEn:'',regionAr:'',isAvailable:false};
+  const activeCityObj = cities.find((c) => c.id === selectedCity) || {id:'',nameAr:t('مدينتك'),nameEn:'',regionAr:'',isAvailable:false};
 
   // Booking happens in the commerce flow (offers, packages, server-priced cart), not in a local modal.
   const handleBookService = (service: ServiceItem) => {
-    router.push('/commerce/service/' + encodeURIComponent(service.id));
+    router.push(localize('/commerce/service/' + encodeURIComponent(service.id)));
   };
 
   const handleBookPackage = (_pkg: SmartPackage) => {
-    router.push('/packages');
+    router.push(localize('/packages'));
   };
 
   // Filtered services for client based on active category
@@ -119,21 +122,21 @@ export default function HomePage() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-saudi-gold-300 font-bold uppercase tracking-wider">
-                  طريقة العرض المخصصة حالياً:
+                  {t('طريقة العرض المخصصة حالياً:')}
                 </span>
                 <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold bg-saudi-gold-500 text-saudi-green-950 shadow-sm">
-                  {currentRole === 'vendor' && 'مورد ومزود خدمات معتمد'}
-                  {currentRole === 'admin' && 'إدارة المنصة المركزية'}
+                  {currentRole === 'vendor' && t('مورد ومزود خدمات معتمد')}
+                  {currentRole === 'admin' && t('إدارة المنصة المركزية')}
                 </span>
                 {currentUser && (
                   <span className="text-xs text-gray-300 hidden sm:inline">
-                    • مسجل باسم: <strong className="text-white font-bold">{currentUser.name}</strong>
+                    {t('• مسجل باسم:')} <strong className="text-white font-bold">{currentUser.name}</strong>
                   </span>
                 )}
               </div>
               <p className="text-xs text-gray-300 mt-0.5 font-tajawal">
-                {currentRole === 'vendor' && 'يتم عرض فرص طلبات التسعير (RFQs)، إدارة الخدمات، جدول الحجوزات، وأدوات نمو المورد.'}
-                {currentRole === 'admin' && 'يتم عرض مؤشرات أداء المنصة، طلبات توثيق السجلات، تدقيق الخدمات، وسجل المعاملات.'}
+                {currentRole === 'vendor' && t('يتم عرض فرص طلبات التسعير (RFQs)، إدارة الخدمات، جدول الحجوزات، وأدوات نمو المورد.')}
+                {currentRole === 'admin' && t('يتم عرض مؤشرات أداء المنصة، طلبات توثيق السجلات، تدقيق الخدمات، وسجل المعاملات.')}
               </p>
             </div>
           </div>
@@ -156,20 +159,20 @@ export default function HomePage() {
                 <Sparkles className="w-4 h-4 text-saudi-gold-400" />
                 <span>
                   {currentUser
-                    ? `أهلاً بك يا ${currentUser.name} • مساحة تخطيط مناسبتك الذكية 🇸🇦`
-                    : 'المنصة السعودية الذكية الأولى لتنظيم والاحتفال بالمناسبات 🇸🇦'}
+                    ? t('أهلاً بك يا {name} • مساحة تخطيط مناسبتك الذكية 🇸🇦', { name: currentUser.name })
+                    : t('المنصة السعودية الذكية الأولى لتنظيم والاحتفال بالمناسبات 🇸🇦')}
                 </span>
               </div>
 
               <div className="max-w-3xl space-y-4">
                 <h1 className="text-3xl sm:text-5xl font-black font-cairo leading-tight tracking-tight text-white">
-                  خططها. احجزها. اعزمهم.{' '}
+                  {t('خططها. احجزها. اعزمهم.')}{' '}
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-saudi-gold-300 via-saudi-gold-400 to-amber-200">
-                    واحتفل بأجمل اللحظات.
+                    {t('واحتفل بأجمل اللحظات.')}
                   </span>
                 </h1>
                 <p className="text-sm sm:text-base text-gray-300 leading-relaxed max-w-2xl font-tajawal">
-                  من الفكرة وحتى آخر ضيف — كل تجهيزات مناسبتك في مكان واحد: قاعات، ضيافة سعودية، كوش وتنسيق، مصورين، باقات جاهزة، وطلب موثّق يؤكده المورد.
+                  {t('من الفكرة وحتى آخر ضيف — كل تجهيزات مناسبتك في مكان واحد: قاعات، ضيافة سعودية، كوش وتنسيق، مصورين، باقات جاهزة، وطلب موثّق يؤكده المورد.')}
                 </p>
               </div>
 
@@ -180,7 +183,7 @@ export default function HomePage() {
                   className="px-6 py-3.5 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-bold rounded-2xl text-sm shadow-lg shadow-saudi-gold-500/20 flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition"
                 >
                   <PlusCircle className="w-5 h-5 text-saudi-green-950" />
-                  <span>+ ابدأ تخطيط مناسبتك</span>
+                  <span>{t('+ ابدأ تخطيط مناسبتك')}</span>
                 </Link>
 
                 <Link
@@ -188,7 +191,7 @@ export default function HomePage() {
                   className="px-5 py-3.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold rounded-2xl text-sm backdrop-blur-md flex items-center gap-2 transition"
                 >
                   <FileText className="w-4 h-4 text-saudi-gold-300" />
-                  <span>اطلب عروض أسعار (RFQ)</span>
+                  <span>{t('اطلب عروض أسعار (RFQ)')}</span>
                 </Link>
               </div>
 
@@ -196,19 +199,19 @@ export default function HomePage() {
               <div className="pt-6 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs text-gray-300">
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-saudi-gold-400" />
-                  <span>موردين موثقين بسجلات رسمية</span>
+                  <span>{t('موردين موثقين بسجلات رسمية')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Zap className="w-4 h-4 text-saudi-gold-400" />
-                  <span>أسعار واضحة قبل الطلب، والمورد يؤكد الحجز</span>
+                  <span>{t('أسعار واضحة قبل الطلب، والمورد يؤكد الحجز')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-saudi-gold-400" />
-                  <span>تغطية في {cities.length} مدن سعودية</span>
+                  <span>{t('تغطية في')} {cities.length} {t('مدن سعودية')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <HeartHandshake className="w-4 h-4 text-saudi-gold-400" />
-                  <span>دفع مجزأ (عربون + متبقي عند التنفيذ)</span>
+                  <span>{t('دفع مجزأ (عربون + متبقي عند التنفيذ)')}</span>
                 </div>
               </div>
             </div>
@@ -221,7 +224,7 @@ export default function HomePage() {
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="text-caption2 font-bold px-2 py-0.5 rounded bg-saudi-green-800 text-white">
-                      مناسبتك الحالية قيد التجهيز
+                      {t('مناسبتك الحالية قيد التجهيز')}
                     </span>
                     <h3 className="text-base sm:text-lg font-black font-cairo text-saudi-green-950">
                       {activeOccasion.title}
@@ -238,11 +241,11 @@ export default function HomePage() {
                     </span>
                     <span className="flex items-center gap-1 font-bold text-saudi-green-900">
                       <DollarSign className="w-3.5 h-3.5 text-saudi-gold-600" />
-                      الميزانية: {formatSAR(activeOccasion.budget)}
+                      {t('الميزانية:')} {formatSAR(activeOccasion.budget)}
                     </span>
                     <span className="text-gray-500">•</span>
                     <span className="text-saudi-gold-700 font-bold">
-                      جاهزية التجهيزات: {activeOccasion.readinessPercentage}%
+                      {t('جاهزية التجهيزات:')} {activeOccasion.readinessPercentage}%
                     </span>
                   </div>
                 </div>
@@ -252,7 +255,7 @@ export default function HomePage() {
                     href="/plan"
                     className="px-4 py-2 bg-saudi-green-800 hover:bg-saudi-green-900 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow-sm"
                   >
-                    <span>متابعة خطة المناسبة</span>
+                    <span>{t('متابعة خطة المناسبة')}</span>
                     <ChevronLeft className="w-3.5 h-3.5" />
                   </Link>
                   {cart.length > 0 && (
@@ -261,7 +264,7 @@ export default function HomePage() {
                       className="px-4 py-2 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-bold text-xs rounded-xl transition flex items-center gap-1"
                     >
                       <ShoppingBag className="w-3.5 h-3.5" />
-                      <span>في السلة ({cart.length})</span>
+                      <span>{t('في السلة (')}{cart.length})</span>
                     </Link>
                   )}
                 </div>
@@ -274,17 +277,17 @@ export default function HomePage() {
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
               <div>
                 <span className="text-xs font-bold text-saudi-gold-600 block uppercase tracking-wider">
-                  ابدأ من نوع الاحتفال
+                  {t('ابدأ من نوع الاحتفال')}
                 </span>
                 <h2 className="text-2xl sm:text-3xl font-black font-cairo text-saudi-green-950">
-                  ما مناسبتك؟ 🎉
+                  {t('ما مناسبتك؟ 🎉')}
                 </h2>
               </div>
               <Link
                 href="/plan"
                 className="text-xs font-bold text-saudi-green-800 hover:text-saudi-gold-700 flex items-center gap-1"
               >
-                <span>عرض كافة أنواع المناسبات ({occasionTypes.length})</span>
+                <span>{t('عرض كافة أنواع المناسبات (')}{occasionTypes.length})</span>
                 <ChevronLeft className="w-4 h-4" />
               </Link>
             </div>
@@ -299,16 +302,16 @@ export default function HomePage() {
                   <div className="relative h-28 w-full bg-gray-100 overflow-hidden">
                     <img
                       src={occ.coverImage}
-                      alt={occ.nameAr}
+                      alt={pick(occ.nameAr, occ.nameEn)}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                     <span className="absolute bottom-2 right-2 text-white font-bold text-xs font-cairo">
-                      {occ.nameAr}
+                      {pick(occ.nameAr, occ.nameEn)}
                     </span>
                   </div>
                   <div className="p-2.5 text-caption2 text-gray-500 leading-tight">
-                    {occ.descriptionAr}
+                    {pick(occ.descriptionAr, occ.descriptionEn)}
                   </div>
                 </Link>
               ))}
@@ -320,20 +323,20 @@ export default function HomePage() {
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
               <div>
                 <span className="text-xs font-bold text-saudi-gold-600 block uppercase tracking-wider">
-                  وفر وقتك ومالك
+                  {t('وفر وقتك ومالك')}
                 </span>
                 <h2 className="text-2xl sm:text-3xl font-black font-cairo text-saudi-green-950">
-                  الباقات الذكية الجاهزة 📦
+                  {t('الباقات الذكية الجاهزة 📦')}
                 </h2>
                 <p className="text-xs text-gray-500 mt-1">
-                  باقات منسقة تجمع أفضل الموردين المعتمدين في بكج واحد مع توفير حقيقي وإمكانية التعديل.
+                  {t('باقات منسقة تجمع أفضل الموردين المعتمدين في بكج واحد مع توفير حقيقي وإمكانية التعديل.')}
                 </p>
               </div>
               <Link
                 href="/packages"
                 className="text-xs font-bold text-saudi-green-800 hover:text-saudi-gold-700 flex items-center gap-1"
               >
-                <span>استعراض كل الباقات ({packages.length})</span>
+                <span>{t('استعراض كل الباقات (')}{packages.length})</span>
                 <ChevronLeft className="w-4 h-4" />
               </Link>
             </div>
@@ -350,20 +353,20 @@ export default function HomePage() {
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
               <div>
                 <span className="text-xs font-bold text-saudi-gold-600 block uppercase tracking-wider">
-                  تجهيزات وخدمات المناسبات
+                  {t('تجهيزات وخدمات المناسبات')}
                 </span>
                 <h2 className="text-2xl sm:text-3xl font-black font-cairo text-saudi-green-950">
-                  الخدمات المميزة في {activeCityObj.nameAr} ⭐
+                  {t('الخدمات المميزة في')} {pick(activeCityObj.nameAr, activeCityObj.nameEn)} ⭐
                 </h2>
                 <p className="text-xs text-gray-500 mt-1">
-                  اختر الفئة واستعرض الخدمات المعتمدة للحجز المباشر مع ضمان المنصة.
+                  {t('اختر الفئة واستعرض الخدمات المعتمدة للحجز المباشر مع ضمان المنصة.')}
                 </p>
               </div>
               <Link
                 href="/marketplace"
                 className="text-xs font-bold text-saudi-green-800 hover:text-saudi-gold-700 flex items-center gap-1 shrink-0"
               >
-                <span>سوق الخدمات الشامل</span>
+                <span>{t('سوق الخدمات الشامل')}</span>
                 <ChevronLeft className="w-4 h-4" />
               </Link>
             </div>
@@ -378,7 +381,7 @@ export default function HomePage() {
                     : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
                 }`}
               >
-                الكل ({services.length})
+                {t('الكل (')}{services.length})
               </button>
               {serviceCategories.map((cat) => (
                 <button
@@ -390,7 +393,7 @@ export default function HomePage() {
                       : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
                   }`}
                 >
-                  {cat.nameAr}
+                  {pick(cat.nameAr, cat.nameEn)}
                 </button>
               ))}
             </div>
@@ -409,14 +412,14 @@ export default function HomePage() {
               <div className="relative z-10 max-w-2xl space-y-4">
                 <div className="inline-flex items-center gap-1.5 bg-saudi-gold-500/20 text-saudi-gold-300 px-3 py-1 rounded-full text-xs font-bold border border-saudi-gold-400/30">
                   <Sparkles className="w-3.5 h-3.5 text-saudi-gold-400" />
-                  <span>المساعد الذكي: {adminConfig.aiAssistantNameAr}</span>
+                  <span>{t('المساعد الذكي:')} {adminConfig.aiAssistantNameAr}</span>
                 </div>
 
                 <h3 className="text-2xl sm:text-3xl font-black font-cairo text-white">
-                  لا تشيل هم الترتيب وتوزيع الميزانية!
+                  {t('لا تشيل هم الترتيب وتوزيع الميزانية!')}
                 </h3>
                 <p className="text-xs sm:text-sm text-gray-200 leading-relaxed font-tajawal">
-                  اكتب فقط: <span className="text-saudi-gold-300 font-bold">"أبغى ملكة منزلية بالرياض لـ 50 شخص وميزانيتي 15 ألف"</span>، وسيقوم المساعد الذكي بتوليد خطة متكاملة فوراً تشمل توزيع الميزانية، قائمة المهام، والموردين الموصى بهم.
+                  {t('اكتب فقط:')} <span className="text-saudi-gold-300 font-bold">{t('"أبغى ملكة منزلية بالرياض لـ 50 شخص وميزانيتي 15 ألف"')}</span>{t('، وسيقوم المساعد الذكي بتوليد خطة متكاملة فوراً تشمل توزيع الميزانية، قائمة المهام، والموردين الموصى بهم.')}
                 </p>
 
                 <div className="pt-2 flex flex-wrap gap-3">
@@ -425,7 +428,7 @@ export default function HomePage() {
                     className="px-6 py-3 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-bold rounded-2xl text-xs sm:text-sm shadow-md flex items-center gap-2 transition"
                   >
                     <Sparkles className="w-4 h-4 text-saudi-green-950" />
-                    <span>جرّب التخطيط بالذكاء الاصطناعي مجاناً</span>
+                    <span>{t('جرّب التخطيط بالذكاء الاصطناعي مجاناً')}</span>
                   </button></FeatureContent>
                 </div>
               </div>
@@ -447,20 +450,20 @@ export default function HomePage() {
             <div className="rounded-3xl p-6 sm:p-10 bg-gradient-to-r from-saudi-sand-200 via-white to-saudi-sand-200 border border-saudi-gold-400/40 shadow-card flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="space-y-2 text-right">
                 <span className="text-xs font-bold text-saudi-gold-700 uppercase tracking-wider block">
-                  عروض أسعار خاصة بمناسبتك
+                  {t('عروض أسعار خاصة بمناسبتك')}
                 </span>
                 <h3 className="text-2xl font-black font-cairo text-saudi-green-950">
-                  عندك متطلبات مخصصة؟ اطلب تسعير خاص من الموردين 💬
+                  {t('عندك متطلبات مخصصة؟ اطلب تسعير خاص من الموردين 💬')}
                 </h3>
                 <p className="text-xs text-gray-600 max-w-xl font-tajawal">
-                  أرسل تفاصيل مناسبتك وسيقوم الموردون المعتمدون في منطقتك بتقديم عروض أسعار تنافسية خلال 24 ساعة مع ضمان الالتزام.
+                  {t('أرسل تفاصيل مناسبتك وسيقوم الموردون المعتمدون في منطقتك بتقديم عروض أسعار تنافسية خلال 24 ساعة مع ضمان الالتزام.')}
                 </p>
               </div>
               <Link
                 href="/rfq"
                 className="px-6 py-3.5 bg-saudi-green-800 hover:bg-saudi-green-900 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-md transition shrink-0 flex items-center gap-2"
               >
-                <span>إنشاء طلب تسعير (RFQ) جديد</span>
+                <span>{t('إنشاء طلب تسعير (RFQ) جديد')}</span>
                 <ChevronLeft className="w-4 h-4" />
               </Link>
             </div>
@@ -479,17 +482,17 @@ export default function HomePage() {
               <div className="inline-flex items-center gap-2 bg-saudi-gold-500/20 border border-saudi-gold-400/40 px-3.5 py-1.5 rounded-full text-saudi-gold-300 text-xs font-bold">
                 <Store className="w-4 h-4 text-saudi-gold-400" />
                 <span>
-                  بوابة الموردين والشركاء المعتمدين 🇸🇦 •{' '}
-                  {currentUser?.businessName || currentUser?.name || 'مورد خدمات مناسبات'}
+                  {t('بوابة الموردين والشركاء المعتمدين 🇸🇦 •')}{' '}
+                  {currentUser?.businessName || currentUser?.name || t('مورد خدمات مناسبات')}
                 </span>
               </div>
 
               <div className="max-w-3xl space-y-3">
                 <h1 className="text-3xl sm:text-4xl font-black font-cairo leading-tight text-white">
-                  مرحباً بك في مركز نمو أعمالك ومبيعاتك 📈
+                  {t('مرحباً بك في مركز نمو أعمالك ومبيعاتك 📈')}
                 </h1>
                 <p className="text-sm text-gray-300 leading-relaxed font-tajawal">
-                  راقب طلبات الحجز المباشرة، نافس وقدم عروض الأسعار على طلبات RFQ، حدّث أسعار خدماتك وباقاتك، واستفد من نظام الدفع المضمون والضمان البنكي.
+                  {t('راقب طلبات الحجز المباشرة، نافس وقدم عروض الأسعار على طلبات RFQ، حدّث أسعار خدماتك وباقاتك، واستفد من نظام الدفع المضمون والضمان البنكي.')}
                 </p>
               </div>
 
@@ -497,46 +500,46 @@ export default function HomePage() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2">
                 <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10">
                   <div className="flex items-center justify-between text-gray-300 text-xs mb-1">
-                    <span>الحجوزات النشطة</span>
+                    <span>{t('الحجوزات النشطة')}</span>
                     <Calendar className="w-4 h-4 text-saudi-gold-400" />
                   </div>
                   <div className="text-2xl font-black text-white font-cairo">
                     {bookings.filter((b) => b.status === 'confirmed').length}
                   </div>
-                  <span className="text-caption2 text-saudi-gold-300">مؤكدة وجاهزة للتنفيذ</span>
+                  <span className="text-caption2 text-saudi-gold-300">{t('مؤكدة وجاهزة للتنفيذ')}</span>
                 </div>
 
                 <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10">
                   <div className="flex items-center justify-between text-gray-300 text-xs mb-1">
-                    <span>طلبات RFQ المتاحة</span>
+                    <span>{t('طلبات RFQ المتاحة')}</span>
                     <FileText className="w-4 h-4 text-saudi-gold-400" />
                   </div>
                   <div className="text-2xl font-black text-saudi-gold-300 font-cairo">
                     {openRFQs.length}
                   </div>
-                  <span className="text-caption2 text-gray-300">طلبات عملاء بانتظار عروضك</span>
+                  <span className="text-caption2 text-gray-300">{t('طلبات عملاء بانتظار عروضك')}</span>
                 </div>
 
                 <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10">
                   <div className="flex items-center justify-between text-gray-300 text-xs mb-1">
-                    <span>تقييم المنشأة</span>
+                    <span>{t('تقييم المنشأة')}</span>
                     <Star className="w-4 h-4 text-saudi-gold-400 fill-saudi-gold-400" />
                   </div>
                   <div className="text-2xl font-black text-white font-cairo">
                     4.9 / 5.0
                   </div>
-                  <span className="text-caption2 text-green-300">موثق بالسجل التجاري ✔</span>
+                  <span className="text-caption2 text-green-300">{t('موثق بالسجل التجاري ✔')}</span>
                 </div>
 
                 <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10">
                   <div className="flex items-center justify-between text-gray-300 text-xs mb-1">
-                    <span>سرعة الاستجابة</span>
+                    <span>{t('سرعة الاستجابة')}</span>
                     <Clock className="w-4 h-4 text-saudi-gold-400" />
                   </div>
                   <div className="text-2xl font-black text-white font-cairo">
-                    15 دقيقة
+                    {t('15 دقيقة')}
                   </div>
-                  <span className="text-caption2 text-saudi-gold-300">أعلى من متوسط السوق</span>
+                  <span className="text-caption2 text-saudi-gold-300">{t('أعلى من متوسط السوق')}</span>
                 </div>
               </div>
 
@@ -547,7 +550,7 @@ export default function HomePage() {
                   className="px-6 py-3.5 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-bold rounded-2xl text-sm shadow-lg flex items-center gap-2 transition"
                 >
                   <Store className="w-4 h-4 text-saudi-green-950" />
-                  <span>الدخول للوحة المورد الكاملة</span>
+                  <span>{t('الدخول للوحة المورد الكاملة')}</span>
                 </Link>
 
                 <Link
@@ -555,7 +558,7 @@ export default function HomePage() {
                   className="px-5 py-3.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold rounded-2xl text-sm transition flex items-center gap-2"
                 >
                   <Calendar className="w-4 h-4 text-saudi-gold-300" />
-                  <span>إدارة الحجوزات الواردة</span>
+                  <span>{t('إدارة الحجوزات الواردة')}</span>
                 </Link>
 
                 <Link
@@ -563,7 +566,7 @@ export default function HomePage() {
                   className="px-5 py-3.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold rounded-2xl text-sm transition flex items-center gap-2"
                 >
                   <PlusCircle className="w-4 h-4 text-saudi-gold-300" />
-                  <span>إضافة وتعديل الخدمات والأسعار</span>
+                  <span>{t('إضافة وتعديل الخدمات والأسعار')}</span>
                 </Link>
 
                 <Link
@@ -571,7 +574,7 @@ export default function HomePage() {
                   className="px-5 py-3.5 bg-white/5 hover:bg-white/15 border border-white/10 text-gray-200 font-bold rounded-2xl text-sm transition flex items-center gap-2"
                 >
                   <Eye className="w-4 h-4 text-saudi-gold-400" />
-                  <span>معاينة كيف يرى العملاء خدماتك</span>
+                  <span>{t('معاينة كيف يرى العملاء خدماتك')}</span>
                 </Link>
               </div>
             </div>
@@ -582,20 +585,20 @@ export default function HomePage() {
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-saudi-sand-300 pb-4">
               <div>
                 <span className="text-xs font-bold text-saudi-gold-600 block uppercase tracking-wider">
-                  فرص أعمال جديدة لموردين معتمدين
+                  {t('فرص أعمال جديدة لموردين معتمدين')}
                 </span>
                 <h2 className="text-2xl sm:text-3xl font-black font-cairo text-saudi-green-950">
-                  طلبات التسعير المتاحة للمزايدة (Live RFQs) 💬
+                  {t('طلبات التسعير المتاحة للمزايدة (Live RFQs) 💬')}
                 </h2>
                 <p className="text-xs text-gray-500 mt-1">
-                  طلبات مباشرة من أصحاب مناسبات يبحثون عن موردين لتنفيذ خدماتهم. قدم عرضك التنافسي الآن!
+                  {t('طلبات مباشرة من أصحاب مناسبات يبحثون عن موردين لتنفيذ خدماتهم. قدم عرضك التنافسي الآن!')}
                 </p>
               </div>
               <Link
                 href="/vendor?tab=rfq"
                 className="text-xs font-bold text-saudi-green-800 hover:text-saudi-gold-700 flex items-center gap-1"
               >
-                <span>عرض جميع طلبات RFQ ({openRFQs.length})</span>
+                <span>{t('عرض جميع طلبات RFQ (')}{openRFQs.length})</span>
                 <ChevronLeft className="w-4 h-4" />
               </Link>
             </div>
@@ -612,7 +615,7 @@ export default function HomePage() {
                         {rfq.occasionTypeAr}
                       </span>
                       <span className="text-xs font-bold text-saudi-gold-700">
-                        الميزانية: {formatSAR(rfq.budget)}
+                        {t('الميزانية:')} {formatSAR(rfq.budget)}
                       </span>
                     </div>
 
@@ -635,20 +638,20 @@ export default function HomePage() {
                       </span>
                       <span className="flex items-center gap-1">
                         <Users className="w-3.5 h-3.5 text-saudi-gold-600" />
-                        {rfq.guestCount} ضيف
+                        {rfq.guestCount} {t('ضيف')}
                       </span>
                     </div>
                   </div>
 
                   <div className="pt-2 flex items-center justify-between">
                     <span className="text-xs text-gray-500">
-                      العروض المقدمة: <strong className="text-gray-700">{rfq.quotesCount}</strong>
+                      {t('العروض المقدمة:')} <strong className="text-gray-700">{rfq.quotesCount}</strong>
                     </span>
                     <Link
                       href={`/vendor?tab=rfq&id=${rfq.id}`}
                       className="px-4 py-2 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-bold text-xs rounded-xl shadow-sm transition"
                     >
-                      تقديم عرض سعر فوري
+                      {t('تقديم عرض سعر فوري')}
                     </Link>
                   </div>
                 </div>
@@ -661,13 +664,13 @@ export default function HomePage() {
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-saudi-sand-300 pb-4">
               <div>
                 <span className="text-xs font-bold text-saudi-gold-600 block uppercase tracking-wider">
-                  كتالوج الخدمات والأسعار
+                  {t('كتالوج الخدمات والأسعار')}
                 </span>
                 <h2 className="text-2xl sm:text-3xl font-black font-cairo text-saudi-green-950">
-                  خدماتك المعروضة في المنصة 🏪
+                  {t('خدماتك المعروضة في المنصة 🏪')}
                 </h2>
                 <p className="text-xs text-gray-500 mt-1">
-                  يمكنك استعراض خدماتك المعروضة أو مقارنة أسعار الخدمات المماثلة في {activeCityObj.nameAr}.
+                  {t('يمكنك استعراض خدماتك المعروضة أو مقارنة أسعار الخدمات المماثلة في')} {pick(activeCityObj.nameAr, activeCityObj.nameEn)}.
                 </p>
               </div>
 
@@ -681,7 +684,7 @@ export default function HomePage() {
                       : 'text-gray-700 hover:text-saudi-green-900'
                   }`}
                 >
-                  خدماتي المسجلة
+                  {t('خدماتي المسجلة')}
                 </button>
                 <button
                   onClick={() => setVendorServiceView('market_comparison')}
@@ -691,7 +694,7 @@ export default function HomePage() {
                       : 'text-gray-700 hover:text-saudi-green-900'
                   }`}
                 >
-                  مقارنة أسعار السوق ({activeCityObj.nameAr})
+                  {t('مقارنة أسعار السوق (')}{pick(activeCityObj.nameAr, activeCityObj.nameEn)})
                 </button>
               </div>
             </div>
@@ -704,9 +707,9 @@ export default function HomePage() {
                   className="bg-white rounded-2xl border border-saudi-sand-300 overflow-hidden shadow-card flex flex-col justify-between"
                 >
                   <div className="relative h-44 w-full bg-gray-100">
-                    <img src={srv.images[0]} alt={srv.titleAr} className="w-full h-full object-cover" />
+                    <img src={srv.images[0]} alt={pick(srv.titleAr, srv.titleEn)} className="w-full h-full object-cover" />
                     <span className="absolute top-2.5 right-2.5 bg-saudi-green-900/80 backdrop-blur-md text-white text-caption2 font-bold px-2 py-0.5 rounded-full">
-                      {srv.categoryNameAr}
+                      {t(srv.categoryNameAr)}
                     </span>
                     <span className="absolute bottom-2.5 right-2.5 bg-black/70 backdrop-blur-md text-saudi-gold-300 text-xs font-bold px-2.5 py-1 rounded-lg">
                       {formatSAR(srv.price)}
@@ -715,12 +718,12 @@ export default function HomePage() {
 
                   <div className="p-4 space-y-3">
                     <div>
-                      <h4 className="font-bold text-sm text-gray-900">{srv.titleAr}</h4>
-                      <p className="text-xs text-gray-500 line-clamp-2 mt-1">{srv.descriptionAr}</p>
+                      <h4 className="font-bold text-sm text-gray-900">{pick(srv.titleAr, srv.titleEn)}</h4>
+                      <p className="text-xs text-gray-500 line-clamp-2 mt-1">{pick(srv.descriptionAr, srv.descriptionEn)}</p>
                     </div>
 
                     <div className="flex items-center justify-between pt-2 border-t border-saudi-sand-200 text-xs text-gray-600">
-                      <span>المدينة: {srv.cityNameAr}</span>
+                      <span>{t('المدينة:')} {srv.cityNameAr}</span>
                       <span className="text-saudi-gold-700 font-bold">★ {srv.vendorRating}</span>
                     </div>
 
@@ -729,14 +732,14 @@ export default function HomePage() {
                         href={`/vendor?tab=services&edit=${srv.id}`}
                         className="flex-1 py-2 bg-saudi-sand-100 hover:bg-saudi-sand-200 text-saudi-green-900 font-bold text-xs rounded-xl text-center transition"
                       >
-                        تعديل في لوحة المورد
+                        {t('تعديل في لوحة المورد')}
                       </Link>
                       <button
                         onClick={() => handleBookService(srv)}
                         className="px-3 py-2 bg-saudi-green-800 text-white font-bold text-xs rounded-xl hover:bg-saudi-green-900 transition"
-                        title="معاينة عملية الحجز كما يراها العميل"
+                        title={t('معاينة عملية الحجز كما يراها العميل')}
                       >
-                        معاينة الحجز
+                        {t('معاينة الحجز')}
                       </button>
                     </div>
                   </div>
@@ -751,27 +754,27 @@ export default function HomePage() {
               <div className="max-w-2xl space-y-4">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-saudi-gold-500/20 text-saudi-gold-300 text-xs font-bold border border-saudi-gold-500/30">
                   <Award className="w-3.5 h-3.5" />
-                  <span>مزايا المورد المعتمد في منصة مناسبتي</span>
+                  <span>{t('مزايا المورد المعتمد في منصة مناسبتي')}</span>
                 </span>
                 <h3 className="text-2xl sm:text-3xl font-black font-cairo text-white">
-                  احصل على شارة التوثيق الذهبية وضاعف مبيعاتك 🛡️
+                  {t('احصل على شارة التوثيق الذهبية وضاعف مبيعاتك 🛡️')}
                 </h3>
                 <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-tajawal">
-                  منشأتك الموثقة بالسجل التجاري أو وثيقة العمل الحر تظهر في أعلى نتائج البحث والترشيحات الذكية للعملاء. جميع الحجوزات مدفوعة ومؤمنة في حساب ضمان المنصة قبل موعد المناسبة.
+                  {t('منشأتك الموثقة بالسجل التجاري أو وثيقة العمل الحر تظهر في أعلى نتائج البحث والترشيحات الذكية للعملاء. جميع الحجوزات مدفوعة ومؤمنة في حساب ضمان المنصة قبل موعد المناسبة.')}
                 </p>
                 <div className="pt-2 flex flex-wrap gap-3">
                   <Link
                     href="/vendor?tab=verification"
                     className="px-5 py-3 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-bold rounded-xl text-xs sm:text-sm transition flex items-center gap-2"
                   >
-                    <span>توثيق السجل التجاري / العمل الحر</span>
+                    <span>{t('توثيق السجل التجاري / العمل الحر')}</span>
                     <ChevronLeft className="w-4 h-4" />
                   </Link>
                   <Link
                     href="/vendor?tab=packages"
                     className="px-5 py-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold rounded-xl text-xs sm:text-sm transition"
                   >
-                    <span>الانضمام إلى باقات مناسبتي الذكية</span>
+                    <span>{t('الانضمام إلى باقات مناسبتي الذكية')}</span>
                   </Link>
                 </div>
               </div>
@@ -791,16 +794,16 @@ export default function HomePage() {
               <div className="inline-flex items-center gap-2 bg-saudi-gold-500/20 border border-saudi-gold-400/40 px-3.5 py-1.5 rounded-full text-saudi-gold-300 text-xs font-bold">
                 <ShieldCheck className="w-4 h-4 text-saudi-gold-400" />
                 <span>
-                  لوحة القيادة المركزية وإدارة المنصة 🇸🇦 • {currentUser?.name || 'مدير النظام'}
+                  {t('لوحة القيادة المركزية وإدارة المنصة 🇸🇦 •')} {currentUser?.name || t('مدير النظام')}
                 </span>
               </div>
 
               <div className="max-w-3xl space-y-3">
                 <h1 className="text-3xl sm:text-4xl font-black font-cairo leading-tight text-white">
-                  مركز الرقابة العامة والعمليات التشغيلية 🛡️
+                  {t('مركز الرقابة العامة والعمليات التشغيلية 🛡️')}
                 </h1>
                 <p className="text-sm text-gray-300 leading-relaxed font-tajawal">
-                  مراقبة فورية لتدفق الحجوزات في كافة المدن، تدقيق واعتماد الموردين الجدد، متابعة التحويلات المالية في حساب الضمان، وضمان جودة الخدمات المقدمة لأصحاب المناسبات.
+                  {t('مراقبة فورية لتدفق الحجوزات في كافة المدن، تدقيق واعتماد الموردين الجدد، متابعة التحويلات المالية في حساب الضمان، وضمان جودة الخدمات المقدمة لأصحاب المناسبات.')}
                 </p>
               </div>
 
@@ -808,48 +811,48 @@ export default function HomePage() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2">
                 <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10">
                   <div className="flex items-center justify-between text-gray-300 text-xs mb-1">
-                    <span>الموردين المعتمدين</span>
+                    <span>{t('الموردين المعتمدين')}</span>
                     <Store className="w-4 h-4 text-saudi-gold-400" />
                   </div>
                   <div className="text-2xl font-black text-white font-cairo">
                     {vendors.length}
                   </div>
                   <span className="text-caption2 text-green-300">
-                    {vendors.filter((v) => v.verified).length} مورد موثق رسمياً
+                    {vendors.filter((v) => v.verified).length} {t('مورد موثق رسمياً')}
                   </span>
                 </div>
 
                 <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10">
                   <div className="flex items-center justify-between text-gray-300 text-xs mb-1">
-                    <span>حجم المعاملات (⃁)</span>
+                    <span>{t('حجم المعاملات (⃁)')}</span>
                     <CreditCard className="w-4 h-4 text-saudi-gold-400" />
                   </div>
                   <div className="text-2xl font-black text-saudi-gold-300 font-cairo">
                     {formatSAR(totalBookingsAmount)}
                   </div>
-                  <span className="text-caption2 text-gray-300">{bookings.length} معاملة منجزة</span>
+                  <span className="text-caption2 text-gray-300">{bookings.length} {t('معاملة منجزة')}</span>
                 </div>
 
                 <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10">
                   <div className="flex items-center justify-between text-gray-300 text-xs mb-1">
-                    <span>طلبات التوثيق المعلقة</span>
+                    <span>{t('طلبات التوثيق المعلقة')}</span>
                     <FileText className="w-4 h-4 text-saudi-gold-400" />
                   </div>
                   <div className="text-2xl font-black text-amber-300 font-cairo">
                     {pendingVendors.length}
                   </div>
-                  <span className="text-caption2 text-amber-200">بانتظار تدقيق السجل</span>
+                  <span className="text-caption2 text-amber-200">{t('بانتظار تدقيق السجل')}</span>
                 </div>
 
                 <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10">
                   <div className="flex items-center justify-between text-gray-300 text-xs mb-1">
-                    <span>الخدمات والباقات النشطة</span>
+                    <span>{t('الخدمات والباقات النشطة')}</span>
                     <Layers className="w-4 h-4 text-saudi-gold-400" />
                   </div>
                   <div className="text-2xl font-black text-white font-cairo">
                     {services.length + packages.length}
                   </div>
-                  <span className="text-caption2 text-saudi-gold-300">عبر {cities.length} مدن</span>
+                  <span className="text-caption2 text-saudi-gold-300">{t('عبر')} {cities.length} {t('مدن')}</span>
                 </div>
               </div>
 
@@ -860,7 +863,7 @@ export default function HomePage() {
                   className="px-6 py-3.5 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-bold rounded-2xl text-sm shadow-lg flex items-center gap-2 transition"
                 >
                   <ShieldCheck className="w-4 h-4 text-saudi-green-950" />
-                  <span>فتح لوحة الإدارة المركزية الكاملة</span>
+                  <span>{t('فتح لوحة الإدارة المركزية الكاملة')}</span>
                 </Link>
 
                 <Link
@@ -868,7 +871,7 @@ export default function HomePage() {
                   className="px-5 py-3.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold rounded-2xl text-sm transition flex items-center gap-2"
                 >
                   <Store className="w-4 h-4 text-saudi-gold-300" />
-                  <span>إدارة الموردين والتوثيق</span>
+                  <span>{t('إدارة الموردين والتوثيق')}</span>
                 </Link>
 
                 <Link
@@ -876,7 +879,7 @@ export default function HomePage() {
                   className="px-5 py-3.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold rounded-2xl text-sm transition flex items-center gap-2"
                 >
                   <CreditCard className="w-4 h-4 text-saudi-gold-300" />
-                  <span>مراقبة الحجوزات والمدفوعات</span>
+                  <span>{t('مراقبة الحجوزات والمدفوعات')}</span>
                 </Link>
 
                 <Link
@@ -884,7 +887,7 @@ export default function HomePage() {
                   className="px-5 py-3.5 bg-white/5 hover:bg-white/15 border border-white/10 text-gray-200 font-bold rounded-2xl text-sm transition flex items-center gap-2"
                 >
                   <Settings className="w-4 h-4 text-saudi-gold-400" />
-                  <span>إعدادات النظام والعمولات</span>
+                  <span>{t('إعدادات النظام والعمولات')}</span>
                 </Link>
               </div>
             </div>
@@ -899,7 +902,7 @@ export default function HomePage() {
                   onClick={() => setAdminActionNotice(null)}
                   className="text-saudi-gold-300 hover:text-white"
                 >
-                  إغلاق
+                  {t('إغلاق')}
                 </button>
               </div>
             </div>
@@ -910,20 +913,20 @@ export default function HomePage() {
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-saudi-sand-300 pb-4">
               <div>
                 <span className="text-xs font-bold text-saudi-gold-600 block uppercase tracking-wider">
-                  إجراءات المشرف الفورية
+                  {t('إجراءات المشرف الفورية')}
                 </span>
                 <h2 className="text-2xl sm:text-3xl font-black font-cairo text-saudi-green-950">
-                  طلبات اعتماد وتوثيق الموردين ({pendingVendors.length}) 📑
+                  {t('طلبات اعتماد وتوثيق الموردين (')}{pendingVendors.length}) 📑
                 </h2>
                 <p className="text-xs text-gray-500 mt-1">
-                  قم بمراجعة السجلات التجارية ووثائق العمل الحر واعتماد الموردين ليظهروا في سوق المنصة.
+                  {t('قم بمراجعة السجلات التجارية ووثائق العمل الحر واعتماد الموردين ليظهروا في سوق المنصة.')}
                 </p>
               </div>
               <Link
                 href="/admin?tab=vendors"
                 className="text-xs font-bold text-saudi-green-800 hover:text-saudi-gold-700 flex items-center gap-1"
               >
-                <span>لوحة تدقيق الموردين الكاملة</span>
+                <span>{t('لوحة تدقيق الموردين الكاملة')}</span>
                 <ChevronLeft className="w-4 h-4" />
               </Link>
             </div>
@@ -953,10 +956,10 @@ export default function HomePage() {
 
                     <div className="bg-saudi-sand-50 p-2.5 rounded-xl text-xs space-y-1 text-gray-700">
                       <div>
-                        السجل التجاري: <strong className="font-mono">{vendor.crNumber || 'تحت التدقيق'}</strong>
+                        {t('السجل التجاري:')} <strong className="font-mono">{vendor.crNumber || t('تحت التدقيق')}</strong>
                       </div>
                       <div>
-                        رقم الاتصال: <span className="font-mono dir-ltr inline-block">{vendor.contactPhone}</span>
+                        {t('رقم الاتصال:')} <span className="font-mono dir-ltr inline-block">{vendor.contactPhone}</span>
                       </div>
                     </div>
                   </div>
@@ -965,17 +968,17 @@ export default function HomePage() {
                     <button
                       onClick={() => {
                         updateVendorStatus(vendor.id, 'active', true);
-                        setAdminActionNotice(`تم اعتماد وتوثيق ${vendor.businessName} بنجاح!`);
+                        setAdminActionNotice(t('تم اعتماد وتوثيق {name} بنجاح!', { name: vendor.businessName }));
                       }}
                       className="flex-1 py-2 bg-saudi-green-800 hover:bg-saudi-green-900 text-white font-bold text-xs rounded-xl shadow-sm transition"
                     >
-                      اعتماد وتوثيق الآن ✔
+                      {t('اعتماد وتوثيق الآن ✔')}
                     </button>
                     <Link
                       href={`/admin?tab=vendors&id=${vendor.id}`}
                       className="px-3 py-2 bg-saudi-sand-100 hover:bg-saudi-sand-200 text-gray-800 font-bold text-xs rounded-xl transition"
                     >
-                      مراجعة
+                      {t('مراجعة')}
                     </Link>
                   </div>
                 </div>
@@ -988,20 +991,20 @@ export default function HomePage() {
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-saudi-sand-300 pb-4">
               <div>
                 <span className="text-xs font-bold text-saudi-gold-600 block uppercase tracking-wider">
-                  سجل التدفقات المالية
+                  {t('سجل التدفقات المالية')}
                 </span>
                 <h2 className="text-2xl sm:text-3xl font-black font-cairo text-saudi-green-950">
-                  أحدث الحجوزات والعمليات المالية المبرمة 💳
+                  {t('أحدث الحجوزات والعمليات المالية المبرمة 💳')}
                 </h2>
                 <p className="text-xs text-gray-500 mt-1">
-                  متابعة أموال الضمان وعربون الحجز ونسب عمولة المنصة (10%).
+                  {t('متابعة أموال الضمان وعربون الحجز ونسب عمولة المنصة (10%).')}
                 </p>
               </div>
               <Link
                 href="/admin?tab=bookings"
                 className="text-xs font-bold text-saudi-green-800 hover:text-saudi-gold-700 flex items-center gap-1"
               >
-                <span>سجل الحجوزات المالي</span>
+                <span>{t('سجل الحجوزات المالي')}</span>
                 <ChevronLeft className="w-4 h-4" />
               </Link>
             </div>
@@ -1011,13 +1014,13 @@ export default function HomePage() {
                 <table className="w-full text-right text-xs">
                   <thead className="bg-saudi-sand-100 text-gray-700 font-bold border-b border-saudi-sand-300">
                     <tr>
-                      <th className="p-3.5">رقم الحجز</th>
-                      <th className="p-3.5">المناسبة والخدمة</th>
-                      <th className="p-3.5">العميل</th>
-                      <th className="p-3.5">المورد</th>
-                      <th className="p-3.5">المبلغ الإجمالي</th>
-                      <th className="p-3.5">حالة الدفع</th>
-                      <th className="p-3.5">إجراء المشرف</th>
+                      <th className="p-3.5">{t('رقم الحجز')}</th>
+                      <th className="p-3.5">{t('المناسبة والخدمة')}</th>
+                      <th className="p-3.5">{t('العميل')}</th>
+                      <th className="p-3.5">{t('المورد')}</th>
+                      <th className="p-3.5">{t('المبلغ الإجمالي')}</th>
+                      <th className="p-3.5">{t('حالة الدفع')}</th>
+                      <th className="p-3.5">{t('إجراء المشرف')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-saudi-sand-200">
@@ -1037,7 +1040,7 @@ export default function HomePage() {
                         <td className="p-3.5 font-black text-gray-900">{formatSAR(b.totalAmount)}</td>
                         <td className="p-3.5">
                           <span className="inline-block px-2 py-0.5 rounded-full text-caption2 font-bold bg-green-100 text-green-800">
-                            {b.status === 'confirmed' ? 'مؤكد بالضمان' : b.status}
+                            {b.status === 'confirmed' ? t('مؤكد بالضمان') : b.status}
                           </span>
                         </td>
                         <td className="p-3.5">
@@ -1045,7 +1048,7 @@ export default function HomePage() {
                             href="/admin?tab=bookings"
                             className="text-saudi-gold-700 hover:underline font-bold"
                           >
-                            تفاصيل
+                            {t('تفاصيل')}
                           </Link>
                         </td>
                       </tr>
@@ -1061,10 +1064,10 @@ export default function HomePage() {
             <div className="bg-gradient-to-r from-saudi-sand-100 via-white to-saudi-sand-100 border border-saudi-gold-400/30 rounded-2xl p-6 shadow-card flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="space-y-1 text-right">
                 <h4 className="font-bold text-base text-saudi-green-950 font-cairo">
-                  أداة فحص ومعاينة تجربة المستخدمين (Persona Simulator) 🎭
+                  {t('أداة فحص ومعاينة تجربة المستخدمين (Persona Simulator) 🎭')}
                 </h4>
                 <p className="text-xs text-gray-600 font-tajawal">
-                  بصفتك مديراً للنظام، يمكنك تجربة المنصة كما يراها العميل أو المورد دون الحاجة لتسجيل الخروج.
+                  {t('بصفتك مديراً للنظام، يمكنك تجربة المنصة كما يراها العميل أو المورد دون الحاجة لتسجيل الخروج.')}
                 </p>
               </div>
 
@@ -1073,13 +1076,13 @@ export default function HomePage() {
                   onClick={() => switchRole('client')}
                   className="px-4 py-2 bg-saudi-green-800 hover:bg-saudi-green-900 text-white font-bold text-xs rounded-xl shadow-sm transition"
                 >
-                  معاينة تجربة العميل
+                  {t('معاينة تجربة العميل')}
                 </button>
                 <button
                   onClick={() => switchRole('vendor')}
                   className="px-4 py-2 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-bold text-xs rounded-xl shadow-sm transition"
                 >
-                  معاينة تجربة المورد
+                  {t('معاينة تجربة المورد')}
                 </button>
               </div>
             </div>

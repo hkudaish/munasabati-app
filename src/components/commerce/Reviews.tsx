@@ -1,7 +1,8 @@
 'use client';
 import React, { useCallback, useEffect, useState } from 'react';
-import Link from 'next/link';
+import Link from '@/components/i18n/Link';
 import { requestJSON } from '@/lib/api-client';
+import { useT, usePick } from '@/components/i18n/LocaleProvider';
 
 const field = 'w-full rounded-xl border border-saudi-sand-300 bg-white p-2 text-sm focus:border-saudi-green-800';
 const primary = 'rounded-xl bg-saudi-green-800 hover:bg-saudi-green-900 text-white px-4 py-2 text-sm font-bold disabled:opacity-50';
@@ -9,18 +10,21 @@ const ghost = 'rounded-xl border px-3 py-1.5 text-xs font-bold hover:bg-saudi-sa
 const CRITERIA: [string, string][] = [['qualityRating', 'جودة العمل'], ['communicationRating', 'التواصل'], ['timelinessRating', 'الالتزام بالموعد'], ['valueRating', 'القيمة مقابل السعر']];
 
 export function Stars({ value }: { value: number }) {
+  const t = useT();
   const n = Math.max(0, Math.min(5, Math.round(value)));
-  return <span role="img" aria-label={`${n} من 5`} className="text-saudi-gold-600">{'★'.repeat(n)}<span className="text-gray-300">{'★'.repeat(5 - n)}</span></span>;
+  return <span role="img" aria-label={t('{n} من 5', { n: n })} className="text-saudi-gold-600">{'★'.repeat(n)}<span className="text-gray-300">{'★'.repeat(5 - n)}</span></span>;
 }
 function StarInput({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
+  const t = useT();
   return <fieldset className="flex flex-wrap items-center gap-2"><legend className="sr-only">{label}</legend><span className="w-36 text-sm">{label}</span>
-    {[1, 2, 3, 4, 5].map(n => <button type="button" key={n} aria-label={`${label}: ${n} من 5`} aria-pressed={value === n} onClick={() => onChange(n)} className={`text-2xl leading-none ${n <= value ? 'text-saudi-gold-600' : 'text-gray-300'}`}>★</button>)}</fieldset>;
+    {[1, 2, 3, 4, 5].map(n => <button type="button" key={n} aria-label={t('{label}: {n} من 5', { label: label, n: n })} aria-pressed={value === n} onClick={() => onChange(n)} className={`text-2xl leading-none ${n <= value ? 'text-saudi-gold-600' : 'text-gray-300'}`}>★</button>)}</fieldset>;
 }
 const Badge = ({ tone, children }: { tone: 'wait' | 'ok' | 'bad'; children: React.ReactNode }) => <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${tone === 'ok' ? 'bg-green-100 text-green-800' : tone === 'wait' ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-800'}`}>{children}</span>;
 
 /* ---------------------------------------------------------------------------------------------------------------- */
 /** Customer: rate completed services and follow the status of the reviews already sent. */
 export function MyReviews() {
+  const t = useT(); const pick = usePick();
   const [data, setData] = useState<any>(null);
   const [form, setForm] = useState<any>(null);
   const [notice, setNotice] = useState('');
@@ -34,28 +38,28 @@ export function MyReviews() {
       const body: any = { itemId: form.itemId, rating: form.rating, commentAr: form.commentAr };
       if (form.detail) CRITERIA.forEach(([k]) => { body[k] = form[k]; });
       await requestJSON('/api/reviews', 'POST', body);
-      setForm(null); await load(); setNotice('شكراً لك! وصل تقييمك وسيظهر للجميع بعد اعتماد الإدارة.');
-    } catch (error) { setNotice(error instanceof Error ? error.message : 'تعذر إرسال التقييم'); } finally { setBusy(false); }
+      setForm(null); await load(); setNotice(t('شكراً لك! وصل تقييمك وسيظهر للجميع بعد اعتماد الإدارة.'));
+    } catch (error) { setNotice(error instanceof Error ? error.message : t('تعذر إرسال التقييم')); } finally { setBusy(false); }
   };
-  return <section aria-label="تقييماتي" className="bg-white border border-saudi-sand-300 shadow-card rounded-2xl p-5 space-y-4">
-    <h2 className="font-bold">تقييم الخدمات</h2>
+  return <section aria-label={t('تقييماتي')} className="bg-white border border-saudi-sand-300 shadow-card rounded-2xl p-5 space-y-4">
+    <h2 className="font-bold">{t('تقييم الخدمات')}</h2>
     {notice && <p role="status" className="rounded-xl border bg-amber-50 p-3 text-sm">{notice}</p>}
-    {!data.enabled && <p className="text-sm text-gray-600">استقبال التقييمات الجديدة متوقف مؤقتاً.</p>}
-    {data.reviewable.length > 0 && <div className="space-y-2"><p className="text-sm font-bold">خدمات مكتملة بانتظار تقييمك</p>
-      {data.reviewable.map((item: any) => <div key={item.itemId} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border p-3"><div><p className="text-sm font-bold">{item.titleAr}</p><p className="font-mono text-xs text-gray-500" dir="ltr">{item.orderNumber}</p></div>
-        <button className={primary} disabled={!data.enabled} onClick={() => setForm({ itemId: item.itemId, titleAr: item.titleAr, rating: 5, commentAr: '', detail: false, qualityRating: 5, communicationRating: 5, timelinessRating: 5, valueRating: 5 })}>قيّم هذه الخدمة</button></div>)}</div>}
-    {data.reviews.length > 0 && <div className="space-y-2"><p className="text-sm font-bold">تقييماتي</p>
-      {data.reviews.map((r: any) => <article key={r.id} className="space-y-2 rounded-xl border p-3"><div className="flex flex-wrap items-center justify-between gap-2"><Stars value={r.rating} />{r.status === 'approved' ? <Badge tone="ok">منشور</Badge> : r.status === 'pending' ? <Badge tone="wait">بانتظار اعتماد الإدارة</Badge> : <Badge tone="bad">غير منشور</Badge>}</div>
-        <p className="text-sm">{r.commentAr}</p>{r.status === 'hidden' && r.moderationNoteAr && <p className="text-xs text-red-700">سبب عدم النشر: {r.moderationNoteAr}</p>}
-        {r.replyAr && <p className="rounded-lg bg-saudi-green-50 p-2 text-xs"><strong>رد المورد:</strong> {r.replyAr}</p>}</article>)}</div>}
-    {form && <div role="dialog" aria-modal="true" aria-label="تقييم الخدمة" className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"><form className="max-h-[90vh] w-full max-w-lg space-y-4 overflow-auto rounded-2xl bg-white p-5" onSubmit={e => { e.preventDefault(); void send(); }}>
-      <h3 className="font-bold">تقييم: {form.titleAr}</h3>
-      <StarInput label="التقييم العام" value={form.rating} onChange={v => setForm({ ...form, rating: v })} />
-      <label className="flex gap-2 text-sm"><input type="checkbox" checked={form.detail} onChange={e => setForm({ ...form, detail: e.target.checked })} />أريد تقييم جوانب محددة</label>
+    {!data.enabled && <p className="text-sm text-gray-600">{t('استقبال التقييمات الجديدة متوقف مؤقتاً.')}</p>}
+    {data.reviewable.length > 0 && <div className="space-y-2"><p className="text-sm font-bold">{t('خدمات مكتملة بانتظار تقييمك')}</p>
+      {data.reviewable.map((item: any) => <div key={item.itemId} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border p-3"><div><p className="text-sm font-bold">{pick(item.titleAr, item.titleEn)}</p><p className="font-mono text-xs text-gray-500" dir="ltr">{item.orderNumber}</p></div>
+        <button className={primary} disabled={!data.enabled} onClick={() => setForm({ itemId: item.itemId, titleAr: item.titleAr, rating: 5, commentAr: '', detail: false, qualityRating: 5, communicationRating: 5, timelinessRating: 5, valueRating: 5 })}>{t('قيّم هذه الخدمة')}</button></div>)}</div>}
+    {data.reviews.length > 0 && <div className="space-y-2"><p className="text-sm font-bold">{t('تقييماتي')}</p>
+      {data.reviews.map((r: any) => <article key={r.id} className="space-y-2 rounded-xl border p-3"><div className="flex flex-wrap items-center justify-between gap-2"><Stars value={r.rating} />{r.status === 'approved' ? <Badge tone="ok">{t('منشور')}</Badge> : r.status === 'pending' ? <Badge tone="wait">{t('بانتظار اعتماد الإدارة')}</Badge> : <Badge tone="bad">{t('غير منشور')}</Badge>}</div>
+        <p className="text-sm">{r.commentAr}</p>{r.status === 'hidden' && r.moderationNoteAr && <p className="text-xs text-red-700">{t('سبب عدم النشر:')} {r.moderationNoteAr}</p>}
+        {r.replyAr && <p className="rounded-lg bg-saudi-green-50 p-2 text-xs"><strong>{t('رد المورد:')}</strong> {r.replyAr}</p>}</article>)}</div>}
+    {form && <div role="dialog" aria-modal="true" aria-label={t('تقييم الخدمة')} className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"><form className="max-h-[90vh] w-full max-w-lg space-y-4 overflow-auto rounded-2xl bg-white p-5" onSubmit={e => { e.preventDefault(); void send(); }}>
+      <h3 className="font-bold">{t('تقييم:')} {pick(form.titleAr, form.titleEn)}</h3>
+      <StarInput label={t('التقييم العام')} value={form.rating} onChange={v => setForm({ ...form, rating: v })} />
+      <label className="flex gap-2 text-sm"><input type="checkbox" checked={form.detail} onChange={e => setForm({ ...form, detail: e.target.checked })} />{t('أريد تقييم جوانب محددة')}</label>
       {form.detail && CRITERIA.map(([k, label]) => <StarInput key={k} label={label} value={form[k]} onChange={v => setForm({ ...form, [k]: v })} />)}
-      <label className="block text-sm">تجربتك مع الخدمة<textarea required minLength={10} maxLength={2000} rows={4} className={field} placeholder="اكتب ما أعجبك أو ما كان يمكن أن يكون أفضل (10 أحرف على الأقل)" value={form.commentAr} onChange={e => setForm({ ...form, commentAr: e.target.value })} /></label>
-      <p className="text-xs text-gray-600">يظهر تقييمك باسمك الأول وأول حرف من اسم العائلة، وبعد مراجعة الإدارة.</p>
-      <div className="flex gap-3"><button className={primary} disabled={busy}>إرسال التقييم</button><button type="button" className="underline" onClick={() => setForm(null)}>إغلاق</button></div>
+      <label className="block text-sm">{t('تجربتك مع الخدمة')}<textarea required minLength={10} maxLength={2000} rows={4} className={field} placeholder={t('اكتب ما أعجبك أو ما كان يمكن أن يكون أفضل (10 أحرف على الأقل)')} value={form.commentAr} onChange={e => setForm({ ...form, commentAr: e.target.value })} /></label>
+      <p className="text-xs text-gray-600">{t('يظهر تقييمك باسمك الأول وأول حرف من اسم العائلة، وبعد مراجعة الإدارة.')}</p>
+      <div className="flex gap-3"><button className={primary} disabled={busy}>{t('إرسال التقييم')}</button><button type="button" className="underline" onClick={() => setForm(null)}>{t('إغلاق')}</button></div>
       {notice && <p role="alert" className="text-sm text-red-700">{notice}</p>}
     </form></div>}
   </section>;

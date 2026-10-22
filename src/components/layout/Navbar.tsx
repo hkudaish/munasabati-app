@@ -4,7 +4,8 @@ import CityPicker from '@/components/geo/CityPicker';
 import { FeatureContent } from '@/components/system/FeatureProvider';
 import React, { useState, Suspense } from 'react';
 import Link from '@/components/system/FeatureLink';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useInnerPathname, useLocale } from '@/components/i18n/LocaleProvider';
 import { useCartGate } from '@/lib/shopper-gate';
 import { useApp } from '@/lib/store';
 import {
@@ -35,10 +36,14 @@ import {
   Settings,
   CreditCard,
 } from 'lucide-react';
+import { useT } from '@/components/i18n/LocaleProvider';
+import LanguageSwitcher from '@/components/i18n/LanguageSwitcher';
 
 function NavbarContent() {
-  const pathname = usePathname();
+  const t = useT();
+  const pathname = useInnerPathname();
   const router = useRouter();
+  const { localize, locale } = useLocale();
   const searchParams = useSearchParams();
   const currentTab = searchParams.get('tab');
   const {
@@ -76,21 +81,21 @@ function NavbarContent() {
       {/* Top Banner for Role Switcher & City & User Auth */}
       <div className="bg-saudi-green-900 text-white text-xs py-1.5 px-3 sm:px-4">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2.5">
-          <CityPicker />
+          <div className="flex items-center gap-2"><CityPicker /><LanguageSwitcher className="!border-saudi-gold-400/60 !py-0.5 !text-saudi-gold-300 hover:!bg-white/10" /></div>
 
           {/* Role Switcher & Account Access */}
           <div className="flex items-center gap-2 sm:gap-4">
             {/* Visual Segmented Role Switcher matching reference image */}
             {showRoleSwitcher && (
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <span className="text-gray-300 text-xs sm:text-xs font-medium hidden md:inline">عرض بصفتك:</span>
+              <span className="text-gray-300 text-xs sm:text-xs font-medium hidden md:inline">{t('عرض بصفتك:')}</span>
               <div className="bg-saudi-green-950/90 p-0.5 rounded-lg border border-saudi-gold-500/30 flex items-center gap-0.5 sm:gap-1 shadow-inner">
                 {/* 1. Customer Option */}
                 <button
                   onClick={() => {
                     switchRole('client');
                     if (pathname === '/vendor' || pathname === '/admin') {
-                      router.push('/');
+                      router.push(localize('/'));
                     }
                   }}
                   className={`px-2 sm:px-3 py-1 rounded-md text-xs font-bold transition flex items-center gap-1 ${
@@ -98,9 +103,9 @@ function NavbarContent() {
                       ? 'bg-saudi-gold-500 text-saudi-green-950 shadow-sm'
                       : 'text-gray-300 hover:text-white hover:bg-white/5'
                   }`}
-                  title="تصفح المنصة كصاحب مناسبة"
+                  title={t('تصفح المنصة كصاحب مناسبة')}
                 >
-                  <span>صاحب المناسبة</span>
+                  <span>{t('صاحب المناسبة')}</span>
                 </button>
 
                 {/* 2. Supplier Option */}
@@ -116,10 +121,10 @@ function NavbarContent() {
                       ? 'bg-saudi-gold-500 text-saudi-green-950 shadow-sm'
                       : 'text-gray-300 hover:text-white hover:bg-white/5'
                   }`}
-                  title="الدخول لبوابة الموردين والشركاء"
+                  title={t('الدخول لبوابة الموردين والشركاء')}
                 >
                   <Store className="w-3.5 h-3.5" />
-                  <span>بوابة الموردين</span>
+                  <span>{t('بوابة الموردين')}</span>
                 </button>)}
 
                 {/* 3. Admin Option (elevated gold badge if active or admin) */}
@@ -135,10 +140,10 @@ function NavbarContent() {
                       ? 'bg-saudi-gold-500 text-saudi-green-950 shadow-sm'
                       : 'text-gray-300 hover:text-white hover:bg-white/5'
                   }`}
-                  title="لوحة الإدارة المركزية (للمشرفين)"
+                  title={t('لوحة الإدارة المركزية (للمشرفين)')}
                 >
                   <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>لوحة الإدارة</span>
+                  <span>{t('لوحة الإدارة')}</span>
                 </button>)}
               </div>
             </div>
@@ -164,7 +169,7 @@ function NavbarContent() {
                       ? 'bg-saudi-gold-500/30 text-saudi-gold-300'
                       : 'bg-emerald-800 text-emerald-200'
                   }`}>
-                    {currentUser.hasSystemAccess ? 'مدير النظام' : currentUser.role === 'admin' ? 'إدارة' : currentUser.role === 'vendor' ? 'مورد' : 'عميل'}
+                    {currentUser.hasSystemAccess ? t('مدير النظام') : currentUser.role === 'admin' ? t('إدارة') : currentUser.role === 'vendor' ? t('مورد') : t('عميل')}
                   </span>
                   <ChevronDown className="w-3 h-3 text-gray-300" />
                 </button>
@@ -179,11 +184,11 @@ function NavbarContent() {
                       <p className="text-xs text-gray-500">{currentUser.phone || currentUser.email}</p>
                       <div className="mt-1.5 flex items-center gap-1">
                         <span className="text-caption2 font-bold px-2 py-0.5 rounded-full bg-saudi-sand-100 text-saudi-green-900">
-                          {currentUser.hasSystemAccess ? '🛡️ مدير النظام' : currentUser.role === 'admin'
-                            ? '🛡️ حساب إداري'
+                          {currentUser.hasSystemAccess ? t('🛡️ مدير النظام') : currentUser.role === 'admin'
+                            ? t('🛡️ حساب إداري')
                             : currentUser.role === 'vendor'
-                            ? '🏪 حساب مورد معتمد'
-                            : '👤 حساب صاحب المناسبة'}
+                            ? t('🏪 حساب مورد معتمد')
+                            : t('👤 حساب صاحب المناسبة')}
                         </span>
                       </div>
                     </div>
@@ -195,7 +200,7 @@ function NavbarContent() {
                           className="w-full text-right px-4 py-2 hover:bg-saudi-sand-50 text-saudi-gold-800 font-bold flex items-center gap-2"
                         >
                           <Store className="w-4 h-4 text-saudi-gold-600" />
-                          <span>ترقية الحساب أو تسجيل منشأة كمورد</span>
+                          <span>{t('ترقية الحساب أو تسجيل منشأة كمورد')}</span>
                         </button>
                       )}
 
@@ -205,7 +210,7 @@ function NavbarContent() {
                           className="w-full text-right px-4 py-2 hover:bg-saudi-sand-50 text-gray-800 font-semibold flex items-center gap-2"
                         >
                           <Store className="w-4 h-4 text-saudi-green-800" />
-                          <span>بوابة المورد وإدارة الخدمات</span>
+                          <span>{t('بوابة المورد وإدارة الخدمات')}</span>
                         </Link>
                       )}
 
@@ -214,21 +219,21 @@ function NavbarContent() {
                         className="w-full text-right px-4 py-2 hover:bg-saudi-sand-50 text-gray-800 font-semibold flex items-center gap-2"
                       >
                         <UserPlus className="w-4 h-4 text-gray-600" />
-                        <span>تبديل الحساب أو إنشاء حساب جديد</span>
+                        <span>{t('تبديل الحساب أو إنشاء حساب جديد')}</span>
                       </button>
 
-                      {currentUser.hasSystemAccess && <Link href="/system-admin" className="block px-3 py-2 text-xs font-bold text-amber-800 hover:bg-amber-50 rounded-xl">مدير النظام</Link>}
-                      {(currentUser.hasAdminAccess || currentUser.hasSystemAccess || currentUser.role === 'admin') && <Link href="/admin/backups" onClick={() => setIsUserDropdownOpen(false)} className="block px-3 py-2 text-xs font-bold text-saudi-green-900 hover:bg-gray-50 rounded-xl">النسخ الاحتياطي</Link>}
-                      {currentUser.hasSystemAccess && <Link href="/system-admin/geography" className="block px-3 py-2 text-xs text-emerald-900">الدول والمدن والخدمات</Link>}
-                      {currentUser.hasSystemAccess && <Link href="/system-admin/availability" className="block px-3 py-2 text-xs text-emerald-900">إدارة الإتاحة والحجز</Link>}
-                      <Link href="/settings/channels" onClick={() => setIsUserDropdownOpen(false)} className="block px-3 py-2 text-xs font-bold text-saudi-green-900 hover:bg-gray-50 rounded-xl">إعدادات إرسال الدعوات</Link>
-                      <Link href="/settings/invitations-data" onClick={() => setIsUserDropdownOpen(false)} className="block px-3 py-2 text-xs text-gray-600 hover:bg-gray-50 rounded-xl">نقل الدعوات السابقة</Link>
+                      {currentUser.hasSystemAccess && <Link href="/system-admin" className="block px-3 py-2 text-xs font-bold text-amber-800 hover:bg-amber-50 rounded-xl">{t('مدير النظام')}</Link>}
+                      {(currentUser.hasAdminAccess || currentUser.hasSystemAccess || currentUser.role === 'admin') && <Link href="/admin/backups" onClick={() => setIsUserDropdownOpen(false)} className="block px-3 py-2 text-xs font-bold text-saudi-green-900 hover:bg-gray-50 rounded-xl">{t('النسخ الاحتياطي')}</Link>}
+                      {currentUser.hasSystemAccess && <Link href="/system-admin/geography" className="block px-3 py-2 text-xs text-emerald-900">{t('الدول والمدن والخدمات')}</Link>}
+                      {currentUser.hasSystemAccess && <Link href="/system-admin/availability" className="block px-3 py-2 text-xs text-emerald-900">{t('إدارة الإتاحة والحجز')}</Link>}
+                      <Link href="/settings/channels" onClick={() => setIsUserDropdownOpen(false)} className="block px-3 py-2 text-xs font-bold text-saudi-green-900 hover:bg-gray-50 rounded-xl">{t('إعدادات إرسال الدعوات')}</Link>
+                      <Link href="/settings/invitations-data" onClick={() => setIsUserDropdownOpen(false)} className="block px-3 py-2 text-xs text-gray-600 hover:bg-gray-50 rounded-xl">{t('نقل الدعوات السابقة')}</Link>
                       <button
                         onClick={logoutUser}
                         className="w-full text-right px-4 py-2 hover:bg-red-50 text-red-700 font-semibold flex items-center gap-2 border-t border-gray-100 mt-1"
                       >
                         <LogOut className="w-4 h-4 text-red-600" />
-                        <span>تسجيل الخروج</span>
+                        <span>{t('تسجيل الخروج')}</span>
                       </button>
                     </div>
                   </div>
@@ -241,15 +246,15 @@ function NavbarContent() {
                   className="bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-bold px-2.5 sm:px-3 py-1 rounded-md text-xs transition shadow-sm flex items-center gap-1"
                 >
                   <UserPlus className="w-3 h-3 text-saudi-green-950" />
-                  <span>إنشاء حساب</span>
+                  <span>{t('إنشاء حساب')}</span>
                 </button>
                 <button
                   onClick={() => openOnboarding()}
-                  aria-label="تسجيل الدخول"
+                  aria-label={t('تسجيل الدخول')}
                   className="text-gray-300 hover:text-white px-2 py-1 rounded text-xs font-bold transition flex items-center gap-1"
                 >
                   <LogIn className="w-3 h-3" />
-                  <span className="hidden sm:inline">تسجيل الدخول</span>
+                  <span className="hidden sm:inline">{t('تسجيل الدخول')}</span>
                 </button>
               </div>
             )}
@@ -268,10 +273,10 @@ function NavbarContent() {
               </div>
               <div className="flex flex-col">
                 <span className="text-2xl font-black tracking-tight text-saudi-green-900 font-cairo">
-                  {adminConfig.platformNameAr}
+                  {locale === 'en' ? 'Munasabati' : adminConfig.platformNameAr}
                 </span>
                 <span className="text-caption2 -mt-1 text-saudi-gold-600 font-medium">
-                  {adminConfig.taglineAr}
+                  {t(adminConfig.taglineAr)}
                 </span>
               </div>
             </Link>
@@ -287,7 +292,7 @@ function NavbarContent() {
                       pathname === '/' ? 'text-saudi-green-800 font-bold bg-saudi-green-50' : 'hover:text-saudi-green-800 hover:bg-gray-50'
                     }`}
                   >
-                    الرئيسية
+                    {t('الرئيسية')}
                   </Link>
                   <Link
                     href="/marketplace"
@@ -296,7 +301,7 @@ function NavbarContent() {
                     }`}
                   >
                     <ShoppingBag className="w-4 h-4 text-saudi-green-700" />
-                    <span>سوق الخدمات</span>
+                    <span>{t('سوق الخدمات')}</span>
                   </Link>
                   <Link
                     href="/packages"
@@ -305,7 +310,7 @@ function NavbarContent() {
                     }`}
                   >
                     <Layers className="w-4 h-4 text-saudi-green-700" />
-                    <span>الباقات الذكية</span>
+                    <span>{t('الباقات الذكية')}</span>
                   </Link>
                   <Link
                     href="/calculator"
@@ -314,7 +319,7 @@ function NavbarContent() {
                     }`}
                   >
                     <Sparkles className="w-4 h-4 text-saudi-green-700" />
-                    <span>حاسبة التكاليف</span>
+                    <span>{t('حاسبة التكاليف')}</span>
                   </Link>
                   <Link
                     href="/rfq"
@@ -323,7 +328,7 @@ function NavbarContent() {
                     }`}
                   >
                     <FileText className="w-4 h-4 text-saudi-green-700" />
-                    <span>عروض الأسعار</span>
+                    <span>{t('عروض الأسعار')}</span>
                   </Link>
                   <Link
                     href="/commerce/orders"
@@ -332,11 +337,11 @@ function NavbarContent() {
                     }`}
                   >
                     <ShieldCheck className="w-4 h-4 text-saudi-green-700" />
-                    <span>حجوزاتي وفواتيري</span>
+                    <span>{t('حجوزاتي وفواتيري')}</span>
                   </Link>
                   <details className="relative">
                     <summary className="flex cursor-pointer list-none items-center gap-1 rounded-lg px-3 py-2 transition hover:bg-gray-50 hover:text-saudi-green-800 [&::-webkit-details-marker]:hidden">
-                      <span>المزيد</span>
+                      <span>{t('المزيد')}</span>
                       <ChevronDown className="w-3.5 h-3.5" />
                     </summary>
                     <div className="absolute right-0 top-full z-50 mt-1 w-52 rounded-2xl border border-gray-100 bg-white p-1.5 shadow-xl">
@@ -346,7 +351,7 @@ function NavbarContent() {
                         className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition ${pathname.startsWith('/zaffah') ? 'bg-saudi-green-50 font-bold text-saudi-green-800' : 'hover:bg-gray-50 hover:text-saudi-green-800'}`}
                       >
                         <Music className="w-4 h-4 text-saudi-green-700" />
-                        <span>الزفات والفنون</span>
+                        <span>{t('الزفات والفنون')}</span>
                       </Link>
                       <Link
                         href="/inspiration"
@@ -354,7 +359,7 @@ function NavbarContent() {
                         className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition ${pathname.startsWith('/inspiration') ? 'bg-saudi-green-50 font-bold text-saudi-green-800' : 'hover:bg-gray-50 hover:text-saudi-green-800'}`}
                       >
                         <Lightbulb className="w-4 h-4 text-saudi-green-700" />
-                        <span>إلهام</span>
+                        <span>{t('إلهام')}</span>
                       </Link>
                       <Link
                         href="/scan"
@@ -362,7 +367,7 @@ function NavbarContent() {
                         className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition ${pathname.startsWith('/scan') ? 'bg-saudi-green-50 font-bold text-saudi-green-800' : 'hover:bg-gray-50 hover:text-saudi-green-800'}`}
                       >
                         <QrCode className="w-4 h-4 text-saudi-green-700" />
-                        <span>ماسح الدخول</span>
+                        <span>{t('ماسح الدخول')}</span>
                       </Link>
                     </div>
                   </details>
@@ -379,42 +384,42 @@ function NavbarContent() {
                     }`}
                   >
                     <Store className="w-4 h-4 text-saudi-green-800" />
-                    <span>بوابة الموردين</span>
+                    <span>{t('بوابة الموردين')}</span>
                   </Link>
                   <Link
                     href="/commerce/orders"
                     className="px-3 py-2 rounded-lg hover:text-saudi-green-800 hover:bg-gray-50 transition flex items-center gap-1"
                   >
                     <Calendar className="w-4 h-4 text-saudi-green-700" />
-                    <span>طلبات الحجز المباشرة</span>
+                    <span>{t('طلبات الحجز المباشرة')}</span>
                   </Link>
                   <Link
                     href="/commerce/orders"
                     className="px-3 py-2 rounded-lg hover:text-saudi-green-800 hover:bg-gray-50 transition flex items-center gap-1"
                   >
                     <FileText className="w-4 h-4 text-saudi-green-700" />
-                    <span>طلبات عروض الأسعار (RFQ)</span>
+                    <span>{t('طلبات عروض الأسعار (RFQ)')}</span>
                   </Link>
                   <Link
                     href="/commerce/manage"
                     className="px-3 py-2 rounded-lg hover:text-saudi-green-800 hover:bg-gray-50 transition flex items-center gap-1"
                   >
                     <Layers className="w-4 h-4 text-saudi-green-700" />
-                    <span>خدماتي وباقاتي</span>
+                    <span>{t('خدماتي وباقاتي')}</span>
                   </Link>
                   <Link
                     href="/vendor/catalog"
                     className="px-3 py-2 rounded-lg hover:text-saudi-green-800 hover:bg-gray-50 transition flex items-center gap-1"
                   >
                     <ShieldCheck className="w-4 h-4 text-saudi-green-700" />
-                    <span>بيانات المتجر</span>
+                    <span>{t('بيانات المتجر')}</span>
                   </Link>
                   <Link
                     href="/marketplace"
                     className="px-3 py-2 rounded-lg hover:text-saudi-green-800 hover:bg-gray-50 transition flex items-center gap-1 text-gray-500"
                   >
                     <ShoppingBag className="w-4 h-4 text-gray-500" />
-                    <span>استعراض السوق كعميل</span>
+                    <span>{t('استعراض السوق كعميل')}</span>
                   </Link>
                 </>
               )}
@@ -431,7 +436,7 @@ function NavbarContent() {
                     }`}
                   >
                     <ShieldCheck className="w-4 h-4 text-saudi-green-700" />
-                    <span>لوحة الإدارة المركزية</span>
+                    <span>{t('لوحة الإدارة المركزية')}</span>
                   </Link>
                   <Link
                     href="/admin/oms"
@@ -442,7 +447,7 @@ function NavbarContent() {
                     }`}
                   >
                     <TrendingUp className="w-4 h-4 text-saudi-green-700" />
-                    <span>إدارة الطلبات (OMS)</span>
+                    <span>{t('إدارة الطلبات (OMS)')}</span>
                   </Link>
                   <Link
                     href="/admin?tab=vendors"
@@ -453,7 +458,7 @@ function NavbarContent() {
                     }`}
                   >
                     <Store className="w-4 h-4 text-saudi-green-700" />
-                    <span>الموردين والاعتماد</span>
+                    <span>{t('الموردين والاعتماد')}</span>
                   </Link>
                   <Link
                     href="/commerce/orders"
@@ -464,7 +469,7 @@ function NavbarContent() {
                     }`}
                   >
                     <CreditCard className="w-4 h-4 text-saudi-green-700" />
-                    <span>الحجوزات والمالية</span>
+                    <span>{t('الحجوزات والمالية')}</span>
                   </Link>
                   <Link
                     href="/commerce/manage"
@@ -475,13 +480,13 @@ function NavbarContent() {
                     }`}
                   >
                     <Settings className="w-4 h-4 text-saudi-green-700" />
-                    <span>إعدادات الكتالوج</span>
+                    <span>{t('إعدادات الكتالوج')}</span>
                   </Link>
                   <Link
                     href="/"
                     className="px-3 py-2 rounded-lg hover:text-saudi-green-800 hover:bg-gray-50 transition flex items-center gap-1 text-gray-500"
                   >
-                    <span>معاينة الواجهة كعميل</span>
+                    <span>{t('معاينة الواجهة كعميل')}</span>
                   </Link>
                 </>
               )}
@@ -508,7 +513,7 @@ function NavbarContent() {
                           {activeOccasion?.title}
                         </span>
                         <span className="text-caption2 text-saudi-green-700 font-semibold">
-                          جاهزية: {activeOccasion?.readinessPercentage}%
+                          {t('جاهزية:')} {activeOccasion?.readinessPercentage}%
                         </span>
                       </div>
                       <ChevronDown className="w-3.5 h-3.5 text-gray-500" />
@@ -520,7 +525,7 @@ function NavbarContent() {
                         onClick={() => setIsOccasionDropdownOpen(false)}
                       >
                         <div className="text-xs font-bold text-gray-500 px-3 py-1 border-b border-gray-100">
-                          مناسباتك الحالية ({occasions.length})
+                          {t('مناسباتك الحالية (')}{occasions.length})
                         </div>
                         <div className="max-h-60 overflow-y-auto divide-y divide-gray-50 my-1">
                           {occasions.map((occ) => (
@@ -549,7 +554,7 @@ function NavbarContent() {
                           className="w-full mt-1 flex items-center justify-center gap-1.5 py-2 px-3 bg-saudi-green-800 text-white font-bold rounded-xl text-xs hover:bg-saudi-green-900 transition"
                         >
                           <PlusCircle className="w-3.5 h-3.5 text-saudi-gold-300" />
-                          <span>إنشاء مناسبة جديدة</span>
+                          <span>{t('إنشاء مناسبة جديدة')}</span>
                         </Link>
                       </div>
                     )}
@@ -561,10 +566,10 @@ function NavbarContent() {
                   <Link
                     href="/compare"
                     className="flex items-center gap-1.5 bg-saudi-sand-100 hover:bg-saudi-sand-200 text-saudi-green-950 px-2.5 sm:px-3 py-2 rounded-xl text-xs font-bold border border-saudi-sand-300 transition"
-                    title="مقارنة الموردين"
+                    title={t('مقارنة الموردين')}
                   >
                     <ArrowLeftRight className="w-3.5 h-3.5 text-saudi-gold-600" />
-                    <span className="hidden sm:inline">مقارنة</span>
+                    <span className="hidden sm:inline">{t('مقارنة')}</span>
                     <span className="bg-saudi-gold-500 text-saudi-green-950 text-caption2 font-bold w-4 h-4 rounded-full flex items-center justify-center">
                       {comparisonVendorIds.length}
                     </span>
@@ -576,10 +581,10 @@ function NavbarContent() {
                   href="/commerce/cart"
                   onClick={(e) => cartGate(e, '/commerce/cart')}
                   className="relative flex items-center gap-1.5 bg-saudi-sand-100 hover:bg-saudi-sand-200 text-saudi-green-950 px-2.5 sm:px-3 py-2 rounded-xl text-xs font-bold border border-saudi-sand-300 transition"
-                  title="سلة الحجوزات"
+                  title={t('سلة الحجوزات')}
                 >
                   <ShoppingBag className="w-4 h-4 text-saudi-green-800" />
-                  <span className="hidden sm:inline">السلة</span>
+                  <span className="hidden sm:inline">{t('السلة')}</span>
                   {cart.length > 0 && (
                     <span className="bg-saudi-green-800 text-white text-caption2 font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
                       {cart.reduce((sum, item) => sum + item.quantity, 0)}
@@ -588,14 +593,14 @@ function NavbarContent() {
                 </Link>
 
                 {/* AI Assistant Button (لُـمى) */}
-                <FeatureContent id="luma"><button
+                {locale === 'ar' && <FeatureContent id="luma"><button
                   onClick={() => setIsAIOpen(true)}
                   className="flex items-center gap-1.5 bg-white hover:bg-saudi-sand-100 border border-saudi-gold-400 text-saudi-green-900 px-3 sm:px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold shadow-sm transition"
                 >
                   <Sparkles className="w-4 h-4 text-saudi-gold-600" />
-                  <span className="hidden sm:inline">{adminConfig.aiAssistantNameAr} (الذكاء الاصطناعي)</span>
-                  <span className="sm:hidden">لُـمى</span>
-                </button></FeatureContent>
+                  <span className="hidden sm:inline">{adminConfig.aiAssistantNameAr} {t('(الذكاء الاصطناعي)')}</span>
+                  <span className="sm:hidden">{t('لُـمى')}</span>
+                </button></FeatureContent>}
 
                 {/* Create Occasion Direct CTA */}
                 <Link
@@ -603,7 +608,7 @@ function NavbarContent() {
                   className="hidden md:flex items-center gap-1.5 bg-saudi-green-800 hover:bg-saudi-green-900 text-white px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold shadow-sm transition"
                 >
                   <PlusCircle className="w-4 h-4 text-saudi-gold-400" />
-                  <span>+ أنشئ مناسبتك</span>
+                  <span>{t('+ أنشئ مناسبتك')}</span>
                 </Link>
               </>
             )}
@@ -616,16 +621,16 @@ function NavbarContent() {
                   className="flex items-center gap-1.5 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold shadow-md transition"
                 >
                   <PlusCircle className="w-4 h-4" />
-                  <span>+ إضافة خدمة جديدة</span>
+                  <span>{t('+ إضافة خدمة جديدة')}</span>
                 </Link>
 
-                <FeatureContent id="luma"><button
+                {locale === 'ar' && <FeatureContent id="luma"><button
                   onClick={() => setIsAIOpen(true)}
                   className="flex items-center gap-1.5 bg-saudi-green-800 hover:bg-saudi-green-900 text-white px-3 py-2 rounded-xl text-xs font-bold transition"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-saudi-gold-400" />
-                  <span>مستشار المورد الذكي</span>
-                </button></FeatureContent>
+                  <span>{t('مستشار المورد الذكي')}</span>
+                </button></FeatureContent>}
               </>
             )}
 
@@ -637,7 +642,7 @@ function NavbarContent() {
                   className="flex items-center gap-1.5 bg-saudi-green-800 hover:bg-saudi-green-900 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition"
                 >
                   <ShieldCheck className="w-4 h-4 text-saudi-gold-400" />
-                  <span>لوحة التحكم الكاملة</span>
+                  <span>{t('لوحة التحكم الكاملة')}</span>
                 </Link>
               </>
             )}
@@ -645,7 +650,7 @@ function NavbarContent() {
             {/* Mobile menu button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              aria-label={isMobileMenuOpen ? 'إغلاق القائمة' : 'فتح القائمة'}
+              aria-label={isMobileMenuOpen ? t('إغلاق القائمة') : t('فتح القائمة')}
               aria-expanded={isMobileMenuOpen}
               className="lg:hidden p-2 text-gray-700 hover:text-saudi-green-800 rounded-lg"
             >
@@ -670,17 +675,17 @@ function NavbarContent() {
                 <div>
                   <p className="font-bold text-xs text-gray-900">{currentUser.name}</p>
                   <p className="text-caption2 text-gray-600">
-                    {currentUser.hasSystemAccess ? 'مدير النظام' : currentUser.role === 'admin' ? 'مشرف المنصة' : currentUser.role === 'vendor' ? 'مورد معتمد' : 'صاحب مناسبة'}
+                    {currentUser.hasSystemAccess ? t('مدير النظام') : currentUser.role === 'admin' ? t('مشرف المنصة') : currentUser.role === 'vendor' ? t('مورد معتمد') : t('صاحب مناسبة')}
                   </p>
                 </div>
               </div>
-              {currentUser.hasSystemAccess && <Link href="/system-admin" className="text-xs font-bold underline text-amber-800">مدير النظام</Link>}
-              <Link href="/settings/channels" className="text-xs underline text-saudi-green-900">إعدادات إرسال الدعوات</Link>
+              {currentUser.hasSystemAccess && <Link href="/system-admin" className="text-xs font-bold underline text-amber-800">{t('مدير النظام')}</Link>}
+              <Link href="/settings/channels" className="text-xs underline text-saudi-green-900">{t('إعدادات إرسال الدعوات')}</Link>
               <button
                 onClick={logoutUser}
                 className="text-xs text-red-600 font-bold p-1 hover:bg-white rounded"
               >
-                خروج
+                {t('خروج')}
               </button>
             </div>
           ) : (
@@ -691,7 +696,7 @@ function NavbarContent() {
               }}
               className="w-full py-2.5 bg-saudi-gold-500 text-saudi-green-950 font-bold rounded-xl text-xs shadow"
             >
-              تسجيل حساب جديد أو تسجيل الدخول
+              {t('تسجيل حساب جديد أو تسجيل الدخول')}
             </button>
           )}
 
@@ -703,14 +708,14 @@ function NavbarContent() {
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="block py-2 text-sm font-bold text-gray-800 hover:text-saudi-green-800"
               >
-                الرئيسية
+                {t('الرئيسية')}
               </Link>
               <Link
                 href="/marketplace"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="block py-2 text-sm font-bold text-gray-800 hover:text-saudi-green-800"
               >
-                سوق الخدمات والتجهيزات
+                {t('سوق الخدمات والتجهيزات')}
               </Link>
               <Link
                 href="/commerce/cart"
@@ -719,7 +724,7 @@ function NavbarContent() {
               >
                 <span className="flex items-center gap-2">
                   <ShoppingBag className="w-4 h-4 text-saudi-gold-600" />
-                  <span>سلة الحجوزات</span>
+                  <span>{t('سلة الحجوزات')}</span>
                 </span>
                 {cart.length > 0 && (
                   <span className="bg-saudi-green-800 text-white text-xs px-2 py-0.5 rounded-full font-mono">
@@ -732,35 +737,35 @@ function NavbarContent() {
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="block py-2 text-sm font-bold text-gray-800 hover:text-saudi-green-800"
               >
-                الباقات الذكية الجاهزة
+                {t('الباقات الذكية الجاهزة')}
               </Link>
               <Link
                 href="/calculator"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="block py-2 text-sm font-bold text-gray-800 hover:text-saudi-green-800"
               >
-                حاسبة تكاليف وميزانية المناسبات
+                {t('حاسبة تكاليف وميزانية المناسبات')}
               </Link>
               <Link
                 href="/commerce/orders"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="block py-2 text-sm font-bold text-gray-800 hover:text-saudi-green-800"
               >
-                طلباتي وحجوزاتي
+                {t('طلباتي وحجوزاتي')}
               </Link>
               <Link
                 href="/commerce"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="block py-2 text-sm font-bold text-gray-800 hover:text-saudi-green-800"
               >
-                طلب ومقارنة عروض الأسعار (RFQ)
+                {t('طلب ومقارنة عروض الأسعار (RFQ)')}
               </Link>
               <Link
                 href="/plan"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="block text-center py-2.5 bg-saudi-green-800 text-white rounded-xl font-bold text-sm"
               >
-                + إنشاء مناسبة جديدة
+                {t('+ إنشاء مناسبة جديدة')}
               </Link>
             </>
           )}
@@ -772,14 +777,14 @@ function NavbarContent() {
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="block py-2 text-sm font-bold text-saudi-green-800"
               >
-                لوحة تحكم بوابة الموردين
+                {t('لوحة تحكم بوابة الموردين')}
               </Link>
               <Link
                 href="/marketplace"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="block py-2 text-sm font-bold text-gray-700"
               >
-                تصفح سوق المناسبات كعميل
+                {t('تصفح سوق المناسبات كعميل')}
               </Link>
             </>
           )}
@@ -795,7 +800,7 @@ function NavbarContent() {
                     : 'text-gray-700'
                 }`}
               >
-                لوحة الإدارة المركزية
+                {t('لوحة الإدارة المركزية')}
               </Link>
               <Link
                 href="/admin/oms"
@@ -804,7 +809,7 @@ function NavbarContent() {
                   pathname === '/admin/oms' ? 'text-saudi-green-800' : 'text-gray-700'
                 }`}
               >
-                إدارة الطلبات (OMS)
+                {t('إدارة الطلبات (OMS)')}
               </Link>
               <Link
                 href="/admin?tab=vendors"
@@ -813,7 +818,7 @@ function NavbarContent() {
                   pathname === '/admin' && currentTab === 'vendors' ? 'text-saudi-green-800' : 'text-gray-700'
                 }`}
               >
-                الموردين والاعتماد
+                {t('الموردين والاعتماد')}
               </Link>
               <Link
                 href="/commerce/orders"
@@ -822,7 +827,7 @@ function NavbarContent() {
                   pathname === '/admin' && currentTab === 'bookings' ? 'text-saudi-green-800' : 'text-gray-700'
                 }`}
               >
-                الحجوزات والمالية
+                {t('الحجوزات والمالية')}
               </Link>
               <Link
                 href="/commerce/manage"
@@ -831,14 +836,14 @@ function NavbarContent() {
                   pathname === '/admin' && currentTab === 'services' ? 'text-saudi-green-800' : 'text-gray-700'
                 }`}
               >
-                إعدادات الكتالوج
+                {t('إعدادات الكتالوج')}
               </Link>
               <Link
                 href="/"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="block py-2 text-sm font-bold text-gray-500"
               >
-                معاينة الواجهة كعميل
+                {t('معاينة الواجهة كعميل')}
               </Link>
             </>
           )}

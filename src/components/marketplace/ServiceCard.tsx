@@ -2,7 +2,7 @@
 
 import { useGeo } from '@/components/geo/GeoProvider';
 import React, { useState } from 'react';
-import Link from 'next/link';
+import Link from '@/components/i18n/Link';
 import {
   Star,
   ShieldCheck,
@@ -19,6 +19,7 @@ import { ServiceItem } from '@/lib/types';
 import { formatSaudiRiyal, ensureServiceDetails } from '@/lib/utils';
 import { useApp } from '@/lib/store';
 import confetti from 'canvas-confetti';
+import { useT, usePick } from '@/components/i18n/LocaleProvider';
 
 interface ServiceCardProps {
   service: ServiceItem;
@@ -26,6 +27,7 @@ interface ServiceCardProps {
 }
 
 export default function ServiceCard({ service, onBookNow }: ServiceCardProps) {
+  const t = useT(); const pick = usePick();
   const { addToCart, favoriteServiceIds, toggleFavoriteService } = useApp();
   const geo=useGeo();
   const allowed=!!geo.data?.availability.find(a=>a.key==='item:'+service.id)?.available;
@@ -42,12 +44,12 @@ export default function ServiceCard({ service, onBookNow }: ServiceCardProps) {
 
   return (
     <div className="bg-white rounded-3xl border border-saudi-sand-300 overflow-hidden shadow-card hover:shadow-xl hover:border-saudi-gold-400/80 transition duration-300 flex flex-col justify-between group">
-      {!allowed&&<p className="p-3 text-xs bg-amber-50 text-amber-900">{geo.data?.selection.cityId?'غير متوفرة في مدينتك':'اختر المدينة للتحقق قبل الحجز'}</p>}
+      {!allowed&&<p className="p-3 text-xs bg-amber-50 text-amber-900">{geo.data?.selection.cityId?t('غير متوفرة في مدينتك'):t('اختر المدينة للتحقق قبل الحجز')}</p>}
       {/* Image Banner */}
       <div className="relative h-48 w-full bg-gray-100 overflow-hidden">
         <img
           src={service.images[0] || 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800&auto=format&fit=crop&q=80'}
-          alt={service.titleAr}
+          alt={pick(service.titleAr, service.titleEn)}
           loading="lazy"
           decoding="async"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
@@ -61,7 +63,7 @@ export default function ServiceCard({ service, onBookNow }: ServiceCardProps) {
               ? 'bg-rose-600 text-white shadow'
               : 'bg-black/40 hover:bg-black/60 text-white'
           }`}
-          title="إضافة إلى المفضلة"
+          title={t('إضافة إلى المفضلة')}
         >
           <Heart className={`w-3.5 h-3.5 ${isFavorite ? 'fill-current' : ''}`} />
         </button>
@@ -76,7 +78,7 @@ export default function ServiceCard({ service, onBookNow }: ServiceCardProps) {
           {service.instantBooking && (
             <span className="bg-emerald-600 text-white text-caption2 font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
               <Zap className="w-3 h-3 fill-current" />
-              طلب مباشر
+              {t('طلب مباشر')}
             </span>
           )}
         </div>
@@ -87,7 +89,7 @@ export default function ServiceCard({ service, onBookNow }: ServiceCardProps) {
           <span>{service.cityNameAr}</span>
           {service.genderPreference && (
             <span className="mr-1 text-gray-300">
-              • {service.genderPreference === 'women' ? 'طاقم نسائي' : service.genderPreference === 'men' ? 'طاقم رجالي' : 'عام'}
+              • {service.genderPreference === 'women' ? t('طاقم نسائي') : service.genderPreference === 'men' ? t('طاقم رجالي') : t('عام')}
             </span>
           )}
         </div>
@@ -126,7 +128,7 @@ export default function ServiceCard({ service, onBookNow }: ServiceCardProps) {
             href={`/service/${service.id}`}
             className="text-sm font-bold text-gray-900 hover:text-saudi-gold-700 font-cairo leading-snug line-clamp-2 transition block"
           >
-            {service.titleAr}
+            {pick(service.titleAr, service.titleEn)}
           </Link>
 
           {/* Features Highlights */}
@@ -143,7 +145,7 @@ export default function ServiceCard({ service, onBookNow }: ServiceCardProps) {
         {/* Price & Action Buttons */}
         <div className="pt-3 border-t border-saudi-sand-200 flex items-center justify-between">
           <div>
-            <span className="text-caption2 text-gray-500 block">السعر شامل الضريبة</span>
+            <span className="text-caption2 text-gray-500 block">{t('السعر شامل الضريبة')}</span>
             <span className="text-base font-bold font-cairo text-saudi-green-950">
               {formatSaudiRiyal(service.price)}
             </span>
@@ -157,7 +159,7 @@ export default function ServiceCard({ service, onBookNow }: ServiceCardProps) {
                   ? 'bg-emerald-700 text-white'
                   : 'bg-saudi-sand-100 hover:bg-saudi-green-100 text-saudi-green-900'
               }`}
-              title="اختر عرض الشراء"
+              title={t('اختر عرض الشراء')}
             >
               {isAdded ? (
                 <Check className="w-4 h-4 text-white" />
@@ -170,7 +172,7 @@ export default function ServiceCard({ service, onBookNow }: ServiceCardProps) {
               href={`/service/${service.id}`}
               className="px-3 py-2 bg-saudi-green-800 hover:bg-saudi-green-900 text-white rounded-xl text-xs font-bold shadow-sm transition"
             >
-              التفاصيل
+              {t('التفاصيل')}
             </Link>
           </div>
         </div>

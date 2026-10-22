@@ -69,3 +69,5 @@ next-env.d.ts
 # Isolated floor plan test
 /.next-fp-test-*/
 /.fp-test-tsconfig-*.json
+scripts/.i18n-report.json
+scripts/.i18n-scan.json

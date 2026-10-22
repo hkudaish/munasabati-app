@@ -6,6 +6,7 @@ import { Layers, Sparkles, CheckCircle2, Star, ArrowLeft, Sliders } from 'lucide
 import { SmartPackage } from '@/lib/types';
 import { formatSAR } from '@/lib/utils';
 import PackageCustomizerModal from './PackageCustomizerModal';
+import { useT, usePick } from '@/components/i18n/LocaleProvider';
 
 interface PackageCardProps {
   pkg: SmartPackage;
@@ -13,6 +14,7 @@ interface PackageCardProps {
 }
 
 export default function PackageCard({ pkg, onBookPackage }: PackageCardProps) {
+  const t = useT(); const pick = usePick();
   const geo=useGeo();
   const allowed=!!geo.data?.availability.find(a=>a.key==='feature:packages')?.available;
   const [isCustomizerOpen, setIsCustomizerOpen] = useState(false);
@@ -25,7 +27,7 @@ export default function PackageCard({ pkg, onBookPackage }: PackageCardProps) {
       <div className="relative h-52 w-full bg-gray-100 overflow-hidden">
         <img
           src={currentPackage.image}
-          alt={currentPackage.titleAr}
+          alt={pick(currentPackage.titleAr, currentPackage.titleEn)}
           loading="lazy"
           decoding="async"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
@@ -33,15 +35,15 @@ export default function PackageCard({ pkg, onBookPackage }: PackageCardProps) {
 
         <div className="absolute top-3 right-3 flex flex-col gap-1.5 items-end">
           <span className="bg-saudi-gold-500 text-saudi-green-950 text-xs font-bold px-3 py-1 rounded-full shadow-md">
-            {currentPackage.badge}
+            {t(currentPackage.badge)}
           </span>
           <span className="bg-saudi-green-900/90 backdrop-blur-md text-white text-xs font-bold px-2.5 py-0.5 rounded-full border border-saudi-gold-400/40">
-            توفير {formatSAR(currentPackage.savings)} 🔥
+            {t('توفير')} {formatSAR(currentPackage.savings)} 🔥
           </span>
         </div>
 
         <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md text-white text-xs font-bold px-2.5 py-1 rounded-lg">
-          تكفي {currentPackage.guestCount} شخص
+          {t('تكفي')} {currentPackage.guestCount} {t('شخص')}
         </div>
       </div>
 
@@ -50,7 +52,7 @@ export default function PackageCard({ pkg, onBookPackage }: PackageCardProps) {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-saudi-gold-600 bg-saudi-gold-50 px-2 py-0.5 rounded-md border border-saudi-gold-200">
-              مناسبة: {currentPackage.occasionTypeNameAr}
+              {t('مناسبة:')} {t(currentPackage.occasionTypeNameAr)}
             </span>
             <div className="flex items-center gap-1 text-xs font-bold text-gray-700">
               <Star className="w-3.5 h-3.5 fill-saudi-gold-500 text-saudi-gold-500" />
@@ -59,19 +61,19 @@ export default function PackageCard({ pkg, onBookPackage }: PackageCardProps) {
           </div>
 
           <h3 className="text-base font-bold leading-8 text-saudi-green-950 font-cairo">
-            {currentPackage.titleAr}
+            {pick(currentPackage.titleAr, currentPackage.titleEn)}
           </h3>
           <p className="text-sm leading-6 text-slate-600 line-clamp-2">
-            {currentPackage.subtitleAr}
+            {pick(currentPackage.subtitleAr, currentPackage.subtitleEn)}
           </p>
 
           {/* Included Items Checklist */}
           <div className="space-y-2.5 rounded-xl bg-saudi-sand-50 p-3">
-            <span className="text-xs font-bold text-gray-700 block">تشمل الباقة · {currentPackage.items.length} خدمات</span>
+            <span className="text-xs font-bold text-gray-700 block">{t('تشمل الباقة ·')} {currentPackage.items.length} {t('خدمات')}</span>
             {currentPackage.items.map((item, idx) => (
               <div key={idx} className="flex items-start gap-1.5 text-xs text-gray-600">
                 <CheckCircle2 className="w-3.5 h-3.5 text-saudi-green-700 shrink-0 mt-0.5" />
-                <span className="line-clamp-2 leading-5">{item.serviceName}</span>
+                <span className="line-clamp-2 leading-5">{t(item.serviceName)}</span>
               </div>
             ))}
           </div>
@@ -85,7 +87,7 @@ export default function PackageCard({ pkg, onBookPackage }: PackageCardProps) {
                 {formatSAR(currentPackage.originalPrice)}
               </span>
               <span className="text-xs font-bold text-saudi-green-800 bg-saudi-green-50 px-2 py-1 rounded-lg">
-                خصم {currentPackage.originalPrice > 0 ? Math.max(0, Math.round(((currentPackage.originalPrice - currentPackage.packagePrice) / currentPackage.originalPrice) * 100)) : 0}%
+                {t('خصم')} {currentPackage.originalPrice > 0 ? Math.max(0, Math.round(((currentPackage.originalPrice - currentPackage.packagePrice) / currentPackage.originalPrice) * 100)) : 0}%
               </span>
             </div>
             <span className="mt-1 block whitespace-nowrap text-2xl font-black font-cairo text-saudi-green-950">
@@ -97,10 +99,10 @@ export default function PackageCard({ pkg, onBookPackage }: PackageCardProps) {
             <button disabled={!allowed||!!geo.data?.preview}
               onClick={() => setIsCustomizerOpen(true)}
               className="p-3 bg-saudi-sand-100 hover:bg-saudi-sand-200 text-gray-800 rounded-xl text-sm font-bold transition flex items-center justify-center gap-2 disabled:opacity-50"
-              title="تخصيص بنود الباقة"
+              title={t('تخصيص بنود الباقة')}
             >
               <Sliders className="w-4 h-4 text-saudi-gold-600" />
-              <span>تخصيص</span>
+              <span>{t('تخصيص')}</span>
             </button>
 
             <button disabled={!allowed||!!geo.data?.preview}
@@ -109,7 +111,7 @@ export default function PackageCard({ pkg, onBookPackage }: PackageCardProps) {
               }}
               className="flex-1 px-4 py-3 bg-saudi-green-800 hover:bg-saudi-green-900 text-white rounded-xl text-sm font-bold shadow-md transition disabled:opacity-50"
             >
-              حجز الباقة
+              {t('حجز الباقة')}
             </button>
           </div>
         </div>

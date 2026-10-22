@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { NOTIFY_EVENT, type NotifyKind } from '@/lib/notify';
+import { useT } from '@/components/i18n/LocaleProvider';
 
 type Toast = { id: number; message: string; kind: NotifyKind };
 
@@ -13,6 +14,7 @@ const tone: Record<NotifyKind, string> = {
 };
 
 export default function Toaster() {
+  const tr = useT();
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   useEffect(() => {
@@ -40,7 +42,7 @@ export default function Toaster() {
           <p className="flex-1 leading-relaxed">{t.message}</p>
           <button
             type="button"
-            aria-label="إغلاق"
+            aria-label={tr('إغلاق')}
             onClick={() => setToasts(x => x.filter(i => i.id !== t.id))}
             className="shrink-0 rounded-lg p-1 hover:bg-black/5"
           >

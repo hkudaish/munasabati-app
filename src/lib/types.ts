@@ -5,6 +5,7 @@ export type BookingStatus = 'requested' | 'awaiting_vendor' | 'quote_received' |
 export type PaymentMethod = 'mada' | 'apple_pay' | 'stc_pay' | 'visa_mastercard' | 'tabby' | 'tamara';
 
 export interface SaudiCity {
+  regionEn?: string;
   id: string;
   nameAr: string;
   nameEn: string;
@@ -14,6 +15,7 @@ export interface SaudiCity {
 }
 
 export interface OccasionType {
+  descriptionEn?: string;
   id: string;
   nameAr: string;
   nameEn: string;
@@ -121,6 +123,8 @@ export interface ServiceAvailability {
 }
 
 export interface ServiceItem {
+  titleEn?: string;
+  descriptionEn?: string;
   subcategoryId?: string | null;
   artistId?: string | null;
   subcategory?: import('./catalog/types').CatalogSubcategory | null;
@@ -168,6 +172,8 @@ export interface PackageItem {
 }
 
 export interface SmartPackage {
+  titleEn?: string;
+  subtitleEn?: string;
   id: string;
   titleAr: string;
   subtitleAr: string;

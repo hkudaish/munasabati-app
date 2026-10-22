@@ -27,8 +27,10 @@ import {
   HelpCircle,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { useT, usePick } from '@/components/i18n/LocaleProvider';
 
 export default function UserOnboardingModal() {
+  const tr = useT(); const pick = usePick();
   const router = useRouter();
   const {
     cities,
@@ -129,7 +131,7 @@ export default function UserOnboardingModal() {
     e.preventDefault();
     setErrorMessage('');
     if (!customerData.name.trim() || !customerData.phone.trim()) {
-      setErrorMessage('يرجى كتابة الاسم ورقم الجوال بشكل صحيح.');
+      setErrorMessage(tr('يرجى كتابة الاسم ورقم الجوال بشكل صحيح.'));
       return;
     }
 
@@ -146,7 +148,7 @@ export default function UserOnboardingModal() {
 
     setIsSubmitting(false);
     if (!res.success) {
-      setErrorMessage(res.error || 'حدث خطأ أثناء التسجيل');
+      setErrorMessage(res.error || tr('حدث خطأ أثناء التسجيل'));
       return;
     }
 
@@ -163,7 +165,7 @@ export default function UserOnboardingModal() {
     e.preventDefault();
     setErrorMessage('');
     if (!vendorData.businessName.trim() || !vendorData.contactPhone.trim()) {
-      setErrorMessage('يرجى إدخال اسم المنشأة ورقم التواصل.');
+      setErrorMessage(tr('يرجى إدخال اسم المنشأة ورقم التواصل.'));
       return;
     }
 
@@ -187,7 +189,7 @@ export default function UserOnboardingModal() {
 
     setIsSubmitting(false);
     if (!res.success) {
-      setErrorMessage(res.error || 'حدث خطأ أثناء تسجيل المورد');
+      setErrorMessage(res.error || tr('حدث خطأ أثناء تسجيل المورد'));
       return;
     }
 
@@ -207,7 +209,7 @@ export default function UserOnboardingModal() {
     setIsSubmitting(false);
 
     if (!res.success) {
-      setErrorMessage(res.error || 'فشل تسجيل الدخول');
+      setErrorMessage(res.error || tr('فشل تسجيل الدخول'));
       return;
     }
 
@@ -243,32 +245,32 @@ export default function UserOnboardingModal() {
               clearPermissionNotice();
             }}
             className="absolute left-4 top-4 p-2 text-gray-300 hover:text-white rounded-full bg-white/10 hover:bg-white/20 transition"
-            title="إغلاق"
+            title={tr('إغلاق')}
           >
             <X className="w-5 h-5" />
           </button>
 
           <div className="flex items-center gap-2 text-saudi-gold-400 text-xs font-bold mb-1">
             <Sparkles className="w-4 h-4" />
-            <span>منصة مناسبتـي الرقمية 🇸🇦</span>
+            <span>{tr('منصة مناسبتـي الرقمية 🇸🇦')}</span>
           </div>
 
           <h2 className="text-xl sm:text-2xl font-black font-cairo text-white" id="dlg-9634-1">
-            {step === 'gate' && 'سجّل الدخول أو أنشئ حساباً للمتابعة'}
-            {step === 'select_role' && 'اختر نوع الحساب للانطلاق'}
-            {step === 'customer_form' && 'إنشاء حساب صاحب المناسبة 🎉'}
-            {step === 'vendor_form' && 'تسجيل منشأة أو مورد جديد 🏪'}
-            {step === 'login' && 'تسجيل الدخول إلى حسابك 🔐'}
-            {step === 'success' && 'أهلاً وسهلاً بك في مناسبتـي! 🌟'}
+            {step === 'gate' && tr('سجّل الدخول أو أنشئ حساباً للمتابعة')}
+            {step === 'select_role' && tr('اختر نوع الحساب للانطلاق')}
+            {step === 'customer_form' && tr('إنشاء حساب صاحب المناسبة 🎉')}
+            {step === 'vendor_form' && tr('تسجيل منشأة أو مورد جديد 🏪')}
+            {step === 'login' && tr('تسجيل الدخول إلى حسابك 🔐')}
+            {step === 'success' && tr('أهلاً وسهلاً بك في مناسبتـي! 🌟')}
           </h2>
 
           <p className="text-xs sm:text-sm text-gray-300 mt-1">
-            {step === 'gate' && 'تصفّح الخدمات متاح للجميع. نحتاج حسابك فقط لحفظ السلة وإتمام طلبك، ولن تفقد اختياراتك.'}
-            {step === 'select_role' && 'سواء كنت تخطط لاحتفال فاخر أو تقدم خدمات احترافية، نوفر لك تجربة مخصصة بالكامل.'}
-            {step === 'customer_form' && 'احجز أفضل الموردين والقاعات ونظّم ميزانيتك وبطاقات دعواتك في مكان واحد.'}
-            {step === 'vendor_form' && 'انضم إلى شبكة الموردين المعتمدين في المملكة واستقبل طلبات الحجز وعروض الأسعار.'}
-            {step === 'login' && 'سجّل الدخول للوصول إلى حجوزاتك، عروضك، ومساحة العمل الخاصة بك.'}
-            {step === 'success' && 'تم تجهيز مساحة عملك بنجاح وتطبيق الصلاحيات الملائمة.'}
+            {step === 'gate' && tr('تصفّح الخدمات متاح للجميع. نحتاج حسابك فقط لحفظ السلة وإتمام طلبك، ولن تفقد اختياراتك.')}
+            {step === 'select_role' && tr('سواء كنت تخطط لاحتفال فاخر أو تقدم خدمات احترافية، نوفر لك تجربة مخصصة بالكامل.')}
+            {step === 'customer_form' && tr('احجز أفضل الموردين والقاعات ونظّم ميزانيتك وبطاقات دعواتك في مكان واحد.')}
+            {step === 'vendor_form' && tr('انضم إلى شبكة الموردين المعتمدين في المملكة واستقبل طلبات الحجز وعروض الأسعار.')}
+            {step === 'login' && tr('سجّل الدخول للوصول إلى حجوزاتك، عروضك، ومساحة العمل الخاصة بك.')}
+            {step === 'success' && tr('تم تجهيز مساحة عملك بنجاح وتطبيق الصلاحيات الملائمة.')}
           </p>
         </div>
 
@@ -281,7 +283,7 @@ export default function UserOnboardingModal() {
               <div className="text-xs sm:text-sm">
                 <p className="font-bold">{permissionNotice.messageAr}</p>
                 <p className="text-amber-700 text-xs mt-0.5">
-                  يرجى تحديد هويتك أدناه أو تسجيل الدخول بالحساب المناسب لمتابعة التصفح.
+                  {tr('يرجى تحديد هويتك أدناه أو تسجيل الدخول بالحساب المناسب لمتابعة التصفح.')}
                 </p>
               </div>
             </div>
@@ -303,21 +305,21 @@ export default function UserOnboardingModal() {
                 onClick={() => setStep('login')}
                 className="w-full rounded-2xl bg-saudi-green-800 hover:bg-saudi-green-900 px-5 py-3.5 text-sm font-bold text-white transition"
               >
-                تسجيل الدخول
+                {tr('تسجيل الدخول')}
               </button>
               <button
                 type="button"
                 onClick={() => { setSelectedRoleForOnboarding('client'); setStep('customer_form'); }}
                 className="w-full rounded-2xl border-2 border-saudi-green-800 bg-white hover:bg-saudi-green-50 px-5 py-3.5 text-sm font-bold text-saudi-green-900 transition"
               >
-                إنشاء حساب جديد
+                {tr('إنشاء حساب جديد')}
               </button>
               <button
                 type="button"
                 onClick={() => { setIsOnboardingOpen(false); setOnboardingGate(null); }}
                 className="w-full rounded-2xl px-5 py-2.5 text-sm font-bold text-gray-600 hover:bg-saudi-sand-100 transition"
               >
-                متابعة التسوق دون حساب
+                {tr('متابعة التسوق دون حساب')}
               </button>
             </div>
           )}
@@ -340,37 +342,37 @@ export default function UserOnboardingModal() {
                         <Calendar className="w-6 h-6 text-saudi-green-800" />
                       </div>
                       <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-saudi-green-50 text-saudi-green-800 border border-saudi-green-200">
-                        صاحب المناسبة
+                        {tr('صاحب المناسبة')}
                       </span>
                     </div>
 
                     <div>
                       <h3 className="text-lg font-black font-cairo text-gray-900 group-hover:text-saudi-green-900 transition">
-                        صاحب المناسبة (عميل)
+                        {tr('صاحب المناسبة (عميل)')}
                       </h3>
                       <p className="text-xs text-gray-600 mt-1 leading-relaxed">
-                        أبحث عن خدمات وموردين وباقات لتنظيم مناسبتي الخاصة أو العائلية.
+                        {tr('أبحث عن خدمات وموردين وباقات لتنظيم مناسبتي الخاصة أو العائلية.')}
                       </p>
                     </div>
 
                     <ul className="space-y-2 pt-2 border-t border-saudi-sand-200 text-xs text-gray-700">
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="w-3.5 h-3.5 text-saudi-green-700 flex-shrink-0" />
-                        <span>استعراض وحجز أكثر من 10 تصنيفات معتمدة</span>
+                        <span>{tr('استعراض وحجز أكثر من 10 تصنيفات معتمدة')}</span>
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="w-3.5 h-3.5 text-saudi-green-700 flex-shrink-0" />
-                        <span>مخطط الطاولات والميزانية والبطاقات بالـ QR</span>
+                        <span>{tr('مخطط الطاولات والميزانية والبطاقات بالـ QR')}</span>
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="w-3.5 h-3.5 text-saudi-green-700 flex-shrink-0" />
-                        <span>عانية ونقوط رقمية تصل لصاحب المناسبة</span>
+                        <span>{tr('عانية ونقوط رقمية تصل لصاحب المناسبة')}</span>
                       </li>
                     </ul>
                   </div>
 
                   <button className="mt-5 w-full py-2.5 px-4 rounded-xl bg-saudi-green-800 group-hover:bg-saudi-green-900 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition">
-                    <span>متابعة كصاحب مناسبة</span>
+                    <span>{tr('متابعة كصاحب مناسبة')}</span>
                     <ChevronLeft className="w-4 h-4" />
                   </button>
                 </div>
@@ -389,37 +391,37 @@ export default function UserOnboardingModal() {
                         <Store className="w-6 h-6 text-saudi-gold-700" />
                       </div>
                       <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-saudi-gold-50 text-saudi-gold-800 border border-saudi-gold-200">
-                        مورد / مزود خدمة
+                        {tr('مورد / مزود خدمة')}
                       </span>
                     </div>
 
                     <div>
                       <h3 className="text-lg font-black font-cairo text-gray-900 group-hover:text-saudi-gold-700 transition">
-                        مورد / مزود خدمة
+                        {tr('مورد / مزود خدمة')}
                       </h3>
                       <p className="text-xs text-gray-600 mt-1 leading-relaxed">
-                        أقدم خدمات أو منتجات احتفالية وأرغب في عرضها واستقبال الحجوزات.
+                        {tr('أقدم خدمات أو منتجات احتفالية وأرغب في عرضها واستقبال الحجوزات.')}
                       </p>
                     </div>
 
                     <ul className="space-y-2 pt-2 border-t border-saudi-sand-200 text-xs text-gray-700">
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="w-3.5 h-3.5 text-saudi-gold-600 flex-shrink-0" />
-                        <span>ظهور في سوق المناسبات عبر 10 مدن رئيسية</span>
+                        <span>{tr('ظهور في سوق المناسبات عبر 10 مدن رئيسية')}</span>
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="w-3.5 h-3.5 text-saudi-gold-600 flex-shrink-0" />
-                        <span>استقبال الحجوزات المباشرة وعروض الأسعار (RFQ)</span>
+                        <span>{tr('استقبال الحجوزات المباشرة وعروض الأسعار (RFQ)')}</span>
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="w-3.5 h-3.5 text-saudi-gold-600 flex-shrink-0" />
-                        <span>عروض أسعار تتضمن ضريبة القيمة المضافة 15%</span>
+                        <span>{tr('عروض أسعار تتضمن ضريبة القيمة المضافة 15%')}</span>
                       </li>
                     </ul>
                   </div>
 
                   <button className="mt-5 w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition">
-                    <span>متابعة كمورد معتمد</span>
+                    <span>{tr('متابعة كمورد معتمد')}</span>
                     <ChevronLeft className="w-4 h-4" />
                   </button>
                 </div>
@@ -428,12 +430,12 @@ export default function UserOnboardingModal() {
               {/* Bottom Quick Switch & Demo Access */}
               <div className="pt-4 border-t border-saudi-sand-200 space-y-3">
                 <div className="flex items-center justify-between text-xs text-gray-600">
-                  <span>لديك حساب بالفعل على المنصة؟</span>
+                  <span>{tr('لديك حساب بالفعل على المنصة؟')}</span>
                   <button
                     onClick={() => setStep('login')}
                     className="font-bold text-saudi-green-800 hover:underline flex items-center gap-1"
                   >
-                    <span>تسجيل الدخول</span>
+                    <span>{tr('تسجيل الدخول')}</span>
                     <ChevronLeft className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -452,24 +454,24 @@ export default function UserOnboardingModal() {
                 className="text-xs font-bold text-saudi-green-800 hover:text-saudi-green-950 flex items-center gap-1 mb-2"
               >
                 <ArrowRight className="w-3.5 h-3.5" />
-                <span>العودة لاختيار نوع الحساب</span>
+                <span>{tr('العودة لاختيار نوع الحساب')}</span>
               </button>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">الاسم الكامل *</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{tr('الاسم الكامل *')}</label>
                   <input
                     type="text"
                     required
                     value={customerData.name}
                     onChange={(e) => setCustomerData({ ...customerData, name: e.target.value })}
-                    placeholder="مثال: سارة عبدالعزيز العتيبي"
+                    placeholder={tr('مثال: سارة عبدالعزيز العتيبي')}
                     className="w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-saudi-green-800"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">رقم الجوال السعودي *</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{tr('رقم الجوال السعودي *')}</label>
                   <input
                     type="tel"
                     required
@@ -482,7 +484,7 @@ export default function UserOnboardingModal() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">البريد الإلكتروني (اختياري)</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{tr('البريد الإلكتروني (اختياري)')}</label>
                   <input
                     type="email"
                     value={customerData.email}
@@ -494,7 +496,7 @@ export default function UserOnboardingModal() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">المدينة *</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{tr('المدينة *')}</label>
                   <select
                     value={customerData.cityId}
                     onChange={(e) => setCustomerData({ ...customerData, cityId: e.target.value })}
@@ -502,14 +504,14 @@ export default function UserOnboardingModal() {
                   >
                     {cities.map((city) => (
                       <option key={city.id} value={city.id}>
-                        {city.nameAr} ({city.regionAr})
+                        {pick(city.nameAr, city.nameEn)} ({pick(city.regionAr, city.regionEn)})
                       </option>
                     ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">نوع المناسبة القادمة</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{tr('نوع المناسبة القادمة')}</label>
                   <select
                     value={customerData.upcomingOccasionType}
                     onChange={(e) => setCustomerData({ ...customerData, upcomingOccasionType: e.target.value })}
@@ -517,14 +519,14 @@ export default function UserOnboardingModal() {
                   >
                     {occasionTypes.map((t) => (
                       <option key={t.id} value={t.id}>
-                        {t.nameAr}
+                        {pick(t.nameAr, t.nameEn)}
                       </option>
                     ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">تاريخ المناسبة التقريبي</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{tr('تاريخ المناسبة التقريبي')}</label>
                   <input
                     type="date"
                     value={customerData.occasionDate}
@@ -534,7 +536,7 @@ export default function UserOnboardingModal() {
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold text-gray-700 mb-1">تعيين كلمة المرور</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{tr('تعيين كلمة المرور')}</label>
                   <PasswordInput
                     required minLength={12} maxLength={128} autoComplete="new-password"
                     value={customerData.password}
@@ -552,10 +554,10 @@ export default function UserOnboardingModal() {
                   className="w-full py-3.5 px-4 rounded-xl bg-saudi-green-800 hover:bg-saudi-green-900 text-white font-bold text-sm shadow-md transition flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
-                    <span>جاري إنشاء الحساب...</span>
+                    <span>{tr('جاري إنشاء الحساب...')}</span>
                   ) : (
                     <>
-                      <span>إنشاء الحساب وبدء التخطيط 🚀</span>
+                      <span>{tr('إنشاء الحساب وبدء التخطيط 🚀')}</span>
                       <ChevronLeft className="w-4 h-4" />
                     </>
                   )}
@@ -573,24 +575,24 @@ export default function UserOnboardingModal() {
                 className="text-xs font-bold text-saudi-green-800 hover:text-saudi-green-950 flex items-center gap-1 mb-2"
               >
                 <ArrowRight className="w-3.5 h-3.5" />
-                <span>العودة لاختيار نوع الحساب</span>
+                <span>{tr('العودة لاختيار نوع الحساب')}</span>
               </button>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">اسم المنشأة أو العلامة التجارية *</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{tr('اسم المنشأة أو العلامة التجارية *')}</label>
                   <input
                     type="text"
                     required
                     value={vendorData.businessName}
                     onChange={(e) => setVendorData({ ...vendorData, businessName: e.target.value })}
-                    placeholder="مثال: لافندر لتنسيق الكوش والزهور"
+                    placeholder={tr('مثال: لافندر لتنسيق الكوش والزهور')}
                     className="w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-saudi-gold-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">الاسم التجاري بالإنجليزية</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{tr('الاسم التجاري بالإنجليزية')}</label>
                   <input
                     type="text"
                     value={vendorData.businessNameEn}
@@ -602,7 +604,7 @@ export default function UserOnboardingModal() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">تصنيف الخدمة الأساسي *</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{tr('تصنيف الخدمة الأساسي *')}</label>
                   <select
                     value={vendorData.categoryId}
                     onChange={(e) => setVendorData({ ...vendorData, categoryId: e.target.value })}
@@ -610,14 +612,14 @@ export default function UserOnboardingModal() {
                   >
                     {serviceCategories.map((cat) => (
                       <option key={cat.id} value={cat.id}>
-                        {cat.nameAr}
+                        {pick(cat.nameAr, cat.nameEn)}
                       </option>
                     ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">المدينة الرئيسية *</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{tr('المدينة الرئيسية *')}</label>
                   <select
                     value={vendorData.cityId}
                     onChange={(e) => setVendorData({ ...vendorData, cityId: e.target.value })}
@@ -625,48 +627,48 @@ export default function UserOnboardingModal() {
                   >
                     {cities.map((city) => (
                       <option key={city.id} value={city.id}>
-                        {city.nameAr}
+                        {pick(city.nameAr, city.nameEn)}
                       </option>
                     ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">الحي / المنطقة</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{tr('الحي / المنطقة')}</label>
                   <input
                     type="text"
                     value={vendorData.neighborhood}
                     onChange={(e) => setVendorData({ ...vendorData, neighborhood: e.target.value })}
-                    placeholder="مثال: حطين / النرجس"
+                    placeholder={tr('مثال: حطين / النرجس')}
                     className="w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-saudi-gold-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">السجل التجاري أو وثيقة العمل الحر</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{tr('السجل التجاري أو وثيقة العمل الحر')}</label>
                   <input
                     type="text"
                     value={vendorData.crNumber}
                     onChange={(e) => setVendorData({ ...vendorData, crNumber: e.target.value })}
-                    placeholder="1010XXXXXX أو FL-XXXXX"
+                    placeholder={tr('1010XXXXXX أو FL-XXXXX')}
                     dir="ltr"
                     className="w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-saudi-gold-500 text-right"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">اسم المسؤول / مدير الحساب</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{tr('اسم المسؤول / مدير الحساب')}</label>
                   <input
                     type="text"
                     value={vendorData.contactName}
                     onChange={(e) => setVendorData({ ...vendorData, contactName: e.target.value })}
-                    placeholder="اسم ممثل المنشأة"
+                    placeholder={tr('اسم ممثل المنشأة')}
                     className="w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-saudi-gold-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">رقم الجوال للتواصل *</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{tr('رقم الجوال للتواصل *')}</label>
                   <input
                     type="tel"
                     required
@@ -679,7 +681,7 @@ export default function UserOnboardingModal() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">رقم الواتساب لاستقبال الحجوزات</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{tr('رقم الواتساب لاستقبال الحجوزات')}</label>
                   <input
                     type="tel"
                     value={vendorData.whatsappNumber}
@@ -691,7 +693,7 @@ export default function UserOnboardingModal() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">متوسط السعر المبدئي (⃁)</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{tr('متوسط السعر المبدئي (⃁)')}</label>
                   <input
                     type="number"
                     value={vendorData.startingPrice}
@@ -702,29 +704,29 @@ export default function UserOnboardingModal() {
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold text-gray-700 mb-1">نبذة تعريفية بالخدمات والمنتجات</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{tr('نبذة تعريفية بالخدمات والمنتجات')}</label>
                   <textarea
                     rows={2}
                     value={vendorData.bioAr}
                     onChange={(e) => setVendorData({ ...vendorData, bioAr: e.target.value })}
-                    placeholder="اكتب نبذة مختصرة عن خبرتكم في تنظيم وتجهيز المناسبات..."
+                    placeholder={tr('اكتب نبذة مختصرة عن خبرتكم في تنظيم وتجهيز المناسبات...')}
                     className="w-full text-xs sm:text-sm px-3.5 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-saudi-gold-500"
                   />
                 </div>
               </div>
 
               <div className="pt-2">
-                <label className="block text-xs font-bold">كلمة المرور (12 حرفاً على الأقل)<PasswordInput required minLength={12} maxLength={128} autoComplete="new-password" value={vendorData.password} onChange={e => setVendorData({ ...vendorData, password: e.target.value })} className="w-full rounded-xl border p-3 mt-1" /></label>
+                <label className="block text-xs font-bold">{tr('كلمة المرور (12 حرفاً على الأقل)')}<PasswordInput required minLength={12} maxLength={128} autoComplete="new-password" value={vendorData.password} onChange={e => setVendorData({ ...vendorData, password: e.target.value })} className="w-full rounded-xl border p-3 mt-1" /></label>
                 <button
                   type="submit"
                   disabled={isSubmitting}
                   className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-bold text-sm shadow-md transition flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
-                    <span>جاري تسجيل المورد وتفعيل البوابة...</span>
+                    <span>{tr('جاري تسجيل المورد وتفعيل البوابة...')}</span>
                   ) : (
                     <>
-                      <span>إتمام تسجيل المنشأة وتفعيل بوابة الموردين 🏪</span>
+                      <span>{tr('إتمام تسجيل المنشأة وتفعيل بوابة الموردين 🏪')}</span>
                       <ChevronLeft className="w-4 h-4" />
                     </>
                   )}
@@ -742,14 +744,14 @@ export default function UserOnboardingModal() {
                 className="text-xs font-bold text-saudi-green-800 hover:text-saudi-green-950 flex items-center gap-1 mb-2"
               >
                 <ArrowRight className="w-3.5 h-3.5" />
-                <span>العودة لاختيار نوع الحساب</span>
+                <span>{tr('العودة لاختيار نوع الحساب')}</span>
               </button>
 
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
                   if (!loginIdentifier.trim()) {
-                    setErrorMessage('يرجى إدخال رقم الجوال أو البريد الإلكتروني');
+                    setErrorMessage(tr('يرجى إدخال رقم الجوال أو البريد الإلكتروني'));
                     return;
                   }
                   handleLoginSubmit(loginIdentifier);
@@ -757,19 +759,19 @@ export default function UserOnboardingModal() {
                 className="space-y-3.5"
               >
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">رقم الجوال أو البريد الإلكتروني</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{tr('رقم الجوال أو البريد الإلكتروني')}</label>
                   <input
                     type="text"
                     required
                     value={loginIdentifier}
                     onChange={(e) => setLoginIdentifier(e.target.value)}
-                    placeholder="05XXXXXXXX أو البريد الإلكتروني"
+                    placeholder={tr('05XXXXXXXX أو البريد الإلكتروني')}
                     className="w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-saudi-green-800"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">كلمة المرور</label>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">{tr('كلمة المرور')}</label>
                   <PasswordInput
                     required
                     autoComplete="current-password"
@@ -785,7 +787,7 @@ export default function UserOnboardingModal() {
                   disabled={isSubmitting}
                   className="w-full py-3 px-4 rounded-xl bg-saudi-green-800 hover:bg-saudi-green-900 text-white font-bold text-sm shadow-md transition"
                 >
-                  {isSubmitting ? 'جاري التحقق...' : 'تسجيل الدخول'}
+                  {isSubmitting ? tr('جاري التحقق...') : tr('تسجيل الدخول')}
                 </button>
               </form>
 
@@ -802,14 +804,14 @@ export default function UserOnboardingModal() {
 
               <div>
                 <h3 className="text-xl font-black font-cairo text-gray-900">
-                  مرحباً بك، {successInfo?.name}! 🎉
+                  {tr('مرحباً بك،')} {successInfo?.name}! 🎉
                 </h3>
                 <p className="text-xs sm:text-sm text-gray-600 mt-1 max-w-md mx-auto">
                   {successInfo?.role === 'vendor'
-                    ? 'تم تفعيل حساب المورد وحفظ هويتك في قاعدة البيانات بنجاح. تم توجيهك إلى بوابة الموردين لإدارة الخدمات والطلبات.'
+                    ? tr('تم تفعيل حساب المورد وحفظ هويتك في قاعدة البيانات بنجاح. تم توجيهك إلى بوابة الموردين لإدارة الخدمات والطلبات.')
                     : successInfo?.role === 'admin'
-                    ? 'تم تسجيل الدخول بصلاحيات الإدارة والتحكم الكاملة.'
-                    : 'تم تسجيلك بنجاح كصاحب مناسبة. يمكنك الآن اكتشاف الموردين، طلب عروض الأسعار، وتخطيط مناسبتك بكل يسر.'}
+                    ? tr('تم تسجيل الدخول بصلاحيات الإدارة والتحكم الكاملة.')
+                    : tr('تم تسجيلك بنجاح كصاحب مناسبة. يمكنك الآن اكتشاف الموردين، طلب عروض الأسعار، وتخطيط مناسبتك بكل يسر.')}
                 </p>
               </div>
 
@@ -818,7 +820,7 @@ export default function UserOnboardingModal() {
                   onClick={handleFinishSuccess}
                   className="px-8 py-3.5 bg-saudi-green-800 hover:bg-saudi-green-900 text-white font-bold rounded-2xl text-sm shadow-lg transition"
                 >
-                  {onboardingGate ? 'متابعة التسوق ←' : 'الانتقال إلى لوحة التحكم الآن ←'}
+                  {onboardingGate ? tr('متابعة التسوق ←') : tr('الانتقال إلى لوحة التحكم الآن ←')}
                 </button>
               </div>
             </div>

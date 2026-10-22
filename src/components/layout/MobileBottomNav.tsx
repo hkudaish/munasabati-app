@@ -3,18 +3,20 @@
 import { FeatureContent } from '@/components/system/FeatureProvider';
 import React from 'react';
 import Link from '@/components/system/FeatureLink';
-import { usePathname } from 'next/navigation';
+import { useInnerPathname } from '@/components/i18n/LocaleProvider';
 import { Home, ShoppingBag, Layers, CalendarDays, Sparkles, FileText, Store, ShieldCheck } from 'lucide-react';
 import { useApp } from '@/lib/store';
+import { useT } from '@/components/i18n/LocaleProvider';
 
 export default function MobileBottomNav() {
-  const pathname = usePathname();
+  const t = useT();
+  const pathname = useInnerPathname();
   const { activeOccasion, setIsAIOpen, cart, currentRole, currentUser } = useApp();
 
   // If Vendor is active
   if (currentRole === 'vendor') {
     return (
-      <div role="navigation" aria-label="التنقل الرئيسي" className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-saudi-sand-200 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] px-2 pt-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))]">
+      <div role="navigation" aria-label={t('التنقل الرئيسي')} className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-saudi-sand-200 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] px-2 pt-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))]">
         <div className="flex items-center justify-around relative">
           <Link
             href="/vendor"
@@ -24,7 +26,7 @@ export default function MobileBottomNav() {
             aria-current={pathname === '/vendor' ? 'page' : undefined}
           >
             <Store className="w-5 h-5" />
-            <span className="text-caption2">لوحة المورد</span>
+            <span className="text-caption2">{t('لوحة المورد')}</span>
           </Link>
 
           <Link
@@ -34,7 +36,7 @@ export default function MobileBottomNav() {
             }`}
           >
             <ShoppingBag className="w-5 h-5" />
-            <span className="text-caption2">السوق</span>
+            <span className="text-caption2">{t('السوق')}</span>
           </Link>
 
           <Link
@@ -45,7 +47,7 @@ export default function MobileBottomNav() {
             }`}
           >
             <Layers className="w-5 h-5" />
-            <span className="text-caption2">الخدمات</span>
+            <span className="text-caption2">{t('الخدمات')}</span>
           </Link>
 
           <Link
@@ -56,7 +58,7 @@ export default function MobileBottomNav() {
             }`}
           >
             <CalendarDays className="w-5 h-5" />
-            <span className="text-caption2">الطلبات</span>
+            <span className="text-caption2">{t('الطلبات')}</span>
           </Link>
 
           <FeatureContent id="luma"><button
@@ -64,7 +66,7 @@ export default function MobileBottomNav() {
             className="flex flex-col items-center gap-1 py-1 px-2.5 rounded-lg text-saudi-gold-600 hover:text-saudi-gold-700 transition"
           >
             <Sparkles className="w-5 h-5" />
-            <span className="text-caption2 font-bold">لُـمى (AI)</span>
+            <span className="text-caption2 font-bold">{t('لُـمى (AI)')}</span>
           </button></FeatureContent>
         </div>
       </div>
@@ -74,7 +76,7 @@ export default function MobileBottomNav() {
   // If Admin is active
   if (currentRole === 'admin') {
     return (
-      <div role="navigation" aria-label="التنقل الرئيسي" className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-saudi-sand-200 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] px-2 pt-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))]">
+      <div role="navigation" aria-label={t('التنقل الرئيسي')} className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-saudi-sand-200 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] px-2 pt-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))]">
         <div className="flex items-center justify-around relative">
           <Link
             href={currentUser?.hasSystemAccess ? '/system-admin' : '/admin'}
@@ -83,7 +85,7 @@ export default function MobileBottomNav() {
             }`}
           >
             <ShieldCheck className="w-5 h-5 text-saudi-green-800" />
-            <span className="text-caption2">{currentUser?.hasSystemAccess ? 'مدير النظام' : 'لوحة الإدارة'}</span>
+            <span className="text-caption2">{currentUser?.hasSystemAccess ? t('مدير النظام') : t('لوحة الإدارة')}</span>
           </Link>
 
           <Link
@@ -91,7 +93,7 @@ export default function MobileBottomNav() {
             className="flex flex-col items-center gap-1 py-1 px-2.5 rounded-lg text-gray-500 hover:text-saudi-green-800 transition"
           >
             <Home className="w-5 h-5" />
-            <span className="text-caption2">الرئيسية</span>
+            <span className="text-caption2">{t('الرئيسية')}</span>
           </Link>
 
           <Link
@@ -99,7 +101,7 @@ export default function MobileBottomNav() {
             className="flex flex-col items-center gap-1 py-1 px-2.5 rounded-lg text-gray-500 hover:text-saudi-green-800 transition"
           >
             <Store className="w-5 h-5" />
-            <span className="text-caption2">الموردين</span>
+            <span className="text-caption2">{t('الموردين')}</span>
           </Link>
 
           <FeatureContent id="luma"><button
@@ -107,7 +109,7 @@ export default function MobileBottomNav() {
             className="flex flex-col items-center gap-1 py-1 px-2.5 rounded-lg text-saudi-gold-600 hover:text-saudi-gold-700 transition"
           >
             <Sparkles className="w-5 h-5" />
-            <span className="text-caption2 font-bold">لُـمى (AI)</span>
+            <span className="text-caption2 font-bold">{t('لُـمى (AI)')}</span>
           </button></FeatureContent>
         </div>
       </div>
@@ -116,7 +118,7 @@ export default function MobileBottomNav() {
 
   // Default: Customer Bottom Nav
   return (
-    <div role="navigation" aria-label="التنقل الرئيسي" className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-saudi-sand-200 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] px-2 pt-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))]">
+    <div role="navigation" aria-label={t('التنقل الرئيسي')} className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-saudi-sand-200 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] px-2 pt-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))]">
       <div className="flex items-center justify-around relative">
         {/* Home */}
         <Link
@@ -127,7 +129,7 @@ export default function MobileBottomNav() {
           }`}
         >
           <Home className="w-5 h-5" />
-          <span className="text-caption2">الرئيسية</span>
+          <span className="text-caption2">{t('الرئيسية')}</span>
         </Link>
 
         {/* Explore: a fixed destination; the cart lives in the header */}
@@ -142,11 +144,11 @@ export default function MobileBottomNav() {
         >
           <ShoppingBag className="w-5 h-5" />
           {cart.length > 0 && (
-            <span aria-label={`في السلة ${cart.reduce((s, i) => s + i.quantity, 0)}`} className="absolute top-0 right-2 bg-saudi-green-800 text-white text-caption2 font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
+            <span aria-label={t('في السلة {p1}', { p1: cart.reduce((s, i) => s + i.quantity, 0) })} className="absolute top-0 right-2 bg-saudi-green-800 text-white text-caption2 font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
               {cart.reduce((s, i) => s + i.quantity, 0)}
             </span>
           )}
-          <span className="text-caption2">استكشف</span>
+          <span className="text-caption2">{t('استكشف')}</span>
         </Link>
 
         {/* My occasion: opens the active occasion, or starts planning */}
@@ -158,7 +160,7 @@ export default function MobileBottomNav() {
           }`}
         >
           <CalendarDays className="w-5 h-5" />
-          <span className="text-caption2">مناسبتي</span>
+          <span className="text-caption2">{t('مناسبتي')}</span>
         </Link>
 
         {/* Quotes */}
@@ -170,7 +172,7 @@ export default function MobileBottomNav() {
           }`}
         >
           <FileText className="w-5 h-5" />
-          <span className="text-caption2">عروض الأسعار</span>
+          <span className="text-caption2">{t('عروض الأسعار')}</span>
         </Link>
 
         {/* AI Assistant (Luma) */}
@@ -179,7 +181,7 @@ export default function MobileBottomNav() {
           className="flex flex-col items-center gap-1 py-1 px-2.5 rounded-lg text-saudi-gold-600 hover:text-saudi-gold-700 transition"
         >
           <Sparkles className="w-5 h-5" />
-          <span className="text-caption2 font-bold">لُـمى (AI)</span>
+          <span className="text-caption2 font-bold">{t('لُـمى (AI)')}</span>
         </button></FeatureContent>
       </div>
     </div>

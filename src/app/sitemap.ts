@@ -20,11 +20,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   const entries: MetadataRoute.Sitemap = SITEMAP_PAGES.flatMap(p => pageEntries(p.path, { changeFrequency: p.changeFrequency, priority: p.priority, lastModified: now }));
   try {
-    const [snapshot, services, updated] = await Promise.all([loadSnapshotForListing(), serviceRows(), prisma.$queryRaw<{ id: string; updatedAt: Date }[]>`SELECT "id", "updatedAt" FROM "CommerceService" WHERE "body"->>'published' = 'true' AND "body"->>'approved' = 'true'`]);
-    const modified = new Map(updated.map(r => [r.id, r.updatedAt]));
+    const [snapshot, services, updated] = await Promise.all([loadSnapshotForListing(), serviceRows(), prisma.$queryRaw<{ id: string; updatedAt: Date; en: boolean }[]>`SELECT "id", "updatedAt", (COALESCE("body"->>'titleEn', '') <> '' AND COALESCE("body"->>'descriptionEn', '') <> '') AS "en" FROM "CommerceService" WHERE "body"->>'published' = 'true' AND "body"->>'approved' = 'true'`]);
+    const modified = new Map(updated.map(r => [r.id, r.updatedAt])), english = new Set(updated.filter(r => r.en).map(r => r.id));
     for (const service of services) {
       const visible = service.kind === 'DIGITAL' ? resolve(snapshot, serviceContext(service, null)).isVisible : service.cities.some(city => resolve(snapshot, serviceContext(service, city)).isVisible);
-      if (visible && service.ready) entries.push(...pageEntries('/commerce/service/' + encodeURIComponent(service.id), { changeFrequency: 'weekly', priority: 0.7, lastModified: modified.get(service.id) ?? now }));
+      if (visible && service.ready) {
+        const path = '/commerce/service/' + encodeURIComponent(service.id), base = { changeFrequency: 'weekly' as const, priority: 0.7, lastModified: modified.get(service.id) ?? now };
+        // the English address is listed only for a service whose English text was written
+        entries.push(...(english.has(service.id) ? pageEntries(path, base) : [{ url: siteUrl() + path, ...base }]));
+      }
     }
   } catch (error) { console.warn(JSON.stringify({ event: 'sitemap.services_failed', error: error instanceof Error ? error.message : String(error) })); } // the fixed pages still list
   return entries;

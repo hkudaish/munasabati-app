@@ -75,7 +75,7 @@ export default async function RootLayout({
           <main className="flex-1">
             <SessionBoundary>{children}</SessionBoundary>
           </main>
-          <SiteChrome><FeatureContent id="luma"><SessionBoundary><LumaAIDrawer /></SessionBoundary></FeatureContent></SiteChrome>
+          {locale === 'ar' && <SiteChrome><FeatureContent id="luma"><SessionBoundary><LumaAIDrawer /></SessionBoundary></FeatureContent></SiteChrome>}
           <UserOnboardingModal />
           <Toaster />
           <ImageFallback />

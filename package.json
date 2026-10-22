@@ -20,6 +20,7 @@
     "backup:list": "node scripts/backup.cjs list",
     "backup:verify": "node scripts/backup.cjs verify",
     "backup:restore": "node scripts/backup.cjs restore",
+    "test:i18n": "node scripts/test-i18n.cjs",
     "test:backup": "node scripts/test-backup.cjs",
     "test:backup-admin": "node scripts/test-backup-admin.cjs",
     "test:floor-plan": "node scripts/test-floor-plan.cjs",

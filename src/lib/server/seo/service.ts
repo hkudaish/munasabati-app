@@ -31,7 +31,7 @@ export async function serviceSeo(id: string, locale: Locale) {
   const title: string = (locale === 'en' && body.titleEn) || body.titleAr || id;
   const description: string = clip((locale === 'en' && body.descriptionEn) || body.descriptionAr || '', 160);
   return {
-    published: visible, title, description, image: httpsImage(body.images?.[0]), provider: vendorName ?? (locale === 'en' ? 'Munasabati' : 'منصة مناسبتـي'),
+    published: visible, title, hasEnglish: !!(body.titleEn && body.descriptionEn), description, image: httpsImage(body.images?.[0]), provider: vendorName ?? (locale === 'en' ? 'Munasabati' : 'منصة مناسبتـي'),
     category: locale === 'en' ? categories?.nameEn : categories?.nameAr, cities: cities.map(c => (locale === 'en' ? c.nameEn || c.nameAr : c.nameAr)),
     lowPrice: prices.length ? Math.min(...prices) / 100 : null, highPrice: prices.length ? Math.max(...prices) / 100 : null, offerCount: offers.length,
     availability: decisions.some(d => d.canBook) ? 'https://schema.org/InStock' : decisions.some(d => d.effectiveStatus === 'COMING_SOON') ? 'https://schema.org/PreOrder' : 'https://schema.org/OutOfStock',
@@ -44,7 +44,7 @@ export function serviceJsonLd(id: string, locale: Locale, seo: NonNullable<Await
   const home = siteUrl() + localizePath('/', locale), store = siteUrl() + localizePath('/commerce', locale);
   return [
     {
-      '@context': 'https://schema.org', '@type': 'Service', '@id': url + '#service', name: seo.title, description: seo.description || undefined, url, inLanguage: locale === 'en' ? 'en' : 'ar-SA',
+      '@context': 'https://schema.org', '@type': 'Service', '@id': url + '#service', name: seo.title, description: seo.description || undefined, url, inLanguage: locale === 'en' && seo.hasEnglish ? 'en' : 'ar-SA',
       ...(seo.image ? { image: [seo.image] } : {}), ...(seo.category ? { serviceType: seo.category } : {}),
       provider: { '@type': 'Organization', name: seo.provider }, areaServed: seo.cities.map(name => ({ '@type': 'City', name })),
       ...(seo.offerCount ? { offers: { '@type': seo.lowPrice != null && seo.highPrice != null && seo.lowPrice !== seo.highPrice ? 'AggregateOffer' : 'Offer', priceCurrency: 'SAR', ...(seo.lowPrice != null ? (seo.highPrice !== seo.lowPrice ? { lowPrice: seo.lowPrice, highPrice: seo.highPrice, offerCount: seo.offerCount } : { price: seo.lowPrice }) : {}), availability: seo.availability, url } } : {}),

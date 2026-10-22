@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const seo = await serviceSeo(params.id, locale).catch(() => null);
   const path = '/commerce/service/' + encodeURIComponent(params.id);
   if (!seo) return buildMetadata({ path, locale, index: false });
-  return buildMetadata({ path, locale, title: `${seo.title} | ${seo.provider}`, description: seo.description || undefined, image: seo.image, index: seo.published });
+  return buildMetadata({ path, locale, title: `${seo.title} | ${seo.provider}`, description: seo.description || undefined, image: seo.image, index: seo.published && (locale === 'ar' || seo.hasEnglish), bilingual: seo.hasEnglish }); // an English address with Arabic-only text is not offered to search engines
 }
 export default async function Page({ params }: Props) {
   const locale = getLocale();

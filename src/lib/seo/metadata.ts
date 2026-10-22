@@ -3,7 +3,7 @@ import { localizePath, isTranslatedPath, stripLocale, type Locale } from '@/lib/
 import { siteUrl, SITE_NAME } from '@/lib/site';
 import { isPrivatePath, pageMeta, HOME } from './registry';
 
-export interface MetaInput { path: string; locale: Locale; title?: string; description?: string; image?: string; index?: boolean; keywords?: string[] }
+export interface MetaInput { path: string; locale: Locale; title?: string; description?: string; image?: string; index?: boolean; keywords?: string[]; /** false when the page has no English text of its own: no English alternate, and the English address points to the Arabic page */ bilingual?: boolean }
 const OPEN_GRAPH_LOCALE: Record<Locale, string> = { ar: 'ar_SA', en: 'en_US' };
 const absolute = (url: string) => (/^https?:\/\//.test(url) ? url : siteUrl() + url);
 
@@ -12,7 +12,7 @@ export function buildMetadata(input: MetaInput): Metadata {
   const arabicPath = stripLocale(input.path).replace(/\/+$/, '') || '/';
   const meta = pageMeta(arabicPath) ?? HOME;
   const title = input.title ?? meta.title[input.locale], description = input.description ?? meta.description[input.locale];
-  const translated = isTranslatedPath(arabicPath);
+  const translated = isTranslatedPath(arabicPath) && input.bilingual !== false;
   const canonical = localizePath(arabicPath, input.locale === 'en' && translated ? 'en' : 'ar');
   const image = absolute(input.image ?? (input.locale === 'en' ? '/og-default-en.png' : '/og-default.png'));
   const indexable = input.index ?? !isPrivatePath(arabicPath);

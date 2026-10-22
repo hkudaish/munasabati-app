@@ -27,8 +27,8 @@
 body {
   font-family: 'Saudi Riyal', var(--font-tajawal), 'Cairo', sans-serif;
   font-variant-numeric: lining-nums tabular-nums;
-  direction: rtl;
-  text-align: right;
+  direction: inherit; /* follows <html dir>: rtl for Arabic, ltr for English */
+  text-align: start;
   background-color: #FAF7F2;
   color: #1E293B;
   overflow-x: hidden;

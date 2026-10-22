@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { X, Check, CheckCircle2, Sliders, Sparkles, Store, ShieldCheck } from 'lucide-react';
 import { SmartPackage, PackageItem } from '@/lib/types';
 import { formatSAR } from '@/lib/utils';
+import { useT, usePick } from '@/components/i18n/LocaleProvider';
 
 interface PackageCustomizerModalProps {
   pkg: SmartPackage;
@@ -18,6 +19,7 @@ export default function PackageCustomizerModal({
   onSaveCustomization,
   onBookNow,
 }: PackageCustomizerModalProps) {
+  const t = useT(); const pick = usePick();
   const [items, setItems] = useState<PackageItem[]>(pkg.items);
 
   const toggleItem = (index: number) => {
@@ -54,10 +56,10 @@ export default function PackageCustomizerModal({
             </div>
             <div>
               <h3 className="text-base font-bold font-cairo text-white" id="dlg-2492-1">
-                تخصيص الباقة: {pkg.titleAr}
+                {t('تخصيص الباقة:')} {pick(pkg.titleAr, pkg.titleEn)}
               </h3>
               <p className="text-xs text-gray-300">
-                أضف أو استبعد الخدمات التي تحتاجها وسيعاد احتساب السعر فوراً.
+                {t('أضف أو استبعد الخدمات التي تحتاجها وسيعاد احتساب السعر فوراً.')}
               </p>
             </div>
           </div>
@@ -92,18 +94,18 @@ export default function PackageCustomizerModal({
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-bold text-saudi-gold-700 bg-saudi-gold-50 px-2 py-0.5 rounded">
-                        {item.categoryName}
+                        {t(item.categoryName)}
                       </span>
                       {!item.customizable && (
-                        <span className="text-caption2 text-gray-500">(بند أساسي لا يمكن إزالته)</span>
+                        <span className="text-caption2 text-gray-500">{t('(بند أساسي لا يمكن إزالته)')}</span>
                       )}
                     </div>
                     <h5 className="text-xs sm:text-sm font-bold text-gray-900">
-                      {item.serviceName}
+                      {t(item.serviceName)}
                     </h5>
                     <p className="text-xs text-gray-500 flex items-center gap-1">
                       <Store className="w-3 h-3 text-saudi-green-700" />
-                      <span>المزود: {item.vendorName}</span>
+                      <span>{t('المزود:')} {item.vendorName}</span>
                     </p>
                   </div>
                 </div>
@@ -112,7 +114,7 @@ export default function PackageCustomizerModal({
                   <span className="text-sm font-bold font-cairo text-saudi-green-950 block">
                     {formatSAR(item.pricePortion)}
                   </span>
-                  <span className="text-caption2 text-gray-500">سعر البند ضمن الباقة</span>
+                  <span className="text-caption2 text-gray-500">{t('سعر البند ضمن الباقة')}</span>
                 </div>
               </div>
             ))}
@@ -122,7 +124,7 @@ export default function PackageCustomizerModal({
         {/* Footer & Total */}
         <div className="p-5 bg-white border-t border-saudi-sand-200 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            <span className="text-xs text-gray-500 block">إجمالي السعر بعد التخصيص:</span>
+            <span className="text-xs text-gray-500 block">{t('إجمالي السعر بعد التخصيص:')}</span>
             <span className="text-2xl font-black font-cairo text-saudi-green-950">
               {formatSAR(calculatedPackagePrice)}
             </span>
@@ -133,13 +135,13 @@ export default function PackageCustomizerModal({
               onClick={() => onSaveCustomization(updatedPackage)}
               className="flex-1 sm:flex-initial px-4 py-2.5 bg-saudi-sand-100 hover:bg-saudi-sand-200 text-gray-800 rounded-xl text-xs font-bold transition"
             >
-              حفظ التخصيص
+              {t('حفظ التخصيص')}
             </button>
             <button
               onClick={() => onBookNow(updatedPackage)}
               className="flex-1 sm:flex-initial px-6 py-2.5 bg-saudi-green-800 hover:bg-saudi-green-900 text-white rounded-xl text-xs font-bold shadow-md transition"
             >
-              متابعة الحجز والدفع
+              {t('متابعة الحجز والدفع')}
             </button>
           </div>
         </div>
