@@ -48,6 +48,7 @@ const VENDORS = [
   { key: 'bloom', business: 'كوشة وورد الياسمين', en: 'Jasmine Decor', category: 'decor', city: 'riyadh', phone: '0552000003', bio: 'كوش وتنسيق ورد وتصاميم ديكور مخصصة لحفلات الزفاف والخطوبة.' },
   { key: 'hall', business: 'قصر الأميرة للاحتفالات', en: 'Princess Palace Hall', category: 'hall', city: 'riyadh', phone: '0552000004', bio: 'قاعة أفراح فاخرة تتسع لـ 600 ضيف مع مواقف وخدمات متكاملة.' },
   { key: 'beats', business: 'نغم للترفيه والصوتيات', en: 'Nagham Entertainment', category: 'entertainment', city: 'jeddah', phone: '0552000005', bio: 'دي جي ومهندس صوت وفرق ترفيه وزفات عصرية.' },
+  { key: 'stage', business: 'سما للإنتاج الفني والحفلات', en: 'Sama Stage Productions', category: 'entertainment', city: 'riyadh', phone: '0552000007', bio: 'حجز الفنانين والفنانات لحفلات الزفاف والمناسبات الخاصة مع الفرقة والصوتيات (بيانات تجريبية).' },
   { key: 'sweet', business: 'حلويات وكيك لمسة سكر', en: 'Sugar Touch', category: 'cake', city: 'jeddah', phone: '0552000006', bio: 'كيك مناسبات وتوزيعات حلويات مصممة حسب الطلب.' },
 ];
 
@@ -76,7 +77,23 @@ const CATALOG = {
     { id: 'sample-hall-wedding', title: 'قاعة أفراح قصر الأميرة', desc: 'قاعة فاخرة تتسع لـ 600 ضيف مع قسم نسائي مستقل ومواقف وخدمات متكاملة.', images: [IMG.wedding], sub: 'wedding-halls',
       offers: [{ id: 'sample-hall-night', name: 'حجز الليلة', model: 'NIGHT', policy: policy({ baseAmount: 1800000, durationMinutes: 720, depositBps: 4000, paymentMilestones: [{ nameAr: 'الرصيد', percentBps: 6000, beforeHours: 72 }] }) }] },
   ],
+  stage: [
+    { id: 'sample-artist-m1', title: 'حفلة الفنان محمد عبده', desc: 'إحياء حفلة بحضور الفنان مع الفرقة الموسيقية والصوتيات. طلب الحجز يخضع لتوفر الفنان وموافقة المورد (بيانات تجريبية).', images: [IMG.stage], sub: 'male-singer', artist: 'artist-m-1',
+      offers: [{ id: 'sample-artist-m1-offer', name: 'حفلة ساعتين', model: 'FIXED', policy: policy({ baseAmount: 12000000, bookingMode: 'APPROVAL', durationMinutes: 120, minDurationMinutes: 60, depositBps: 5000, paymentMilestones: [{ nameAr: 'الرصيد', percentBps: 5000, beforeHours: 72 }] }) }] },
+    { id: 'sample-artist-m2', title: 'حفلة الفنان عبدالمجيد عبدالله', desc: 'إحياء حفلة بحضور الفنان مع الفرقة الموسيقية والصوتيات. طلب الحجز يخضع لتوفر الفنان وموافقة المورد (بيانات تجريبية).', images: [IMG.stage], sub: 'male-singer', artist: 'artist-m-2',
+      offers: [{ id: 'sample-artist-m2-offer', name: 'حفلة ساعتين', model: 'FIXED', policy: policy({ baseAmount: 10000000, bookingMode: 'APPROVAL', durationMinutes: 120, minDurationMinutes: 60, depositBps: 5000, paymentMilestones: [{ nameAr: 'الرصيد', percentBps: 5000, beforeHours: 72 }] }) }] },
+    { id: 'sample-artist-m3', title: 'حفلة الفنان ماجد المهندس', desc: 'إحياء حفلة بحضور الفنان مع الفرقة الموسيقية والصوتيات. طلب الحجز يخضع لتوفر الفنان وموافقة المورد (بيانات تجريبية).', images: [IMG.stage], sub: 'male-singer', artist: 'artist-m-3',
+      offers: [{ id: 'sample-artist-m3-offer', name: 'حفلة ساعتين', model: 'FIXED', policy: policy({ baseAmount: 9000000, bookingMode: 'APPROVAL', durationMinutes: 120, minDurationMinutes: 60, depositBps: 5000, paymentMilestones: [{ nameAr: 'الرصيد', percentBps: 5000, beforeHours: 72 }] }) }] },
+    { id: 'sample-artist-f1', title: 'حفلة الفنانة أصالة', desc: 'إحياء حفلة بحضور الفنان مع الفرقة الموسيقية والصوتيات. طلب الحجز يخضع لتوفر الفنان وموافقة المورد (بيانات تجريبية).', images: [IMG.stage], sub: 'female-singer', artist: 'artist-f-1',
+      offers: [{ id: 'sample-artist-f1-offer', name: 'حفلة ساعتين', model: 'FIXED', policy: policy({ baseAmount: 11000000, bookingMode: 'APPROVAL', durationMinutes: 120, minDurationMinutes: 60, depositBps: 5000, paymentMilestones: [{ nameAr: 'الرصيد', percentBps: 5000, beforeHours: 72 }] }) }] },
+    { id: 'sample-artist-f2', title: 'حفلة الفنانة أحلام', desc: 'إحياء حفلة بحضور الفنان مع الفرقة الموسيقية والصوتيات. طلب الحجز يخضع لتوفر الفنان وموافقة المورد (بيانات تجريبية).', images: [IMG.stage], sub: 'female-singer', artist: 'artist-f-2',
+      offers: [{ id: 'sample-artist-f2-offer', name: 'حفلة ساعتين', model: 'FIXED', policy: policy({ baseAmount: 9500000, bookingMode: 'APPROVAL', durationMinutes: 120, minDurationMinutes: 60, depositBps: 5000, paymentMilestones: [{ nameAr: 'الرصيد', percentBps: 5000, beforeHours: 72 }] }) }] },
+  ],
   beats: [
+    { id: 'sample-artist-m4', title: 'حفلة الفنان راشد الماجد', desc: 'إحياء حفلة بحضور الفنان مع الفرقة الموسيقية والصوتيات. طلب الحجز يخضع لتوفر الفنان وموافقة المورد (بيانات تجريبية).', images: [IMG.stage], sub: 'male-singer', artist: 'artist-m-4',
+      offers: [{ id: 'sample-artist-m4-offer', name: 'حفلة ساعتين', model: 'FIXED', policy: policy({ baseAmount: 9500000, bookingMode: 'APPROVAL', durationMinutes: 120, minDurationMinutes: 60, depositBps: 5000, paymentMilestones: [{ nameAr: 'الرصيد', percentBps: 5000, beforeHours: 72 }] }) }] },
+    { id: 'sample-artist-f3', title: 'حفلة الفنانة أميمة', desc: 'إحياء حفلة بحضور الفنان مع الفرقة الموسيقية والصوتيات. طلب الحجز يخضع لتوفر الفنان وموافقة المورد (بيانات تجريبية).', images: [IMG.stage], sub: 'female-singer', artist: 'artist-f-3',
+      offers: [{ id: 'sample-artist-f3-offer', name: 'حفلة ساعتين', model: 'FIXED', policy: policy({ baseAmount: 8500000, bookingMode: 'APPROVAL', durationMinutes: 120, minDurationMinutes: 60, depositBps: 5000, paymentMilestones: [{ nameAr: 'الرصيد', percentBps: 5000, beforeHours: 72 }] }) }] },
     { id: 'sample-beats-dj', title: 'دي جي وتجهيز صوتي', desc: 'دي جي محترف مع نظام صوت وإضاءة تناسب الحفلات الخاصة.', images: [IMG.stage], sub: 'event-dj',
       offers: [{ id: 'sample-beats-dj-hour', name: 'دي جي بالساعة', model: 'HOURLY', policy: policy({ baseAmount: 90000, durationMinutes: 240, minDurationMinutes: 180 }) }] },
   ],
@@ -131,6 +148,7 @@ async function ensureUser(data) {
 
   // vendors + their catalog
   const offerIds = {};
+  const seedAdmin = await login('admin' + DOMAIN);   // authorises the performers a vendor may list (the platform decides who represents an artist)
   for (const v of VENDORS) {
     const { user, created } = await ensureUser({ name: v.business, email: v.key + '.vendor' + DOMAIN, phone: v.phone, role: 'VENDOR', cityId: v.city });
     let vendor = await prisma.vendor.findFirst({ where: { userId: user.id } });
@@ -144,15 +162,26 @@ async function ensureUser(data) {
     const haveOffer = new Set((existing.body.offers || []).map(o => o.id));
     for (const s of CATALOG[v.key]) {
       let serviceId = s.id;
-      if (!haveService.has(s.id)) {
-        const r = await call('/api/commerce/manage', 'POST', { kind: 'SERVICE', id: s.id, body: { titleAr: s.title, descriptionAr: s.desc, kind: 'BOOKABLE', categoryId: v.category, subcategoryId: s.sub || null, artistId: null, cities: [v.city], managerIds: [user.id], resourceIds: [], published: true, approved: true, images: s.images, videoUrls: [] } }, cookie);
+      // an artist's service needs the platform's authorisation of the executing party first (a performer profile managed by this vendor)
+      const personId = s.artist ? 'sample-person-' + s.id : null;
+      if (personId) {
+        const name = (await prisma.catalogArtist.findUnique({ where: { id: s.artist } }))?.nameAr ?? s.artist;
+        const r = await call('/api/bookings/config', 'POST', { kind: 'PERSON', id: personId, body: { nameAr: name, artistId: s.artist, managementAr: v.business, managerIds: [user.id], enabled: true, authorized: true, calendar: { minNoticeHours: 0 } } }, seedAdmin);
+        if (![200, 409].includes(r.status)) throw new Error('performer ' + personId + ' failed: ' + r.status + ' ' + JSON.stringify(r.body));
+      }
+      const current = (existing.body.services || []).find(x => x.id === s.id);
+      if (!haveService.has(s.id) || (personId && !(current?.body.resourceIds || []).includes(personId))) {
+        const r = await call('/api/commerce/manage', 'POST', { kind: 'SERVICE', id: s.id, body: { titleAr: s.title, descriptionAr: s.desc, kind: 'BOOKABLE', categoryId: v.category, subcategoryId: s.sub || null, artistId: s.artist || null, cities: [v.city], managerIds: [user.id], resourceIds: personId ? [personId] : [], published: true, approved: true, images: s.images, videoUrls: [] }, ...(current ? { version: current.version } : {}) }, cookie);
         if (r.status !== 200) throw new Error('service ' + s.id + ' failed: ' + r.status + ' ' + JSON.stringify(r.body));
         summary.services++;
       }
+      // an offer copies the service's performer profile when it is saved, so after the service gained one the offers are saved again
+      const offersNow = personId ? (await call('/api/commerce/manage', 'GET', undefined, cookie)).body.offers || [] : [];
       for (const o of s.offers) {
         offerIds[o.id] = o.id;
-        if (haveOffer.has(o.id)) continue;
-        const r = await call('/api/commerce/manage', 'POST', { kind: 'OFFER', id: o.id, serviceId, body: { nameAr: o.name, model: o.model, enabled: true, allowPackages: true, holdMinutes: 15, policy: o.policy } }, cookie);
+        const curOffer = offersNow.find(x => x.id === o.id);
+        if (haveOffer.has(o.id) && !(personId && !(curOffer?.body.resourceIds || []).includes(personId))) continue;
+        const r = await call('/api/commerce/manage', 'POST', { kind: 'OFFER', id: o.id, serviceId, ...(curOffer ? { version: curOffer.version } : {}), body: { nameAr: o.name, model: o.model, enabled: true, allowPackages: true, holdMinutes: 15, policy: o.policy } }, cookie);
         if (r.status !== 200) throw new Error('offer ' + o.id + ' failed: ' + r.status + ' ' + JSON.stringify(r.body));
         summary.offers++;
       }
