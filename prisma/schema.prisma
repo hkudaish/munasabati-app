@@ -885,8 +885,8 @@ model OMSNotificationLog {
 // -------------------------------------------------------------
 model Review {
   id                  String       @id @default(uuid())
-  vendorId            String
-  vendor              Vendor       @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendorId            String?
+  vendor              Vendor?      @relation(fields: [vendorId], references: [id], onDelete: Cascade)
   serviceId           String?
   service             ServiceItem? @relation(fields: [serviceId], references: [id])
   userId              String?
@@ -904,11 +904,22 @@ model Review {
   status              String       @default("approved")
   featured            Boolean      @default(false)
   replyAr             String?      @db.Text
+  commerceItemId      String?
+  commerceServiceId   String?
+  replyStatus         String       @default("NONE")
+  replyDraftAr        String?      @db.Text
+  replyAt             DateTime?    @db.Timestamptz(3)
+  replyById           String?
+  moderatedById       String?
+  moderatedAt         DateTime?    @db.Timestamptz(3)
+  moderationNoteAr    String?      @db.Text
   createdAt           DateTime     @default(now())
 
   @@index([vendorId])
   @@index([rating])
   @@index([featured])
+  @@index([commerceServiceId])
+  @@unique([userId, commerceItemId])
 }
 
 // -------------------------------------------------------------

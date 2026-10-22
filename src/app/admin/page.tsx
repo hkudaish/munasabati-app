@@ -1,4 +1,5 @@
 'use client';
+import { ReviewModeration } from '@/components/commerce/Reviews';
 import { notify } from '@/lib/notify';
 
 import React, { useState, useEffect, Suspense } from 'react';
@@ -77,11 +78,6 @@ function AdminDashboardContent() {
     releaseEscrowPayout,
     refundBooking,
     occasions,
-    reviews,
-    toggleReviewFeatured,
-    updateReviewStatus,
-    deleteReview,
-    replyToReview,
     cities,
     toggleCityAvailability,
     rankingWeights,
@@ -121,12 +117,7 @@ function AdminDashboardContent() {
   const [vendorCityFilter, setVendorCityFilter] = useState('all');
   const [serviceSearch, setServiceSearch] = useState('');
   const [serviceCategoryFilter, setServiceCategoryFilter] = useState('all');
-  const [reviewFilter, setReviewFilter] = useState<'all' | 'approved' | 'featured'>('all');
   const [bookingFilter, setBookingFilter] = useState<'all' | 'confirmed' | 'completed' | 'payout_pending'>('all');
-
-  // Reply state in reviews
-  const [replyingReviewId, setReplyingReviewId] = useState<string | null>(null);
-  const [replyText, setReplyText] = useState('');
 
   // Add Vendor Modal state
   const [isAddVendorOpen, setIsAddVendorOpen] = useState(false);
@@ -174,12 +165,6 @@ function AdminDashboardContent() {
       s.vendorName.toLowerCase().includes(serviceSearch.toLowerCase());
     const matchesCat = serviceCategoryFilter === 'all' || s.categoryId === serviceCategoryFilter;
     return matchesSearch && matchesCat;
-  });
-
-  const filteredReviews = reviews.filter((r) => {
-    if (reviewFilter === 'featured') return r.featured;
-    if (reviewFilter === 'approved') return r.status === 'approved';
-    return true;
   });
 
   const filteredBookings = bookings.filter((b) => {
@@ -282,12 +267,6 @@ function AdminDashboardContent() {
     setTimeout(() => setPayoutSuccessMsg(null), 3500);
   };
 
-  const handleSendReply = (reviewId: string) => {
-    if (!replyText.trim()) return;
-    replyToReview(reviewId, replyText);
-    setReplyingReviewId(null);
-    setReplyText('');
-  };
 
   if (currentRole !== 'admin') {
     return (
@@ -525,7 +504,7 @@ function AdminDashboardContent() {
           }`}
         >
           <Star className="w-4 h-4 text-saudi-gold-600" />
-          <span>آراء العملاء والاعتدال ({reviews.length})</span>
+          <span>آراء العملاء والاعتدال</span>
         </button>
 
         <button
@@ -1054,136 +1033,8 @@ function AdminDashboardContent() {
           </div>
         )}
 
-        {/* 7. Reviews Moderation Tab */}
-        {activeTab === 'reviews' && (
-          <div className="bg-white rounded-3xl border border-saudi-sand-300 p-6 shadow-sm space-y-6">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div>
-                <h4 className="text-base font-bold text-gray-900 font-cairo">
-                  إدارة واعتدال تقييمات وتجارب العملاء ({filteredReviews.length})
-                </h4>
-                <p className="text-xs text-gray-500">
-                  تحديد التقييمات المميزة لعرضها في واجهة المنصة (Social Proof) والرد على آراء العملاء.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <select
-                  value={reviewFilter}
-                  onChange={(e) => setReviewFilter(e.target.value as any)}
-                  className="px-3 py-2 bg-saudi-sand-50 border border-gray-200 rounded-xl text-xs font-bold"
-                >
-                  <option value="all">كافة التقييمات</option>
-                  <option value="featured">المميزة بالصفحة الرئيسية ⭐</option>
-                  <option value="approved">المعتمدة فقط</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              {filteredReviews.map((rev) => (
-                <div
-                  key={rev.id}
-                  className="p-5 bg-white rounded-2xl border border-saudi-sand-300 shadow-sm space-y-3"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={
-                          rev.avatarUrl ||
-                          `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                            rev.customerName
-                          )}&background=004D3F&color=FAF6EB&bold=true`
-                        }
-                        alt={rev.customerName}
-                        className="w-10 h-10 rounded-xl object-cover"
-                      />
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h5 className="font-bold text-xs text-gray-900">{rev.customerName}</h5>
-                          <span className="text-caption2 text-gray-500">({rev.customerCityAr} - {rev.occasionTypeAr})</span>
-                          {rev.featured && (
-                            <span className="bg-saudi-gold-100 text-saudi-gold-900 text-caption2 font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
-                              <Star className="w-3 h-3 fill-saudi-gold-500" />
-                              مميز في الواجهة
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-xs text-saudi-green-800 font-semibold">
-                          تقييم المورد: <strong>{rev.vendorName}</strong>
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-saudi-gold-700 bg-saudi-gold-50 px-2 py-1 rounded-lg">
-                        ★ {rev.rating}
-                      </span>
-                      <button
-                        onClick={() => toggleReviewFeatured(rev.id)}
-                        className={`px-3 py-1 rounded-xl text-xs font-bold transition ${
-                          rev.featured
-                            ? 'bg-saudi-gold-500 text-saudi-green-950'
-                            : 'bg-saudi-sand-100 text-gray-700 hover:bg-saudi-sand-200'
-                        }`}
-                      >
-                        {rev.featured ? 'إلغاء التمييز' : 'تمييز بالواجهة ⭐'}
-                      </button>
-                      <button
-                        onClick={() => deleteReview(rev.id)}
-                        className="p-1 text-gray-500 hover:text-red-600 transition"
-                        title="حذف التقييم"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-
-                  <p className="text-xs text-gray-700 bg-saudi-sand-50 p-3 rounded-xl">
-                    "{rev.commentAr}"
-                  </p>
-
-                  {/* Vendor/Admin Reply */}
-                  {rev.vendorReplyAr ? (
-                    <div className="text-xs bg-saudi-green-50 p-3 rounded-xl border border-saudi-green-200 text-saudi-green-950">
-                      <strong>رد المورد/الإدارة:</strong> "{rev.vendorReplyAr}"
-                    </div>
-                  ) : replyingReviewId === rev.id ? (
-                    <div className="flex items-center gap-2 pt-1">
-                      <input
-                        type="text"
-                        value={replyText}
-                        onChange={(e) => setReplyText(e.target.value)}
-                        placeholder="اكتب رد الإدارة أو المورد..."
-                        className="flex-1 px-3 py-2 text-xs border border-gray-300 rounded-xl bg-white"
-                      />
-                      <button
-                        onClick={() => handleSendReply(rev.id)}
-                        className="px-4 py-2 bg-saudi-green-800 text-white font-bold rounded-xl text-xs"
-                      >
-                        إرسال الرد
-                      </button>
-                      <button
-                        onClick={() => setReplyingReviewId(null)}
-                        className="px-3 py-2 text-xs text-gray-500"
-                      >
-                        إلغاء
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => setReplyingReviewId(rev.id)}
-                      className="text-xs font-bold text-saudi-green-800 hover:text-saudi-green-950 flex items-center gap-1"
-                    >
-                      <MessageSquare className="w-3 h-3" />
-                      <span>إضافة رد رسمي على التقييم</span>
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* 7. Reviews Moderation Tab: saved on the server, approve-first */}
+        {activeTab === 'reviews' && <ReviewModeration />}
 
         {/* 8. Cities Configuration Tab */}
         {activeTab === 'cities' && (

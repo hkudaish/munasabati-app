@@ -2,6 +2,7 @@ import 'server-only';
 import { randomUUID } from 'node:crypto';
 import { prisma } from '@/lib/db';
 import { requireUser,rateLimit } from '../auth';
+import { servicePublicReviews } from '../reviews';
 import { HttpError,text,integer } from '../http';
 import { mediaUrls,mediaUrl } from '../catalog';
 import { atomic,lock,admin,Tx,definitions } from '../booking/repository';
@@ -31,7 +32,7 @@ export async function catalog(manage=false,geoOverride?:Awaited<ReturnType<typeo
   const cityIds=service.body.cities.filter((city:string)=>available.get(city)?.has('feature:commerce')&&available.get(city)?.has('category:'+service.body.categoryId)&&(!service.sourceId||available.get(city)?.has('item:'+service.sourceId)));
   if(!cityIds.length)continue;
   for(const offer of offers.filter(o=>o.serviceId===service.id&&o.body.enabled)){try{const a=await activeOffer(prisma,offer.id);publicOffers.push({id:offer.id,serviceId:service.id,version:offer.version,managedBy:a.managerNames,body:{...offer.body,managerIds:undefined,shares:undefined,policy:{...a.effective.policy,commissionBps:0}},people:a.effective.people.map((p:any)=>({id:p.id,nameAr:p.body.nameAr,managementAr:p.body.managementAr}))});}catch(e){if(!(e instanceof HttpError))throw e;}}
-  const reviews=service.sourceId?await prisma.review.findMany({where:{serviceId:service.sourceId,status:'approved'},select:{id:true,reviewerName:true,rating:true,commentAr:true,date:true},take:20}):[];publicServices.push({providerName:vendorNames.find(v=>v.id===service.vendorId)?.businessName??'منصة مناسبتـي',reviews,id:service.id,version:service.version,vendorId:service.vendorId,body:{...service.body,cities:cityIds,managerIds:undefined,resourceIds:undefined}});
+  const {reviews,summary:reviewSummary}=await servicePublicReviews(service.id,service.sourceId);publicServices.push({providerName:vendorNames.find(v=>v.id===service.vendorId)?.businessName??'منصة مناسبتـي',reviews,reviewSummary,id:service.id,version:service.version,vendorId:service.vendorId,body:{...service.body,cities:cityIds,managerIds:undefined,resourceIds:undefined}});
  }
  const offerIds=new Set(publicOffers.map(o=>o.id)),publicPackages=packages.filter(p=>p.body.published&&items.some(i=>i.packageId===p.id)&&items.filter(i=>i.packageId===p.id).every(i=>offerIds.has(i.offerId))).map(p=>({...p,ownerId:undefined,items:items.filter(i=>i.packageId===p.id)}));
  return {services:publicServices,offers:publicOffers,packages:publicPackages,relationships:relationships.filter(r=>publicServices.some(s=>s.id===r.serviceId)&&publicServices.some(s=>s.id===r.relatedServiceId)),cities: geo.cities.filter(c=>c.isAvailable).map(c=>({id:c.id,nameAr:c.nameAr})),categories,artists};

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import {requestJSON} from '@/lib/api-client';
 import {useApp} from '@/lib/store';
 import OfferSettings,{ServiceMedia} from './OfferSettings';
+import {VendorReviews} from './Reviews';
 const field='w-full rounded-xl border border-saudi-sand-300 bg-white p-2 text-sm focus:border-saudi-green-800',button='rounded-xl bg-saudi-green-800 hover:bg-saudi-green-900 text-white px-4 py-2 font-bold disabled:opacity-50';
 export default function CommerceManage(){const {currentUser}=useApp(),[data,setData]=useState<any>(null),[editor,setEditor]=useState<any>(null),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false);
  const request=useRef(0),cancel=useCallback(()=>{request.current++;},[]);const load=useCallback(async()=>{const token=++request.current;const result=await requestJSON('/api/commerce/manage');if(token===request.current)setData(result);},[]);useEffect(()=>{setData(null);setEditor(null);void load().catch(e=>setNotice(e.message));return cancel;},[load,cancel,currentUser?.id]);
@@ -21,5 +22,6 @@ export default function CommerceManage(){const {currentUser}=useApp(),[data,setD
  {editor.kind==='OFFER'&&<OfferSettings body={editor.body} set={set} cities={data.cities}/>}
  <div className="flex gap-3"><button className={button} disabled={busy}>حفظ</button><button type="button" className="underline" onClick={()=>setEditor(null)}>إغلاق</button></div></form>}
  <section className="space-y-4">{data.services.map((s:any)=><article key={s.id} className="bg-white border border-saudi-sand-300 shadow-card rounded-2xl p-5 space-y-3"><div className="flex flex-wrap justify-between gap-3"><h2 className="font-bold">{s.body.titleAr}</h2><div className="flex gap-3 text-sm"><button className="underline" onClick={()=>open('SERVICE',s)}>تعديل تعريف الخدمة</button><button className={button} onClick={()=>open('OFFER',undefined,s.id)}>+ عرض شراء</button><button className="underline" onClick={()=>open('RELATIONSHIP',undefined,s.id)}>ربط خدمة مكملة</button></div></div><p className="text-xs">{s.body.approved?'معتمدة':'بانتظار اعتماد المنصة'} • {s.body.published?'منشورة':'مسودة'} • تعريف واحد، {data.offers.filter((o:any)=>o.serviceId===s.id).length} عروض</p><div className="grid sm:grid-cols-3 gap-3">{data.offers.filter((o:any)=>o.serviceId===s.id).map((o:any)=><button key={o.id} className="text-right border rounded-xl p-3" onClick={()=>open('OFFER',o)}>{o.body.nameAr}<span className="block text-xs text-gray-600">الإصدار {o.version} • {o.body.enabled?'مفعّل':'معطّل'}</span></button>)}</div></article>)}</section><section className="bg-white border border-saudi-sand-300 shadow-card rounded-2xl p-5 space-y-3"><h2 className="font-bold">الباقات</h2>{data.packages.map((p:any)=><button key={p.id} className="block border rounded-xl p-3 w-full text-right" onClick={()=>open('PACKAGE',p)}>{p.body.nameAr} • الإصدار {p.version}</button>)}</section>
+ <VendorReviews/>
  </>}</div>;
 }

@@ -12,6 +12,7 @@ export const FEATURE_CATALOG = [
   { id: 'inspiration', name: 'الإلهام', description: 'الأفكار والمحتوى المرئي', paths: ['/inspiration'], apiPaths: [], visible: true, enabled: true },
   { id: 'commerce', name: 'الحجوزات والشراء', description: 'السلة والدفع والحجوزات', paths: ['/cart','/checkout','/bookings'], apiPaths: ['/api/oms/orders'], visible: true, enabled: true },
   { id: 'vendor_portal', name: 'بوابة الموردين', description: 'لوحة المورد وإدارة طلباته', paths: ['/vendor'], apiPaths: [], visible: true, enabled: true },
+  { id: 'reviews', name: 'تقييمات وتعليقات العملاء', description: 'تقييم الخدمات المكتملة وردود الموردين بعد اعتماد الإدارة', paths: [], apiPaths: ['/api/reviews'], visible: true, enabled: true },
   { id: 'luma', name: 'المخططة الذكية لُمى', description: 'المساعد داخل صفحات التطبيق', paths: [], apiPaths: [], visible: true, enabled: true },
 ] as const;
 export type FeatureId = typeof FEATURE_CATALOG[number]['id'];
