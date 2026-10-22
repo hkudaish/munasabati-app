@@ -14,8 +14,8 @@ export default function ServiceSelectionFields({ categoryId, value, onChange, op
       onChange({ ...value, subcategoryIds: ids, artistIds: value.artistIds.filter(id => options.artists.some(a => a.id === id && allowed.some(s => s.artistKind === 'any' || s.artistKind === a.kind))) });
     }} className="mt-1 rounded"/><span>{sub.nameAr}</span></label>)}
     {!!artists.length && <label className="block space-y-2"><span className="font-bold">اختر الفنان أو الفنانة المفضلة</span><select aria-label="الفنان المفضل" value={value.artistIds[0] || ''} onChange={e => onChange({ ...value, artistIds: e.target.value ? [e.target.value] : [] })} className="w-full min-w-0 max-w-full rounded-lg border p-2 bg-white"><option value="">سأختار لاحقاً</option>{artists.map(a => <option key={a.id} value={a.id}>{a.nameAr}</option>)}</select></label>}
-    {selected.some(s => s.kind === 'audio') && <Link href="/zaffah#supplier-library" className="block text-saudi-green-800 underline font-bold">استمع لمكتبات محلات الزفات</Link>}
+    {selected.some(s => s.kind === 'audio') && <Link href={`/zaffah?returnTo=${encodeURIComponent('/plan?resume=1')}#supplier-library`} className="block text-saudi-green-800 underline font-bold">استمع لمكتبات محلات الزفات</Link>}
     {selected.some(s => s.kind === 'performer') && <p className="text-gray-600 leading-5">الاختيار تفضيل ضمن الخطة؛ الحجز يتطلب عرض خدمة فعلياً وموافقة المورد.</p>}
-    {!!value.artistIds.length && <Link href={`/artists?artist=${encodeURIComponent(value.artistIds[0])}`} className="block text-saudi-green-800 underline font-bold">عرض خدمات الفنان وطلبات الحجز</Link>}
+    {!!value.artistIds.length && <Link href={`/artists?artist=${encodeURIComponent(value.artistIds[0])}&returnTo=${encodeURIComponent('/plan?resume=1')}`} className="block text-saudi-green-800 underline font-bold">عرض خدمات الفنان وطلبات الحجز</Link>}
   </fieldset>;
 }

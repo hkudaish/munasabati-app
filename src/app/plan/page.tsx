@@ -58,6 +58,26 @@ function PlanWizardContent() {
     'invitations',
   ]);
 
+  // The wizard survives leaving the page (for example to look at an artist's services) and coming back, by link or with the browser's back button.
+  const SAVED_KEY = 'plan-wizard-v1', SAVED_MAX_AGE = 6 * 3600000;
+  const [restored, setRestored] = useState(false), [wasRestored, setWasRestored] = useState(false);
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(sessionStorage.getItem(SAVED_KEY) || 'null');
+      if (saved && Date.now() - saved.at < SAVED_MAX_AGE && !searchParams.get('type') && (saved.step > 1 || searchParams.get('resume'))) {
+        setOccasionTypeId(saved.occasionTypeId); setCityId(saved.cityId); setDate(saved.date); setIsApproximateDate(!!saved.isApproximateDate); setGuestCount(saved.guestCount);
+        setGuestsSection(saved.guestsSection); setVenueType(saved.venueType); setBudget(saved.budget); setTier(saved.tier); setTitle(saved.title ?? '');
+        setSelectedServices(saved.selectedServices); setDetails(saved.details ?? {}); setStep(saved.step); setWasRestored(true);
+      }
+    } catch { /* no saved progress, or storage is unavailable */ }
+    setRestored(true);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!restored) return;
+    try { sessionStorage.setItem(SAVED_KEY, JSON.stringify({ at: Date.now(), step, occasionTypeId, cityId, date, isApproximateDate, guestCount, guestsSection, venueType, budget, tier, title, selectedServices, details })); } catch { /* storage unavailable */ }
+  }, [restored, step, occasionTypeId, cityId, date, isApproximateDate, guestCount, guestsSection, venueType, budget, tier, title, selectedServices, details]);
+  const startOver = () => { try { sessionStorage.removeItem(SAVED_KEY); } catch { /* ignore */ } window.location.assign('/plan'); };
+
   // Read URL query if any (e.g. /plan?type=wedding)
   useEffect(() => {
     const typeParam = searchParams.get('type');
@@ -108,6 +128,7 @@ function PlanWizardContent() {
 
       if (newId) {
         try { confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } }); } catch {}
+        try { sessionStorage.removeItem(SAVED_KEY); } catch { /* ignore */ }
         router.push(`/occasion/${newId}`);
       }
     } finally { setIsSubmitting(false); }
@@ -116,6 +137,7 @@ function PlanWizardContent() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 sm:py-12 space-y-8 animate-fadeIn">
       <h1 className="sr-only">تخطيط مناسبة جديدة</h1>
+      {wasRestored && <p role="status" className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-saudi-green-200 bg-saudi-green-50 p-3 text-xs"><span>استعدنا تقدمك السابق في الخطة من حيث توقفت.</span><button type="button" onClick={startOver} className="font-bold underline">ابدأ من جديد</button></p>}
       {/* Wizard Progress Bar */}
       <div className="space-y-2">
         <div className="flex items-center justify-between text-xs text-gray-500 font-bold">
