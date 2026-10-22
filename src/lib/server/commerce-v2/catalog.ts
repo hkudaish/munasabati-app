@@ -3,6 +3,8 @@ import { randomUUID } from 'node:crypto';
 import { prisma } from '@/lib/db';
 import { requireUser,rateLimit } from '../auth';
 import { servicePublicReviews } from '../reviews';
+import { loadPoliciesForListing } from '../availability/loader';
+import { ListedService, offerAvailability, packageAvailability, serviceAvailability } from '../availability/listing';
 import { HttpError,text,integer } from '../http';
 import { mediaUrls,mediaUrl } from '../catalog';
 import { atomic,lock,admin,Tx,definitions } from '../booking/repository';
@@ -11,7 +13,6 @@ import { requireFeature } from '../features';
 import { mergePolicy,defaultPolicy } from '@/lib/booking/engine';
 import { serviceKinds,relationshipKinds,offerPrice } from '@/lib/commerce/engine';
 import { readGeo } from '../geo/data';
-import { availability } from '@/lib/geo/engine';
 export async function serviceRow(tx:Tx,id:string){const rows=await tx.$queryRaw<any[]>`SELECT * FROM "CommerceService" WHERE "id"=${id}`;if(!rows[0])throw new HttpError(404,'الخدمة غير موجودة');return rows[0];}
 export async function offerRow(tx:Tx,id:string){const rows=await tx.$queryRaw<any[]>`SELECT * FROM "CommerceOffer" WHERE "id"=${id}`;if(!rows[0])throw new HttpError(404,'العرض غير موجود');return rows[0];}
 export const owns=(user:any,service:any)=>admin(user)||service.ownerId===user.id;
@@ -26,15 +27,21 @@ export async function catalog(manage=false,geoOverride?:Awaited<ReturnType<typeo
  const user=manage?await requireUser():null;if(manage&&!admin(user)&&user!.role!=='VENDOR')throw new HttpError(403,'غير مخول');
  const [services,offers,packages,items,relationships,defs,cities,users,categories,subcategories,artists]=await Promise.all([prisma.$queryRaw<any[]>`SELECT * FROM "CommerceService" ORDER BY "createdAt" DESC`,prisma.$queryRaw<any[]>`SELECT * FROM "CommerceOffer" ORDER BY "createdAt","id"`,prisma.$queryRaw<any[]>`SELECT * FROM "CommercePackage" ORDER BY "createdAt" DESC`,prisma.$queryRaw<any[]>`SELECT * FROM "CommercePackageItem" ORDER BY "id"`,prisma.$queryRaw<any[]>`SELECT * FROM "CommerceRelationship"`,definitions(),prisma.saudiCity.findMany({where:{isAvailable:true}}),manage&&admin(user)?prisma.user.findMany({where:{isActive:true,role:{in:['ADMIN','SUPER_ADMIN','VENDOR']}},select:{id:true,name:true}}):[],prisma.serviceCategory.findMany(),prisma.serviceSubcategory.findMany(),prisma.catalogArtist.findMany()]);
  if(manage)return {services:services.filter(s=>owns(user,s)),offers:offers.filter(o=>admin(user)||services.some(s=>s.id===o.serviceId&&owns(user,s))),packages:packages.filter(p=>admin(user)||p.ownerId===user!.id),items:items.filter(i=>packages.some(p=>p.id===i.packageId&&(admin(user)||p.ownerId===user!.id))),availableOffers:offers.filter(o=>o.body.enabled&&o.body.allowPackages||services.some(s=>s.id===o.serviceId&&owns(user,s))).map(o=>({...o,serviceTitleAr:services.find(s=>s.id===o.serviceId)?.body.titleAr,body:{...o.body,shares:undefined,managerIds:undefined,resourceIds:undefined,policy:{...o.body.policy,commissionBps:undefined}}})),relationships:relationships.filter(r=>services.some(s=>s.id===r.serviceId&&owns(user,s))),types:defs.filter(d=>d.kind==='TYPE'),people:defs.filter(d=>d.kind==='PERSON'&&(admin(user)||d.body.managerIds.includes(user!.id))),cities,categories,subcategories,artists,users:admin(user)?users:[{id:user!.id,name:user!.name}],isAdmin:admin(user),userId:user!.id,defaultPolicy:defaultPolicy()};
- const geo=geoOverride??await readGeo(),available=new Map(geo.cities.map(c=>[c.id,new Set(availability(geo,{cityId:c.id,countryCode:c.countryCode,source:'MANUAL'}).filter(a=>a.available).map(a=>a.key))]));
- const vendorNames=await prisma.vendor.findMany({select:{id:true,businessName:true}});const publicOffers:any[]=[],publicServices:any[]=[];
+ const geo=geoOverride??await readGeo();
+ const vendorNames=await prisma.vendor.findMany({select:{id:true,businessName:true,status:true,user:{select:{isActive:true}}}});const publicOffers:any[]=[],publicServices:any[]=[];
+ const snapshot={policies:await loadPoliciesForListing(),geo},readyServices=new Set(offers.filter(o=>o.body.enabled).map(o=>o.serviceId)),listedById:Record<string,ListedService>={};
  for(const service of services.filter(s=>s.body.published&&s.body.approved)){
-  const cityIds=service.body.cities.filter((city:string)=>available.get(city)?.has('feature:commerce')&&available.get(city)?.has('category:'+service.body.categoryId)&&(!service.sourceId||available.get(city)?.has('item:'+service.sourceId)));
-  if(!cityIds.length)continue;
-  for(const offer of offers.filter(o=>o.serviceId===service.id&&o.body.enabled)){try{const a=await activeOffer(prisma,offer.id);publicOffers.push({id:offer.id,serviceId:service.id,version:offer.version,managedBy:a.managerNames,body:{...offer.body,managerIds:undefined,shares:undefined,policy:{...a.effective.policy,commissionBps:0}},people:a.effective.people.map((p:any)=>({id:p.id,nameAr:p.body.nameAr,managementAr:p.body.managementAr}))});}catch(e){if(!(e instanceof HttpError))throw e;}}
-  const {reviews,summary:reviewSummary}=await servicePublicReviews(service.id,service.sourceId);publicServices.push({providerName:vendorNames.find(v=>v.id===service.vendorId)?.businessName??'منصة مناسبتـي',reviews,reviewSummary,id:service.id,version:service.version,vendorId:service.vendorId,body:{...service.body,cities:cityIds,managerIds:undefined,resourceIds:undefined}});
+  // what shows where is decided by the central availability engine (policies + the city coverage rules): hidden services drop out, coming-soon and suspended ones stay with a notice
+  const vendor=vendorNames.find(v=>v.id===service.vendorId),listed:ListedService={id:service.id,sourceId:service.sourceId,categoryId:service.body.categoryId,vendorId:service.vendorId,kind:service.body.kind,cities:service.body.cities,vendorActive:!vendor||(vendor.status==='ACTIVE'&&vendor.user?.isActive!==false),ready:readyServices.has(service.id)};
+  const sa=serviceAvailability(snapshot,listed),cityIds=Object.keys(sa.byCity).filter(c=>sa.byCity[c].v);
+  if(!cityIds.length)continue;listedById[service.id]=listed;
+  for(const offer of offers.filter(o=>o.serviceId===service.id&&o.body.enabled)){try{const a=await activeOffer(prisma,offer.id);publicOffers.push({id:offer.id,serviceId:service.id,version:offer.version,availability:Object.fromEntries(Object.entries(offerAvailability(snapshot,listed,offer.id)).filter(([c])=>cityIds.includes(c))),managedBy:a.managerNames,body:{...offer.body,managerIds:undefined,shares:undefined,policy:{...a.effective.policy,commissionBps:0}},people:a.effective.people.map((p:any)=>({id:p.id,nameAr:p.body.nameAr,managementAr:p.body.managementAr}))});}catch(e){if(!(e instanceof HttpError))throw e;}}
+  const {reviews,summary:reviewSummary}=await servicePublicReviews(service.id,service.sourceId);publicServices.push({providerName:vendor?.businessName??'منصة مناسبتـي',availability:Object.fromEntries(cityIds.map(c=>[c,sa.byCity[c]])),nationalAvailability:sa.national,reviews,reviewSummary,id:service.id,version:service.version,vendorId:service.vendorId,body:{...service.body,cities:cityIds,managerIds:undefined,resourceIds:undefined}});
  }
- const offerIds=new Set(publicOffers.map(o=>o.id)),publicPackages=packages.filter(p=>p.body.published&&items.some(i=>i.packageId===p.id)&&items.filter(i=>i.packageId===p.id).every(i=>offerIds.has(i.offerId))).map(p=>({...p,ownerId:undefined,items:items.filter(i=>i.packageId===p.id)}));
+ const offerIds=new Set(publicOffers.map(o=>o.id)),publicPackages=packages.filter(p=>p.body.published&&items.some(i=>i.packageId===p.id)&&items.filter(i=>i.packageId===p.id).every(i=>offerIds.has(i.offerId)||i.body.optional)&&items.some(i=>i.packageId===p.id&&offerIds.has(i.offerId))).map(p=>{
+  // an optional component that is hidden everywhere does not hide the package; each city says whether the package can be booked there
+  const parts=items.filter(i=>i.packageId===p.id),comps=parts.filter(i=>offerIds.has(i.offerId)).map(i=>{const service=listedById[publicOffers.find(o=>o.id===i.offerId)!.serviceId];return {key:i.id,optional:!!i.body.optional,service,offerId:i.offerId,substitutes:(i.body.substitutions??[]).map((id:string)=>({id,service:listedById[publicOffers.find(o=>o.id===id)?.serviceId]})).filter((x:any)=>x.service)};}),cityList=Array.from(new Set(comps.flatMap(c=>c.service.cities))).filter(c=>geo.cities.some(g=>g.id===c));
+  return {...p,ownerId:undefined,items:parts,availability:comps.length?packageAvailability(snapshot,p.id,comps,cityList):{}};});
  return {services:publicServices,offers:publicOffers,packages:publicPackages,relationships:relationships.filter(r=>publicServices.some(s=>s.id===r.serviceId)&&publicServices.some(s=>s.id===r.relatedServiceId)),cities: geo.cities.filter(c=>c.isAvailable).map(c=>({id:c.id,nameAr:c.nameAr})),categories,artists};
 }
 export async function syncOffer(tx:Tx,offer:any,service:any){

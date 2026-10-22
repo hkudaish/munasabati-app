@@ -95,6 +95,7 @@ model User {
   CommerceFulfillmentGroup_managerId CommerceFulfillmentGroup[] @relation("CommerceFulfillmentGroup_managerId")
   CommerceTransfer_makerId CommerceTransfer[] @relation("CommerceTransfer_makerId")
   CommerceTransfer_checkerId CommerceTransfer[] @relation("CommerceTransfer_checkerId")
+  availabilityInterests AvailabilityInterest[]
 }
 
 // -------------------------------------------------------------
@@ -110,6 +111,7 @@ model GeoCountry {
   updatedAt DateTime @updatedAt
   regions GeoRegion[]
   cities SaudiCity[]
+  availabilityRules AvailabilityGeoRule[]
 }
 model GeoRegion {
   id String @id
@@ -119,6 +121,7 @@ model GeoRegion {
   nameEn String
   cities SaudiCity[]
   @@unique([countryCode, nameEn])
+  availabilityRules AvailabilityGeoRule[]
 }
 model GeoRule {
   id String @id @default(uuid())
@@ -227,6 +230,8 @@ model SaudiCity {
   orders      MultiVendorOrder[]
 
   @@index([isAvailable])
+  availabilityRules AvailabilityGeoRule[]
+  availabilityInterests AvailabilityInterest[]
 }
 
 model ServiceCategory {
@@ -1221,4 +1226,110 @@ model OccasionFloorPlan {
   version    Int      @default(1)
   updatedAt  DateTime @default(now()) @updatedAt @db.Timestamptz(3)
   occasion   Occasion @relation(fields: [occasionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+// -------------------------------------------------------------
+// Availability policies: one centralized, policy-driven model (see docs/AVAILABILITY.md).
+// The existing geographic coverage tables (GeoRule etc.) stay the city/service coverage layer; these tables add the
+// configured status, visibility, booking mode, restrictions, schedules, geography-scoped restrictions and an audit trail.
+// -------------------------------------------------------------
+model AvailabilityPolicy {
+  id String @id @default(uuid())
+  entityType String
+  entityId String
+  configuredStatus String @default("ACTIVE")
+  visibilityMode String @default("AUTO")
+  bookingMode String @default("ENABLED")
+  priority Int @default(0)
+  restrictionConfig Json @default("{}")
+  suspensionPolicy Json @default("{}")
+  publicMessage Json @default("{}")
+  effectiveFrom DateTime? @db.Timestamptz(3)
+  effectiveUntil DateTime? @db.Timestamptz(3)
+  autoActivate Boolean @default(false)
+  reason String?
+  createdBy String?
+  updatedBy String?
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @default(now()) @db.Timestamptz(3)
+  version Int @default(1)
+  geoRules AvailabilityGeoRule[]
+  schedules AvailabilitySchedule[]
+  @@index([entityType, entityId])
+  @@index([configuredStatus])
+}
+model AvailabilityGeoRule {
+  id String @id @default(uuid())
+  policyId String
+  policy AvailabilityPolicy @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  countryCode String?
+  country GeoCountry? @relation(fields: [countryCode], references: [code], onDelete: Cascade)
+  regionId String?
+  region GeoRegion? @relation(fields: [regionId], references: [id], onDelete: Cascade)
+  cityId String?
+  city SaudiCity? @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  geographicEffect String @default("ALLOW")
+  statusOverride String?
+  restrictionConfig Json @default("{}")
+  effectiveFrom DateTime? @db.Timestamptz(3)
+  effectiveUntil DateTime? @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @default(now()) @db.Timestamptz(3)
+  @@index([policyId])
+  @@index([cityId])
+}
+model AvailabilitySchedule {
+  id String @id @default(uuid())
+  policyId String
+  policy AvailabilityPolicy @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  kind String @default("OPERATING")
+  timezone String @default("Asia/Riyadh")
+  startTime String?
+  endTime String?
+  dayOfWeek Int?
+  recurrenceRule String?
+  startDate String?
+  endDate String?
+  maxBookings Int?
+  isEnabled Boolean @default(true)
+  @@index([policyId])
+}
+model AvailabilityAuditLog {
+  id String @id @default(uuid())
+  policyId String?
+  entityType String?
+  entityId String?
+  action String
+  previousValue Json?
+  newValue Json?
+  actorId String?
+  reason String?
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  @@index([policyId, createdAt])
+  @@index([entityType, entityId, createdAt])
+}
+model AvailabilityInterest {
+  id String @id @default(uuid())
+  serviceId String
+  cityId String
+  city SaudiCity @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  customerId String
+  customer User @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  contactPreference String @default("NONE")
+  consentAt DateTime @db.Timestamptz(3)
+  status String @default("ACTIVE")
+  notifiedAt DateTime? @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  @@unique([serviceId, cityId, customerId])
+  @@index([serviceId, cityId, status])
+}
+model PublicStatsConfig {
+  id String @id @default("default")
+  enabled Boolean @default(true)
+  cards Json @default("[]")
+  scope String @default("GLOBAL")
+  cityId String?
+  period String @default("ALL")
+  version Int @default(1)
+  updatedAt DateTime @default(now()) @db.Timestamptz(3)
 }

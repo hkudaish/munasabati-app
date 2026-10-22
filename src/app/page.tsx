@@ -44,6 +44,7 @@ import { formatSAR } from '@/lib/utils';
 import ServiceCard from '@/components/marketplace/ServiceCard';
 import PackageCard from '@/components/marketplace/PackageCard';
 import CustomerReviewsShowcase from '@/components/common/CustomerReviewsShowcase';
+import PublicStatistics from '@/components/common/PublicStatistics';
 import { ServiceItem, SmartPackage, UserRole } from '@/lib/types';
 
 export default function HomePage() {
@@ -429,6 +430,11 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
+          </section>
+
+          {/* 6b. Platform statistics: real, verified figures only (hidden when switched off or empty) */}
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <PublicStatistics />
           </section>
 
           {/* 7. Client Reviews Showcase */}

@@ -1,7 +1,7 @@
 import 'server-only';
 import { featureForPath } from '@/lib/system/feature-catalog';
 import { NextResponse } from 'next/server';
-export class HttpError extends Error { constructor(public status: number, message: string) { super(message); } }
+export class HttpError extends Error { constructor(public status: number, message: string, public extra?: Record<string, unknown>) { super(message); } }
 export function sameOrigin(request: Request) {
   const origin = request.headers.get('origin');
   const expected = new URL(process.env.NEXT_PUBLIC_APP_URL || request.url).origin;
@@ -31,7 +31,7 @@ export function api(handler: (request: Request, context: any) => Promise<unknown
     try { const feature = featureForPath(new URL(request.url).pathname, true); if (feature && !options.allowDisabledFeature) await (await import('./features')).requireFeature(feature.id); if (!['GET', 'HEAD'].includes(request.method)) sameOrigin(request); const data = await handler(request, context); return NextResponse.json(data, { headers: { 'Cache-Control': 'no-store' } }); }
     catch (e: any) {
       const status = e instanceof HttpError ? e.status : ['P2002','P2034'].includes(e?.code) ? 409 : e?.code === 'P2025' ? 404 : 503;
-      return NextResponse.json({ error: e instanceof HttpError ? e.message : status === 409 ? 'البيانات مسجلة مسبقاً أو تعارض تحديث؛ أعد التحميل' : status === 404 ? 'السجل غير موجود' : 'تعذر الاتصال بالخدمة؛ لم يتم تأكيد الحفظ. أعد المحاولة.' }, { status, headers: { 'Cache-Control': 'no-store' } });
+      return NextResponse.json({ ...(e instanceof HttpError && e.extra ? e.extra : {}), error: e instanceof HttpError ? e.message : status === 409 ? 'البيانات مسجلة مسبقاً أو تعارض تحديث؛ أعد التحميل' : status === 404 ? 'السجل غير موجود' : 'تعذر الاتصال بالخدمة؛ لم يتم تأكيد الحفظ. أعد المحاولة.' }, { status, headers: { 'Cache-Control': 'no-store' } });
     }
   };
 }

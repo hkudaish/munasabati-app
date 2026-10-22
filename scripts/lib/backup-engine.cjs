@@ -26,7 +26,7 @@ const { createHash, createCipheriv, createDecipheriv, randomBytes } = require('n
 const DEFAULT_EXCLUDE = ['AuthSession', 'AuthAttempt', 'SystemSetupToken'];
 // The administration audit trail is never rolled back by a restore: otherwise a restore could erase the record of what
 // happened since the backup (including the restore itself). Rows from the backup are only added where missing.
-const DEFAULT_PRESERVE = ['SystemAuditLog'];
+const DEFAULT_PRESERVE = ['SystemAuditLog', 'AvailabilityAuditLog'];
 const FORMAT = 1;
 const LOCK_TTL_MS = 6 * 3600 * 1000;
 
