@@ -38,6 +38,7 @@ import {
 } from 'lucide-react';
 import { useT } from '@/components/i18n/LocaleProvider';
 import LanguageSwitcher from '@/components/i18n/LanguageSwitcher';
+import RemindersBell from '@/components/common/RemindersBell';
 
 function NavbarContent() {
   const t = useT();
@@ -496,6 +497,7 @@ function NavbarContent() {
 
           {/* Left: Role-Specific Action CTAs */}
           <div className="flex items-center gap-2 sm:gap-3">
+            {(currentRole === 'admin' || currentRole === 'vendor') && <RemindersBell />}
             {/* 1. Customer Actions */}
             {currentRole === 'client' && (
               <>

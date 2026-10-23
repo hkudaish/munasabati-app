@@ -5,6 +5,7 @@ import { activeLines } from './cart';
 import { detectAllPriceChanges } from './price-watch';
 import { expireDrafts } from './drafts';
 import { readSettings, renderTemplate, money, NotificationSettings } from './events';
+import { counts, remindersFor } from './reminders';
 
 const MAX_RETRIES = 5;
 const LEASE_MINUTES = 10;
@@ -98,10 +99,25 @@ async function sendEmail(to: string, subject: string, body: string, key: string)
   return { id: typeof data.id === 'string' ? data.id : null };
 }
 
-type Decision = { skip: string } | { send: { title: string; body: string } };
+type Decision = { skip: string } | { send: { title: string; body: string; ref?: 'CART' | 'OPS'; url?: string } };
 /** Looks again at the customer's cart at the moment of sending: a message about something that is no longer true is never sent. */
 async function decide(job: any, settings: NotificationSettings): Promise<Decision> {
   if (!settings.enabled) return { skip: 'disabled' };
+  if (job.template === 'ops_alert' || job.template === 'ops_digest') {
+    if (!settings.ops.enabled) return { skip: 'disabled' };
+    const person = (await prisma.$queryRaw<any[]>`SELECT "id","role","isActive" FROM "User" WHERE "id"=${job.userId}`)[0];
+    if (!person?.isActive) return { skip: 'inactive' };
+    const allowedOps = await consent(job.userId);
+    if ((job.channel === 'inbox' && !allowedOps.inbox) || (job.channel === 'email' && !allowedOps.email)) return { skip: 'no_consent' };
+    const list = await remindersFor(person);
+    if (job.template === 'ops_alert') {
+      const still = list.find(r => r.id === job.payload.ref);
+      return still ? { send: { title: still.titleAr, body: still.detailAr, ref: 'OPS', url: still.url } } : { skip: 'resolved' };      // the problem was dealt with in the meantime
+    }
+    if (!list.length) return { skip: 'nothing_pending' };
+    const c = counts(list);
+    return { send: { title: `لديك ${c.total} تنبيهاً يحتاج متابعة`, body: `${c.critical} عاجل، ${c.warning} تحذير، ${c.info} للعلم.\n` + list.slice(0, 5).map(r => '• ' + r.titleAr + ' — ' + r.detailAr.split('\n')[0]).join('\n'), ref: 'OPS', url: '/reminders' } };
+  }
   const cart = (await prisma.$queryRaw<any[]>`SELECT "body","locale","lastActivityAt" FROM "CommerceCart" WHERE "userId"=${job.userId}`)[0];
   if (!cart) return { skip: 'no_cart' };
   const locale: 'ar' | 'en' = cart.locale === 'en' ? 'en' : 'ar', active = activeLines(cart.body.lines), ids = new Set(active.map((l: any) => l.id));
@@ -139,7 +155,7 @@ export async function runNotificationJobs(limit = 50) {
       if ('skip' in decision) { await prisma.$executeRaw`UPDATE "NotificationJob" SET "status"='SKIPPED',"lastError"=${decision.skip} WHERE "id"=${job.id}`; result.skipped++; continue; }
       let providerId: string | null = null, provider = 'inbox';
       if (job.channel === 'inbox') {
-        await prisma.$executeRaw`INSERT INTO "ServiceInbox" ("id","userId","requestId","event","body") VALUES (${randomUUID()},${job.userId},${'notify:' + job.id},${'CART:' + job.template},${JSON.stringify({ referenceType: 'CART', titleAr: decision.send.title, statusAr: decision.send.body, url: '/commerce/cart' })}::jsonb) ON CONFLICT ("userId","requestId","event") DO NOTHING`;
+        await prisma.$executeRaw`INSERT INTO "ServiceInbox" ("id","userId","requestId","event","body") VALUES (${randomUUID()},${job.userId},${'notify:' + job.id},${(decision.send.ref ?? 'CART') + ':' + job.template},${JSON.stringify({ referenceType: decision.send.ref ?? 'CART', titleAr: decision.send.title, statusAr: decision.send.body, url: decision.send.url ?? '/commerce/cart' })}::jsonb) ON CONFLICT ("userId","requestId","event") DO NOTHING`;
       } else {
         provider = 'email';
         const user = (await prisma.$queryRaw<any[]>`SELECT "email" FROM "User" WHERE "id"=${job.userId}`)[0];
@@ -159,12 +175,37 @@ export async function runNotificationJobs(limit = 50) {
   return result;
 }
 
+/**
+ * Operational reminders for the people who run the service (administrators, supervisors, coordinators) and for vendors:
+ * an alert for every urgent item (once per item) and one digest a day from 07:00 Riyadh time. Each is re-checked when it is sent.
+ */
+export async function scheduleOpsReminders(limit = 300) {
+  const { settings } = await prisma.$transaction(tx => readSettings(tx as any));
+  if (!settings.enabled || !settings.ops.enabled) return { users: 0, alerts: 0, digests: 0 };
+  const people = await prisma.$queryRaw<any[]>`SELECT "id","role" FROM "User" WHERE "isActive" AND "role" IN ('ADMIN','SUPER_ADMIN','VENDOR') ORDER BY "id" LIMIT ${limit}`;
+  const riyadh = new Date(Date.now() + 3 * 3600000), day = riyadh.toISOString().slice(0, 10), afterSeven = riyadh.getUTCHours() >= 7;
+  let alerts = 0, digests = 0;
+  const jobs = async () => (await prisma.$queryRaw<any[]>`SELECT COUNT(*)::int AS n FROM "NotificationJob"`)[0].n;
+  for (const person of people) {
+    try {
+      const list = await remindersFor(person);
+      const before = await jobs();
+      for (const r of list.filter(x => x.severity === 'critical')) await addJobs({ id: null }, { template: 'ops_alert', userId: person.id, key: jobKey(['ops', person.id, r.id]), scheduledAt: new Date(), payload: { ref: r.id } }, settings);
+      const afterAlerts = await jobs(); alerts += afterAlerts - before;
+      if (list.length && afterSeven) await addJobs({ id: null }, { template: 'ops_digest', userId: person.id, key: jobKey(['ops-digest', person.id, day]), scheduledAt: new Date(), payload: {} }, settings);
+      digests += (await jobs()) - afterAlerts;
+    } catch (error) { console.warn(JSON.stringify({ event: 'ops-reminders.failed', userId: person.id, error: error instanceof Error ? error.message : String(error) })); }
+  }
+  return { users: people.length, alerts, digests };
+}
+
 /** One pass of everything scheduled: find price changes, expire old drafts, queue reminders, turn events into jobs, send. */
 export async function runCron() {
   const prices = await detectAllPriceChanges();
   const expired = await expireDrafts();
   const reminders = await scheduleReminders();
+  const ops = await scheduleOpsReminders();
   const outbox = await dispatchOutbox();
   const jobs = await runNotificationJobs();
-  return { prices, expiredDrafts: Number(expired), reminders, outbox, jobs };
+  return { prices, expiredDrafts: Number(expired), reminders, ops, outbox, jobs };
 }

@@ -1459,3 +1459,16 @@ model NotificationAttempt {
   attemptedAt       DateTime @default(now()) @db.Timestamptz(3)
   @@index([jobId], map: "NotificationAttempt_jobId_idx")
 }
+
+model LumaQuestionLog {
+  id          String   @id
+  audience    String
+  intent      String
+  categoryId  String?
+  cityId      String?
+  resultCount Int      @default(0)
+  text        String?
+  userId      String?
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  @@index([audience, intent, createdAt], map: "LumaQuestionLog_audience_intent_idx")
+}

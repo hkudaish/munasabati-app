@@ -10,13 +10,14 @@ const field = 'w-full rounded-xl border border-saudi-sand-300 bg-white p-2 text-
 export default function BookingInsights() {
   const [city, setCity] = useState(''), [service, setService] = useState(''), [from, setFrom] = useState(''), [to, setTo] = useState('');
   const [stats, setStats] = useState<any>(null), [abandoned, setAbandoned] = useState<any>(null), [changes, setChanges] = useState<any>(null), [jobs, setJobs] = useState<any>(null), [settings, setSettings] = useState<any>(null);
+  const [luma, setLuma] = useState<any>(null);
   const [stages, setStages] = useState(''), [finalHours, setFinalHours] = useState(''), [window, setWindowMinutes] = useState('15'), [notice, setNotice] = useState('');
 
   const query = useCallback(() => { const q = new URLSearchParams(); if (city) q.set('cityId', city); if (service) q.set('serviceId', service); if (from) q.set('from', from); if (to) q.set('to', new Date(to + 'T23:59:59').toISOString()); return q.toString() ? '?' + q.toString() : ''; }, [city, service, from, to]);
   const load = useCallback(async () => {
     try {
-      const [a, b, c, d, e] = await Promise.all([requestJSON('/api/admin/booking-analytics' + query()), requestJSON('/api/admin/abandoned-carts' + query()), requestJSON('/api/admin/price-change-events' + query()), requestJSON('/api/admin/notification-jobs'), requestJSON('/api/admin/notification-settings')]);
-      setStats(a); setAbandoned(b); setChanges(c); setJobs(d); setSettings(e);
+      const [a, b, c, d, e, l] = await Promise.all([requestJSON('/api/admin/booking-analytics' + query()), requestJSON('/api/admin/abandoned-carts' + query()), requestJSON('/api/admin/price-change-events' + query()), requestJSON('/api/admin/notification-jobs'), requestJSON('/api/admin/notification-settings'), requestJSON('/api/admin/luma-insights')]);
+      setLuma(l); setStats(a); setAbandoned(b); setChanges(c); setJobs(d); setSettings(e);
       setStages(e.settings.reminders.stagesHours.join(',')); setFinalHours(e.settings.reminders.finalHours ?? ''); setWindowMinutes(String(e.settings.price.groupWindowMinutes));
     } catch (error) { setNotice(error instanceof Error ? error.message : 'تعذر التحميل'); }
   }, [query]);
@@ -72,9 +73,19 @@ export default function BookingInsights() {
           <label><input type="checkbox" checked={settings.settings.reminders.enabled} onChange={e => void saveSettings({ reminders: { ...settings.settings.reminders, enabled: e.target.checked } })} /> تذكير السلال المتروكة</label>
           <label><input type="checkbox" checked={settings.settings.price.enabled} onChange={e => void saveSettings({ price: { ...settings.settings.price, enabled: e.target.checked } })} /> إشعارات تغيّر الأسعار</label>
           <label><input type="checkbox" checked={settings.settings.price.notifyDecreases} onChange={e => void saveSettings({ price: { ...settings.settings.price, notifyDecreases: e.target.checked } })} /> إشعار الانخفاض</label>
+          <label><input type="checkbox" checked={settings.settings.ops.enabled} onChange={e => void saveSettings({ ops: { enabled: e.target.checked } })} /> تنبيهات العمل للإدارة والموردين</label>
           <label><input type="checkbox" checked={settings.settings.channels.email} onChange={e => void saveSettings({ channels: { ...settings.settings.channels, email: e.target.checked } })} /> البريد (لمن وافق)</label>
         </div>
         <button className="rounded-xl bg-saudi-green-800 px-4 py-2 font-bold text-white" onClick={() => void saveTimings()}>حفظ التوقيتات</button>
+      </section>
+
+      <section className={card + ' space-y-2'}>
+        <h2 className="font-bold">أسئلة لُـمى (آخر 30 يوماً)</h2>
+        <p className="text-xs text-gray-600">تتعلم لُـمى من الاستخدام: الأسئلة الناجحة الأكثر تكراراً تظهر أولاً في اقتراحاتها، وما لا تستطيع الإجابة عنه يظهر هنا لتقرروا إضافته. أسئلة العملاء تُحفظ كحقائق مجردة (الخدمة والمدينة والنتيجة) بلا نص حر.</p>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div><h3 className="mb-1 text-sm font-bold">الأكثر طلباً</h3>{luma?.top.length ? <ul className="space-y-1 text-sm">{luma.top.slice(0, 10).map((t: any, i: number) => <li key={i} className="flex justify-between gap-2 border-b py-1"><span>{t.audience === 'staff' ? 'إدارة' : 'عميل'} · {t.intent}{t.categoryId ? ` · ${t.categoryId}` : ''}{t.cityId ? ` · ${t.cityId}` : ''}</span><span>{t.asked} ({t.answered} بنتيجة)</span></li>)}</ul> : <p className="text-sm text-gray-500">لا بيانات بعد.</p>}</div>
+          <div><h3 className="mb-1 text-sm font-bold">أسئلة لم تستطع الإجابة عنها</h3>{luma?.unanswered.length ? <ul className="space-y-1 text-sm">{luma.unanswered.map((u: any, i: number) => <li key={i} className="flex justify-between gap-2 border-b py-1"><span>«{u.text}»</span><span>{u.n}</span></li>)}</ul> : <p className="text-sm text-gray-500">لا أسئلة بلا إجابة.</p>}{luma?.noResults.length > 0 && <p className="mt-2 text-xs text-amber-800">بحثات بلا نتائج: {luma.noResults.slice(0, 5).map((n: any) => `${n.categoryId ?? '—'}/${n.cityId ?? '—'} (${n.n})`).join('، ')}</p>}</div>
+        </div>
       </section>
 
       <section className={card + ' space-y-2'}>

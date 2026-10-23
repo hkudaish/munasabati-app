@@ -23,6 +23,7 @@
     "test:i18n": "node scripts/test-i18n.cjs",
     "test:translate": "node scripts/test-translate.cjs",
     "test:booking-drafts": "node scripts/test-booking-drafts.cjs",
+    "test:luma": "node scripts/test-luma.cjs",
     "test:backup": "node scripts/test-backup.cjs",
     "test:backup-admin": "node scripts/test-backup-admin.cjs",
     "test:floor-plan": "node scripts/test-floor-plan.cjs",

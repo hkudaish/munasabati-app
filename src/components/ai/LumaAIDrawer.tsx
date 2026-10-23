@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -38,6 +38,7 @@ import confetti from 'canvas-confetti';
 import RichText from './RichText';
 import StaffLumaDrawer from './StaffLumaDrawer';
 import { useLumaAccess } from './lumaAccess';
+import { categoryNoun, matchCategory, matchCity, nextWeekday } from '@/lib/luma/vocabulary';
 
 interface GeneratedPlan {
   occasionTitle: string;
@@ -62,6 +63,7 @@ interface ChatMessage {
   intent?: string;
   candidates?: VendorRecommendationResult[];
   comparisonCandidates?: VendorRecommendationResult[];
+  suggested?: string[];
   actionType?: 'add_to_cart_success' | 'plan_generated' | 'none';
   actionData?: any;
 }
@@ -82,6 +84,8 @@ export default function LumaAIDrawer() {
     comparisonVendorIds,
     addToComparison,
     rankingWeights,
+    serviceCategories,
+    occasionTypes,
   } = useApp();
 
   const access = useLumaAccess();
@@ -115,21 +119,6 @@ export default function LumaAIDrawer() {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, isAIOpen]);
-
-  // Quick prompt suggestions
-  const shoppingPrompts = [
-    'أحتاج مصور زواج احترافي بالرياض الجمعة القادمة',
-    'أريد مورد كوشة وضيافة بميزانية أقل من 5000 ريال',
-    'رشح لي أفضل الموردين تقييماً في جدة',
-    'أريد أرخص خيار متاح لتنسيق الورد',
-    'قارن لي بين أفضل مصورين',
-  ];
-
-  const plannerPrompts = [
-    'أبغى حفلة تخرج بالرياض لـ 80 شخص وميزانيتي 15 ألف',
-    'أبغى ملكة منزلية بسيطة بجدة لـ 50 شخص وميزانيتي 20 ألف',
-    'زواج فخم لـ 200 شخص بالرياض بميزانية 50 ألف',
-  ];
 
   // Helper to extract criteria from text
   const extractCriteriaFromText = (
@@ -217,52 +206,8 @@ export default function LumaAIDrawer() {
       intent = 'SORT_RESULTS';
     }
 
-    // Category detection
-    if (
-      lower.includes('مصور') ||
-      lower.includes('تصوير') ||
-      lower.includes('كاميرا') ||
-      lower.includes('فوتوغرافي') ||
-      lower.includes('فيديو')
-    ) {
-      categoryId = 'photography';
-    } else if (
-      lower.includes('كوش') ||
-      lower.includes('ديكور') ||
-      lower.includes('ورد') ||
-      lower.includes('زهور') ||
-      lower.includes('تنسيق')
-    ) {
-      categoryId = 'decor';
-    } else if (
-      lower.includes('ضيافة') ||
-      lower.includes('قهوجي') ||
-      lower.includes('صباب') ||
-      lower.includes('بوفيه') ||
-      lower.includes('شاي') ||
-      lower.includes('عشاء')
-    ) {
-      categoryId = 'hospitality';
-    } else if (
-      lower.includes('زفة') ||
-      lower.includes('دي جي') ||
-      lower.includes('فرقة') ||
-      lower.includes('صوتيات') ||
-      lower.includes('مطرب') ||
-      lower.includes('عرضة')
-    ) {
-      categoryId = 'music';
-    } else if (
-      lower.includes('توزيعات') ||
-      lower.includes('هدايا') ||
-      lower.includes('عطور') ||
-      lower.includes('عود') ||
-      lower.includes('بخور')
-    ) {
-      categoryId = 'gifts';
-    } else if (lower.includes('كيك') || lower.includes('حلا') || lower.includes('شوكولاته')) {
-      categoryId = 'sweets';
-    }
+    // Category detection: against the categories that exist in the platform, never a fixed list of ids
+    categoryId = matchCategory(text, serviceCategories)?.id;
 
     // Occasion Type detection
     if (lower.includes('زواج') || lower.includes('عرس') || lower.includes('زفاف')) {
@@ -275,18 +220,8 @@ export default function LumaAIDrawer() {
       occasionTypeId = 'newborn';
     }
 
-    // City detection
-    if (lower.includes('الرياض') || lower.includes('بالرياض')) {
-      cityId = 'riyadh';
-    } else if (lower.includes('جدة') || lower.includes('جده') || lower.includes('بجدة')) {
-      cityId = 'jeddah';
-    } else if (lower.includes('الدمام') || lower.includes('الخبر') || lower.includes('الشرقية')) {
-      cityId = 'khobar';
-    } else if (lower.includes('مكة') || lower.includes('بمكة')) {
-      cityId = 'makkah';
-    } else if (lower.includes('المدينة') || lower.includes('بالمدينة')) {
-      cityId = 'madinah';
-    }
+    // City detection: against the cities the platform really serves
+    cityId = matchCity(text, cities)?.id;
 
     // Price extraction
     const budgetMatch = text.match(/(\d+)\s*(ألف|الف|k)/i);
@@ -312,9 +247,7 @@ export default function LumaAIDrawer() {
     }
 
     // Date extraction (e.g. الجمعة القادمة)
-    if (lower.includes('الجمعة') || lower.includes('السبت') || lower.includes('تاريخ')) {
-      date = '2026-10-09'; // deterministic upcoming Friday date
-    }
+    date = nextWeekday(text);      // the real next such day, not a fixed date
 
     return {
       criteria: {
@@ -329,6 +262,45 @@ export default function LumaAIDrawer() {
       },
       intent,
     };
+  };
+
+  // Which searches customers have made successfully (most popular first); used only to order the suggestions below
+  const [popular, setPopular] = useState<{ categoryId: string; cityId: string | null; n: number }[]>([]);
+  useEffect(() => { if (isAIOpen && access === 'customer') void fetch('/api/luma/log').then(r => r.json()).then(d => setPopular(d.popular ?? [])).catch(() => {}); }, [isAIOpen, access]);
+
+  /**
+   * Questions she can answer exactly: every suggestion is run through the same understanding and ranking as a real question,
+   * and is shown only if it returns vendors right now. They come from the categories and cities of the vendors that exist.
+   */
+  const shoppingPrompts = useMemo(() => {
+    const pairs = new Map<string, number>();
+    for (const v of vendors) { const k = v.categoryId + '|' + v.cityId; pairs.set(k, (pairs.get(k) ?? 0) + 1); }
+    const boost = (k: string) => popular.find(p => p.categoryId + '|' + p.cityId === k)?.n ?? 0;
+    const ordered = Array.from(pairs.entries()).sort((a, b) => boost(b[0]) - boost(a[0]) || b[1] - a[1]);
+    const out: string[] = [], usedCategories = new Set<string>();
+    for (const [k] of ordered) {
+      const [categoryId, cityId] = k.split('|'), category = serviceCategories.find(c => c.id === categoryId), city = cities.find(c => c.id === cityId);
+      if (!category || !city || usedCategories.has(categoryId)) continue;
+      const sentence = `أفضل ${categoryNoun(category)} في ${city.nameAr}`;
+      const parsed = extractCriteriaFromText(sentence);
+      if (parsed.criteria.categoryId !== categoryId || parsed.criteria.cityId !== cityId) continue;
+      if (rankVendors(vendors, services, parsed.criteria, rankingWeights).length === 0) continue;
+      usedCategories.add(categoryId); out.push(sentence);
+      if (out.length >= 4) break;
+    }
+    out.push('ماذا يوجد في سلتي؟');
+    return out;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vendors, services, serviceCategories, cities, rankingWeights, popular]);
+
+  const planCities = cities.filter(c => c.isAvailable !== false);
+  const plannerPrompts = useMemo(() => {
+    const first = planCities[0]?.nameAr, second = planCities[1]?.nameAr ?? first;
+    return first ? [`أبغى حفلة تخرج في ${first} لـ 80 شخص وميزانيتي 15 ألف`, `أبغى ملكة منزلية بسيطة في ${second} لـ 50 شخص وميزانيتي 20 ألف`, `زواج فخم لـ 200 شخص في ${first} بميزانية 50 ألف`] : [];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cities]);
+  const record = (intent: string, criteria: { categoryId?: string; cityId?: string }, resultCount: number) => {
+    void fetch('/api/luma/log', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ intent, categoryId: criteria.categoryId, cityId: criteria.cityId, resultCount }) }).catch(() => {});
   };
 
   // Main Handler for Luma Shopping Assistant
@@ -474,7 +446,15 @@ export default function LumaAIDrawer() {
         effectiveCriteria.cityId = prevCity;
       }
 
+      const understood = !!(effectiveCriteria.categoryId || effectiveCriteria.cityId || effectiveCriteria.maxPrice || effectiveCriteria.minRating || effectiveCriteria.verifiedOnly || effectiveCriteria.occasionTypeId);
+      if (!understood && intent === 'SEARCH_VENDOR') {
+        record('UNKNOWN', {}, 0);
+        setMessages((prev) => [...prev, { id: `lum_${Date.now()}`, sender: 'luma', text: 'لم أفهم طلبك بدقة، ولا أحب أن أخمّن. اذكر الخدمة والمدينة (مثال: «أفضل مصور في الرياض»)، أو اختر أحد الأسئلة التي أجيب عنها بدقة:', timestamp: 'الآن', intent: 'UNKNOWN', suggested: shoppingPrompts }]);
+        setIsProcessing(false);
+        return;
+      }
       const rankedResults = rankVendors(vendors, services, effectiveCriteria, rankingWeights);
+      record('SEARCH_VENDOR', effectiveCriteria, rankedResults.length);
       const topResults = rankedResults.slice(0, 4);
       setActiveCandidatesContext(topResults);
 
@@ -502,6 +482,7 @@ export default function LumaAIDrawer() {
         timestamp: 'الآن',
         intent: 'SEARCH_RESULTS',
         candidates: topResults,
+        ...(topResults.length === 0 ? { suggested: shoppingPrompts } : {}),
       };
 
       setMessages((prev) => [...prev, lumaReply]);
@@ -552,13 +533,9 @@ export default function LumaAIDrawer() {
         tier = 'medium';
       }
 
-      if (lower.includes('جدة') || lower.includes('جده')) {
-        cityId = 'jeddah';
-        cityNameAr = 'جدة';
-      } else if (lower.includes('الدمام') || lower.includes('الخبر')) {
-        cityId = 'khobar';
-        cityNameAr = 'الخبر';
-      }
+      const foundCity = matchCity(queryText, cities);
+      if (foundCity) { cityId = foundCity.id; cityNameAr = foundCity.nameAr; }
+      else if (!cities.some(c => c.id === cityId) && cities[0]) { cityId = cities[0].id; cityNameAr = cities[0].nameAr; }
 
       const budgetMatch = queryText.match(/(\d+)\s*(ألف|الف|k)/i);
       if (budgetMatch) {
@@ -790,6 +767,7 @@ export default function LumaAIDrawer() {
                     }`}
                   >
                     <p className="whitespace-pre-line font-tajawal"><RichText text={msg.text} /></p>
+                    {msg.suggested && <div className="mt-3 flex flex-wrap gap-2">{msg.suggested.map(q => <button key={q} type="button" onClick={() => handleShoppingQuery(q)} className="rounded-full border border-saudi-green-800 bg-white px-3 py-1.5 text-xs text-saudi-green-900 hover:bg-saudi-green-50">{q}</button>)}</div>}
                     <span
                       className={`text-caption2 block mt-1.5 ${
                         msg.sender === 'user' ? 'text-gray-300' : 'text-gray-500'
@@ -1081,11 +1059,12 @@ export default function LumaAIDrawer() {
         {/* Input Bar */}
         <div className="p-3 sm:p-4 bg-white border-t border-saudi-sand-200">
           {/* Quick chip suggestions if in shopping mode */}
-          {activeMode === 'shopping' && messages.length <= 2 && (
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-2 mb-2 scrollbar-none">
+          {activeMode === 'shopping' && shoppingPrompts.length > 0 && (
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-2 mb-2 scrollbar-none" role="list" aria-label="أسئلة مقترحة">
+              <span className="shrink-0 text-caption2 font-bold text-gray-500">أسئلة أجيب عنها بدقة:</span>
               {shoppingPrompts.map((prompt, idx) => (
                 <button
-                  key={idx}
+                  key={idx} role="listitem"
                   onClick={() => {
                     setInputQuery(prompt);
                     handleShoppingQuery(prompt);

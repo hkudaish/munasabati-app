@@ -13,6 +13,7 @@ export interface NotificationSettings {
   reminders: { enabled: boolean; stagesHours: number[]; finalHours: number | null };
   price: { enabled: boolean; groupWindowMinutes: number; notifyDecreases: boolean };
   channels: { inbox: boolean; email: boolean };
+  ops: { enabled: boolean };            // alerts and a daily digest for administrators, supervisors, coordinators and vendors
   templates: Record<string, { ar?: { title?: string; body?: string }; en?: { title?: string; body?: string } }>;
 }
 export const DEFAULT_SETTINGS: NotificationSettings = {
@@ -20,6 +21,7 @@ export const DEFAULT_SETTINGS: NotificationSettings = {
   reminders: { enabled: true, stagesHours: [24, 72], finalHours: null },
   price: { enabled: true, groupWindowMinutes: 15, notifyDecreases: true },
   channels: { inbox: true, email: true },
+  ops: { enabled: true },
   templates: {},
 };
 export async function readSettings(tx: Tx): Promise<{ settings: NotificationSettings; version: number }> {
@@ -32,6 +34,7 @@ export async function readSettings(tx: Tx): Promise<{ settings: NotificationSett
       reminders: { ...DEFAULT_SETTINGS.reminders, ...(body.reminders ?? {}) },
       price: { ...DEFAULT_SETTINGS.price, ...(body.price ?? {}) },
       channels: { ...DEFAULT_SETTINGS.channels, ...(body.channels ?? {}) },
+      ops: { ...DEFAULT_SETTINGS.ops, ...(body.ops ?? {}) },
       templates: body.templates ?? {},
     },
   };
@@ -58,6 +61,7 @@ export function parseSettings(input: any): NotificationSettings {
     reminders: { enabled: input.reminders?.enabled !== false, stagesHours: stages, finalHours: input.reminders?.finalHours == null ? null : hours(input.reminders.finalHours) },
     price: { enabled: input.price?.enabled !== false, groupWindowMinutes: Math.min(1440, Math.max(0, Number.isInteger(input.price?.groupWindowMinutes) ? input.price.groupWindowMinutes : 15)), notifyDecreases: input.price?.notifyDecreases !== false },
     channels: { inbox: input.channels?.inbox !== false, email: input.channels?.email !== false },
+    ops: { enabled: input.ops?.enabled !== false },
     templates,
   };
 }
