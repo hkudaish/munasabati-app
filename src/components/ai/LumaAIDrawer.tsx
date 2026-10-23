@@ -35,6 +35,9 @@ import { formatSaudiRiyal, ensureServiceDetails, ensureVendorDetails } from '@/l
 import { rankVendors, checkAvailability } from '@/lib/ranking-engine';
 import { VendorRecommendationResult, VendorRecommendationCriteria, RankingWeights } from '@/lib/types';
 import confetti from 'canvas-confetti';
+import RichText from './RichText';
+import StaffLumaDrawer from './StaffLumaDrawer';
+import { useLumaAccess } from './lumaAccess';
 
 interface GeneratedPlan {
   occasionTitle: string;
@@ -81,6 +84,9 @@ export default function LumaAIDrawer() {
     rankingWeights,
   } = useApp();
 
+  const access = useLumaAccess();
+  // vendors have no assistant: if it was opened (another screen, an old tab) it closes
+  useEffect(() => { if (access === 'none' && isAIOpen) setIsAIOpen(false); }, [access, isAIOpen, setIsAIOpen]);
   const [activeMode, setActiveMode] = useState<'shopping' | 'planner'>('shopping');
   const [inputQuery, setInputQuery] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -675,7 +681,8 @@ export default function LumaAIDrawer() {
     } catch {}
   };
 
-  if (!isAIOpen) return null;
+  if (!isAIOpen || access === 'none') return null;
+  if (access === 'staff') return <StaffLumaDrawer />;
 
   return (
     <div role="dialog" aria-modal="true" aria-labelledby="dlg-6056-1" className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm animate-fadeIn">
@@ -782,7 +789,7 @@ export default function LumaAIDrawer() {
                         : 'bg-white text-gray-900 border border-saudi-sand-300 rounded-bl-none'
                     }`}
                   >
-                    <p className="whitespace-pre-line font-tajawal">{msg.text}</p>
+                    <p className="whitespace-pre-line font-tajawal"><RichText text={msg.text} /></p>
                     <span
                       className={`text-caption2 block mt-1.5 ${
                         msg.sender === 'user' ? 'text-gray-300' : 'text-gray-500'

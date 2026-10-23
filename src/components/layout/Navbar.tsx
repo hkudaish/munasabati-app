@@ -645,6 +645,13 @@ function NavbarContent() {
                   <ShieldCheck className="w-4 h-4 text-saudi-gold-400" />
                   <span>{t('لوحة التحكم الكاملة')}</span>
                 </Link>
+                {locale === 'ar' && <FeatureContent id="luma"><button
+                  onClick={() => setIsAIOpen(true)}
+                  className="flex items-center gap-1.5 bg-white hover:bg-saudi-sand-100 border border-saudi-gold-400 text-saudi-green-900 px-3 py-2 rounded-xl text-xs font-bold transition"
+                >
+                  <Sparkles className="w-4 h-4 text-saudi-gold-600" />
+                  <span>{t('مستشارة الموردين')}</span>
+                </button></FeatureContent>}
               </>
             )}
 

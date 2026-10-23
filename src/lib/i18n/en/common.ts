@@ -664,6 +664,7 @@ export const EN_COMMON: Record<string, string> = {
   "تم حفظ مسودتك تلقائياً": "Your draft was saved automatically",
   "تعذر الحفظ التلقائي؛ يمكنك المتابعة": "Autosave failed; you can continue",
   "مؤشرات الحجز والسلال": "Booking and cart insights",
+  "مستشارة الموردين": "Vendor advisor",
   "الرياض": "Riyadh",
   "جدة": "Jeddah",
   "الدمام والخبر": "Dammam & Khobar",
