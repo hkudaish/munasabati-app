@@ -59,7 +59,8 @@ export function nextState(data:any){if(!data.availabilityChecked)return 'AVAILAB
 export function refundLimit(data:any,now=Date.now()){const bps=+new Date(data.startAt)-now>=data.policy.cancellation.freeBeforeHours*3600000?10000:data.policy.cancellation.refundBps;return Math.max(0,Math.round(data.paid*bps/10000)-data.refunded);}
 export function settlementBasis(data:any){
  if(data.cancelledAt){const retained=amount(data.paid-(data.refundEntitlement??0)),subtotal=Math.round(retained*10000/(10000+data.policy.taxBps)),commission=Math.round(subtotal*data.policy.commissionBps/10000);return {total:retained,subtotal,tax:retained-subtotal,commission,providerNet:subtotal-commission};}
- return {...data.price,providerNet:data.price.subtotal-data.price.commission};
+ // a discount the platform funds does not reduce what the provider is paid (the commission is charged on subtotal + platform-funded part); vendor-funded and package discounts do
+ return {...data.price,providerNet:data.price.subtotal+(data.price.funding?.platform??0)-data.price.commission};
 }
 export function settlement(data:any,paidOut:number,now=Date.now()){
  const cancelled=data.status==='CANCELLED',holdStart=cancelled?data.cancelledAt:data.completedAt;

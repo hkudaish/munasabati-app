@@ -1,5 +1,6 @@
 import 'server-only';
-import { activeLines,savedLines } from './cart';
+import { activeLines,savedLines,cartBody,quoteOptionsFor } from './cart';
+import { lockLimitedRules,persistQuote } from './pricing';
 import { detectPriceChanges } from './price-watch';
 import { syncDraftsWithCart } from './draft-sync';
 import { emit } from './events';
@@ -37,8 +38,11 @@ export async function checkout(input:any){
  await lock(tx,'checkout:'+user.id+':'+key);const prior=(await tx.$queryRaw<any[]>`SELECT * FROM "CommerceOrder" WHERE "idempotencyKey"=${user.id+':'+key}`)[0];if(prior){if(prior.requestHash!==fingerprint)throw new HttpError(409,'المفتاح مستخدم لطلب مختلف');return orderView(tx,prior,user);}
  await lock(tx,'cart:'+user.id);const cart=(await tx.$queryRaw<any[]>`SELECT * FROM "CommerceCart" WHERE "userId"=${user.id}`)[0];const active=activeLines(cart?.body.lines??[]),kept=savedLines(cart?.body.lines??[]);if(!active.length||cart.version!==input.cartVersion)throw new HttpError(409,'السلة تغيرت أو فارغة');
  const unacknowledged=await tx.$queryRaw<any[]>`SELECT 1 FROM "CartPriceChange" WHERE "userId"=${user.id} AND "acknowledgedAt" IS NULL AND "direction"='INCREASE' AND "lineId" = ANY(${active.map((l:any)=>l.id)}) LIMIT 1`;if(unacknowledged.length)throw new HttpError(409,'يلزم الاعتراف بزيادة السعر أولاً',{priceChangeRequired:true});
- const quoted=await quoteLines(tx,active);if(quoted.hash!==quoteHash)throw new HttpError(409,'تغير السعر أو العرض؛ راجع السلة واقبل الشروط المحدثة');
- const id=randomUUID(),body={packageSnapshots:quoted.packageSnapshots,initialTotals:quoted.totals,acceptedAt:new Date().toISOString()};await tx.$executeRaw`INSERT INTO "CommerceOrder" ("id","customerId","number","body","idempotencyKey","requestHash") VALUES (${id},${user.id},${'MC-'+randomUUID()},${JSON.stringify(body)}::jsonb,${user.id+':'+key},${fingerprint})`;
+ // customers racing for the last uses of a limited promotion are served one at a time; the price is then computed with the usage as it really stands
+ await lockLimitedRules(tx);
+ const quoted=await quoteLines(tx,active,quoteOptionsFor(user.id,cart.body));if(quoted.hash!==quoteHash)throw new HttpError(409,'تغير السعر أو العرض؛ راجع السلة واقبل الشروط المحدثة');
+ const id=randomUUID(),priceQuoteId=randomUUID(),body={packageSnapshots:quoted.packageSnapshots,initialTotals:quoted.totals,priceQuoteId,acceptedAt:new Date().toISOString()};await tx.$executeRaw`INSERT INTO "CommerceOrder" ("id","customerId","number","body","idempotencyKey","requestHash") VALUES (${id},${user.id},${'MC-'+randomUUID()},${JSON.stringify(body)}::jsonb,${user.id+':'+key},${fingerprint})`;
+ await persistQuote(tx,{userId:user.id,orderId:id,quote:quoted.pricing,id:priceQuoteId});   // the itemised quote, what was applied and the redemptions: immutable, so the agreed price can always be explained
  const groups=new Map<string,string[]>();for(const line of quoted.lines){const itemId=randomUUID(),data:any={...line.selection,offeringId:line.offerId,titleAr:line.titleAr,descriptionAr:line.service.descriptionAr,categoryId:line.service.categoryId,managerIds:line.managers,resourceKeys:line.resourceKeys,resourceQuantity:line.selection.quantity,people:line.people,shares:line.shares,policy:line.policy,price:line.price,availabilityChecked:false,customerAccepted:!line.price.needsQuote,approvals:[],paid:0,refunded:0,fulfillmentStatus:'NOT_STARTED',status:'APPROVAL_PENDING',commerceOrderId:id,commerceItemId:itemId,expiresAt:new Date(Date.now()+line.policy.requestExpiryHours*3600000).toISOString()};
   const fields=data.fields;if(!fields||typeof fields!=='object'||Array.isArray(fields)||JSON.stringify(fields).length>20000)throw new HttpError(400,'حقول غير صالحة');for(const f of line.policy.requiredFields){const v=fields[f.key];if(typeof v!==(f.type==='text'?'string':f.type)||(f.type==='text'&&!v.trim())||(f.type==='boolean'&&!v))throw new HttpError(400,'أكمل '+f.labelAr);}
   if(line.policy.bookingMode==='DIRECT'&&!line.price.needsQuote)data.approvals=[...line.managers];data.status=nextState({...data,availabilityChecked:true});if(!line.requiresBooking&&data.status==='READY_TO_CONFIRM')data.status='CONFIRMED';
@@ -51,7 +55,7 @@ export async function checkout(input:any){
   }
  }
  for(const [managerId,itemIds]of Array.from(groups.entries()))await tx.$executeRaw`INSERT INTO "CommerceFulfillmentGroup" ("id","orderId","managerId","body") VALUES (${randomUUID()},${id},${managerId},${JSON.stringify({itemIds})}::jsonb)`;
- await tx.$executeRaw`UPDATE "CommerceCart" SET "body"=${JSON.stringify({lines:kept})}::jsonb,"version"="version"+1,"lastActivityAt"=CURRENT_TIMESTAMP,"updatedAt"=CURRENT_TIMESTAMP WHERE "userId"=${user.id}`;await syncDraftsWithCart(tx,user.id,kept.map((l:any)=>l.id),active.map((l:any)=>l.id));await emit(tx,{aggregateType:'Order',aggregateId:id,type:'OrderCreated',payload:{lineCount:quoted.lines.length}});await notifyOrder(tx,await orderRow(tx,id),'CREATE');await tx.systemAuditLog.create({data:{actorId:user.id,action:'COMMERCE_ORDER_CREATED',targetId:id,details:{lineCount:quoted.lines.length,quoteHash}}});return orderView(tx,await orderRow(tx,id),user);
+ await tx.$executeRaw`UPDATE "CommerceCart" SET "body"=${JSON.stringify(cartBody({...cart.body,promoCodes:undefined},kept))}::jsonb,"version"="version"+1,"lastActivityAt"=CURRENT_TIMESTAMP,"updatedAt"=CURRENT_TIMESTAMP WHERE "userId"=${user.id}`;await syncDraftsWithCart(tx,user.id,kept.map((l:any)=>l.id),active.map((l:any)=>l.id));await emit(tx,{aggregateType:'Order',aggregateId:id,type:'OrderCreated',payload:{lineCount:quoted.lines.length}});await notifyOrder(tx,await orderRow(tx,id),'CREATE');await tx.systemAuditLog.create({data:{actorId:user.id,action:'COMMERCE_ORDER_CREATED',targetId:id,details:{lineCount:quoted.lines.length,quoteHash}}});return orderView(tx,await orderRow(tx,id),user);
  });
 }
 export async function orderAction(input:any){

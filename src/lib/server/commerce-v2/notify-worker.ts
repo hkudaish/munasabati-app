@@ -6,6 +6,7 @@ import { detectAllPriceChanges } from './price-watch';
 import { expireDrafts } from './drafts';
 import { readSettings, renderTemplate, money, NotificationSettings } from './events';
 import { counts, remindersFor } from './reminders';
+import { applyDuePriceSchedules, releaseStaleRedemptions } from './pricing-jobs';
 
 const MAX_RETRIES = 5;
 const LEASE_MINUTES = 10;
@@ -201,11 +202,13 @@ export async function scheduleOpsReminders(limit = 300) {
 
 /** One pass of everything scheduled: find price changes, expire old drafts, queue reminders, turn events into jobs, send. */
 export async function runCron() {
+  const schedules = await applyDuePriceSchedules();      // before the price watch, so the changes they make are noticed in the same pass
+  const released = await releaseStaleRedemptions();
   const prices = await detectAllPriceChanges();
   const expired = await expireDrafts();
   const reminders = await scheduleReminders();
   const ops = await scheduleOpsReminders();
   const outbox = await dispatchOutbox();
   const jobs = await runNotificationJobs();
-  return { prices, expiredDrafts: Number(expired), reminders, ops, outbox, jobs };
+  return { schedules, releasedRedemptions: released, prices, expiredDrafts: Number(expired), reminders, ops, outbox, jobs };
 }

@@ -5,7 +5,7 @@ import { prisma } from '@/lib/db';
 import { digest, sessionUser } from '../auth';
 import { HttpError, text, integer } from '../http';
 import { atomic, lock, Tx } from '../booking/repository';
-import { activeLines, parseLines, publicQuote, quoteLines } from './cart';
+import { activeLines, cartBody, parseLines, publicQuote, quoteLines, quoteOptionsFor } from './cart';
 import { emit } from './events';
 import { recordBaseline } from './price-watch';
 
@@ -218,8 +218,8 @@ async function updateCartLine(tx: Tx, draft: any, config: any, snapshotId: strin
   if (!current) return false;
   const [line] = parseLines([{ id: draft.cartLineId, ...config, draftId: draft.id, snapshotId, ...(current.savedForLater ? { savedForLater: true } : {}) }]);
   const lines = cart.body.lines.map((l: any) => (l.id === draft.cartLineId ? line : l));
-  const quote = await quoteLines(tx, activeLines(lines));
-  await tx.$executeRaw`UPDATE "CommerceCart" SET "body"=${JSON.stringify({ lines })}::jsonb,"version"="version"+1,"lastActivityAt"=CURRENT_TIMESTAMP,"updatedAt"=CURRENT_TIMESTAMP WHERE "userId"=${draft.userId}`;
+  const quote = await quoteLines(tx, activeLines(lines), quoteOptionsFor(draft.userId, cart.body));
+  await tx.$executeRaw`UPDATE "CommerceCart" SET "body"=${JSON.stringify(cartBody(cart.body, lines))}::jsonb,"version"="version"+1,"lastActivityAt"=CURRENT_TIMESTAMP,"updatedAt"=CURRENT_TIMESTAMP WHERE "userId"=${draft.userId}`;
   await recordBaseline(tx, draft.userId, quote.lines);
   await emit(tx, { aggregateType: 'Cart', aggregateId: draft.userId, version: cart.version + 1, type: 'CartItemUpdated', payload: { lineId: draft.cartLineId, snapshotId } });
   return true;
@@ -240,8 +240,8 @@ export async function addDraftToCart(id: string, locale = 'ar') {
     const [line] = parseLines([{ id: draft.id, ...config, draftId: draft.id, snapshotId: draft.latestSnapshotId }]);
     const existing: any[] = cart?.body.lines ?? [], lines = [...existing.filter(l => l.id !== draft.id), line];
     if (lines.length > 40) throw new HttpError(400, 'السلة تقبل حتى 40 عنصراً');
-    const quote = await quoteLines(tx, activeLines(lines));
-    await tx.$executeRaw`INSERT INTO "CommerceCart" ("userId","body","locale","lastActivityAt") VALUES (${actor.userId},${JSON.stringify({ lines })}::jsonb,${locale === 'en' ? 'en' : 'ar'},CURRENT_TIMESTAMP) ON CONFLICT ("userId") DO UPDATE SET "body"=EXCLUDED."body","locale"=EXCLUDED."locale","lastActivityAt"=CURRENT_TIMESTAMP,"version"="CommerceCart"."version"+1,"updatedAt"=CURRENT_TIMESTAMP`;
+    const quote = await quoteLines(tx, activeLines(lines), quoteOptionsFor(actor.userId, cart?.body));
+    await tx.$executeRaw`INSERT INTO "CommerceCart" ("userId","body","locale","lastActivityAt") VALUES (${actor.userId},${JSON.stringify(cartBody(cart?.body, lines))}::jsonb,${locale === 'en' ? 'en' : 'ar'},CURRENT_TIMESTAMP) ON CONFLICT ("userId") DO UPDATE SET "body"=EXCLUDED."body","locale"=EXCLUDED."locale","lastActivityAt"=CURRENT_TIMESTAMP,"version"="CommerceCart"."version"+1,"updatedAt"=CURRENT_TIMESTAMP`;
     await tx.$executeRaw`UPDATE "BookingDraft" SET "status"='IN_CART',"cartLineId"=${draft.id},"lastActivityAt"=CURRENT_TIMESTAMP,"updatedAt"=CURRENT_TIMESTAMP WHERE "id"=${draft.id}`;
     await recordBaseline(tx, actor.userId as string, quote.lines);
     const saved = (await tx.$queryRaw<any[]>`SELECT "version" FROM "CommerceCart" WHERE "userId"=${actor.userId}`)[0];

@@ -3,10 +3,12 @@ import { createHash, randomUUID } from 'node:crypto';
 import { prisma } from '@/lib/db';
 import { atomic, lock, Tx } from '../booking/repository';
 import { HttpError } from '../http';
-import { activeLines, quoteLines } from './cart';
+import { activeLines, quoteLines, quoteOptionsFor } from './cart';
 import { emit } from './events';
 
 const PRICING_VERSION = 1;
+/** Why a total moved: the price before discounts is unchanged but the discount is different (a promotion started, ended or stopped qualifying), or the catalog price itself changed. */
+const reasonOf = (before: any, after: any) => (before && Math.abs((before.subtotal ?? 0) + (before.discount ?? 0) - (after.subtotal + after.discount)) <= 1 && (before.discount ?? 0) !== after.discount ? 'DISCOUNT_CHANGED' : 'CATALOG_PRICE_CHANGED');
 const total = (line: any) => Math.round(line.price.total);
 const breakdownOf = (rows: any[]) => ({
   subtotal: rows.reduce((n, l) => n + l.price.subtotal, 0), tax: rows.reduce((n, l) => n + l.price.tax, 0), fees: rows.reduce((n, l) => n + l.price.fees, 0),
@@ -26,12 +28,13 @@ export async function detectPriceChanges(userId: string): Promise<number> {
     const lines = activeLines(cart?.body.lines ?? []);
     if (!lines.length) return 0;
     let quoted: any[] = [];
-    try { quoted = (await quoteLines(tx, lines)).lines; }
+    const options = quoteOptionsFor(userId, cart.body);
+    try { quoted = (await quoteLines(tx, lines, options)).lines; }
     catch (error) {
       if (!(error instanceof HttpError)) throw error;
       // the cart as a whole cannot be priced: find which items are the problem, and price the rest
       for (const line of lines) {
-        try { quoted.push(...(await quoteLines(tx, [line])).lines); }
+        try { quoted.push(...(await quoteLines(tx, [line], options)).lines); }
         catch (inner) {
           if (!(inner instanceof HttpError)) throw inner;
           if (inner.message.includes('يلزم إضافة الخدمة المطلوبة')) continue;     // a relationship between items, not a fault of this one
@@ -47,7 +50,7 @@ export async function detectPriceChanges(userId: string): Promise<number> {
     for (const [lineId, rows] of Array.from(byLine.entries())) {
       if (rows.some(r => r.price.needsQuote)) continue;                              // no price to compare until the vendor quotes
       const now = rows.reduce((n, l) => n + total(l), 0), breakdown = breakdownOf(rows);
-      const last = (await tx.$queryRaw<any[]>`SELECT "id","totalHalala" FROM "CartPriceSnapshot" WHERE "userId"=${userId} AND "lineId"=${lineId} ORDER BY "createdAt" DESC, "id" DESC LIMIT 1`)[0];
+      const last = (await tx.$queryRaw<any[]>`SELECT "id","totalHalala","breakdown" FROM "CartPriceSnapshot" WHERE "userId"=${userId} AND "lineId"=${lineId} ORDER BY "createdAt" DESC, "id" DESC LIMIT 1`)[0];
       if (last && Number(last.totalHalala) === now) continue;
       const id = randomUUID();
       await tx.$executeRaw`INSERT INTO "CartPriceSnapshot" ("id","userId","lineId","currency","totalHalala","breakdown","pricingVersion") VALUES (${id},${userId},${lineId},'SAR',${now},${JSON.stringify(breakdown)}::jsonb,${PRICING_VERSION})`;
@@ -55,7 +58,7 @@ export async function detectPriceChanges(userId: string): Promise<number> {
       const previous = Number(last.totalHalala), difference = now - previous, direction = difference > 0 ? 'INCREASE' : 'DECREASE';
       const percent = previous ? Number(((difference / previous) * 100).toFixed(4)) : null;
       const changeId = randomUUID();
-      await tx.$executeRaw`INSERT INTO "CartPriceChange" ("id","userId","lineId","previousSnapshotId","newSnapshotId","direction","differenceHalala","differencePercent","reasonCode","acknowledgedAt") VALUES (${changeId},${userId},${lineId},${last.id},${id},${direction},${difference},${percent},'CATALOG_PRICE_CHANGED',${direction === 'DECREASE' ? new Date() : null})`;
+      await tx.$executeRaw`INSERT INTO "CartPriceChange" ("id","userId","lineId","previousSnapshotId","newSnapshotId","direction","differenceHalala","differencePercent","reasonCode","acknowledgedAt") VALUES (${changeId},${userId},${lineId},${last.id},${id},${direction},${difference},${percent},${reasonOf(last.breakdown, breakdown)},${direction === 'DECREASE' ? new Date() : null})`;
       await emit(tx, { aggregateType: 'Cart', aggregateId: userId, version: cart.version, type: direction === 'INCREASE' ? 'CartPriceIncreased' : 'CartPriceDecreased', payload: { changeId, lineId, previousHalala: previous, newHalala: now, differenceHalala: difference, title: rows[0].titleAr, titleEn: rows[0].service?.titleEn || null } });
       changes++;
     }

@@ -410,6 +410,13 @@ function NavbarContent() {
                     <span>{t('خدماتي وباقاتي')}</span>
                   </Link>
                   <Link
+                    href="/commerce/pricing"
+                    className="px-3 py-2 rounded-lg hover:text-saudi-green-800 hover:bg-gray-50 transition flex items-center gap-1"
+                  >
+                    <CreditCard className="w-4 h-4 text-saudi-green-700" />
+                    <span>{t('التسعير والخصومات')}</span>
+                  </Link>
+                  <Link
                     href="/vendor/catalog"
                     className="px-3 py-2 rounded-lg hover:text-saudi-green-800 hover:bg-gray-50 transition flex items-center gap-1"
                   >
@@ -483,6 +490,13 @@ function NavbarContent() {
                   >
                     <Settings className="w-4 h-4 text-saudi-green-700" />
                     <span>{t('إعدادات الكتالوج')}</span>
+                  </Link>
+                  <Link
+                    href="/commerce/pricing"
+                    className="px-3 py-2 rounded-lg hover:text-saudi-green-800 hover:bg-gray-50 transition flex items-center gap-1"
+                  >
+                    <CreditCard className="w-4 h-4 text-saudi-green-700" />
+                    <span>{t('التسعير والخصومات')}</span>
                   </Link>
                   <Link
                     href="/"
@@ -847,6 +861,13 @@ function NavbarContent() {
                 }`}
               >
                 {t('إعدادات الكتالوج')}
+              </Link>
+              <Link
+                href="/commerce/pricing"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block py-2 text-sm font-bold text-gray-700"
+              >
+                {t('التسعير والخصومات')}
               </Link>
               <Link
                 href="/"

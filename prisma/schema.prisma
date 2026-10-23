@@ -1472,3 +1472,148 @@ model LumaQuestionLog {
   createdAt   DateTime @default(now()) @db.Timestamptz(3)
   @@index([audience, intent, createdAt], map: "LumaQuestionLog_audience_intent_idx")
 }
+
+// ---- unified pricing (netlify/database/migrations/202610230003_pricing_engine.sql adds CHECKs, the overlap and immutability triggers and the legacy backfill) ----
+model PackagePricingPolicy {
+  id                 String    @id
+  packageId          String
+  pricingModel       String
+  currency           String    @default("SAR") @db.Char(3)
+  fixedPrice         BigInt?
+  discountPercentage Decimal?  @db.Decimal(7, 4)
+  discountAmount     BigInt?
+  config             Json      @default("{}")
+  effectiveFrom      DateTime  @default(now()) @db.Timestamptz(3)
+  effectiveUntil     DateTime? @db.Timestamptz(3)
+  version            Int
+  status             String    @default("DRAFT")
+  createdBy          String?
+  createdAt          DateTime  @default(now()) @db.Timestamptz(3)
+  @@unique([packageId, version], map: "PackagePricingPolicy_package_version_key")
+  @@index([packageId, status, effectiveFrom], map: "PackagePricingPolicy_package_status_idx")
+}
+
+model DiscountRule {
+  id               String    @id
+  name             String
+  kind             String    @default("GENERAL")
+  discountType     String
+  value            Decimal   @db.Decimal(18, 4)
+  maximumDiscount  BigInt?
+  minimumSubtotal  BigInt    @default(0)
+  priority         Int       @default(0)
+  stackable        Boolean   @default(false)
+  stackingGroup    String?
+  fundingType      String    @default("PLATFORM")
+  vendorShareBps   Int       @default(0)
+  code             String?
+  startsAt         DateTime? @db.Timestamptz(3)
+  endsAt           DateTime? @db.Timestamptz(3)
+  usageLimit       Int?
+  perCustomerLimit Int?
+  ownerVendorId    String?
+  campaign         String?
+  status           String    @default("DRAFT")
+  conditions       Json      @default("{}")
+  version          Int       @default(1)
+  createdBy        String?
+  createdAt        DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime  @default(now()) @db.Timestamptz(3)
+  @@index([status, startsAt, endsAt], map: "DiscountRule_status_idx")
+}
+
+model DiscountRuleTarget {
+  id        String  @id
+  ruleId    String
+  packageId String?
+  serviceId String?
+  offerId   String?
+  vendorId  String?
+  @@index([ruleId], map: "DiscountRuleTarget_ruleId_idx")
+  @@index([packageId], map: "DiscountRuleTarget_packageId_idx")
+  @@index([serviceId], map: "DiscountRuleTarget_serviceId_idx")
+  @@index([offerId], map: "DiscountRuleTarget_offerId_idx")
+  @@index([vendorId], map: "DiscountRuleTarget_vendorId_idx")
+}
+
+model PriceQuote {
+  id                 String   @id
+  userId             String?
+  orderId            String?
+  calculationVersion Int
+  currency           String   @default("SAR") @db.Char(3)
+  status             String   @default("ESTIMATE")
+  mode               String   @default("PACKAGE")
+  totals             Json
+  summary            Json     @default("{}")
+  createdAt          DateTime @default(now()) @db.Timestamptz(3)
+  @@index([orderId], map: "PriceQuote_orderId_idx")
+  @@index([userId], map: "PriceQuote_userId_idx")
+}
+
+model PriceQuoteComponent {
+  id             String  @id
+  priceQuoteId   String
+  offerId        String?
+  packageItemId  String?
+  packageId      String?
+  lineId         String
+  componentType  String
+  quantity       Int
+  unitPrice      BigInt
+  grossAmount    BigInt
+  discountAmount BigInt
+  netAmount      BigInt
+  taxAmount      BigInt  @default(0)
+  vendorFundedAmount   BigInt @default(0)
+  platformFundedAmount BigInt @default(0)
+  commissionAmount     BigInt @default(0)
+  vendorId       String?
+  currency       String  @default("SAR") @db.Char(3)
+  @@index([priceQuoteId], map: "PriceQuoteComponent_priceQuoteId_idx")
+  @@index([offerId], map: "PriceQuoteComponent_offerId_idx")
+}
+
+model AppliedDiscount {
+  id                  String   @id
+  priceQuoteId        String
+  discountRuleId      String?
+  discountRuleVersion Int?
+  source              String
+  description         String
+  discountAmount      BigInt
+  eligibleBaseAmount  BigInt
+  fundingType         String
+  allocationDetails   Json     @default("{}")
+  ruleSnapshot        Json?
+  createdAt           DateTime @default(now()) @db.Timestamptz(3)
+  @@index([priceQuoteId], map: "AppliedDiscount_priceQuoteId_idx")
+  @@index([discountRuleId], map: "AppliedDiscount_discountRuleId_idx")
+}
+
+model DiscountRedemption {
+  id             String   @id
+  discountRuleId String
+  customerId     String
+  orderId        String
+  redeemedAt     DateTime @default(now()) @db.Timestamptz(3)
+  discountAmount BigInt
+  status         String   @default("REDEEMED")
+  @@unique([discountRuleId, orderId], map: "DiscountRedemption_rule_order_key")
+  @@index([discountRuleId, status], map: "DiscountRedemption_rule_status_idx")
+  @@index([customerId, discountRuleId], map: "DiscountRedemption_customer_idx")
+}
+
+model OfferPriceSchedule {
+  id                 String    @id
+  offerId            String
+  newBaseAmount      BigInt
+  effectiveFrom      DateTime  @db.Timestamptz(3)
+  status             String    @default("SCHEDULED")
+  appliedAt          DateTime? @db.Timestamptz(3)
+  previousBaseAmount BigInt?
+  createdBy          String?
+  createdAt          DateTime  @default(now()) @db.Timestamptz(3)
+  @@index([status, effectiveFrom], map: "OfferPriceSchedule_due_idx")
+  @@index([offerId], map: "OfferPriceSchedule_offerId_idx")
+}
