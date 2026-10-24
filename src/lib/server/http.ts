@@ -28,7 +28,7 @@ export function integer(value: unknown, max: number, fallback = 0): number {
 }
 export function api(handler: (request: Request, context: any) => Promise<unknown>, options: { allowDisabledFeature?: boolean } = {}) {
   return async (request: Request, context: any) => {
-    try { const feature = featureForPath(new URL(request.url).pathname, true); if (feature && !options.allowDisabledFeature) await (await import('./features')).requireFeature(feature.id); if (!['GET', 'HEAD'].includes(request.method)) sameOrigin(request); const data = await handler(request, context); return NextResponse.json(data, { headers: { 'Cache-Control': 'no-store' } }); }
+    try { const feature = featureForPath(new URL(request.url).pathname, true); if (feature && !options.allowDisabledFeature) await (await import('./features')).requireFeature(feature.id); if (!['GET', 'HEAD'].includes(request.method)) sameOrigin(request); const data = await handler(request, context && context.params ? { ...context, params: await context.params } : context); return NextResponse.json(data, { headers: { 'Cache-Control': 'no-store' } }); }
     catch (e: any) {
       const status = e instanceof HttpError ? e.status : ['P2002','P2034'].includes(e?.code) ? 409 : e?.code === 'P2025' ? 404 : 503;
       return NextResponse.json({ ...(e instanceof HttpError && e.extra ? e.extra : {}), error: e instanceof HttpError ? e.message : status === 409 ? 'البيانات مسجلة مسبقاً أو تعارض تحديث؛ أعد التحميل' : status === 404 ? 'السجل غير موجود' : 'تعذر الاتصال بالخدمة؛ لم يتم تأكيد الحفظ. أعد المحاولة.' }, { status, headers: { 'Cache-Control': 'no-store' } });

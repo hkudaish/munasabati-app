@@ -40,8 +40,8 @@ const cairo = Cairo({
 
 /** Title, description, canonical and language alternates, robots, Open Graph and Twitter cards for the page and language being served. */
 export async function generateMetadata(): Promise<Metadata> {
-  const { innerPath } = getPaths();
-  return buildMetadata({ path: innerPath, locale: getLocale() });
+  const { innerPath } = await getPaths();
+  return buildMetadata({ path: innerPath, locale: await getLocale() });
 }
 
 export const viewport: Viewport = {
@@ -61,7 +61,7 @@ export default async function RootLayout({
     geoContext({ layout: true }).catch(() => null),
     featureStatesForLayout().catch(() => defaultFeatures().map(f => ({ ...f, enabled: false, visible: false }))),
   ]);
-  const locale = getLocale(), { innerPath } = getPaths(), base = siteUrl();
+  const locale = await getLocale(), { innerPath } = await getPaths(), base = siteUrl();
   return (
     <html lang={locale} dir={locale === 'en' ? 'ltr' : 'rtl'} className={`${tajawal.variable} ${cairo.variable}`}>
       <body className="min-h-screen flex flex-col bg-[#FAF7F2] text-[#1E293B] antialiased selection:bg-saudi-gold-400 selection:text-saudi-green-950">

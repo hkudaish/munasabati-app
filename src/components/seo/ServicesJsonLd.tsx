@@ -9,7 +9,7 @@ import { siteUrl } from '@/lib/site';
 
 /** An ItemList of the services the public can currently see, for the store pages. */
 export default async function ServicesJsonLd() {
-  const locale = getLocale();
+  const locale = await getLocale();
   try {
     const [snapshot, services, titles] = await Promise.all([loadSnapshotForListing(), serviceRows(), prisma.$queryRaw<{ id: string; en: string | null }[]>`SELECT "id", "body"->>'titleEn' AS en FROM "CommerceService"`]);
     const english = new Map(titles.map(t => [t.id, t.en]));

@@ -5,9 +5,9 @@ import { PRIVATE_PREFIXES } from '@/lib/seo/registry';
 
 export const dynamic = 'force-dynamic';
 /** Only the real site is crawlable. Preview deploys, branch deploys and any other host (localhost, a test server) are closed to crawlers. */
-export default function robots(): MetadataRoute.Robots {
+export default async function robots(): Promise<MetadataRoute.Robots> {
   const base = siteUrl();
-  const host = headers().get('host') ?? '';
+  const host = (await headers()).get('host') ?? '';
   if (host && host !== new URL(base).host) return { rules: [{ userAgent: '*', disallow: '/' }] };
   return {
     rules: [{ userAgent: '*', allow: '/', disallow: ['/api/', ...PRIVATE_PREFIXES.flatMap(p => [p, '/en' + p])] }],

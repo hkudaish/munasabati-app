@@ -53,18 +53,18 @@ interface Actor { userId: string | null; guestHash: string | null }
 /** The signed-in customer, or the anonymous visitor identified by an httpOnly token. A guest's drafts move to their account the moment they sign in. */
 async function identify(create = false): Promise<Actor> {
   const user = await sessionUser();
-  const token = cookies().get(GUEST_COOKIE)?.value;
+  const token = (await cookies()).get(GUEST_COOKIE)?.value;
   if (user) {
     if (token) {
       await prisma.$executeRaw`UPDATE "BookingDraft" SET "userId"=${user.id},"guestTokenHash"=NULL,"expiresAt"=CURRENT_TIMESTAMP + interval '90 days',"updatedAt"=CURRENT_TIMESTAMP WHERE "guestTokenHash"=${digest(token)} AND "userId" IS NULL`;
-      cookies().delete(GUEST_COOKIE);
+      (await cookies()).delete(GUEST_COOKIE);
     }
     return { userId: user.id, guestHash: null };
   }
   if (token) return { userId: null, guestHash: digest(token) };
   if (!create) throw new HttpError(401, 'يرجى تسجيل الدخول');
   const fresh = randomBytes(32).toString('base64url');
-  cookies().set(GUEST_COOKIE, fresh, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/', maxAge: 30 * 86400 });
+  (await cookies()).set(GUEST_COOKIE, fresh, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/', maxAge: 30 * 86400 });
   return { userId: null, guestHash: digest(fresh) };
 }
 const owns = (draft: any, actor: Actor) => (actor.userId ? draft.userId === actor.userId : !!actor.guestHash && draft.guestTokenHash === actor.guestHash);

@@ -22,19 +22,21 @@ export const digest = (value: string) => createHash('sha256').update(value).dige
 export async function createSession(userId: string) {
   const token = randomBytes(32).toString('base64url'); const expiresAt = new Date(Date.now() + 7 * 86400000);
   await prisma.authSession.create({ data: { tokenHash: digest(token), userId, expiresAt } });
-  cookies().set(COOKIE, token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/', expires: expiresAt });
+  (await cookies()).set(COOKIE, token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/', expires: expiresAt });
 }
 export async function sessionUser() {
-  const token = cookies().get(COOKIE)?.value;
+  const token = (await cookies()).get(COOKIE)?.value;
   if (!token) return null;
   const session = await prisma.authSession.findUnique({ where: { tokenHash: digest(token) }, include: { user: { include: { vendorProfile: true } } } });
   return session && session.user.isActive && session.expiresAt > new Date() ? session.user : null;
 }
 export async function requireUser() { const user = await sessionUser(); if (!user) throw new HttpError(401, 'يرجى تسجيل الدخول'); return user; }
-export async function logout() { const token = cookies().get(COOKIE)?.value; if (token) await prisma.authSession.deleteMany({ where: { tokenHash: digest(token) } }); cookies().delete(COOKIE); }
+export async function logout() { const token = (await cookies()).get(COOKIE)?.value; if (token) await prisma.authSession.deleteMany({ where: { tokenHash: digest(token) } }); (await cookies()).delete(COOKIE); }
 export function profile(user: any) {
   return { id: user.id, name: user.name, phone: user.phone, email: user.email, cityId: user.cityId, createdAt: user.createdAt, avatar: user.avatar, role: ['ADMIN','SUPER_ADMIN'].includes(user.role) ? 'admin' : user.role === 'VENDOR' ? 'vendor' : 'client', hasSystemAccess: user.role === 'SUPER_ADMIN', hasAdminAccess: ['ADMIN','SUPER_ADMIN'].includes(user.role), vendorId: user.vendorProfile?.id, businessName: user.vendorProfile?.businessName };
 }
+/** The visitor's address as the host reports it: Netlify's own header cannot be set by the client, the forwarded list is the fallback. */
+export function clientIp(request: Request) { return request.headers.get('x-nf-client-connection-ip') || request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'local'; }
 export async function rateLimit(key: string, limit = 20, windowMs = 900000) {
   const hashed = digest(key); const now = new Date();
   await prisma.authAttempt.deleteMany({ where: { key: hashed, expiresAt: { lte: now } } });

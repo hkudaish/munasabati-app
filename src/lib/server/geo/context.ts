@@ -9,8 +9,8 @@ import { GeoChange, GeoContextData, GeoSelection, GeoSnapshot } from '@/lib/geo/
 import { readGeo } from './data';
 export const VISITOR_COOKIE='munasabati_geo';
 export async function visitorId(create=false){
- let id=cookies().get(VISITOR_COOKIE)?.value;
- if(!id||!/^[-\w]{43}$/.test(id)){if(!create)return null;id=randomBytes(32).toString('base64url');cookies().set(VISITOR_COOKIE,id,{httpOnly:true,sameSite:'lax',secure:process.env.NODE_ENV==='production',path:'/',maxAge:180*86400});}
+ let id=(await cookies()).get(VISITOR_COOKIE)?.value;
+ if(!id||!/^[-\w]{43}$/.test(id)){if(!create)return null;id=randomBytes(32).toString('base64url');(await cookies()).set(VISITOR_COOKIE,id,{httpOnly:true,sameSite:'lax',secure:process.env.NODE_ENV==='production',path:'/',maxAge:180*86400});}
  return digest(id);
 }
 export function ipSelection(s:GeoSnapshot,h:Headers, trusted:boolean):GeoSelection {
@@ -23,7 +23,7 @@ export async function selection(s:GeoSnapshot):Promise<GeoSelection>{
  const hash=await visitorId(); const user=await sessionUser();
  const preferences=await prisma.geoPreference.findMany({where:{expiresAt:{gt:new Date()},OR:[...(hash?[{visitorHash:hash}]:[]),...(user?[{userId:user.id}]:[])]},orderBy:{updatedAt:'desc'},take:30});
  for(const source of ['MANUAL','GPS','IP']){const p=preferences.find(p=>p.source===source);if(p)return {cityId:p.cityId,countryCode:p.countryCode,unknownName:p.unknownName,source:source as GeoSelection['source']};}
- return ipSelection(s,new Headers(headers()),process.env.VERCEL==='1');
+ return ipSelection(s,new Headers(await headers()),process.env.VERCEL==='1');
 }
 export async function previewContext(id:string):Promise<GeoContextData>{
  const user=await requireSystemAdmin();const preview=await prisma.geoPreview.findFirst({where:{id,ownerId:user.id,expiresAt:{gt:new Date()}}});

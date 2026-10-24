@@ -18,6 +18,7 @@ const contentSecurityPolicy = [
 ].join('; ');
 
 const nextConfig = {
+  poweredByHeader: false,
   distDir: process.env.NEXT_TEST_DIST_DIR || '.next',
   typescript: { tsconfigPath: process.env.NEXT_TEST_TSCONFIG || 'tsconfig.json' },
   reactStrictMode: true,
