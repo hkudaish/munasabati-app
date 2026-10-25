@@ -41,7 +41,7 @@
 ، وسيقوم المساعد الذكي بتوليد خطة متكاملة فوراً تشمل توزيع الميزانية، قائمة المهام، والموردين الموصى بهم. => , and the smart assistant will instantly generate a complete plan including the budget split, task list and recommended vendors.
 جرّب التخطيط بالذكاء الاصطناعي مجاناً => Try AI planning for free
 عروض أسعار خاصة بمناسبتك => Quotes made for your event
-عندك متطلبات مخصصة؟ اطلب تسعير خاص من الموردين 💬 => Have special requirements? Ask vendors for a custom quote 💬
+عندك متطلبات خاصة؟ اطلب عرض سعر 💬 => Have special requirements? Ask for a quote 💬
 أرسل تفاصيل مناسبتك وسيقوم الموردون المعتمدون في منطقتك بتقديم عروض أسعار تنافسية خلال 24 ساعة مع ضمان الالتزام. => Send your event details and verified vendors in your area will submit competitive quotes within 24 hours, with a commitment guarantee.
 إنشاء طلب تسعير (RFQ) جديد => Create a new quote request (RFQ)
 بوابة الموردين والشركاء المعتمدين 🇸🇦 • => Verified vendors and partners portal 🇸🇦 •

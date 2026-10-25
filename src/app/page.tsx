@@ -453,7 +453,7 @@ export default function HomePage() {
                   {t('عروض أسعار خاصة بمناسبتك')}
                 </span>
                 <h3 className="text-2xl font-black font-cairo text-saudi-green-950">
-                  {t('عندك متطلبات مخصصة؟ اطلب تسعير خاص من الموردين 💬')}
+                  {t('عندك متطلبات خاصة؟ اطلب عرض سعر 💬')}
                 </h3>
                 <p className="text-xs text-gray-600 max-w-xl font-tajawal">
                   {t('أرسل تفاصيل مناسبتك وسيقوم الموردون المعتمدون في منطقتك بتقديم عروض أسعار تنافسية خلال 24 ساعة مع ضمان الالتزام.')}

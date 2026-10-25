@@ -19,7 +19,7 @@ export default function LanguageSwitcher({ className = '' }: { className?: strin
     <button type="button" onClick={go} disabled={!target} lang={locale === 'en' ? 'ar' : 'en'} dir={locale === 'en' ? 'rtl' : 'ltr'}
       title={target ? undefined : locale === 'en' ? 'هذه الصفحة غير متاحة بالعربية' : 'This page is not available in English yet'}
       aria-label={locale === 'en' ? 'التبديل إلى العربية' : 'Switch to English'}
-      className={`rounded-lg border border-saudi-gold-400/60 px-3 py-1 text-xs font-bold text-saudi-gold-700 hover:bg-saudi-gold-50 disabled:cursor-not-allowed disabled:opacity-40 ${className}`}>
+      className={`rounded-lg border border-saudi-gold-400/60 px-3 py-1 text-xs font-bold text-saudi-gold-300 hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40 ${className}`}>
       {label}
     </button>
   );

@@ -49,10 +49,13 @@ const config: Config = {
           violet: "#4A154B",
         },
       },
-      // Type scale (apple-design): 11px is the floor; 16px is body.
+      // Type scale: nothing meant to be read is under 13px (Arabic letterforms need the room); 16px is body.
+      // xs and sm are the two sizes most running text uses, so they are set here rather than at each use.
       fontSize: {
-        caption2: ["0.6875rem", { lineHeight: "1rem" }],
-        caption: ["0.75rem", { lineHeight: "1.125rem" }],
+        xs: ["0.8125rem", { lineHeight: "1.25rem" }],
+        sm: ["0.9375rem", { lineHeight: "1.5rem" }],
+        caption2: ["0.8125rem", { lineHeight: "1.125rem" }],
+        caption: ["0.8125rem", { lineHeight: "1.125rem" }],
         footnote: ["0.8125rem", { lineHeight: "1.25rem" }],
         subhead: ["0.9375rem", { lineHeight: "1.375rem" }],
         body: ["1rem", { lineHeight: "1.625rem" }],

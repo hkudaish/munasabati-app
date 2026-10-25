@@ -71,3 +71,4 @@ next-env.d.ts
 /.fp-test-tsconfig-*.json
 scripts/.i18n-report.json
 scripts/.i18n-scan.json
+.taste-skill/
