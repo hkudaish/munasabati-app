@@ -20,53 +20,53 @@ export default function MobileBottomNav() {
         <div className="flex items-center justify-around relative">
           <Link
             href="/vendor"
-            className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-lg transition ${
+            className={`flex flex-col items-center gap-1 py-1 px-1 flex-1 min-w-0 rounded-lg transition ${
               pathname === '/vendor' ? 'text-saudi-green-800 font-bold' : 'text-gray-500 hover:text-saudi-green-800'
             }`}
             aria-current={pathname === '/vendor' ? 'page' : undefined}
           >
             <Store className="w-5 h-5" />
-            <span className="text-caption2">{t('لوحة المورد')}</span>
+            <span className="text-caption2 max-w-full truncate">{t('لوحة المورد')}</span>
           </Link>
 
           <Link
             href="/marketplace"
-            className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-lg transition ${
+            className={`flex flex-col items-center gap-1 py-1 px-1 flex-1 min-w-0 rounded-lg transition ${
               pathname.startsWith('/marketplace') ? 'text-saudi-green-800 font-bold' : 'text-gray-500 hover:text-saudi-green-800'
             }`}
           >
             <ShoppingBag className="w-5 h-5" />
-            <span className="text-caption2">{t('السوق')}</span>
+            <span className="text-caption2 max-w-full truncate">{t('السوق')}</span>
           </Link>
 
           <Link
             href="/vendor/catalog"
             aria-current={pathname.startsWith('/vendor/catalog') ? 'page' : undefined}
-            className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-lg transition ${
+            className={`flex flex-col items-center gap-1 py-1 px-1 flex-1 min-w-0 rounded-lg transition ${
               pathname.startsWith('/vendor/catalog') ? 'text-saudi-green-800 font-bold' : 'text-gray-500 hover:text-saudi-green-800'
             }`}
           >
             <Layers className="w-5 h-5" />
-            <span className="text-caption2">{t('الخدمات')}</span>
+            <span className="text-caption2 max-w-full truncate">{t('الخدمات')}</span>
           </Link>
 
           <Link
             href="/vendor/orders"
             aria-current={pathname.startsWith('/vendor/orders') ? 'page' : undefined}
-            className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-lg transition ${
+            className={`flex flex-col items-center gap-1 py-1 px-1 flex-1 min-w-0 rounded-lg transition ${
               pathname.startsWith('/vendor/orders') ? 'text-saudi-green-800 font-bold' : 'text-gray-500 hover:text-saudi-green-800'
             }`}
           >
             <CalendarDays className="w-5 h-5" />
-            <span className="text-caption2">{t('الطلبات')}</span>
+            <span className="text-caption2 max-w-full truncate">{t('الطلبات')}</span>
           </Link>
 
           <FeatureContent id="luma"><button
             onClick={() => setIsAIOpen(true)}
-            className="flex flex-col items-center gap-1 py-1 px-2.5 rounded-lg text-saudi-gold-600 hover:text-saudi-gold-700 transition"
+            className="flex flex-col items-center gap-1 py-1 px-1 flex-1 min-w-0 rounded-lg text-saudi-gold-600 hover:text-saudi-gold-700 transition"
           >
             <Sparkles className="w-5 h-5" />
-            <span className="text-caption2 font-bold">{t('لُـمى (AI)')}</span>
+            <span className="text-caption2 font-bold max-w-full truncate">{t('لُـمى (AI)')}</span>
           </button></FeatureContent>
         </div>
       </div>
@@ -80,36 +80,36 @@ export default function MobileBottomNav() {
         <div className="flex items-center justify-around relative">
           <Link
             href={currentUser?.hasSystemAccess ? '/system-admin' : '/admin'}
-            className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-lg transition ${
+            className={`flex flex-col items-center gap-1 py-1 px-1 flex-1 min-w-0 rounded-lg transition ${
               pathname === '/admin' ? 'text-saudi-green-800 font-bold' : 'text-gray-500 hover:text-saudi-green-800'
             }`}
           >
             <ShieldCheck className="w-5 h-5 text-saudi-green-800" />
-            <span className="text-caption2">{currentUser?.hasSystemAccess ? t('مدير النظام') : t('لوحة الإدارة')}</span>
+            <span className="text-caption2 max-w-full truncate">{currentUser?.hasSystemAccess ? t('مدير النظام') : t('لوحة الإدارة')}</span>
           </Link>
 
           <Link
             href="/"
-            className="flex flex-col items-center gap-1 py-1 px-2.5 rounded-lg text-gray-500 hover:text-saudi-green-800 transition"
+            className="flex flex-col items-center gap-1 py-1 px-1 flex-1 min-w-0 rounded-lg text-gray-500 hover:text-saudi-green-800 transition"
           >
             <Home className="w-5 h-5" />
-            <span className="text-caption2">{t('الرئيسية')}</span>
+            <span className="text-caption2 max-w-full truncate">{t('الرئيسية')}</span>
           </Link>
 
           <Link
             href="/vendor"
-            className="flex flex-col items-center gap-1 py-1 px-2.5 rounded-lg text-gray-500 hover:text-saudi-green-800 transition"
+            className="flex flex-col items-center gap-1 py-1 px-1 flex-1 min-w-0 rounded-lg text-gray-500 hover:text-saudi-green-800 transition"
           >
             <Store className="w-5 h-5" />
-            <span className="text-caption2">{t('الموردين')}</span>
+            <span className="text-caption2 max-w-full truncate">{t('الموردين')}</span>
           </Link>
 
           <FeatureContent id="luma"><button
             onClick={() => setIsAIOpen(true)}
-            className="flex flex-col items-center gap-1 py-1 px-2.5 rounded-lg text-saudi-gold-600 hover:text-saudi-gold-700 transition"
+            className="flex flex-col items-center gap-1 py-1 px-1 flex-1 min-w-0 rounded-lg text-saudi-gold-600 hover:text-saudi-gold-700 transition"
           >
             <Sparkles className="w-5 h-5" />
-            <span className="text-caption2 font-bold">{t('لُـمى (AI)')}</span>
+            <span className="text-caption2 font-bold max-w-full truncate">{t('لُـمى (AI)')}</span>
           </button></FeatureContent>
         </div>
       </div>
@@ -124,19 +124,19 @@ export default function MobileBottomNav() {
         <Link
           href="/"
           aria-current={pathname === '/' ? 'page' : undefined}
-          className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-lg transition ${
+          className={`flex flex-col items-center gap-1 py-1 px-1 flex-1 min-w-0 rounded-lg transition ${
             pathname === '/' ? 'text-saudi-green-800 font-bold' : 'text-gray-500 hover:text-saudi-green-800'
           }`}
         >
           <Home className="w-5 h-5" />
-          <span className="text-caption2">{t('الرئيسية')}</span>
+          <span className="text-caption2 max-w-full truncate">{t('الرئيسية')}</span>
         </Link>
 
         {/* Explore: a fixed destination; the cart lives in the header */}
         <Link
           href="/marketplace"
           aria-current={pathname.startsWith('/marketplace') ? 'page' : undefined}
-          className={`relative flex flex-col items-center gap-1 py-1 px-2.5 rounded-lg transition ${
+          className={`relative flex flex-col items-center gap-1 py-1 px-1 flex-1 min-w-0 rounded-lg transition ${
             pathname.startsWith('/marketplace')
               ? 'text-saudi-green-800 font-bold'
               : 'text-gray-500 hover:text-saudi-green-800'
@@ -148,40 +148,40 @@ export default function MobileBottomNav() {
               {cart.reduce((s, i) => s + i.quantity, 0)}
             </span>
           )}
-          <span className="text-caption2">{t('استكشف')}</span>
+          <span className="text-caption2 max-w-full truncate">{t('استكشف')}</span>
         </Link>
 
         {/* My occasion: opens the active occasion, or starts planning */}
         <Link
           href={activeOccasion ? `/occasion/${activeOccasion.id}` : '/plan'}
           aria-current={pathname.startsWith('/occasion') || pathname.startsWith('/plan') ? 'page' : undefined}
-          className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-lg transition ${
+          className={`flex flex-col items-center gap-1 py-1 px-1 flex-1 min-w-0 rounded-lg transition ${
             pathname.startsWith('/occasion') || pathname.startsWith('/plan') ? 'text-saudi-green-800 font-bold' : 'text-gray-500 hover:text-saudi-green-800'
           }`}
         >
           <CalendarDays className="w-5 h-5" />
-          <span className="text-caption2">{t('مناسبتي')}</span>
+          <span className="text-caption2 max-w-full truncate">{t('مناسبتي')}</span>
         </Link>
 
         {/* Quotes */}
         <Link
           href="/rfq"
           aria-current={pathname.startsWith('/rfq') ? 'page' : undefined}
-          className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-lg transition ${
+          className={`flex flex-col items-center gap-1 py-1 px-1 flex-1 min-w-0 rounded-lg transition ${
             pathname.startsWith('/rfq') ? 'text-saudi-green-800 font-bold' : 'text-gray-500 hover:text-saudi-green-800'
           }`}
         >
           <FileText className="w-5 h-5" />
-          <span className="text-caption2">{t('عروض الأسعار')}</span>
+          <span className="text-caption2 max-w-full truncate">{t('عروض الأسعار')}</span>
         </Link>
 
         {/* AI Assistant (Luma) */}
         <FeatureContent id="luma"><button
           onClick={() => setIsAIOpen(true)}
-          className="flex flex-col items-center gap-1 py-1 px-2.5 rounded-lg text-saudi-gold-600 hover:text-saudi-gold-700 transition"
+          className="flex flex-col items-center gap-1 py-1 px-1 flex-1 min-w-0 rounded-lg text-saudi-gold-600 hover:text-saudi-gold-700 transition"
         >
           <Sparkles className="w-5 h-5" />
-          <span className="text-caption2 font-bold">{t('لُـمى (AI)')}</span>
+          <span className="text-caption2 font-bold max-w-full truncate">{t('لُـمى (AI)')}</span>
         </button></FeatureContent>
       </div>
     </div>

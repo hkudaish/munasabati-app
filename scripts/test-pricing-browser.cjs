@@ -36,7 +36,7 @@ const db = new PrismaClient(), base = process.env.TEST_APP_URL || 'http://localh
         for (const tab of tabs) {
           await evaluate(`Array.from(document.querySelectorAll('nav button')).find(b=>b.innerText.trim()===${JSON.stringify(tab)}).click()`);
           await wait(`!document.body.innerText.includes('جارٍ التحميل')`);
-          assert.equal(await evaluate(`document.documentElement.scrollWidth<=window.innerWidth+2`), true, `horizontal overflow on ${tab} at ${width}px`);
+          assert.equal(await evaluate(`document.documentElement.scrollWidth<=${width}+2`), true, `horizontal overflow on ${tab} at ${width}px`);
         }
         await evaluate(`Array.from(document.querySelectorAll('nav button')).find(b=>b.innerText.trim()==='قواعد الخصم والحملات').click()`);
         await wait(`Array.from(document.querySelectorAll('button')).some(b=>b.innerText.includes('قاعدة جديدة'))`);
