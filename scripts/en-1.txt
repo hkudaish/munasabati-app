@@ -5,8 +5,8 @@
 • مسجل باسم: => • Registered as:
 يتم عرض فرص طلبات التسعير (RFQs)، إدارة الخدمات، جدول الحجوزات، وأدوات نمو المورد. => Showing quote-request opportunities (RFQs), service management, the booking schedule and vendor growth tools.
 يتم عرض مؤشرات أداء المنصة، طلبات توثيق السجلات، تدقيق الخدمات، وسجل المعاملات. => Showing platform performance indicators, record verification requests, service audits and the transaction log.
-أهلاً بك يا {name} • مساحة تخطيط مناسبتك الذكية 🇸🇦 => Welcome, {name} • Your smart event planning space 🇸🇦
-المنصة السعودية الذكية الأولى لتنظيم والاحتفال بالمناسبات 🇸🇦 => The first smart Saudi platform for planning and celebrating events 🇸🇦
+أهلاً بك يا {name} • مساحة تخطيط مناسبتك الذكية => Welcome, {name} • Your smart event planning space
+المنصة السعودية الذكية الأولى لتنظيم والاحتفال بالمناسبات => The first smart Saudi platform for planning and celebrating events
 خططها. احجزها. اعزمهم. => Plan it. Book it. Invite them.
 واحتفل بأجمل اللحظات. => And celebrate the best moments.
 من الفكرة وحتى آخر ضيف — كل تجهيزات مناسبتك في مكان واحد: قاعات، ضيافة سعودية، كوش وتنسيق، مصورين، باقات جاهزة، وطلب موثّق يؤكده المورد. => From the idea to the last guest — everything for your event in one place: venues, Saudi hospitality, stage and floral design, photographers, ready-made packages, and a documented order confirmed by the vendor.
@@ -23,10 +23,10 @@
 متابعة خطة المناسبة => Continue your event plan
 في السلة ( => In cart (
 ابدأ من نوع الاحتفال => Start with the type of celebration
-ما مناسبتك؟ 🎉 => What is your occasion? 🎉
+ما مناسبتك؟ => What is your occasion?
 عرض كافة أنواع المناسبات ( => View all occasion types (
 وفر وقتك ومالك => Save your time and money
-الباقات الذكية الجاهزة 📦 => Ready-made smart packages 📦
+الباقات الذكية الجاهزة => Ready-made smart packages
 باقات منسقة تجمع أفضل الموردين المعتمدين في بكج واحد مع توفير حقيقي وإمكانية التعديل. => Curated packages bringing the best verified vendors together in one bundle, with real savings and room to customize.
 استعراض كل الباقات ( => Browse all packages (
 تجهيزات وخدمات المناسبات => Event supplies and services
@@ -41,7 +41,7 @@
 ، وسيقوم المساعد الذكي بتوليد خطة متكاملة فوراً تشمل توزيع الميزانية، قائمة المهام، والموردين الموصى بهم. => , and the smart assistant will instantly generate a complete plan including the budget split, task list and recommended vendors.
 جرّب التخطيط بالذكاء الاصطناعي مجاناً => Try AI planning for free
 عروض أسعار خاصة بمناسبتك => Quotes made for your event
-عندك متطلبات خاصة؟ اطلب عرض سعر 💬 => Have special requirements? Ask for a quote 💬
+عندك متطلبات خاصة؟ اطلب عرض سعر => Have special requirements? Ask for a quote
 أرسل تفاصيل مناسبتك وسيقوم الموردون المعتمدون في منطقتك بتقديم عروض أسعار تنافسية خلال 24 ساعة مع ضمان الالتزام. => Send your event details and verified vendors in your area will submit competitive quotes within 24 hours, with a commitment guarantee.
 إنشاء طلب تسعير (RFQ) جديد => Create a new quote request (RFQ)
 بوابة الموردين والشركاء المعتمدين 🇸🇦 • => Verified vendors and partners portal 🇸🇦 •
