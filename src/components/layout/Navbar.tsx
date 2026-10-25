@@ -85,7 +85,7 @@ function NavbarContent() {
           <div className="flex items-center gap-2"><CityPicker /><LanguageSwitcher className="!border-saudi-gold-400/60 !py-0.5 !text-saudi-gold-300 hover:!bg-white/10" /></div>
 
           {/* Role Switcher & Account Access */}
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4 min-w-0 max-w-full">
             {/* Visual Segmented Role Switcher matching reference image */}
             {showRoleSwitcher && (
             <div className="flex items-center gap-1.5 sm:gap-2">
@@ -656,14 +656,14 @@ function NavbarContent() {
               <>
                 <Link
                   href="/admin"
-                  className="flex items-center gap-1.5 bg-saudi-green-800 hover:bg-saudi-green-900 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition"
+                  className="hidden sm:flex items-center gap-1.5 bg-saudi-green-800 hover:bg-saudi-green-900 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition"
                 >
                   <ShieldCheck className="w-4 h-4 text-saudi-gold-400" />
                   <span>{t('لوحة التحكم الكاملة')}</span>
                 </Link>
                 {locale === 'ar' && <FeatureContent id="luma"><button
                   onClick={() => setIsAIOpen(true)}
-                  className="flex items-center gap-1.5 bg-white hover:bg-saudi-sand-100 border border-saudi-gold-400 text-saudi-green-900 px-3 py-2 rounded-xl text-xs font-bold transition"
+                  className="hidden sm:flex items-center gap-1.5 bg-white hover:bg-saudi-sand-100 border border-saudi-gold-400 text-saudi-green-900 px-3 py-2 rounded-xl text-xs font-bold transition"
                 >
                   <Sparkles className="w-4 h-4 text-saudi-gold-600" />
                   <span>{t('مستشارة الموردين')}</span>
