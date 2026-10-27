@@ -91,6 +91,9 @@ export default function UserOnboardingModal() {
   // Login Form Data
   const [loginIdentifier, setLoginIdentifier] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
+  // Accounts with an authenticator app are asked for a code after the password is accepted.
+  const [mfaStep, setMfaStep] = useState(false);
+  const [loginCode, setLoginCode] = useState('');
   // Set when the server locks sign-in after repeated wrong passwords; the form stays disabled until the time passes.
   const [lockedUntil, setLockedUntil] = useState(0);
   const [now, setNow] = useState(() => Date.now());
@@ -210,10 +213,12 @@ export default function UserOnboardingModal() {
   const handleLoginSubmit = async (identifier: string, requestedRole?: 'client' | 'vendor' | 'admin') => {
     setErrorMessage('');
     setIsSubmitting(true);
-    const res = await loginUser(identifier, requestedRole, loginPassword);
+    const res = await loginUser(identifier, requestedRole, loginPassword, mfaStep ? loginCode : undefined);
     setIsSubmitting(false);
 
+    if (res.mfaRequired) { setMfaStep(true); setLoginCode(''); setErrorMessage(''); return; }
     if (!res.success) {
+      if (mfaStep) setLoginCode('');
       setErrorMessage(res.error || tr('فشل تسجيل الدخول'));
       if (res.retryAfter) { setNow(Date.now()); setLockedUntil(Date.now() + res.retryAfter * 1000); setLoginPassword(''); }
       return;
@@ -770,7 +775,7 @@ export default function UserOnboardingModal() {
                     autoCapitalize="none"
                     spellCheck={false}
                     value={loginIdentifier}
-                    onChange={(e) => setLoginIdentifier(e.target.value)}
+                    onChange={(e) => { setLoginIdentifier(e.target.value); setMfaStep(false); }}
                     placeholder={tr('05XXXXXXXX أو البريد الإلكتروني')}
                     className="w-full text-base px-4 py-3 rounded-xl border border-gray-300 text-start focus:outline-none focus-visible:ring-2 focus-visible:ring-saudi-green-800 focus-visible:border-saudi-green-800"
                   />
@@ -783,11 +788,31 @@ export default function UserOnboardingModal() {
                     required
                     autoComplete="current-password"
                     value={loginPassword}
-                    onChange={e => setLoginPassword(e.target.value)}
+                    onChange={e => { setLoginPassword(e.target.value); setMfaStep(false); }}
                     placeholder="••••••••"
                     className="w-full text-base px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-saudi-green-800 focus-visible:border-saudi-green-800"
                   />
                 </div>
+
+                {mfaStep && (
+                  <div>
+                    <label htmlFor="login-code" className="block text-sm font-bold text-gray-800 mb-1.5">{tr('رمز التحقق من تطبيق المصادقة')}</label>
+                    <input
+                      id="login-code"
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      autoFocus
+                      required
+                      maxLength={16}
+                      value={loginCode}
+                      onChange={(e) => setLoginCode(e.target.value)}
+                      placeholder="123456"
+                      className="w-full text-base px-4 py-3 rounded-xl border border-gray-300 tracking-widest focus:outline-none focus-visible:ring-2 focus-visible:ring-saudi-green-800 focus-visible:border-saudi-green-800"
+                    />
+                    <p className="mt-1.5 text-sm text-gray-600">{tr('افتح تطبيق المصادقة وأدخل الرمز المكوّن من 6 أرقام. إذا فقدت هاتفك، أدخل أحد رموز الاسترداد.')}</p>
+                  </div>
+                )}
 
                 <button
                   type="submit"

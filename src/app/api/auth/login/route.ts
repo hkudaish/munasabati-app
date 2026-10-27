@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/db';
+import { checkSecondFactor, totpEnabled } from '@/lib/server/totp';
 import { api, body, text, HttpError } from '@/lib/server/http';
 import { assertLoginAllowed, clearLoginFailures, clientIp, createSession, profile, rateLimit, recordLoginFailure, verifyPassword } from '@/lib/server/auth';
 export const POST = api(async request => {
@@ -10,6 +11,11 @@ export const POST = api(async request => {
   await assertLoginAllowed(ip, identifier);
   const user = await prisma.user.findFirst({ where: { OR: [{ phone: identifier }, { email: identifier }] }, include: { vendorProfile: true } });
   if (!await verifyPassword(data.password, user?.passwordHash || null) || !user || !user.isActive) { await recordLoginFailure(ip, identifier); throw new HttpError(401, 'بيانات الدخول غير صحيحة؛ الحسابات القديمة تحتاج تهيئة كلمة مرور من مسؤول النظام'); }
+  // Accounts that enrolled an authenticator also need a current code (or a recovery code); a wrong one counts toward the same lockout as a wrong password.
+  if (await totpEnabled(user.id)) {
+    if (typeof data.code !== 'string' || !data.code.trim()) return { success: false, mfaRequired: true };
+    if (!await checkSecondFactor(user.id, data.code)) { await recordLoginFailure(ip, identifier); throw new HttpError(401, 'رمز التحقق غير صحيح أو مستخدم من قبل'); }
+  }
   await clearLoginFailures(ip, identifier);
   await createSession(user.id);
   return { success: true, user: profile(user) };

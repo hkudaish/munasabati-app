@@ -94,7 +94,7 @@ interface AppContextType {
   setOnboardingGate: (gate: { returnTo?: string } | null) => void;
   registerCustomer: (payload: CustomerRegistrationPayload) => Promise<{ success: boolean; user?: UserProfile; error?: string }>;
   registerVendor: (payload: VendorRegistrationPayload) => Promise<{ success: boolean; user?: UserProfile; error?: string }>;
-  loginUser: (identifier: string, requestedRole?: UserRole, password?: string) => Promise<{ success: boolean; user?: UserProfile; error?: string; retryAfter?: number }>;
+  loginUser: (identifier: string, requestedRole?: UserRole, password?: string, code?: string) => Promise<{ success: boolean; user?: UserProfile; error?: string; retryAfter?: number; mfaRequired?: boolean }>;
   logoutUser: () => void;
   /** True once the server has answered whether anyone is signed in (safe to guard protected pages). */
   authReady: boolean;
@@ -611,14 +611,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const loginUser = async (identifier: string, requestedRole?: UserRole, password?: string) => {
+  const loginUser = async (identifier: string, requestedRole?: UserRole, password?: string, code?: string) => {
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identifier, password }),
+        body: JSON.stringify({ identifier, password, code }),
       });
       const data = await res.json();
+      if (data.mfaRequired) return { success: false, mfaRequired: true };
       if (!res.ok || !data.success) {
         throw Object.assign(new Error(data.error || 'فشل تسجيل الدخول'), { retryAfter: typeof data.retryAfter === 'number' ? data.retryAfter : undefined });
       }

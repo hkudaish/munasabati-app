@@ -228,6 +228,7 @@ function NavbarContent() {
                       <Link href="/admin/backups" onClick={() => setIsUserDropdownOpen(false)} className="block px-3 py-2 text-xs font-bold text-saudi-green-900 hover:bg-gray-50 rounded-xl">{t('النسخ الاحتياطي')}</Link></>}
                       {currentUser.hasSystemAccess && <Link href="/system-admin/geography" className="block px-3 py-2 text-xs text-emerald-900">{t('الدول والمدن والخدمات')}</Link>}
                       {currentUser.hasSystemAccess && <Link href="/system-admin/availability" className="block px-3 py-2 text-xs text-emerald-900">{t('إدارة الإتاحة والحجز')}</Link>}
+                      <Link href="/settings/security" onClick={() => setIsUserDropdownOpen(false)} className="block px-3 py-2 text-xs font-bold text-saudi-green-900 hover:bg-gray-50 rounded-xl">{t('الأمان وتسجيل الدخول')}</Link>
                       <Link href="/settings/channels" onClick={() => setIsUserDropdownOpen(false)} className="block px-3 py-2 text-xs font-bold text-saudi-green-900 hover:bg-gray-50 rounded-xl">{t('إعدادات إرسال الدعوات')}</Link>
                       <Link href="/settings/invitations-data" onClick={() => setIsUserDropdownOpen(false)} className="block px-3 py-2 text-xs text-gray-600 hover:bg-gray-50 rounded-xl">{t('نقل الدعوات السابقة')}</Link>
                       <button
