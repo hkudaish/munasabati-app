@@ -150,24 +150,22 @@ export default function HomePage() {
       {currentRole === 'client' && (
         <div className="space-y-16 animate-fadeIn">
           {/* 1. Client Hero Section */}
-          <section className="relative bg-hero-pattern text-white pt-10 pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden border-b border-saudi-gold-500/20">
-            <div className="absolute -top-24 right-1/4 w-96 h-96 bg-saudi-gold-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-24 left-1/4 w-96 h-96 bg-saudi-green-500/20 rounded-full blur-3xl pointer-events-none" />
+          <section className="relative bg-saudi-green-950 text-white pt-12 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
 
             <div className="max-w-7xl mx-auto relative z-10 space-y-8">
-              <div className="inline-flex items-center gap-2 bg-saudi-gold-500/15 border border-saudi-gold-400/40 px-3.5 py-1.5 rounded-full text-saudi-gold-300 text-xs font-bold">
+              <div className="inline-flex items-center gap-2 text-saudi-gold-300 text-sm font-bold">
                 <Sparkles className="w-4 h-4 text-saudi-gold-400" />
                 <span>
                   {currentUser
-                    ? t('أهلاً بك يا {name} • مساحة تخطيط مناسبتك الذكية 🇸🇦', { name: currentUser.name })
-                    : t('المنصة السعودية الذكية الأولى لتنظيم والاحتفال بالمناسبات 🇸🇦')}
+                    ? t('أهلاً بك يا {name} • مساحة تخطيط مناسبتك الذكية', { name: currentUser.name })
+                    : t('المنصة السعودية الذكية الأولى لتنظيم والاحتفال بالمناسبات')}
                 </span>
               </div>
 
-              <div className="max-w-3xl space-y-4">
-                <h1 className="text-3xl sm:text-5xl font-black font-cairo leading-tight tracking-tight text-white">
+              <div className="max-w-5xl space-y-4">
+                <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black font-cairo leading-tight text-white">
                   {t('خططها. احجزها. اعزمهم.')}{' '}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-saudi-gold-300 via-saudi-gold-400 to-amber-200">
+                  <span className="block text-saudi-gold-300">
                     {t('واحتفل بأجمل اللحظات.')}
                   </span>
                 </h1>
@@ -180,7 +178,7 @@ export default function HomePage() {
               <div className="flex flex-wrap items-center gap-3 pt-2">
                 <Link
                   href="/plan"
-                  className="px-6 py-3.5 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-bold rounded-2xl text-sm shadow-lg shadow-saudi-gold-500/20 flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition"
+                  className="px-6 py-3.5 bg-saudi-gold-500 hover:bg-saudi-gold-400 text-saudi-green-950 font-bold rounded-2xl text-base flex items-center gap-2 active:scale-[0.98] transition"
                 >
                   <PlusCircle className="w-5 h-5 text-saudi-green-950" />
                   <span>{t('+ ابدأ تخطيط مناسبتك')}</span>
@@ -188,7 +186,7 @@ export default function HomePage() {
 
                 <Link
                   href="/rfq"
-                  className="px-5 py-3.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold rounded-2xl text-sm backdrop-blur-md flex items-center gap-2 transition"
+                  className="px-5 py-3.5 bg-white/10 hover:bg-white/20 text-white font-bold rounded-2xl text-base flex items-center gap-2 transition"
                 >
                   <FileText className="w-4 h-4 text-saudi-gold-300" />
                   <span>{t('اطلب عروض أسعار (RFQ)')}</span>
@@ -196,7 +194,7 @@ export default function HomePage() {
               </div>
 
               {/* Trust stats row */}
-              <div className="pt-6 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs text-gray-300">
+              <div className="pt-6 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs text-gray-300">
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-saudi-gold-400" />
                   <span>{t('موردين موثقين بسجلات رسمية')}</span>
@@ -220,7 +218,7 @@ export default function HomePage() {
           {/* 2. Client Active Planning Strip (إذا كان لديه مناسبة أو عناصر في السلة) */}
           {activeOccasion && (
             <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="bg-gradient-to-r from-saudi-sand-100 via-white to-saudi-sand-100 border border-saudi-gold-400/30 rounded-2xl p-5 shadow-card flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div className="bg-saudi-sand-100 border border-saudi-gold-400/30 rounded-2xl p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="text-caption2 font-bold px-2 py-0.5 rounded bg-saudi-green-800 text-white">
@@ -253,7 +251,7 @@ export default function HomePage() {
                 <div className="flex items-center gap-3">
                   <Link
                     href="/plan"
-                    className="px-4 py-2 bg-saudi-green-800 hover:bg-saudi-green-900 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow-sm"
+                    className="px-4 py-2 bg-saudi-green-800 hover:bg-saudi-green-900 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5"
                   >
                     <span>{t('متابعة خطة المناسبة')}</span>
                     <ChevronLeft className="w-3.5 h-3.5" />
@@ -276,11 +274,8 @@ export default function HomePage() {
           <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
               <div>
-                <span className="text-xs font-bold text-saudi-gold-600 block uppercase tracking-wider">
-                  {t('ابدأ من نوع الاحتفال')}
-                </span>
                 <h2 className="text-2xl sm:text-3xl font-black font-cairo text-saudi-green-950">
-                  {t('ما مناسبتك؟ 🎉')}
+                  {t('ما مناسبتك؟')}
                 </h2>
               </div>
               <Link
@@ -297,7 +292,7 @@ export default function HomePage() {
                 <Link
                   key={occ.id}
                   href={`/plan?type=${occ.id}`}
-                  className="group bg-white rounded-2xl border border-saudi-sand-300 overflow-hidden shadow-card hover:border-saudi-gold-500 hover:shadow-xl hover:-translate-y-1 transition duration-300 flex flex-col"
+                  className="group bg-white rounded-2xl border border-saudi-sand-300 overflow-hidden hover:border-saudi-gold-500 hover:-translate-y-1 transition duration-300 flex flex-col"
                 >
                   <div className="relative h-28 w-full bg-gray-100 overflow-hidden">
                     <img
@@ -322,11 +317,8 @@ export default function HomePage() {
           <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
               <div>
-                <span className="text-xs font-bold text-saudi-gold-600 block uppercase tracking-wider">
-                  {t('وفر وقتك ومالك')}
-                </span>
                 <h2 className="text-2xl sm:text-3xl font-black font-cairo text-saudi-green-950">
-                  {t('الباقات الذكية الجاهزة 📦')}
+                  {t('الباقات الذكية الجاهزة')}
                 </h2>
                 <p className="text-xs text-gray-500 mt-1">
                   {t('باقات منسقة تجمع أفضل الموردين المعتمدين في بكج واحد مع توفير حقيقي وإمكانية التعديل.')}
@@ -352,11 +344,8 @@ export default function HomePage() {
           <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
               <div>
-                <span className="text-xs font-bold text-saudi-gold-600 block uppercase tracking-wider">
-                  {t('تجهيزات وخدمات المناسبات')}
-                </span>
                 <h2 className="text-2xl sm:text-3xl font-black font-cairo text-saudi-green-950">
-                  {t('الخدمات المميزة في')} {pick(activeCityObj.nameAr, activeCityObj.nameEn)} ⭐
+                  {t('الخدمات المميزة في')} {pick(activeCityObj.nameAr, activeCityObj.nameEn)}
                 </h2>
                 <p className="text-xs text-gray-500 mt-1">
                   {t('اختر الفئة واستعرض الخدمات المعتمدة للحجز المباشر مع ضمان المنصة.')}
@@ -408,7 +397,7 @@ export default function HomePage() {
 
           {/* 6. Client Section: AI Planner */}
           <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-gradient-to-br from-saudi-green-900 via-saudi-green-800 to-saudi-green-950 rounded-3xl p-6 sm:p-10 text-white shadow-2xl relative overflow-hidden border border-saudi-gold-500/30">
+            <div className="bg-saudi-green-900 rounded-3xl p-6 sm:p-10 text-white relative overflow-hidden border border-saudi-gold-500/30">
               <div className="relative z-10 max-w-2xl space-y-4">
                 <div className="inline-flex items-center gap-1.5 bg-saudi-gold-500/20 text-saudi-gold-300 px-3 py-1 rounded-full text-xs font-bold border border-saudi-gold-400/30">
                   <Sparkles className="w-3.5 h-3.5 text-saudi-gold-400" />
@@ -425,7 +414,7 @@ export default function HomePage() {
                 <div className="pt-2 flex flex-wrap gap-3">
                   <FeatureContent id="luma"><button
                     onClick={() => setIsAIOpen(true)}
-                    className="px-6 py-3 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-bold rounded-2xl text-xs sm:text-sm shadow-md flex items-center gap-2 transition"
+                    className="px-6 py-3 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-bold rounded-2xl text-xs sm:text-sm flex items-center gap-2 transition"
                   >
                     <Sparkles className="w-4 h-4 text-saudi-green-950" />
                     <span>{t('جرّب التخطيط بالذكاء الاصطناعي مجاناً')}</span>
@@ -447,13 +436,10 @@ export default function HomePage() {
 
           {/* 8. Client RFQ Banner (إذا لم يجد ما يبحث عنه) */}
           <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="rounded-3xl p-6 sm:p-10 bg-gradient-to-r from-saudi-sand-200 via-white to-saudi-sand-200 border border-saudi-gold-400/40 shadow-card flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="rounded-3xl p-6 sm:p-10 bg-saudi-sand-200 border border-saudi-gold-400/40 flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="space-y-2 text-right">
-                <span className="text-xs font-bold text-saudi-gold-700 uppercase tracking-wider block">
-                  {t('عروض أسعار خاصة بمناسبتك')}
-                </span>
                 <h3 className="text-2xl font-black font-cairo text-saudi-green-950">
-                  {t('عندك متطلبات خاصة؟ اطلب عرض سعر 💬')}
+                  {t('عندك متطلبات خاصة؟ اطلب عرض سعر')}
                 </h3>
                 <p className="text-xs text-gray-600 max-w-xl font-tajawal">
                   {t('أرسل تفاصيل مناسبتك وسيقوم الموردون المعتمدون في منطقتك بتقديم عروض أسعار تنافسية خلال 24 ساعة مع ضمان الالتزام.')}
@@ -461,7 +447,7 @@ export default function HomePage() {
               </div>
               <Link
                 href="/rfq"
-                className="px-6 py-3.5 bg-saudi-green-800 hover:bg-saudi-green-900 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-md transition shrink-0 flex items-center gap-2"
+                className="px-6 py-3.5 bg-saudi-green-800 hover:bg-saudi-green-900 text-white font-bold text-xs sm:text-sm rounded-2xl transition shrink-0 flex items-center gap-2"
               >
                 <span>{t('إنشاء طلب تسعير (RFQ) جديد')}</span>
                 <ChevronLeft className="w-4 h-4" />
