@@ -168,7 +168,7 @@ function PlanWizardContent() {
             <div className="space-y-1">
               <span className="text-xs font-bold text-saudi-gold-600 block uppercase">1. البداية</span>
               <h2 className="text-2xl font-black font-cairo text-saudi-green-950">
-                ما المناسبة التي ترغب في التخطيط لها؟ 🎉
+                ما المناسبة التي ترغب في التخطيط لها؟
               </h2>
               <p className="text-xs text-gray-500">
                 اختر نوع المناسبة وسنقوم بتخصيص كافة الخدمات والمهام المناسبة لها.
@@ -205,7 +205,7 @@ function PlanWizardContent() {
             <div className="space-y-1">
               <span className="text-xs font-bold text-saudi-gold-600 block uppercase">2. المكان والموعد</span>
               <h2 className="text-2xl font-black font-cairo text-saudi-green-950">
-                في أي مدينة؟ ومتى موعد المناسبة؟ 📅
+                في أي مدينة؟ ومتى موعد المناسبة؟
               </h2>
             </div>
 
@@ -266,7 +266,7 @@ function PlanWizardContent() {
             <div className="space-y-1">
               <span className="text-xs font-bold text-saudi-gold-600 block uppercase">3. الضيوف والأقسام</span>
               <h2 className="text-2xl font-black font-cairo text-saudi-green-950">
-                كم عدد الضيوف المتوقع؟ وتوزيع الحضور؟ 👥
+                كم عدد الضيوف المتوقع؟ وتوزيع الحضور؟
               </h2>
             </div>
 
@@ -337,7 +337,7 @@ function PlanWizardContent() {
             <div className="space-y-1">
               <span className="text-xs font-bold text-saudi-gold-600 block uppercase">4. المكان والموقع</span>
               <h2 className="text-2xl font-black font-cairo text-saudi-green-950">
-                أين ستقام المناسبة؟ 🏰
+                أين ستقام المناسبة؟
               </h2>
             </div>
 
@@ -376,7 +376,7 @@ function PlanWizardContent() {
             <div className="space-y-1">
               <span className="text-xs font-bold text-saudi-gold-600 block uppercase">5. الميزانية والمستوى</span>
               <h2 className="text-2xl font-black font-cairo text-saudi-green-950">
-                ما الميزانية التقريبية ومستوى الفخامة؟ 💰
+                ما الميزانية التقريبية ومستوى الفخامة؟
               </h2>
             </div>
 
@@ -440,7 +440,7 @@ function PlanWizardContent() {
             <div className="space-y-1">
               <span className="text-xs font-bold text-saudi-gold-600 block uppercase">6. التجهيزات</span>
               <h2 className="text-2xl font-black font-cairo text-saudi-green-950">
-                ما هي الخدمات والتجهيزات التي تحتاجها؟ 🛍️
+                ما هي الخدمات والتجهيزات التي تحتاجها؟
               </h2>
             </div>
 
@@ -481,7 +481,7 @@ function PlanWizardContent() {
             <div className="space-y-1">
               <span className="text-xs font-bold text-saudi-gold-600 block uppercase">7. الخطة الجاهزة</span>
               <h2 className="text-2xl font-black font-cairo text-saudi-green-950">
-                جاهزون لبناء مساحة عمل مناسبتك! 🚀
+                جاهزون لبناء مساحة عمل مناسبتك!
               </h2>
               <p className="text-xs text-gray-500">
                 راجع ملخص البيانات أدناه واعتمد الخطة للانتقال فوراً لغرفة عمليات المناسبة.

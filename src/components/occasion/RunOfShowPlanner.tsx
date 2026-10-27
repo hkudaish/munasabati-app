@@ -299,7 +299,7 @@ export const RunOfShowPlanner: React.FC<RunOfShowPlannerProps> = ({ occasion }) 
                 )}
                 {item.notes && (
                   <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 mr-auto bg-amber-50 dark:bg-amber-950/40 px-2.5 py-1 rounded-lg">
-                    <span>💡 {item.notes}</span>
+                    <span>{item.notes}</span>
                   </div>
                 )}
               </div>

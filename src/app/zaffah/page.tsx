@@ -130,7 +130,7 @@ const FOLK_GENRES: FolkArtGenre[] = [
     nameAr: 'فن السامري والخماري والحوطي',
     regionAr: 'نجد والقصيم وحائل والشرقية',
     regionKey: 'central',
-    badge: 'طرب شعبي أصيل 🪘',
+    badge: 'طرب شعبي أصيل',
     badgeColor: 'bg-amber-500 text-neutral-950',
     descriptionAr: 'من أعذب الفنون الغنائية النجدية الوجدانية، يعتمد على إيقاعات الدفوف المنسجمة مع الكورال المتبادل والقصائد النبطية الغزلية الرقيقة.',
     historicalSignificanceAr: 'تطور في مدن نجد (عنيزة، حائل، حوطة بني تميم) متوارثاً عبر أجيال العشاق والشعراء في ليالي السمر وجلسات القمراء.',
@@ -149,7 +149,7 @@ const FOLK_GENRES: FolkArtGenre[] = [
     nameAr: 'المزمار والمجس والمجرور الحجازي',
     regionAr: 'مكة المكرمة، جدة، المدينة، والطائف',
     regionKey: 'west',
-    badge: 'تراث إنساني باليونيسكو 🌴',
+    badge: 'تراث إنساني باليونيسكو',
     badgeColor: 'bg-emerald-700 text-white',
     descriptionAr: 'فلكلور الحجاز التراثي الشهير؛ يفتتح بالموال والمجس الترحيبي الحجازي الرخيم، متبوعاً بإيقاعات علبة المزمار والمرجف وأهازيج الشوباش والرقص بالعصي.',
     historicalSignificanceAr: 'رمز كرم وأفراح حارات مكة وجدة التاريخية، يعبر عن البهجة والترحاب الحار بزوار وأهل العرس.',
@@ -168,7 +168,7 @@ const FOLK_GENRES: FolkArtGenre[] = [
     nameAr: 'الفن الخبيتي والينبعاوي والرديح',
     regionAr: 'ينبع والساحل الغربي وجدة',
     regionKey: 'west',
-    badge: 'طرب ساحلي حماسي 🔥',
+    badge: 'طرب ساحلي حماسي',
     badgeColor: 'bg-rose-500 text-white',
     descriptionAr: 'إيقاعات ساحلية سريعة ومبهجة تعتمد على آلة السمسمية التراثية الساحرة، تضفي بهجة استثنائية وحماساً فائقاً على صالات الحفلات.',
     historicalSignificanceAr: 'فنون ارتبطت ببحارة الساحل الغربي وقوافل التجارة، تطورت لتصبح روح الاحتفالات الشبابية الكبرى.',
@@ -187,7 +187,7 @@ const FOLK_GENRES: FolkArtGenre[] = [
     nameAr: 'الخطوة واللعب والعرضة الجنوبية',
     regionAr: 'عسير وأبها والباحة وجازان',
     regionKey: 'south',
-    badge: 'شموخ السراة والجنوب ⛰️',
+    badge: 'شموخ السراة والجنوب',
     badgeColor: 'bg-indigo-600 text-white',
     descriptionAr: 'فن جنوبي ساحر يعتمد على التناغم الحركي الهادئ والخطى المتناسقة مع إيقاعات الزلفة والميجان وأشعار الكرم والترحيب الجنوبية العريقة.',
     historicalSignificanceAr: 'فن أصيل توارثته قبائل عسير وغامد وزهران ورجال الحجر، يعبر عن الانسجام والوقار والتلاحم الجماعي.',
@@ -206,7 +206,7 @@ const FOLK_GENRES: FolkArtGenre[] = [
     nameAr: 'فن الدحة الشمالية والهجيني',
     regionAr: 'تبوك والجوف والحدود الشمالية وحائل',
     regionKey: 'north',
-    badge: 'هدير الفرسان وعزوة الشمال 🦅',
+    badge: 'هدير الفرسان وعزوة الشمال',
     badgeColor: 'bg-stone-700 text-amber-300',
     descriptionAr: 'هدير الفرسان وزئير الحماسة؛ صفوف متلاحمة تصفق صفقات متناغمة (القصعة) مع أصوات الكورال والقصائد الحماسية وعزف الربابة التراثي.',
     historicalSignificanceAr: 'كانت تؤدى بعد معارك الدفاع عن الديار لإرهاب الأعداء وإعلان الظفر، وأصبحت اليوم مظهر الفخر والاحتفال بالكرامة.',
@@ -225,7 +225,7 @@ const FOLK_GENRES: FolkArtGenre[] = [
     nameAr: 'فن القزوعي والزامل النجراني',
     regionAr: 'نجران وظهران الجنوب وشرورة',
     regionKey: 'south',
-    badge: 'حماسة ووقار الفرسان 🗡️',
+    badge: 'حماسة ووقار الفرسان',
     badgeColor: 'bg-yellow-700 text-white',
     descriptionAr: 'فن حماسي مهيب يعتمد على دوي الأقدام والرزفة المتناسقة مع لمعان الجنابي النجرانية والقصائد النبطية الفصيحة في الكرم والشجاعة.',
     historicalSignificanceAr: 'رمز التحالفات القبلية واستقبال وفود الأعراس عند مداخل القرى، معبرة عن أعلى درجات الحفاوة والإجلال.',
@@ -244,7 +244,7 @@ const FOLK_GENRES: FolkArtGenre[] = [
     nameAr: 'الفنون البحرية والليوة والصوت الحساوي',
     regionAr: 'الأحساء والدمام والخبر والجبيل',
     regionKey: 'east',
-    badge: 'سحر واحة الأحساء وبحر الخليج 🌊',
+    badge: 'سحر واحة الأحساء وبحر الخليج',
     badgeColor: 'bg-cyan-700 text-white',
     descriptionAr: 'مزيج فريد بين فنون واحة الأحساء وأهازيج نهامي البحر، مع إيقاعات طبل الليوة ورقصة الفريسة الشعبية والصوت الحساوي الأصيل.',
     historicalSignificanceAr: 'تراث غني يجمع بين تراث مزارعي النخيل وغواصي اللؤلؤ في الخليج العربي، يتميز بالحيوية والألحان الشجية.',
@@ -263,7 +263,7 @@ const FOLK_GENRES: FolkArtGenre[] = [
     nameAr: 'الرفيحي والسامري العلاوي',
     regionAr: 'العلا وتبوك والوجه وضباء',
     regionKey: 'north',
-    badge: 'عبق الآثار وألحان العلا 🏜️',
+    badge: 'عبق الآثار وألحان العلا',
     badgeColor: 'bg-amber-700 text-white',
     descriptionAr: 'فن شعبي سريع ورشيق يتميز بالتصفيق السريع المتلاحق والخطوات الراقصة الخفيفة مع أبيات شعرية عذبة تتغنى بجمال جبال وتراث العلا.',
     historicalSignificanceAr: 'تراث أصيل بين بوادي وحواضر شمال الحجاز ووادي القرى، يحمل خفة الروح والبهجة التلقائية.',
@@ -282,7 +282,7 @@ const FOLK_GENRES: FolkArtGenre[] = [
     nameAr: 'الزفات الملكية والكورال الأوركسترالي',
     regionAr: 'كافة مدن المملكة (الرياض، جدة، الشرقية)',
     regionKey: 'central',
-    badge: 'اللحظة الأيقونية الفخمة 👑',
+    badge: 'اللحظة الأيقونية الفخمة',
     badgeColor: 'bg-purple-600 text-white',
     descriptionAr: 'إنتاج موسيقي أوركسترالي متكامل مخصص لزفة العروسين بأسمائهما مع آلات حية، توزيع سينمائي، ومؤثرات صوتية وضوئية فائقة الدقة.',
     historicalSignificanceAr: 'تطور فني حديث يدمج بين الشعر النبطي والأوركسترا العالمية لخلق لحظة أسطورية لا تُنسى في صالات الأفراح.',
@@ -301,7 +301,7 @@ const FOLK_GENRES: FolkArtGenre[] = [
     nameAr: 'فرق الدفوف والزفات النسائية الإسلامية VIP',
     regionAr: 'الرياض وجدة والدمام ومكة',
     regionKey: 'womens',
-    badge: 'طرب نسائي خاص 100% 🪘',
+    badge: 'طرب نسائي خاص 100%',
     badgeColor: 'bg-pink-600 text-white',
     descriptionAr: 'فرق نسائية محترفة ومعتمدة لإحياء ليالي الأعراس النسائية بطرب راقٍ وأصيل بالدفوف الصافية الخالية من أي شبهة أو آلات ممنوعة وبخصوصية تامة.',
     historicalSignificanceAr: 'تراث أصيل لزواجات النساء السعودية، يحافظ على الخصوصية الكاملة مع تقديم أجمل أغاني الزفات والشيلات الحماسية.',
@@ -1218,7 +1218,7 @@ export default function ZaffahPage() {
                         : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white'
                     }`}
                   >
-                    <span>🎭 ألوان الفنون التراثية</span>
+                    <span>ألوان الفنون التراثية</span>
                     <span className="text-caption2 px-1.5 py-0.5 rounded-full bg-neutral-200 dark:bg-neutral-700 font-bold">
                       {FOLK_GENRES.length}
                     </span>
@@ -1232,7 +1232,7 @@ export default function ZaffahPage() {
                         : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white'
                     }`}
                   >
-                    <span>👥 الفرق الشعبية المعتمدة للحجز</span>
+                    <span>الفرق الشعبية المعتمدة للحجز</span>
                     <span className="text-caption2 px-1.5 py-0.5 rounded-full bg-white/20 text-white font-bold">
                       {FOLK_TROUPES.length}
                     </span>
@@ -1279,12 +1279,12 @@ export default function ZaffahPage() {
                 <span className="text-xs font-bold text-neutral-400 pl-2 shrink-0">تصفية حسب المنطقة:</span>
                 {[
                   { id: 'all', label: 'كافة المناطق 🇸🇦' },
-                  { id: 'central', label: 'نجد والوسطى 🏛️' },
-                  { id: 'west', label: 'الحجاز والغربية 🌴' },
-                  { id: 'south', label: 'عسير والجنوب ⛰️' },
-                  { id: 'east', label: 'الأحساء والشرقية 🌊' },
-                  { id: 'north', label: 'تبوك والشمال 🦅' },
-                  { id: 'womens', label: 'الدفوف والزفات النسائية 👑' },
+                  { id: 'central', label: 'نجد والوسطى' },
+                  { id: 'west', label: 'الحجاز والغربية' },
+                  { id: 'south', label: 'عسير والجنوب' },
+                  { id: 'east', label: 'الأحساء والشرقية' },
+                  { id: 'north', label: 'تبوك والشمال' },
+                  { id: 'womens', label: 'الدفوف والزفات النسائية' },
                 ].map((region) => (
                   <button
                     key={region.id}
@@ -1356,7 +1356,7 @@ export default function ZaffahPage() {
 
                           {/* Historical Significance Pill */}
                           <div className="p-2.5 rounded-xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-800/40 text-xs text-amber-900 dark:text-amber-300 leading-relaxed">
-                            <span className="font-bold ml-1">📜 الأصل التاريخي:</span>
+                            <span className="font-bold ml-1">الأصل التاريخي:</span>
                             {genre.historicalSignificanceAr}
                           </div>
 
@@ -1409,7 +1409,7 @@ export default function ZaffahPage() {
                                   key={idx}
                                   className="text-caption2 px-2 py-0.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300"
                                 >
-                                  🥁 {inst}
+                                  {inst}
                                 </span>
                               ))}
                             </div>
@@ -1417,7 +1417,7 @@ export default function ZaffahPage() {
 
                           {/* Dress Code Tag */}
                           <div className="text-xs text-neutral-500 dark:text-neutral-400 bg-neutral-50 dark:bg-neutral-800/40 p-2 rounded-xl">
-                            <span className="font-bold text-neutral-700 dark:text-neutral-300 ml-1">👗 الزي التراثي:</span>
+                            <span className="font-bold text-neutral-700 dark:text-neutral-300 ml-1">الزي التراثي:</span>
                             {genre.dressCodeAr}
                           </div>
                         </div>
@@ -1684,10 +1684,10 @@ export default function ZaffahPage() {
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     {[
-                      { id: 'royal', label: '👑 زفة ملكية فخمة', desc: 'أوركسترا وهيبة' },
+                      { id: 'royal', label: 'زفة ملكية فخمة', desc: 'أوركسترا وهيبة' },
                       { id: 'traditional', label: '🇸🇦 أهزوجة وعرضة تراثية', desc: 'طابع شعبي أصيل' },
-                      { id: 'poetic', label: '💫 قصيدة رومانسية راقية', desc: 'أبيات شعرية عذبة' },
-                      { id: 'modern', label: '✨ لحن عصري سريع', desc: 'حماسي وشبابي' },
+                      { id: 'poetic', label: 'قصيدة رومانسية راقية', desc: 'أبيات شعرية عذبة' },
+                      { id: 'modern', label: 'لحن عصري سريع', desc: 'حماسي وشبابي' },
                     ].map((style) => (
                       <button
                         key={style.id}
@@ -1721,9 +1721,6 @@ export default function ZaffahPage() {
             <div className="lg:col-span-6 bg-gradient-to-br from-neutral-900 via-neutral-950 to-black text-white p-6 sm:p-8 rounded-3xl border border-amber-500/30 shadow-2xl space-y-6 relative overflow-hidden">
               <div className="flex items-center justify-between border-b border-neutral-800 pb-4">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
-                    📜
-                  </div>
                   <h4 className="font-bold text-sm text-neutral-200">
                     مخطوطة نص الزفة المخصص
                   </h4>

@@ -1242,7 +1242,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       };
     }
     setAppliedCoupon(found);
-    return { success: true, messageAr: `تم تفعيل كود الخصم: ${found.descriptionAr} بنجاح! 🎉` };
+    return { success: true, messageAr: `تم تفعيل كود الخصم: ${found.descriptionAr} بنجاح!` };
   };
 
   const removeCoupon = () => {

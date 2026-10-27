@@ -37,7 +37,7 @@ export default function RFQHubPage() {
             <span>نظام طلب ومقارنة عروض الأسعار الموحد</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black font-cairo text-saudi-green-950">
-            عروض الأسعار (RFQ Comparison Matrix) 📊
+            عروض الأسعار (RFQ Comparison Matrix)
           </h1>
           <p className="text-xs text-gray-500 max-w-2xl font-tajawal">
             لا داعي لمقارنة ملفات PDF العشوائية يدوياً؛ استقبل عروض أسعار موحدة ومفصلة وقارنها جنباً إلى جنب واقبل العرض الأنسب بضغطة واحدة.

@@ -561,7 +561,7 @@ export default function UserOnboardingModal() {
                     <span>{tr('جاري إنشاء الحساب...')}</span>
                   ) : (
                     <>
-                      <span>{tr('إنشاء الحساب وبدء التخطيط 🚀')}</span>
+                      <span>{tr('إنشاء الحساب وبدء التخطيط')}</span>
                       <ChevronLeft className="w-4 h-4" />
                     </>
                   )}
@@ -811,7 +811,7 @@ export default function UserOnboardingModal() {
 
               <div>
                 <h3 className="text-xl font-black font-cairo text-gray-900">
-                  {tr('مرحباً بك،')} {successInfo?.name}! 🎉
+                  {tr('مرحباً بك،')} {successInfo?.name}!
                 </h3>
                 <p className="text-xs sm:text-sm text-gray-600 mt-1 max-w-md mx-auto">
                   {successInfo?.role === 'vendor'

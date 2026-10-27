@@ -107,7 +107,7 @@ export default function VendorProfilePage() {
       notes: 'أضيف من صفحة المورد المعتمد',
     });
 
-    setToastMessage(`تمت إضافة "${service.titleAr}" إلى سلتك! 🛍️`);
+    setToastMessage(`تمت إضافة "${service.titleAr}" إلى سلتك!`);
     setTimeout(() => setToastMessage(null), 3500);
 
     try {
@@ -274,7 +274,7 @@ export default function VendorProfilePage() {
                 key={idx}
                 className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-saudi-gold-100 text-saudi-gold-900 text-xs font-bold border border-saudi-gold-300"
               >
-                ✨ {badge}
+                {badge}
               </span>
             ))}
           </div>
@@ -285,7 +285,7 @@ export default function VendorProfilePage() {
           <div className="bg-white p-4 rounded-2xl border border-saudi-sand-300 shadow-sm text-center">
             <span className="text-xs text-gray-500 block">نسبة الالتزام بالموعد</span>
             <span className="text-xl font-black font-cairo text-saudi-green-950 block mt-1">
-              {vendor.metrics.onTimeRate}% ⏱️
+              {vendor.metrics.onTimeRate}%
             </span>
             <span className="text-caption2 text-emerald-700 font-bold">دقة عالية بالمواعيد</span>
           </div>
@@ -293,7 +293,7 @@ export default function VendorProfilePage() {
           <div className="bg-white p-4 rounded-2xl border border-saudi-sand-300 shadow-sm text-center">
             <span className="text-xs text-gray-500 block">معدل رضا العملاء</span>
             <span className="text-xl font-black font-cairo text-saudi-gold-700 block mt-1">
-              {vendor.metrics.satisfactionRate}% ⭐
+              {vendor.metrics.satisfactionRate}%
             </span>
             <span className="text-caption2 text-saudi-gold-800 font-bold">مراجعات ممتازة</span>
           </div>
@@ -301,7 +301,7 @@ export default function VendorProfilePage() {
           <div className="bg-white p-4 rounded-2xl border border-saudi-sand-300 shadow-sm text-center">
             <span className="text-xs text-gray-500 block">العملاء المتكررون</span>
             <span className="text-xl font-black font-cairo text-saudi-green-950 block mt-1">
-              {vendor.metrics.repeatCustomerRate}% 🔄
+              {vendor.metrics.repeatCustomerRate}%
             </span>
             <span className="text-caption2 text-gray-500">ولاء وثقة عالية</span>
           </div>
@@ -309,7 +309,7 @@ export default function VendorProfilePage() {
           <div className="bg-white p-4 rounded-2xl border border-saudi-sand-300 shadow-sm text-center">
             <span className="text-xs text-gray-500 block">سرعة الرد</span>
             <span className="text-xl font-black font-cairo text-saudi-green-950 block mt-1">
-              {vendor.metrics.responseTimeMinutes} دقيقة ⚡
+              {vendor.metrics.responseTimeMinutes} دقيقة
             </span>
             <span className="text-caption2 text-emerald-700 font-bold">تجاوب فوري</span>
           </div>

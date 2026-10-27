@@ -29,7 +29,7 @@ export default function InspirationPage() {
           <span>معرض الإلهام والتصاميم السعودية</span>
         </div>
         <h1 className="text-2xl sm:text-3xl font-black font-cairo text-saudi-green-950">
-          إلهام المناسبات (Inspiration Feed) ✨
+          إلهام المناسبات (Inspiration Feed)
         </h1>
         <p className="text-xs text-gray-500 max-w-2xl font-tajawal">
           استلهم أفكاراً واقعية لحفلات التخرج، الأعراس، عقد القران، واستقبال المواليد مع ربط مباشر بالموردين المسؤولين عن كل تفصيلة.

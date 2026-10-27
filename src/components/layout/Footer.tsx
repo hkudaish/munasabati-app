@@ -115,11 +115,11 @@ export default function Footer() {
           <div>
             <h4 className="text-sm font-bold text-saudi-gold-400 mb-3">{t('المنصة والخدمات')}</h4>
             <ul className="space-y-2 text-xs text-gray-300">
-              <li><Link href="/calculator" className="hover:text-saudi-gold-300 font-bold text-saudi-gold-200">{t('🧮 حاسبة ميزانية المناسبات')}</Link></li>
-              <li><Link href="/zaffah" className="hover:text-saudi-gold-300 font-bold text-saudi-gold-200">{t('🎵 الزفات والفنون الشعبية')}</Link></li>
-              <li><Link href="/bookings" className="hover:text-saudi-gold-300">{t('🧾 حجوزاتي وفواتيري ZATCA')}</Link></li>
-              <li><Link href="/vendor" className="hover:text-saudi-gold-300">{t('💼 بوابة مزودي الخدمات')}</Link></li>
-              <li><Link href="/admin" className="hover:text-saudi-gold-300">{t('⚙️ لوحة الإدارة العامة')}</Link></li>
+              <li><Link href="/calculator" className="hover:text-saudi-gold-300 font-bold text-saudi-gold-200">{t('حاسبة ميزانية المناسبات')}</Link></li>
+              <li><Link href="/zaffah" className="hover:text-saudi-gold-300 font-bold text-saudi-gold-200">{t('الزفات والفنون الشعبية')}</Link></li>
+              <li><Link href="/bookings" className="hover:text-saudi-gold-300">{t('حجوزاتي وفواتيري ZATCA')}</Link></li>
+              <li><Link href="/vendor" className="hover:text-saudi-gold-300">{t('بوابة مزودي الخدمات')}</Link></li>
+              <li><Link href="/admin" className="hover:text-saudi-gold-300">{t('لوحة الإدارة العامة')}</Link></li>
               <li><Link href="/rfq" className="hover:text-saudi-gold-300">{t('طلب عروض أسعار (RFQ)')}</Link></li>
               <li><Link href="/inspiration" className="hover:text-saudi-gold-300">{t('معرض الإلهام')}</Link></li>
               <li><Link href="/scan" className="hover:text-saudi-gold-300">{t('ماسح كود QR للدخول')}</Link></li>

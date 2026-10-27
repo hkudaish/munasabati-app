@@ -148,7 +148,7 @@ export default function OccasionWorkspacePage() {
             <div className="space-y-0.5 text-xs">
               <span className="text-saudi-gold-300 font-bold block">جاهزية المناسبة</span>
               <span className="text-gray-300 block text-xs">
-                {daysRemaining > 0 ? `متبقي ${daysRemaining} يوماً على الموعد` : 'موعد المناسبة اليوم! 🎉'}
+                {daysRemaining > 0 ? `متبقي ${daysRemaining} يوماً على الموعد` : 'موعد المناسبة اليوم!'}
               </span>
             </div>
           </div>
@@ -186,7 +186,7 @@ export default function OccasionWorkspacePage() {
             className="bg-saudi-green-900/90 hover:bg-saudi-green-950 text-saudi-gold-300 border border-saudi-gold-400/40 px-4 py-2 rounded-xl font-bold flex items-center gap-1.5 transition shadow-sm mr-auto"
           >
             <Sparkles className="w-3.5 h-3.5 text-saudi-gold-400" />
-            <span>شاشة استقبال الضيوف (TV Screen) 📺</span>
+            <span>شاشة استقبال الضيوف (TV Screen)</span>
           </Link>
         </div>
       </div>
@@ -286,7 +286,7 @@ export default function OccasionWorkspacePage() {
           }`}
         >
           <Gift className="w-4 h-4 text-saudi-gold-600" />
-          <span>العانية والرفد 🎁</span>
+          <span>العانية والرفد</span>
         </button>
 
         <button

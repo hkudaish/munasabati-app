@@ -85,7 +85,7 @@ export default function ComparePage() {
       notes: 'أضيف عبر المقارنة المباشرة',
     });
 
-    setToastMessage(`تمت إضافة خدمة "${srv.titleAr}" إلى سلتك! 🛍️`);
+    setToastMessage(`تمت إضافة خدمة "${srv.titleAr}" إلى سلتك!`);
     setTimeout(() => setToastMessage(null), 3500);
 
     try {
@@ -226,17 +226,17 @@ export default function ComparePage() {
                     <div className="flex flex-wrap justify-center gap-1.5">
                       {isLowestPrice && (
                         <span className="bg-emerald-100 text-emerald-800 text-caption2 font-bold px-2 py-0.5 rounded-full border border-emerald-300">
-                          الأقل سعراً 💰
+                          الأقل سعراً
                         </span>
                       )}
                       {isHighestRating && (
                         <span className="bg-saudi-gold-100 text-saudi-gold-900 text-caption2 font-bold px-2 py-0.5 rounded-full border border-saudi-gold-400">
-                          الأعلى تقييماً ⭐
+                          الأعلى تقييماً
                         </span>
                       )}
                       {isFastest && (
                         <span className="bg-blue-100 text-blue-800 text-caption2 font-bold px-2 py-0.5 rounded-full border border-blue-300">
-                          الأسرع تجاوباً ⚡
+                          الأسرع تجاوباً
                         </span>
                       )}
                       {vendor.verified && (

@@ -487,10 +487,10 @@ export default function CartPage() {
 
               <div className="text-center space-y-1 pt-1">
                 <span className="text-caption2 text-gray-500 block">
-                  🔒 دفع إلكتروني آمن معتمد من البنك المركزي السعودي (SAMA)
+                  دفع إلكتروني آمن معتمد من البنك المركزي السعودي (SAMA)
                 </span>
                 <span className="text-caption2 text-saudi-green-800 font-bold block">
-                  🛡️ عقد إلكتروني موحد يضمن حقوق الطرفين وسياسة إلغاء مرنة
+                  عقد إلكتروني موحد يضمن حقوق الطرفين وسياسة إلغاء مرنة
                 </span>
               </div>
             </div>

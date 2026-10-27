@@ -38,7 +38,7 @@ export default function PackageCard({ pkg, onBookPackage }: PackageCardProps) {
             {t(currentPackage.badge)}
           </span>
           <span className="bg-saudi-green-900/90 backdrop-blur-md text-white text-xs font-bold px-2.5 py-0.5 rounded-full border border-saudi-gold-400/40">
-            {t('توفير')} {formatSAR(currentPackage.savings)} 🔥
+            {t('توفير')} {formatSAR(currentPackage.savings)}
           </span>
         </div>
 

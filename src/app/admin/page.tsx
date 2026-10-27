@@ -937,7 +937,7 @@ function AdminDashboardContent() {
                         </span>
                       ) : (
                         <span className="bg-amber-100 text-amber-800 text-caption2 font-bold px-2 py-0.5 rounded-full">
-                          محتجز في الضمان 🛡️
+                          محتجز في الضمان
                         </span>
                       )}
                     </div>
@@ -962,7 +962,7 @@ function AdminDashboardContent() {
                         className="px-4 py-2 bg-saudi-green-800 hover:bg-saudi-green-900 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-sm transition"
                       >
                         <DollarSign className="w-3.5 h-3.5 text-saudi-gold-300" />
-                        <span>تحرير المستحقات ⚡</span>
+                        <span>تحرير المستحقات</span>
                       </button>
                     ) : (
                       <span className="text-xs font-bold text-emerald-700 flex items-center gap-1">
@@ -1015,9 +1015,9 @@ function AdminDashboardContent() {
                   </h5>
 
                   <div className="text-xs text-gray-600 space-y-1">
-                    <p>📍 {occ.cityNameAr} ({occ.neighborhood}) • 📅 {occ.date}</p>
-                    <p>👥 عدد الضيوف: <strong>{occ.guestCount} ضيف</strong></p>
-                    <p>💰 الميزانية المقدرة: <strong className="text-saudi-green-900">{formatSAR(occ.budget)}</strong></p>
+                    <p>{occ.cityNameAr} ({occ.neighborhood}) • {occ.date}</p>
+                    <p>عدد الضيوف: <strong>{occ.guestCount} ضيف</strong></p>
+                    <p>الميزانية المقدرة: <strong className="text-saudi-green-900">{formatSAR(occ.budget)}</strong></p>
                   </div>
 
                   <Link
@@ -1459,7 +1459,7 @@ function AdminDashboardContent() {
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl border border-saudi-sand-300">
             <div className="flex items-center justify-between border-b border-gray-100 pb-3">
               <h4 className="text-base font-bold text-saudi-green-950 font-cairo" id="dlg-5557-2">
-                إضافة خدمة جديدة لسوق المناسبات 🛍️
+                إضافة خدمة جديدة لسوق المناسبات
               </h4>
               <button onClick={() => setIsAddServiceOpen(false)} className="text-gray-500 hover:text-gray-600">
                 ✕

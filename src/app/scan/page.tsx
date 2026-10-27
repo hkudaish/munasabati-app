@@ -51,7 +51,7 @@ export default function GateScannerPage() {
         tableName: matchedGuest.tableName || 'طاولة عامة',
         companionCount: matchedGuest.companionCount,
         category: matchedGuest.category === 'women' ? 'قسم النساء' : 'قسم الرجال',
-        message: 'تم التحقق من الرمز وتسجيل الحضور بنجاح! حياك الله 🎉',
+        message: 'تم التحقق من الرمز وتسجيل الحضور بنجاح! حياك الله',
       });
 
       try {
@@ -82,7 +82,7 @@ export default function GateScannerPage() {
           <span>بوابة الدخول ومسح رمز الـ QR</span>
         </div>
         <h1 className="text-2xl sm:text-3xl font-black font-cairo text-saudi-green-950">
-          قارئ بطاقات دخول المناسبة 📱
+          قارئ بطاقات دخول المناسبة
         </h1>
         <p className="text-xs text-gray-500">
           مسح بطاقات الـ QR لتسجيل حضور الضيوف فوراً وتوجيههم إلى طاولاتهم المخصصة.
@@ -95,7 +95,7 @@ export default function GateScannerPage() {
             className="inline-flex items-center gap-2 py-2 px-4 bg-saudi-green-900 hover:bg-saudi-green-950 text-saudi-gold-300 font-bold rounded-2xl text-xs border border-saudi-gold-400/40 shadow-sm transition"
           >
             <Monitor className="w-3.5 h-3.5 text-saudi-gold-400" />
-            <span>عرض شاشة الترحيب بالقاعة (TV Reception Screen) 📺</span>
+            <span>عرض شاشة الترحيب بالقاعة (TV Reception Screen)</span>
           </Link>
         </div>
       </div>
@@ -153,7 +153,7 @@ export default function GateScannerPage() {
           {/* Quick Demo QR buttons */}
           <div className="space-y-1 text-right">
             <span className="text-caption2 text-saudi-gold-300 font-bold block">
-              💡 اضغط لتجربة فحص بطاقات المدعوين التجريبية:
+              اضغط لتجربة فحص بطاقات المدعوين التجريبية:
             </span>
             <div className="flex flex-wrap gap-1.5">
               {occasionGuests.slice(0, 3).map((g) => (

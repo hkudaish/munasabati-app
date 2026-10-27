@@ -347,7 +347,7 @@ export default function LumaAIDrawer() {
             notes: 'أضيف عبر مساعد لُـمى الذكي',
           });
 
-          setAddedItemNotification(`تمت إضافة "${srv.titleAr}" إلى سلتك بنجاح! 🛍️`);
+          setAddedItemNotification(`تمت إضافة "${srv.titleAr}" إلى سلتك بنجاح!`);
           setTimeout(() => setAddedItemNotification(null), 4000);
 
           try {
@@ -650,7 +650,7 @@ export default function LumaAIDrawer() {
       notes: 'أضيف عبر بطاقة ترشيح لُـمى الذكية',
     });
 
-    setAddedItemNotification(`تمت إضافة "${srv.titleAr}" إلى سلتك! 🛍️`);
+    setAddedItemNotification(`تمت إضافة "${srv.titleAr}" إلى سلتك!`);
     setTimeout(() => setAddedItemNotification(null), 3500);
 
     try {
@@ -986,7 +986,7 @@ export default function LumaAIDrawer() {
             <div className="space-y-4">
               <div className="bg-white p-4 rounded-2xl border border-saudi-sand-300 space-y-2">
                 <span className="text-xs font-bold text-gray-700 block">
-                  💡 أمثلة لتخطيط مناسبتك مع لُـمى:
+                  أمثلة لتخطيط مناسبتك مع لُـمى:
                 </span>
                 <div className="flex flex-wrap gap-2">
                   {plannerPrompts.map((p, idx) => (

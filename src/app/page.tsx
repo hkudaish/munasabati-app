@@ -399,11 +399,6 @@ export default function HomePage() {
           <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="bg-saudi-green-900 rounded-3xl p-6 sm:p-10 text-white relative overflow-hidden border border-saudi-gold-500/30">
               <div className="relative z-10 max-w-2xl space-y-4">
-                <div className="inline-flex items-center gap-1.5 bg-saudi-gold-500/20 text-saudi-gold-300 px-3 py-1 rounded-full text-xs font-bold border border-saudi-gold-400/30">
-                  <Sparkles className="w-3.5 h-3.5 text-saudi-gold-400" />
-                  <span>{t('المساعد الذكي:')} {adminConfig.aiAssistantNameAr}</span>
-                </div>
-
                 <h3 className="text-2xl sm:text-3xl font-black font-cairo text-white">
                   {t('لا تشيل هم الترتيب وتوزيع الميزانية!')}
                 </h3>
@@ -475,7 +470,7 @@ export default function HomePage() {
 
               <div className="max-w-3xl space-y-3">
                 <h1 className="text-3xl sm:text-4xl font-black font-cairo leading-tight text-white">
-                  {t('مرحباً بك في مركز نمو أعمالك ومبيعاتك 📈')}
+                  {t('مرحباً بك في مركز نمو أعمالك ومبيعاتك')}
                 </h1>
                 <p className="text-sm text-gray-300 leading-relaxed font-tajawal">
                   {t('راقب طلبات الحجز المباشرة، نافس وقدم عروض الأسعار على طلبات RFQ، حدّث أسعار خدماتك وباقاتك، واستفد من نظام الدفع المضمون والضمان البنكي.')}
@@ -574,7 +569,7 @@ export default function HomePage() {
                   {t('فرص أعمال جديدة لموردين معتمدين')}
                 </span>
                 <h2 className="text-2xl sm:text-3xl font-black font-cairo text-saudi-green-950">
-                  {t('طلبات التسعير المتاحة للمزايدة (Live RFQs) 💬')}
+                  {t('طلبات التسعير المتاحة للمزايدة (Live RFQs)')}
                 </h2>
                 <p className="text-xs text-gray-500 mt-1">
                   {t('طلبات مباشرة من أصحاب مناسبات يبحثون عن موردين لتنفيذ خدماتهم. قدم عرضك التنافسي الآن!')}
@@ -653,7 +648,7 @@ export default function HomePage() {
                   {t('كتالوج الخدمات والأسعار')}
                 </span>
                 <h2 className="text-2xl sm:text-3xl font-black font-cairo text-saudi-green-950">
-                  {t('خدماتك المعروضة في المنصة 🏪')}
+                  {t('خدماتك المعروضة في المنصة')}
                 </h2>
                 <p className="text-xs text-gray-500 mt-1">
                   {t('يمكنك استعراض خدماتك المعروضة أو مقارنة أسعار الخدمات المماثلة في')} {pick(activeCityObj.nameAr, activeCityObj.nameEn)}.
@@ -743,7 +738,7 @@ export default function HomePage() {
                   <span>{t('مزايا المورد المعتمد في منصة مناسبتي')}</span>
                 </span>
                 <h3 className="text-2xl sm:text-3xl font-black font-cairo text-white">
-                  {t('احصل على شارة التوثيق الذهبية وضاعف مبيعاتك 🛡️')}
+                  {t('احصل على شارة التوثيق الذهبية وضاعف مبيعاتك')}
                 </h3>
                 <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-tajawal">
                   {t('منشأتك الموثقة بالسجل التجاري أو وثيقة العمل الحر تظهر في أعلى نتائج البحث والترشيحات الذكية للعملاء. جميع الحجوزات مدفوعة ومؤمنة في حساب ضمان المنصة قبل موعد المناسبة.')}
@@ -786,7 +781,7 @@ export default function HomePage() {
 
               <div className="max-w-3xl space-y-3">
                 <h1 className="text-3xl sm:text-4xl font-black font-cairo leading-tight text-white">
-                  {t('مركز الرقابة العامة والعمليات التشغيلية 🛡️')}
+                  {t('مركز الرقابة العامة والعمليات التشغيلية')}
                 </h1>
                 <p className="text-sm text-gray-300 leading-relaxed font-tajawal">
                   {t('مراقبة فورية لتدفق الحجوزات في كافة المدن، تدقيق واعتماد الموردين الجدد، متابعة التحويلات المالية في حساب الضمان، وضمان جودة الخدمات المقدمة لأصحاب المناسبات.')}
@@ -902,7 +897,7 @@ export default function HomePage() {
                   {t('إجراءات المشرف الفورية')}
                 </span>
                 <h2 className="text-2xl sm:text-3xl font-black font-cairo text-saudi-green-950">
-                  {t('طلبات اعتماد وتوثيق الموردين (')}{pendingVendors.length}) 📑
+                  {t('طلبات اعتماد وتوثيق الموردين (')}{pendingVendors.length})
                 </h2>
                 <p className="text-xs text-gray-500 mt-1">
                   {t('قم بمراجعة السجلات التجارية ووثائق العمل الحر واعتماد الموردين ليظهروا في سوق المنصة.')}
@@ -980,7 +975,7 @@ export default function HomePage() {
                   {t('سجل التدفقات المالية')}
                 </span>
                 <h2 className="text-2xl sm:text-3xl font-black font-cairo text-saudi-green-950">
-                  {t('أحدث الحجوزات والعمليات المالية المبرمة 💳')}
+                  {t('أحدث الحجوزات والعمليات المالية المبرمة')}
                 </h2>
                 <p className="text-xs text-gray-500 mt-1">
                   {t('متابعة أموال الضمان وعربون الحجز ونسب عمولة المنصة (10%).')}
@@ -1050,7 +1045,7 @@ export default function HomePage() {
             <div className="bg-saudi-sand-100 border border-saudi-gold-400/30 rounded-2xl p-6 shadow-card flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="space-y-1 text-right">
                 <h4 className="font-bold text-base text-saudi-green-950 font-cairo">
-                  {t('أداة فحص ومعاينة تجربة المستخدمين (Persona Simulator) 🎭')}
+                  {t('أداة فحص ومعاينة تجربة المستخدمين (Persona Simulator)')}
                 </h4>
                 <p className="text-xs text-gray-600 font-tajawal">
                   {t('بصفتك مديراً للنظام، يمكنك تجربة المنصة كما يراها العميل أو المورد دون الحاجة لتسجيل الخروج.')}

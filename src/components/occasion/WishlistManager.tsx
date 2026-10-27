@@ -99,7 +99,7 @@ export default function WishlistManager() {
                 {gift.isFulfilled && (
                   <div className="absolute inset-0 bg-saudi-green-950/70 backdrop-blur-xs flex flex-col items-center justify-center text-white">
                     <CheckCircle2 className="w-8 h-8 text-saudi-gold-400 mb-1" />
-                    <span className="text-xs font-bold">تم الإهداء بالكامل! ✨</span>
+                    <span className="text-xs font-bold">تم الإهداء بالكامل!</span>
                     {gift.giftedBy && (
                       <span className="text-xs text-saudi-gold-200 mt-0.5">من: {gift.giftedBy}</span>
                     )}
@@ -232,7 +232,7 @@ export default function WishlistManager() {
         <div role="dialog" aria-modal="true" aria-labelledby="dlg-5650-2" className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fadeIn">
           <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4">
             <h4 className="text-base font-bold text-gray-900 font-cairo" id="dlg-5650-2">
-              المساهمة في إهداء المناسبة 🎁
+              المساهمة في إهداء المناسبة
             </h4>
             <p className="text-xs text-gray-500">
               أنت تساهم في: <span className="font-bold text-gray-800">{contributeModalGift.title}</span>

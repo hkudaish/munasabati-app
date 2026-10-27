@@ -185,11 +185,11 @@ function NavbarContent() {
                       <p className="text-xs text-gray-500">{currentUser.phone || currentUser.email}</p>
                       <div className="mt-1.5 flex items-center gap-1">
                         <span className="text-caption2 font-bold px-2 py-0.5 rounded-full bg-saudi-sand-100 text-saudi-green-900">
-                          {currentUser.hasSystemAccess ? t('🛡️ مدير النظام') : currentUser.role === 'admin'
-                            ? t('🛡️ حساب إداري')
+                          {currentUser.hasSystemAccess ? t('مدير النظام') : currentUser.role === 'admin'
+                            ? t('حساب إداري')
                             : currentUser.role === 'vendor'
-                            ? t('🏪 حساب مورد معتمد')
-                            : t('👤 حساب صاحب المناسبة')}
+                            ? t('حساب مورد معتمد')
+                            : t('حساب صاحب المناسبة')}
                         </span>
                       </div>
                     </div>
