@@ -162,7 +162,7 @@ export default function CustomerOrderTrackingPage() {
 
           <button
             onClick={() => setShowLuma(!showLuma)}
-            className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs transition shadow-lg shadow-amber-500/20"
+            className="flex items-center gap-2 bg-amber-500 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs transition shadow-lg shadow-amber-500/20"
           >
             <Sparkles className="w-4 h-4" />
             <span>المساعد لُـمى</span>

@@ -243,7 +243,7 @@ export default function UserOnboardingModal() {
       {/* Modal Card */}
       <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-saudi-sand-300 overflow-hidden max-h-[92vh] flex flex-col">
         {/* Header Ribbon */}
-        <div className="bg-gradient-to-r from-saudi-green-950 via-saudi-green-900 to-saudi-green-950 text-white p-5 sm:p-6 relative">
+        <div className="bg-saudi-green-950 text-white p-5 sm:p-6 relative">
           <button
             onClick={() => {
               setIsOnboardingOpen(false);
@@ -340,7 +340,7 @@ export default function UserOnboardingModal() {
                     setSelectedRoleForOnboarding('client');
                     setStep('customer_form');
                   }}
-                  className="group relative cursor-pointer rounded-2xl border-2 border-saudi-sand-300 hover:border-saudi-green-800 bg-gradient-to-b from-white to-saudi-sand-50/50 p-5 transition duration-200 hover:shadow-xl hover:-translate-y-1 flex flex-col justify-between"
+                  className="group relative cursor-pointer rounded-2xl border-2 border-saudi-sand-300 hover:border-saudi-green-800 bg-white p-5 transition duration-200 hover:shadow-xl hover:-translate-y-1 flex flex-col justify-between"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
@@ -389,7 +389,7 @@ export default function UserOnboardingModal() {
                     setSelectedRoleForOnboarding('vendor');
                     setStep('vendor_form');
                   }}
-                  className="group relative cursor-pointer rounded-2xl border-2 border-saudi-sand-300 hover:border-saudi-gold-600 bg-gradient-to-b from-white to-amber-50/30 p-5 transition duration-200 hover:shadow-xl hover:-translate-y-1 flex flex-col justify-between"
+                  className="group relative cursor-pointer rounded-2xl border-2 border-saudi-sand-300 hover:border-saudi-gold-600 bg-white p-5 transition duration-200 hover:shadow-xl hover:-translate-y-1 flex flex-col justify-between"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
@@ -426,7 +426,7 @@ export default function UserOnboardingModal() {
                     </ul>
                   </div>
 
-                  <button className="mt-5 w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition">
+                  <button className="mt-5 w-full py-2.5 px-4 rounded-xl bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition">
                     <span>{tr('متابعة كمورد معتمد')}</span>
                     <ChevronLeft className="w-4 h-4" />
                   </button>
@@ -720,7 +720,7 @@ export default function UserOnboardingModal() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-bold text-sm shadow-md transition flex items-center justify-center gap-2"
+                  className="w-full py-3.5 px-4 rounded-xl bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-bold text-sm shadow-md transition flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
                     <span>{tr('جاري تسجيل المورد وتفعيل البوابة...')}</span>

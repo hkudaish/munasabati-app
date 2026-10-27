@@ -665,9 +665,9 @@ export default function LumaAIDrawer() {
     <div role="dialog" aria-modal="true" aria-labelledby="dlg-6056-1" className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm animate-fadeIn">
       <div className="w-full max-w-2xl h-full bg-white shadow-2xl flex flex-col overflow-hidden animate-slideUp">
         {/* Header */}
-        <div className="bg-gradient-to-r from-saudi-green-950 via-saudi-green-900 to-saudi-green-800 text-white p-4 sm:p-5 flex items-center justify-between border-b border-saudi-gold-500/30">
+        <div className="bg-saudi-green-950 text-white p-4 sm:p-5 flex items-center justify-between border-b border-saudi-gold-500/30">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-saudi-gold-400 to-saudi-gold-600 text-saudi-green-950 flex items-center justify-center font-black shadow-lg">
+            <div className="w-11 h-11 rounded-2xl bg-saudi-gold-400 text-saudi-green-950 flex items-center justify-center font-black shadow-lg">
               <Sparkles className="w-6 h-6" />
             </div>
             <div>

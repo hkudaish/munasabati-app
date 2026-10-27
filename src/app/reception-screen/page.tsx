@@ -166,7 +166,7 @@ function ReceptionWelcomeScreenContent() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#00261E] via-[#003B2F] to-[#001813] text-white flex flex-col justify-between p-4 sm:p-8 select-none relative overflow-hidden font-tajawal">
+    <div className="min-h-screen bg-[#00261E] text-white flex flex-col justify-between p-4 sm:p-8 select-none relative overflow-hidden font-tajawal">
       
       {/* Background Islamic Geometric / Glow Accents */}
       <div className="absolute -top-40 -left-40 w-96 h-96 bg-saudi-gold-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -237,10 +237,10 @@ function ReceptionWelcomeScreenContent() {
       <div className="relative z-10 flex-1 flex items-center justify-center py-6 sm:py-10">
         {activeWelcomeGuest ? (
           /* VIP Announcement Banner (Triggered when guest checks in) */
-          <div className="w-full max-w-4xl bg-gradient-to-b from-[#00382D] to-[#001F18] border-2 border-saudi-gold-400 rounded-3xl p-8 sm:p-14 text-center shadow-[0_0_80px_rgba(197,155,39,0.35)] animate-fadeIn space-y-6 relative overflow-hidden">
+          <div className="w-full max-w-4xl bg-[#00382D] border-2 border-saudi-gold-400 rounded-3xl p-8 sm:p-14 text-center shadow-[0_0_80px_rgba(197,155,39,0.35)] animate-fadeIn space-y-6 relative overflow-hidden">
             
             {/* Top Ornamental Ribbon */}
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 text-saudi-green-950 px-6 py-2 rounded-full font-bold text-xs sm:text-sm shadow-md uppercase tracking-wider">
+            <div className="inline-flex items-center gap-2 bg-saudi-gold-500 text-saudi-green-950 px-6 py-2 rounded-full font-bold text-xs sm:text-sm shadow-md uppercase tracking-wider">
               <Sparkles className="w-4 h-4" />
               <span>أهلاً وسهلاً ومرحباً بكم في حفلنا المبارك</span>
               <Sparkles className="w-4 h-4" />
@@ -290,7 +290,7 @@ function ReceptionWelcomeScreenContent() {
           /* Ambient Idle State (Waiting for Guests) */
           <div className="w-full max-w-4xl text-center space-y-8 animate-fadeIn">
             <div className="space-y-3">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto rounded-3xl bg-gradient-to-br from-saudi-gold-400 to-saudi-gold-600 text-saudi-green-950 flex items-center justify-center shadow-[0_0_50px_rgba(197,155,39,0.4)] animate-pulse">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto rounded-3xl bg-saudi-gold-400 text-saudi-green-950 flex items-center justify-center shadow-[0_0_50px_rgba(197,155,39,0.4)] animate-pulse">
                 <Sparkles className="w-10 h-10 sm:w-12 sm:h-12" />
               </div>
 

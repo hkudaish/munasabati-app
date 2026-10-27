@@ -63,9 +63,9 @@ export default function StaffLumaDrawer() {
   return (
     <div role="dialog" aria-modal="true" aria-labelledby="luma-staff-title" className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm animate-fadeIn">
       <div className="w-full max-w-2xl h-full bg-white shadow-2xl flex flex-col overflow-hidden animate-slideUp">
-        <div className="bg-gradient-to-r from-saudi-green-950 via-saudi-green-900 to-saudi-green-800 text-white p-4 sm:p-5 flex items-center justify-between border-b border-saudi-gold-500/30">
+        <div className="bg-saudi-green-950 text-white p-4 sm:p-5 flex items-center justify-between border-b border-saudi-gold-500/30">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-saudi-gold-400 to-saudi-gold-600 text-saudi-green-950 flex items-center justify-center shadow-lg"><Sparkles className="w-6 h-6" /></div>
+            <div className="w-11 h-11 rounded-2xl bg-saudi-gold-400 text-saudi-green-950 flex items-center justify-center shadow-lg"><Sparkles className="w-6 h-6" /></div>
             <div>
               <h3 id="luma-staff-title" className="text-lg font-bold font-cairo">المساعد الذكي: {adminConfig.aiAssistantNameAr} <span className="bg-saudi-gold-500/20 text-saudi-gold-300 text-caption2 font-bold px-2 py-0.5 rounded-full border border-saudi-gold-400/40">مستشارة الإدارة</span></h3>
               <p className="text-xs text-gray-300">أبرز الموردين • المواعيد المستحقة • المشكلات والملاحظات</p>

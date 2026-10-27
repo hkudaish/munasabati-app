@@ -69,10 +69,24 @@ const config: Config = {
         sans: ["Saudi Riyal", "var(--font-tajawal)", "sans-serif"],
         mono: ["Saudi Riyal", "ui-monospace", "monospace"],
       },
+      // Radius follows the role of the surface: controls 10px, cards 14px, sheets and dialogs 20px.
+      borderRadius: {
+        lg: "0.5rem",
+        xl: "0.625rem",
+        "2xl": "0.875rem",
+        "3xl": "1.25rem",
+      },
+      // Shadows are emerald-tinted and shallow; depth is reserved for things that float (menus, dialogs).
       boxShadow: {
-        glow: "0 0 25px -5px rgba(197, 155, 39, 0.25)",
-        "glow-green": "0 0 25px -5px rgba(0, 77, 63, 0.25)",
-        card: "0 10px 30px -10px rgba(0,0,0,0.06), 0 4px 6px -2px rgba(0,0,0,0.02)",
+        sm: "0 1px 2px rgba(0, 51, 42, 0.06)",
+        DEFAULT: "0 1px 3px rgba(0, 51, 42, 0.08)",
+        md: "0 2px 6px -1px rgba(0, 51, 42, 0.08)",
+        lg: "0 6px 16px -4px rgba(0, 51, 42, 0.10)",
+        xl: "0 12px 28px -8px rgba(0, 51, 42, 0.14)",
+        "2xl": "0 24px 48px -12px rgba(0, 51, 42, 0.22)",
+        glow: "0 0 0 3px rgba(197, 155, 39, 0.18)",
+        "glow-green": "0 0 0 3px rgba(0, 77, 63, 0.14)",
+        card: "0 1px 2px rgba(0, 51, 42, 0.05)",
       },
       animation: {
         "fade-in": "fadeIn 0.2s cubic-bezier(0.23, 1, 0.32, 1)",

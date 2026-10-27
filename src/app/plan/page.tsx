@@ -541,7 +541,7 @@ function PlanWizardContent() {
             <button
               onClick={handleFinishWizard}
               disabled={!coverageReady || isSubmitting}
-              className="px-8 py-3 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-bold rounded-xl text-xs sm:text-sm shadow-md flex items-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-8 py-3 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-bold rounded-xl text-xs sm:text-sm shadow-md flex items-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Sparkles className="w-4 h-4 text-saudi-green-950" />
               <span>{isSubmitting ? 'جاري إنشاء المناسبة…' : 'توليد "خطة مناسبتي" وفتح مساحة العمل'}</span>

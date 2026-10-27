@@ -113,7 +113,7 @@ export default function HomePage() {
       ========================================================================= */}
       {currentRole !== 'client' && (
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-        <div className="bg-gradient-to-r from-saudi-green-950 via-saudi-green-900 to-saudi-green-950 border border-saudi-gold-500/30 rounded-2xl p-3.5 sm:p-4 text-white shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+        <div className="bg-saudi-green-950 border border-saudi-gold-500/30 rounded-2xl p-3.5 sm:p-4 text-white shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-saudi-gold-500/20 border border-saudi-gold-400/40 flex items-center justify-center shrink-0">
               {currentRole === 'vendor' && <Store className="w-5 h-5 text-saudi-gold-300" />}
@@ -463,7 +463,7 @@ export default function HomePage() {
       {currentRole === 'vendor' && (
         <div className="space-y-16 animate-fadeIn">
           {/* 1. Vendor Hero Section */}
-          <section className="relative bg-gradient-to-br from-saudi-green-950 via-[#0B2820] to-saudi-green-950 text-white pt-10 pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden border-b border-saudi-gold-500/20">
+          <section className="relative bg-saudi-green-950 text-white pt-10 pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden border-b border-saudi-gold-500/20">
             <div className="max-w-7xl mx-auto relative z-10 space-y-8">
               <div className="inline-flex items-center gap-2 bg-saudi-gold-500/20 border border-saudi-gold-400/40 px-3.5 py-1.5 rounded-full text-saudi-gold-300 text-xs font-bold">
                 <Store className="w-4 h-4 text-saudi-gold-400" />
@@ -533,7 +533,7 @@ export default function HomePage() {
               <div className="flex flex-wrap items-center gap-3 pt-2">
                 <Link
                   href="/vendor"
-                  className="px-6 py-3.5 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-bold rounded-2xl text-sm shadow-lg flex items-center gap-2 transition"
+                  className="px-6 py-3.5 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-bold rounded-2xl text-sm shadow-lg flex items-center gap-2 transition"
                 >
                   <Store className="w-4 h-4 text-saudi-green-950" />
                   <span>{t('الدخول للوحة المورد الكاملة')}</span>
@@ -736,7 +736,7 @@ export default function HomePage() {
 
           {/* 4. Vendor Growth & Certification Hub */}
           <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-gradient-to-r from-saudi-green-950 via-saudi-green-900 to-saudi-green-950 rounded-3xl p-6 sm:p-10 text-white border border-saudi-gold-500/30 shadow-2xl">
+            <div className="bg-saudi-green-950 rounded-3xl p-6 sm:p-10 text-white border border-saudi-gold-500/30 shadow-2xl">
               <div className="max-w-2xl space-y-4">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-saudi-gold-500/20 text-saudi-gold-300 text-xs font-bold border border-saudi-gold-500/30">
                   <Award className="w-3.5 h-3.5" />
@@ -775,7 +775,7 @@ export default function HomePage() {
       {currentRole === 'admin' && (
         <div className="space-y-16 animate-fadeIn">
           {/* 1. Admin Central Hero Section */}
-          <section className="relative bg-gradient-to-br from-[#071d17] via-[#09221b] to-[#071d17] text-white pt-10 pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden border-b border-saudi-gold-500/30">
+          <section className="relative bg-[#071d17] text-white pt-10 pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden border-b border-saudi-gold-500/30">
             <div className="max-w-7xl mx-auto relative z-10 space-y-8">
               <div className="inline-flex items-center gap-2 bg-saudi-gold-500/20 border border-saudi-gold-400/40 px-3.5 py-1.5 rounded-full text-saudi-gold-300 text-xs font-bold">
                 <ShieldCheck className="w-4 h-4 text-saudi-gold-400" />
@@ -846,7 +846,7 @@ export default function HomePage() {
               <div className="flex flex-wrap items-center gap-3 pt-2">
                 <Link
                   href="/admin"
-                  className="px-6 py-3.5 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-bold rounded-2xl text-sm shadow-lg flex items-center gap-2 transition"
+                  className="px-6 py-3.5 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-bold rounded-2xl text-sm shadow-lg flex items-center gap-2 transition"
                 >
                   <ShieldCheck className="w-4 h-4 text-saudi-green-950" />
                   <span>{t('فتح لوحة الإدارة المركزية الكاملة')}</span>
@@ -1047,7 +1047,7 @@ export default function HomePage() {
 
           {/* 4. Admin Live Persona Switcher Tool */}
           <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-gradient-to-r from-saudi-sand-100 via-white to-saudi-sand-100 border border-saudi-gold-400/30 rounded-2xl p-6 shadow-card flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="bg-saudi-sand-100 border border-saudi-gold-400/30 rounded-2xl p-6 shadow-card flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="space-y-1 text-right">
                 <h4 className="font-bold text-base text-saudi-green-950 font-cairo">
                   {t('أداة فحص ومعاينة تجربة المستخدمين (Persona Simulator) 🎭')}

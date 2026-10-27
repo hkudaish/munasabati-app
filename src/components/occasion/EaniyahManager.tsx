@@ -104,7 +104,7 @@ export default function EaniyahManager({ occasionId }: EaniyahManagerProps) {
       {/* Header and Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Total Collected */}
-        <div className="bg-gradient-to-br from-saudi-green-950 via-saudi-green-900 to-saudi-green-800 p-6 rounded-3xl text-white border border-saudi-gold-500/30 shadow-lg relative overflow-hidden space-y-3">
+        <div className="bg-saudi-green-950 p-6 rounded-3xl text-white border border-saudi-gold-500/30 shadow-lg relative overflow-hidden space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs text-saudi-gold-300 font-bold flex items-center gap-1.5">
               <Gift className="w-4 h-4" />

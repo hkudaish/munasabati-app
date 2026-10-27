@@ -326,7 +326,7 @@ function AdminDashboardContent() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
       {/* Top Banner & Title */}
-      <div className="bg-gradient-to-r from-saudi-green-950 via-saudi-green-900 to-saudi-green-950 rounded-3xl p-6 sm:p-8 text-white border border-saudi-gold-500/20 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="bg-saudi-green-950 rounded-3xl p-6 sm:p-8 text-white border border-saudi-gold-500/20 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="space-y-2">
           <div className="inline-flex items-center gap-2 bg-saudi-gold-500/20 border border-saudi-gold-500/30 text-saudi-gold-300 px-3.5 py-1 rounded-full text-xs font-bold">
             <ShieldCheck className="w-4 h-4" />

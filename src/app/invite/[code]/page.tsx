@@ -100,7 +100,7 @@ export default function GuestRSVPPage() {
         <div className="bg-white rounded-3xl border border-saudi-sand-300 shadow-2xl overflow-hidden space-y-6">
           
           {/* Top Header Card */}
-          <div className="bg-gradient-to-b from-saudi-green-950 via-saudi-green-900 to-saudi-green-800 text-white p-8 text-center space-y-4 relative">
+          <div className="bg-saudi-green-950 text-white p-8 text-center space-y-4 relative">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-saudi-gold-500 text-saudi-green-950 shadow-lg">
               <Sparkles className="w-6 h-6" />
             </div>
@@ -256,7 +256,7 @@ export default function GuestRSVPPage() {
         </div>
 
         {/* Feature 1: Digital Eaniyah Viral Hook Card */}
-        <div className="bg-gradient-to-r from-amber-50 via-saudi-sand-50 to-amber-100/60 rounded-3xl p-5 border border-saudi-gold-400/40 shadow-lg space-y-3">
+        <div className="bg-amber-50 rounded-3xl p-5 border border-saudi-gold-400/40 shadow-lg space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="w-9 h-9 rounded-xl bg-saudi-gold-500 text-saudi-green-950 flex items-center justify-center shadow-md">
@@ -280,7 +280,7 @@ export default function GuestRSVPPage() {
 
           <button
             onClick={() => setIsEaniyahOpen(true)}
-            className="w-full py-3 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-bold rounded-2xl text-xs flex items-center justify-center gap-2 shadow-md transition"
+            className="w-full py-3 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-bold rounded-2xl text-xs flex items-center justify-center gap-2 shadow-md transition"
           >
             <Smartphone className="w-4 h-4" />
             <span>إهداء عانية الآن بضغطة زر 🤍</span>

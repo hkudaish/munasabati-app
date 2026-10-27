@@ -1123,7 +1123,7 @@ export default function ZaffahPage() {
         {/* ========================================== */}
         {/* 1. HERO TITLE BANNER                       */}
         {/* ========================================== */}
-        <div className="relative rounded-3xl p-8 sm:p-12 overflow-hidden bg-gradient-to-r from-emerald-950 via-neutral-900 to-neutral-950 text-white border border-amber-500/30 shadow-2xl">
+        <div className="relative rounded-3xl p-8 sm:p-12 overflow-hidden bg-emerald-950 text-white border border-amber-500/30 shadow-2xl">
           <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
           <div className="absolute bottom-0 left-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl -ml-20 -mb-20 pointer-events-none" />
           
@@ -1709,7 +1709,7 @@ export default function ZaffahPage() {
                 <button
                   type="submit"
                   disabled={isGenerating}
-                  className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600 text-neutral-950 font-bold text-sm shadow-lg shadow-amber-500/20 transition flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full py-3.5 px-6 rounded-2xl bg-amber-600 hover:bg-amber-700 text-neutral-950 font-bold text-sm shadow-lg shadow-amber-500/20 transition flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   <Sparkles className="w-4 h-4" />
                   <span>{isGenerating ? 'جاري نظم وتوليد القصيدة...' : 'توليد نص وقصيدة الزفة'}</span>

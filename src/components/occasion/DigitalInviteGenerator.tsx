@@ -176,7 +176,7 @@ function InvitationStudio() {
   const suggestions = [...LIBRARY_TEMPLATES, ...BUILTIN_TEMPLATES].filter(t => t.occasion === templateKind).slice(0, 8);
   if (!ready) return <div className="p-6" role="status">{notice || 'جارٍ تحميل مكتبة التصاميم…'}{notice && <button onClick={() => window.location.reload()} className="mx-3 underline">إعادة المحاولة</button>}</div>;
   return <div className="space-y-6" dir="rtl">
-    <div className="rounded-3xl bg-gradient-to-l from-saudi-green-950 to-saudi-green-800 p-6 text-white flex flex-wrap items-center justify-between gap-4">
+    <div className="rounded-3xl bg-saudi-green-950 p-6 text-white flex flex-wrap items-center justify-between gap-4">
       <div><span className="text-xs text-saudi-gold-300">مساحة إبداعك</span><h3 className="text-xl font-bold mt-1">كل مناسبة تستحق دعوة تليق بها</h3><p className="text-sm text-white/80 mt-2">{LIBRARY_TEMPLATES.length + BUILTIN_TEMPLATES.length} قالباً منسّقاً · دعوات للرجال والنساء · تخصيص مرن · معاينة وتصدير</p></div><Palette className="h-10 w-10 text-saudi-gold-300" />
     </div>
     <p className="text-xs text-gray-600">التصاميم والمفضلة والدعوات محفوظة في قاعدة البيانات. رابط البطاقة العام للعرض؛ تأكيد الحضور متاح عبر رابط الضيف الشخصي من قائمة المدعوين.</p>

@@ -38,7 +38,7 @@ export default function CustomerReviewsShowcase({
   if (!reviews?.length) return null;
   return (
     <section aria-label={t('تجارب العملاء')} className="space-y-8">
-      <div className="relative overflow-hidden rounded-3xl border border-saudi-gold-500/20 bg-gradient-to-br from-saudi-green-950 via-saudi-green-900 to-saudi-green-950 p-6 text-white sm:p-10">
+      <div className="relative overflow-hidden rounded-3xl border border-saudi-gold-500/20 bg-saudi-green-950 p-6 text-white sm:p-10">
         <div className="relative z-10 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
           <div className="max-w-2xl space-y-2">
             <div className="inline-flex items-center gap-2 rounded-full border border-saudi-gold-500/30 bg-saudi-gold-500/20 px-3.5 py-1 text-xs font-bold text-saudi-gold-300"><ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" /><span>{t('من عملاء أتموا خدماتهم عبر المنصة')}</span></div>

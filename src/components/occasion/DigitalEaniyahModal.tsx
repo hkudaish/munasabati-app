@@ -157,7 +157,7 @@ export default function DigitalEaniyahModal({
       <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-saudi-sand-300 overflow-hidden my-6">
         
         {/* Modal Top Header */}
-        <div className="bg-gradient-to-r from-saudi-green-950 via-saudi-green-900 to-saudi-green-800 text-white p-5 px-6 flex items-center justify-between border-b border-saudi-gold-500/30">
+        <div className="bg-saudi-green-950 text-white p-5 px-6 flex items-center justify-between border-b border-saudi-gold-500/30">
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-xl bg-saudi-gold-500/20 text-saudi-gold-300 flex items-center justify-center border border-saudi-gold-400/40">
               <Gift className="w-5 h-5" />
@@ -436,7 +436,7 @@ export default function DigitalEaniyahModal({
                 type="button"
                 onClick={handleConfirmGift}
                 disabled={isProcessing}
-                className="w-full py-4 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-bold rounded-2xl text-sm flex items-center justify-center gap-2 shadow-lg transition disabled:opacity-50"
+                className="w-full py-4 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-bold rounded-2xl text-sm flex items-center justify-center gap-2 shadow-lg transition disabled:opacity-50"
               >
                 {isProcessing ? (
                   <div className="flex items-center gap-2">

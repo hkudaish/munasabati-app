@@ -93,7 +93,7 @@ export default function OccasionWorkspacePage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
       <RequestedServices selections={currentOccasion.serviceSelections} />
       {/* 1. Occasion Header Banner */}
-      <div className="bg-gradient-to-r from-saudi-green-950 via-saudi-green-900 to-saudi-green-800 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden border border-saudi-gold-500/30">
+      <div className="bg-saudi-green-950 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden border border-saudi-gold-500/30">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
           <div className="space-y-2 max-w-2xl">
             <div className="flex flex-wrap items-center gap-2 text-xs">
@@ -453,7 +453,7 @@ export default function OccasionWorkspacePage() {
             </div>
 
             {/* Next Step Advice */}
-            <div className="bg-gradient-to-r from-saudi-gold-50 to-amber-50 border border-saudi-gold-300 p-6 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="bg-saudi-gold-50 border border-saudi-gold-300 p-6 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="space-y-1 text-center sm:text-right">
                 <h5 className="font-bold text-sm text-saudi-green-950 flex items-center justify-center sm:justify-start gap-1.5">
                   <Sparkles className="w-4 h-4 text-saudi-gold-600" />

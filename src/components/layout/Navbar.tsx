@@ -245,7 +245,7 @@ function NavbarContent() {
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={() => openOnboarding()}
-                  className="bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 font-bold px-2.5 sm:px-3 py-1 rounded-md text-xs transition shadow-sm flex items-center gap-1"
+                  className="bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 font-bold px-2.5 sm:px-3 py-1 rounded-md text-xs transition shadow-sm flex items-center gap-1"
                 >
                   <UserPlus className="w-3 h-3 text-saudi-green-950" />
                   <span>{t('إنشاء حساب')}</span>
@@ -270,7 +270,7 @@ function NavbarContent() {
           {/* Right: Logo & Slogan */}
           <div className="flex items-center gap-5 lg:gap-7">
             <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-saudi-green-800 to-saudi-green-950 flex items-center justify-center text-saudi-gold-400 shadow-md group-hover:scale-105 transition">
+              <div className="w-10 h-10 rounded-xl bg-saudi-green-800 flex items-center justify-center text-saudi-gold-400 shadow-md group-hover:scale-105 transition">
                 <Sparkles className="w-6 h-6" />
               </div>
               <div className="flex flex-col">
@@ -635,7 +635,7 @@ function NavbarContent() {
               <>
                 <Link
                   href="/vendor"
-                  className="flex items-center gap-1.5 bg-gradient-to-r from-saudi-gold-500 to-saudi-gold-600 hover:from-saudi-gold-600 hover:to-saudi-gold-700 text-saudi-green-950 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold shadow-md transition"
+                  className="flex items-center gap-1.5 bg-saudi-gold-500 hover:bg-saudi-gold-600 text-saudi-green-950 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold shadow-md transition"
                 >
                   <PlusCircle className="w-4 h-4" />
                   <span>{t('+ إضافة خدمة جديدة')}</span>

@@ -428,7 +428,7 @@ export default function GuestManager() {
       {/* QR Code Pass Modal */}
       {activeQRModalGuest && (
         <div role="dialog" aria-modal="true" aria-labelledby="dlg-2299-2" className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
-          <div className="bg-gradient-to-b from-saudi-green-950 to-saudi-green-900 text-white rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4 border border-saudi-gold-500/40 text-center relative overflow-hidden">
+          <div className="bg-saudi-green-950 text-white rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4 border border-saudi-gold-500/40 text-center relative overflow-hidden">
             <div className="absolute top-0 right-0 left-0 h-2 bg-gold-gradient" />
 
             <div className="space-y-1">
