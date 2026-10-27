@@ -91,6 +91,11 @@ export default function UserOnboardingModal() {
   // Login Form Data
   const [loginIdentifier, setLoginIdentifier] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
+  // Set when the server locks sign-in after repeated wrong passwords; the form stays disabled until the time passes.
+  const [lockedUntil, setLockedUntil] = useState(0);
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => { if (lockedUntil <= Date.now()) return; const t = setInterval(() => { const n = Date.now(); setNow(n); if (n >= lockedUntil) { setLockedUntil(0); setErrorMessage(''); } }, 1000); return () => clearInterval(t); }, [lockedUntil]);
+  const lockSeconds = lockedUntil > now ? Math.ceil((lockedUntil - now) / 1000) : 0;
 
   // Sync initial role when modal opens
   useEffect(() => {
@@ -210,6 +215,7 @@ export default function UserOnboardingModal() {
 
     if (!res.success) {
       setErrorMessage(res.error || tr('فشل تسجيل الدخول'));
+      if (res.retryAfter) { setNow(Date.now()); setLockedUntil(Date.now() + res.retryAfter * 1000); setLoginPassword(''); }
       return;
     }
 
@@ -252,16 +258,16 @@ export default function UserOnboardingModal() {
 
           <div className="flex items-center gap-2 text-saudi-gold-400 text-xs font-bold mb-1">
             <Sparkles className="w-4 h-4" />
-            <span>{tr('منصة مناسبتـي الرقمية 🇸🇦')}</span>
+            <span>{tr('منصة مناسبتـي الرقمية')}</span>
           </div>
 
           <h2 className="text-xl sm:text-2xl font-black font-cairo text-white" id="dlg-9634-1">
             {step === 'gate' && tr('سجّل الدخول أو أنشئ حساباً للمتابعة')}
             {step === 'select_role' && tr('اختر نوع الحساب للانطلاق')}
-            {step === 'customer_form' && tr('إنشاء حساب صاحب المناسبة 🎉')}
-            {step === 'vendor_form' && tr('تسجيل منشأة أو مورد جديد 🏪')}
-            {step === 'login' && tr('تسجيل الدخول إلى حسابك 🔐')}
-            {step === 'success' && tr('أهلاً وسهلاً بك في مناسبتـي! 🌟')}
+            {step === 'customer_form' && tr('إنشاء حساب صاحب المناسبة')}
+            {step === 'vendor_form' && tr('تسجيل منشأة أو مورد جديد')}
+            {step === 'login' && tr('تسجيل الدخول إلى حسابك')}
+            {step === 'success' && tr('أهلاً وسهلاً بك في مناسبتـي!')}
           </h2>
 
           <p className="text-xs sm:text-sm text-gray-300 mt-1">
@@ -290,7 +296,7 @@ export default function UserOnboardingModal() {
           )}
 
           {errorMessage && (
-            <div className="bg-red-50 border border-red-200 text-red-800 rounded-2xl p-3.5 text-xs sm:text-sm flex items-center gap-2">
+            <div role="alert" id="login-error" className="bg-red-50 border border-red-200 text-red-800 rounded-2xl p-3.5 text-sm flex items-center gap-2">
               <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
               <span>{errorMessage}</span>
             </div>
@@ -478,7 +484,6 @@ export default function UserOnboardingModal() {
                     value={customerData.phone}
                     onChange={(e) => setCustomerData({ ...customerData, phone: e.target.value })}
                     placeholder="05XXXXXXXX"
-                    dir="ltr"
                     className="w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-saudi-green-800 text-right"
                   />
                 </div>
@@ -490,7 +495,6 @@ export default function UserOnboardingModal() {
                     value={customerData.email}
                     onChange={(e) => setCustomerData({ ...customerData, email: e.target.value })}
                     placeholder="sara@example.com"
-                    dir="ltr"
                     className="w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-saudi-green-800 text-right"
                   />
                 </div>
@@ -598,7 +602,6 @@ export default function UserOnboardingModal() {
                     value={vendorData.businessNameEn}
                     onChange={(e) => setVendorData({ ...vendorData, businessNameEn: e.target.value })}
                     placeholder="Lavender Events"
-                    dir="ltr"
                     className="w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-saudi-gold-500 text-right"
                   />
                 </div>
@@ -651,7 +654,6 @@ export default function UserOnboardingModal() {
                     value={vendorData.crNumber}
                     onChange={(e) => setVendorData({ ...vendorData, crNumber: e.target.value })}
                     placeholder={tr('1010XXXXXX أو FL-XXXXX')}
-                    dir="ltr"
                     className="w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-saudi-gold-500 text-right"
                   />
                 </div>
@@ -675,7 +677,6 @@ export default function UserOnboardingModal() {
                     value={vendorData.contactPhone}
                     onChange={(e) => setVendorData({ ...vendorData, contactPhone: e.target.value })}
                     placeholder="05XXXXXXXX"
-                    dir="ltr"
                     className="w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-saudi-gold-500 text-right"
                   />
                 </div>
@@ -687,7 +688,6 @@ export default function UserOnboardingModal() {
                     value={vendorData.whatsappNumber}
                     onChange={(e) => setVendorData({ ...vendorData, whatsappNumber: e.target.value })}
                     placeholder="05XXXXXXXX"
-                    dir="ltr"
                     className="w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-saudi-gold-500 text-right"
                   />
                 </div>
@@ -726,7 +726,7 @@ export default function UserOnboardingModal() {
                     <span>{tr('جاري تسجيل المورد وتفعيل البوابة...')}</span>
                   ) : (
                     <>
-                      <span>{tr('إتمام تسجيل المنشأة وتفعيل بوابة الموردين 🏪')}</span>
+                      <span>{tr('إتمام تسجيل المنشأة وتفعيل بوابة الموردين')}</span>
                       <ChevronLeft className="w-4 h-4" />
                     </>
                   )}
@@ -741,57 +741,64 @@ export default function UserOnboardingModal() {
               <button
                 type="button"
                 onClick={() => setStep('select_role')}
-                className="text-xs font-bold text-saudi-green-800 hover:text-saudi-green-950 flex items-center gap-1 mb-2"
+                className="text-sm font-bold text-saudi-green-800 hover:text-saudi-green-950 flex items-center gap-1 mb-2"
               >
-                <ArrowRight className="w-3.5 h-3.5" />
+                <ArrowRight className="w-4 h-4" />
                 <span>{tr('العودة لاختيار نوع الحساب')}</span>
               </button>
 
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
+                  if (lockSeconds > 0) return;
                   if (!loginIdentifier.trim()) {
                     setErrorMessage(tr('يرجى إدخال رقم الجوال أو البريد الإلكتروني'));
                     return;
                   }
                   handleLoginSubmit(loginIdentifier);
                 }}
-                className="space-y-3.5"
+                className="space-y-4"
+                aria-describedby={errorMessage ? 'login-error' : undefined}
               >
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">{tr('رقم الجوال أو البريد الإلكتروني')}</label>
+                  <label htmlFor="login-identifier" className="block text-sm font-bold text-gray-800 mb-1.5">{tr('رقم الجوال أو البريد الإلكتروني')}</label>
                   <input
+                    id="login-identifier"
                     type="text"
                     required
+                    autoComplete="username"
+                    autoCapitalize="none"
+                    spellCheck={false}
                     value={loginIdentifier}
                     onChange={(e) => setLoginIdentifier(e.target.value)}
                     placeholder={tr('05XXXXXXXX أو البريد الإلكتروني')}
-                    className="w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-saudi-green-800"
+                    className="w-full text-base px-4 py-3 rounded-xl border border-gray-300 text-start focus:outline-none focus-visible:ring-2 focus-visible:ring-saudi-green-800 focus-visible:border-saudi-green-800"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">{tr('كلمة المرور')}</label>
+                  <label htmlFor="login-password" className="block text-sm font-bold text-gray-800 mb-1.5">{tr('كلمة المرور')}</label>
                   <PasswordInput
+                    id="login-password"
                     required
                     autoComplete="current-password"
                     value={loginPassword}
                     onChange={e => setLoginPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-saudi-green-800"
+                    className="w-full text-base px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-saudi-green-800 focus-visible:border-saudi-green-800"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-3 px-4 rounded-xl bg-saudi-green-800 hover:bg-saudi-green-900 text-white font-bold text-sm shadow-md transition"
+                  disabled={isSubmitting || lockSeconds > 0}
+                  className="w-full py-3.5 px-4 rounded-xl bg-saudi-green-800 hover:bg-saudi-green-900 disabled:bg-gray-300 disabled:text-gray-600 disabled:cursor-not-allowed text-white font-bold text-base transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-saudi-green-800"
                 >
-                  {isSubmitting ? tr('جاري التحقق...') : tr('تسجيل الدخول')}
+                  {lockSeconds > 0
+                    ? `${tr('أعد المحاولة بعد')} ${Math.floor(lockSeconds / 60)}:${String(lockSeconds % 60).padStart(2, '0')}`
+                    : isSubmitting ? tr('جاري التحقق...') : tr('تسجيل الدخول')}
                 </button>
               </form>
-
-
             </div>
           )}
 

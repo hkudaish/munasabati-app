@@ -7,13 +7,13 @@
 يرجى إدخال اسم المنشأة ورقم التواصل. => Please enter the business name and contact number.
 حدث خطأ أثناء تسجيل المورد => An error occurred while registering the vendor
 فشل تسجيل الدخول => Sign-in failed
-منصة مناسبتـي الرقمية 🇸🇦 => Munasabati digital platform 🇸🇦
+منصة مناسبتـي الرقمية => Munasabati digital platform
 سجّل الدخول أو أنشئ حساباً للمتابعة => Sign in or create an account to continue
 اختر نوع الحساب للانطلاق => Choose an account type to get started
-إنشاء حساب صاحب المناسبة 🎉 => Create an event host account 🎉
-تسجيل منشأة أو مورد جديد 🏪 => Register a new business or vendor 🏪
-تسجيل الدخول إلى حسابك 🔐 => Sign in to your account 🔐
-أهلاً وسهلاً بك في مناسبتـي! 🌟 => Welcome to Munasabati! 🌟
+إنشاء حساب صاحب المناسبة => Create an event host account
+تسجيل منشأة أو مورد جديد => Register a new business or vendor
+تسجيل الدخول إلى حسابك => Sign in to your account
+أهلاً وسهلاً بك في مناسبتـي! => Welcome to Munasabati!
 تصفّح الخدمات متاح للجميع. نحتاج حسابك فقط لحفظ السلة وإتمام طلبك، ولن تفقد اختياراتك. => Browsing services is open to everyone. We only need your account to save the cart and complete your order, and you won't lose your selections.
 سواء كنت تخطط لاحتفال فاخر أو تقدم خدمات احترافية، نوفر لك تجربة مخصصة بالكامل. => Whether you are planning a luxury celebration or providing professional services, we offer a fully tailored experience.
 احجز أفضل الموردين والقاعات ونظّم ميزانيتك وبطاقات دعواتك في مكان واحد. => Book the best vendors and venues and organize your budget and invitation cards in one place.
@@ -66,7 +66,7 @@
 اكتب نبذة مختصرة عن خبرتكم في تنظيم وتجهيز المناسبات... => Write a short summary of your experience in organizing and preparing events...
 كلمة المرور (12 حرفاً على الأقل) => Password (at least 12 characters)
 جاري تسجيل المورد وتفعيل البوابة... => Registering the vendor and activating the portal...
-إتمام تسجيل المنشأة وتفعيل بوابة الموردين 🏪 => Complete business registration and activate the vendor portal 🏪
+إتمام تسجيل المنشأة وتفعيل بوابة الموردين => Complete business registration and activate the vendor portal
 يرجى إدخال رقم الجوال أو البريد الإلكتروني => Please enter your mobile number or email
 رقم الجوال أو البريد الإلكتروني => Mobile number or email
 05XXXXXXXX أو البريد الإلكتروني => 05XXXXXXXX or email
@@ -310,3 +310,4 @@
 فتح نزاع => Open a dispute
 حل النزاع => Resolve the dispute
 خططها. احجزها. اعزمهم. احتفل. => Plan it. Book it. Invite them. Celebrate.
+أعد المحاولة بعد => Try again in

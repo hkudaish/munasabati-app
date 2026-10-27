@@ -94,7 +94,7 @@ interface AppContextType {
   setOnboardingGate: (gate: { returnTo?: string } | null) => void;
   registerCustomer: (payload: CustomerRegistrationPayload) => Promise<{ success: boolean; user?: UserProfile; error?: string }>;
   registerVendor: (payload: VendorRegistrationPayload) => Promise<{ success: boolean; user?: UserProfile; error?: string }>;
-  loginUser: (identifier: string, requestedRole?: UserRole, password?: string) => Promise<{ success: boolean; user?: UserProfile; error?: string }>;
+  loginUser: (identifier: string, requestedRole?: UserRole, password?: string) => Promise<{ success: boolean; user?: UserProfile; error?: string; retryAfter?: number }>;
   logoutUser: () => void;
   /** True once the server has answered whether anyone is signed in (safe to guard protected pages). */
   authReady: boolean;
@@ -620,7 +620,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.error || 'فشل تسجيل الدخول');
+        throw Object.assign(new Error(data.error || 'فشل تسجيل الدخول'), { retryAfter: typeof data.retryAfter === 'number' ? data.retryAfter : undefined });
       }
 
       const cityObj = cities.find((c) => c.id === data.user.cityId);
@@ -638,7 +638,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
       return { success: true, user: userProfile };
     } catch (err: any) {
-      return { success: false, error: err.message || 'حدث خطأ أثناء تسجيل الدخول' };
+      return { success: false, error: err.message || 'حدث خطأ أثناء تسجيل الدخول', retryAfter: err.retryAfter };
     }
   };
 

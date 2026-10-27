@@ -1,14 +1,16 @@
 import { prisma } from '@/lib/db';
 import { api, body, text, HttpError } from '@/lib/server/http';
-import { clientIp, createSession, profile, rateLimit, verifyPassword } from '@/lib/server/auth';
+import { assertLoginAllowed, clearLoginFailures, clientIp, createSession, profile, rateLimit, recordLoginFailure, verifyPassword } from '@/lib/server/auth';
 export const POST = api(async request => {
   const data = await body(request, 4096); const identifier = text(data.identifier, 254, true).toLowerCase();
   // Three keys, so one person cannot lock another out: the same device on the same account is limited tightly, a single address is limited across accounts
   // (credential stuffing), and an account is limited loosely across all addresses (a distributed guess).
   const ip = clientIp(request);
   await rateLimit(`login:${ip}:${identifier}`, 8); await rateLimit(`login-ip:${ip}`, 40); await rateLimit(`login-id:${identifier}`, 60);
+  await assertLoginAllowed(ip, identifier);
   const user = await prisma.user.findFirst({ where: { OR: [{ phone: identifier }, { email: identifier }] }, include: { vendorProfile: true } });
-  if (!await verifyPassword(data.password, user?.passwordHash || null) || !user || !user.isActive) throw new HttpError(401, 'بيانات الدخول غير صحيحة؛ الحسابات القديمة تحتاج تهيئة كلمة مرور من مسؤول النظام');
+  if (!await verifyPassword(data.password, user?.passwordHash || null) || !user || !user.isActive) { await recordLoginFailure(ip, identifier); throw new HttpError(401, 'بيانات الدخول غير صحيحة؛ الحسابات القديمة تحتاج تهيئة كلمة مرور من مسؤول النظام'); }
+  await clearLoginFailures(ip, identifier);
   await createSession(user.id);
   return { success: true, user: profile(user) };
 });

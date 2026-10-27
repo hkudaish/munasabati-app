@@ -28,6 +28,7 @@
     "test:pricing": "node scripts/test-pricing.cjs",
     "test:pricing-browser": "node scripts/test-pricing-browser.cjs",
     "test:overflow": "node scripts/test-overflow-browser.cjs",
+    "test:login-lockout": "node scripts/test-login-lockout.cjs",
     "test:backup": "node scripts/test-backup.cjs",
     "test:backup-admin": "node scripts/test-backup-admin.cjs",
     "test:floor-plan": "node scripts/test-floor-plan.cjs",

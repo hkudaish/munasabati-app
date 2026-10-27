@@ -22,6 +22,10 @@ export const digest = (value: string) => createHash('sha256').update(value).dige
 export async function createSession(userId: string) {
   const token = randomBytes(32).toString('base64url'); const expiresAt = new Date(Date.now() + 7 * 86400000);
   await prisma.authSession.create({ data: { tokenHash: digest(token), userId, expiresAt } });
+  // Keep a person's session list short: drop expired ones and everything beyond the ten newest.
+  await prisma.authSession.deleteMany({ where: { userId, expiresAt: { lte: new Date() } } });
+  const stale = await prisma.authSession.findMany({ where: { userId }, orderBy: { createdAt: 'desc' }, skip: 10, select: { tokenHash: true } });
+  if (stale.length) await prisma.authSession.deleteMany({ where: { tokenHash: { in: stale.map(s => s.tokenHash) } } });
   (await cookies()).set(COOKIE, token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/', expires: expiresAt });
 }
 export async function sessionUser() {
@@ -43,6 +47,34 @@ export async function rateLimit(key: string, limit = 20, windowMs = 900000) {
   const attempt = await prisma.authAttempt.upsert({ where: { key: hashed }, create: { key: hashed, expiresAt: new Date(Date.now() + windowMs) }, update: { count: { increment: 1 } } });
   if (attempt.count > limit) throw new HttpError(429, 'طلبات كثيرة؛ حاول بعد قليل');
 }
+
+const FAIL_PAIR_LIMIT = 5, FAIL_ACCOUNT_LIMIT = 20, FAIL_WINDOW = 900000, FAIL_ACCOUNT_WINDOW = 3600000, LOCK_BASE = 900000, LOCK_MAX = 86400000;
+const failKeys = (ip: string, identifier: string) => ({ pair: digest(`fail:${ip}:${identifier}`), account: digest(`fail-id:${identifier}`), tier: digest(`lock-tier:${identifier}`) });
+/** Refuses a sign-in while the device or the account is locked after repeated wrong passwords. Checking never counts as an attempt, so a locked-out attacker cannot extend a victim's lock. */
+export async function assertLoginAllowed(ip: string, identifier: string) {
+  const k = failKeys(ip, identifier); const now = new Date();
+  const rows = await prisma.authAttempt.findMany({ where: { key: { in: [k.pair, k.account] }, expiresAt: { gt: now } } });
+  const locked = rows.filter(r => r.count >= (r.key === k.pair ? FAIL_PAIR_LIMIT : FAIL_ACCOUNT_LIMIT)).sort((a, b) => b.expiresAt.getTime() - a.expiresAt.getTime())[0];
+  if (locked) {
+    const retryAfter = Math.max(1, Math.ceil((locked.expiresAt.getTime() - now.getTime()) / 1000)), minutes = Math.ceil(retryAfter / 60);
+    throw new HttpError(429, `تم إيقاف تسجيل الدخول مؤقتاً بعد محاولات خاطئة متكررة. حاول بعد ${minutes >= 120 ? Math.ceil(minutes / 60) + ' ساعات' : minutes + ' دقيقة'}`, { retryAfter });
+  }
+}
+/** Counts a wrong password. Reaching the limit locks that device on that account, then the whole account, for 15 minutes the first time and twice as long for each later lock within a day (at most 24 hours). */
+export async function recordLoginFailure(ip: string, identifier: string) {
+  const k = failKeys(ip, identifier);
+  for (const [key, limit, window] of [[k.pair, FAIL_PAIR_LIMIT, FAIL_WINDOW], [k.account, FAIL_ACCOUNT_LIMIT, FAIL_ACCOUNT_WINDOW]] as const) {
+    await prisma.authAttempt.deleteMany({ where: { key, expiresAt: { lte: new Date() } } });
+    const row = await prisma.authAttempt.upsert({ where: { key }, create: { key, expiresAt: new Date(Date.now() + window) }, update: { count: { increment: 1 } } });
+    if (row.count === limit) {
+      await prisma.authAttempt.deleteMany({ where: { key: k.tier, expiresAt: { lte: new Date() } } });
+      const tier = await prisma.authAttempt.upsert({ where: { key: k.tier }, create: { key: k.tier, expiresAt: new Date(Date.now() + 86400000) }, update: { count: { increment: 1 } } });
+      await prisma.authAttempt.update({ where: { key }, data: { expiresAt: new Date(Date.now() + Math.min(LOCK_BASE * 2 ** (tier.count - 1), LOCK_MAX)) } });
+    }
+  }
+}
+/** A correct password clears this device's failures; the account-wide count is left to expire so a guesser cannot reset it. */
+export async function clearLoginFailures(ip: string, identifier: string) { await prisma.authAttempt.deleteMany({ where: { key: failKeys(ip, identifier).pair } }); }
 
 export async function requireSystemAdmin() { const user = await requireUser(); if (user.role !== 'SUPER_ADMIN') throw new HttpError(403, 'هذه الصلاحية مخصصة لمدير النظام'); return user; }
 export async function requireAdmin() { const user = await requireUser(); if (!['ADMIN','SUPER_ADMIN'].includes(user.role)) throw new HttpError(403, 'هذه الصلاحية مخصصة للإدارة'); return user; }
