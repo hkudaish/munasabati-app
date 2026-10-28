@@ -1,5 +1,6 @@
 'use client';
 import { ReviewModeration } from '@/components/commerce/Reviews';
+import { DemoDataPanel } from '@/components/admin/DemoDataPanel';
 import { notify } from '@/lib/notify';
 
 import React, { useState, useEffect, Suspense } from 'react';
@@ -1079,6 +1080,7 @@ function AdminDashboardContent() {
         )}
 
         {/* 9. System & AI Settings Tab */}
+        {activeTab === 'settings' && <DemoDataPanel />}
         {activeTab === 'settings' && (
           <div className="bg-white rounded-3xl p-6 sm:p-8 border border-saudi-sand-300 shadow-sm space-y-6 max-w-3xl">
             <h4 className="text-base font-bold text-gray-900 font-cairo flex items-center gap-2">

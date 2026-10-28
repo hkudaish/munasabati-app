@@ -333,3 +333,20 @@
 إيقاف التحقق بخطوتين => Turn off two-step verification
 رمز التحقق من تطبيق المصادقة => Code from your authenticator app
 افتح تطبيق المصادقة وأدخل الرمز المكوّن من 6 أرقام. إذا فقدت هاتفك، أدخل أحد رموز الاسترداد. => Open your authenticator app and enter the 6-digit code. If you lost your phone, enter one of your recovery codes.
+
+البيانات التجريبية للسوق => Marketplace demo data
+موردون وخدمات وعروض وباقات تجريبية تملأ السوق قبل انضمام الموردين الحقيقيين. الموردون التجريبيون بلا كلمة مرور ولا يمكنهم تسجيل الدخول، ويمكنك حذفها كلها في أي وقت. => Demo vendors, services, offers and packages that fill the marketplace before real vendors join. Demo vendors have no password and cannot sign in, and you can delete all of it at any time.
+الحالي => Current
+موردين => vendors
+خدمة => services
+عرضاً => offers
+باقة => packages
+جارٍ الإضافة => Adding
+جارٍ الحذف => Deleting
+إكمال البيانات التجريبية => Finish demo data
+إضافة بيانات تجريبية => Add demo data
+حذف كل البيانات التجريبية => Delete all demo data
+تمت إضافة البيانات التجريبية. => Demo data added.
+تم حذف البيانات التجريبية. => Demo data deleted.
+سيتم حذف كل البيانات التجريبية (الموردين والخدمات والعروض والباقات). هل تريد المتابعة؟ => This will delete all demo data (vendors, services, offers and packages). Continue?
+تعذر حذف البيانات التجريبية لارتباطها بطلبات أو أسعار محفوظة، لذلك أُخفيت من السوق وتعود عند إعادة إضافتها. => The demo data could not be deleted because orders or saved prices depend on it, so it was hidden from the marketplace. Adding demo data again brings it back.
