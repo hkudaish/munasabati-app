@@ -163,7 +163,7 @@ export function resolve(snapshot: Snapshot, ctx: Context, now: Date = new Date()
     if (r.offerIds?.length && ctx.offerId && !r.offerIds.includes(ctx.offerId)) violate('RESTRICTION_OFFER');
     if (r.maxQuantity != null && quantity > r.maxQuantity) violate('RESTRICTION_QUANTITY');
     if (r.allowedTimeSlots?.length && ctx.bookingTime && !inTimeSlot(r.allowedTimeSlots, ctx.bookingTime)) violate('RESTRICTION_TIME_SLOT');
-    if (r.minLeadHours != null && ctx.bookingDate) { const when = Date.parse(`${ctx.bookingDate}T${ctx.bookingTime ?? '00:00'}:00+03:00`); if (Number.isFinite(when) && when - +now < r.minLeadHours * 3600000) violate('RESTRICTION_LEAD_TIME'); }
+    if (r.minLeadHours != null && ctx.bookingDate && !ctx.waiveLeadTime) { const when = Date.parse(`${ctx.bookingDate}T${ctx.bookingTime ?? '00:00'}:00+03:00`); if (Number.isFinite(when) && when - +now < r.minLeadHours * 3600000) violate('RESTRICTION_LEAD_TIME'); }
   }
   if (checksDate && ctx.bookingDate) {
     const closure = closedAt(schedules, ctx.bookingDate, ctx.bookingTime);

@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/db';
 import { api, body, text, HttpError } from '@/lib/server/http';
 import { createSession, hashPassword, profile, rateLimit } from '@/lib/server/auth';
+import { onVendorRegistered } from '@/lib/server/vendor-approval';
 export const POST = api(async request => {
   const data = await body(request, 12000);
   if (!['client', 'vendor'].includes(data.userType)) throw new HttpError(400, 'نوع الحساب غير صالح');
@@ -15,7 +16,8 @@ export const POST = api(async request => {
   const cityId = text(input.cityId, 80, true);
   const user = await prisma.$transaction(async tx => {
     const user = await tx.user.create({ data: { name: text(vendor ? input.contactName || input.businessName : input.name, 120, true), phone, email, passwordHash, role: vendor ? 'VENDOR' : 'CLIENT', cityId } });
-    if (vendor) await tx.vendor.create({ data: { userId: user.id, businessName: text(input.businessName, 160, true), businessNameEn: text(input.businessNameEn, 160), categoryId: text(input.categoryId, 80, true), cityId, neighborhood: text(input.neighborhood, 160), logo: '', bannerImage: '', bioAr: text(input.bioAr, 4000), cancellationPolicyAr: '', contactPhone: phone, whatsappNumber: text(input.whatsappNumber || phone, 20), status: 'UNDER_REVIEW', verified: false } });
+    const created = vendor ? await tx.vendor.create({ data: { userId: user.id, businessName: text(input.businessName, 160, true), businessNameEn: text(input.businessNameEn, 160), categoryId: text(input.categoryId, 80, true), cityId, neighborhood: text(input.neighborhood, 160), logo: '', bannerImage: '', bioAr: text(input.bioAr, 4000), cancellationPolicyAr: '', contactPhone: phone, whatsappNumber: text(input.whatsappNumber || phone, 20), status: 'UNDER_REVIEW', verified: false } }) : null;
+    if (created) await onVendorRegistered(tx, created);
     return tx.user.findUniqueOrThrow({ where: { id: user.id }, include: { vendorProfile: true } });
   });
   await createSession(user.id);

@@ -6,6 +6,6 @@ export async function requestJSON(path: string, method = 'GET', data?: unknown) 
   if(preview&&path.startsWith('/api/')&&!path.startsWith('/api/coverage-preview/'))path='/api/coverage-preview/'+preview+path.slice(4);
   const response = await fetch(path, { method, credentials: 'same-origin', cache: 'no-store', headers: data === undefined ? undefined : { 'Content-Type': 'application/json' }, body: data === undefined ? undefined : JSON.stringify(data) });
   const result = await response.json();
-  if (!response.ok) throw new Error(translateMessage(result.error || 'تعذر إتمام الطلب'));
+  if (!response.ok) { const error = new Error(translateMessage(result.error || 'تعذر إتمام الطلب')) as Error & { data?: any; status?: number }; error.data = result; error.status = response.status; throw error; }
   return result;
 }

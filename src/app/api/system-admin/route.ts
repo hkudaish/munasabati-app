@@ -57,6 +57,7 @@ export const POST = api(async request => {
     await systemMutation(actor.id, async tx => {
       const changed = await tx.vendor.updateMany({ where: { id, updatedAt: stamp }, data: { businessName, status: d.status, verified: d.verified } });
       if (!changed.count) throw new HttpError(409, 'تم تعديل المورد؛ أعد تحميل البيانات');
+      await (await import('@/lib/server/vendor-approval')).syncApprovalFromStatus(tx as any, id, d.status, actor.id);
       await tx.systemAuditLog.create({ data: { actorId: actor.id, action: 'VENDOR_UPDATED', targetId: id, details: { status: d.status, verified: d.verified } } });
     }); return { success: true };
   }

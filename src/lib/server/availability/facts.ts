@@ -82,11 +82,11 @@ export async function countByScope(db: GeoDB, scopes: string[], date: string, fa
   return used;
 }
 
-export interface BuildInput { offeringId: string; cityId?: string | null; countryCode?: string | null; date?: string | null; time?: string | null; quantity?: number; intent?: Intent; actorIsAdmin?: boolean; packageId?: string | null; visitorCityId?: string | null; excludeRequestId?: string | null; noLock?: boolean }
+export interface BuildInput { /** an approved exception waives the minimum lead time restriction (and nothing else) */ waiveLeadTime?: boolean; offeringId: string; cityId?: string | null; countryCode?: string | null; date?: string | null; time?: string | null; quantity?: number; intent?: Intent; actorIsAdmin?: boolean; packageId?: string | null; visitorCityId?: string | null; excludeRequestId?: string | null; noLock?: boolean }
 export function toContext(facts: OfferFacts, input: BuildInput): Context {
   return {
     entityType: 'OFFER', moduleId: 'commerce', categoryId: facts.categoryId, serviceId: facts.serviceId, legacyServiceId: facts.legacyServiceId, offerId: facts.offerId, vendorId: facts.vendorId, packageId: input.packageId ?? null, serviceKind: facts.kind,
-    cityId: input.cityId ?? null, countryCode: input.countryCode ?? null, visitorCityId: input.visitorCityId ?? null, bookingDate: input.date ?? null, bookingTime: input.time ?? null, quantity: input.quantity ?? 1, intent: input.intent ?? 'VIEW', actorIsAdmin: input.actorIsAdmin,
+    cityId: input.cityId ?? null, countryCode: input.countryCode ?? null, visitorCityId: input.visitorCityId ?? null, bookingDate: input.date ?? null, bookingTime: input.time ?? null, quantity: input.quantity ?? 1, intent: input.intent ?? 'VIEW', actorIsAdmin: input.actorIsAdmin, waiveLeadTime: input.waiveLeadTime,
     serviceCities: facts.serviceCities, vendorActive: facts.vendorActive, offerEnabled: facts.offerEnabled, serviceReady: facts.serviceReady,
   };
 }

@@ -49,6 +49,8 @@
     "test:commerce-migration": "node scripts/test-commerce-migration.cjs",
     "test:service-catalog": "node scripts/test-service-catalog.cjs",
     "test:service-catalog-migration": "node scripts/test-service-catalog-migration.cjs",
+    "test:exception-engine": "node scripts/test-exception-engine.cjs",
+    "test:exceptions": "node scripts/test-exceptions.cjs",
     "test:booking-engine": "node scripts/test-booking-engine.cjs",
     "test:configurable-bookings": "node scripts/test-configurable-bookings.cjs",
     "test:service-commerce": "node scripts/test-service-commerce.cjs",

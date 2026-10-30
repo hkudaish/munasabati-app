@@ -19,6 +19,7 @@ async function call(route,method='GET',data,cookie) {
 }
 (async()=>{
  const pushed=spawnSync(process.execPath,['node_modules/prisma/build/index.js','db','push','--skip-generate'],{env,encoding:'utf8'});assert.equal(pushed.status,0,pushed.stderr||pushed.stdout);
+ const migrated=spawnSync(process.execPath,['node_modules/prisma/build/index.js','db','execute','--file','netlify/database/migrations/202610300001_exception_requests.sql','--schema','prisma/schema.prisma'],{env,encoding:'utf8'});assert.equal(migrated.status,0,migrated.stderr||migrated.stdout);   // vendor approval records live in the exception-requests migration
  await prisma.saudiCity.create({data:{id:'riyadh',nameAr:'الرياض',nameEn:'Riyadh',regionAr:'الرياض'}});
  await require('./seed-geography.cjs').seedGeography(prisma);
  await prisma.serviceCategory.create({data:{id:'test',nameAr:'اختبار',nameEn:'Test',iconName:'test',descriptionAr:'اختبار',color:'#ffffff'}});

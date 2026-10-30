@@ -210,5 +210,7 @@ export async function runCron() {
   const ops = await scheduleOpsReminders();
   const outbox = await dispatchOutbox();
   const jobs = await runNotificationJobs();
-  return { schedules, releasedRedemptions: released, prices, expiredDrafts: Number(expired), reminders, ops, outbox, jobs };
+  // exception requests: expiring offers, escalations and queued messages (a failure here must not stop the jobs above from reporting)
+  const exceptions = await import('../exceptions/sweep').then(m => m.sweepExceptions()).catch(e => ({ error: e instanceof Error ? e.message : 'failed' }));
+  return { schedules, releasedRedemptions: released, prices, expiredDrafts: Number(expired), reminders, ops, outbox, jobs, exceptions };
 }

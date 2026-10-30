@@ -60,6 +60,8 @@ export interface Context {
   bookingDate?: string | null;       // YYYY-MM-DD in the service timezone
   bookingTime?: string | null;       // HH:MM
   quantity?: number; bookingUnits?: number; intent?: Intent; actorIsAdmin?: boolean;
+  /** set only for a booking that carries an approved advance-notice exception */
+  waiveLeadTime?: boolean;
   /** facts about records that already exist (set by the loader from the existing tables) */
   serviceCities?: string[]; vendorActive?: boolean; offerEnabled?: boolean; serviceReady?: boolean;
   /** bookings already counted for the booking date, for the daily cap */

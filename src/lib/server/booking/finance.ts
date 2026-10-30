@@ -23,7 +23,7 @@ export async function recordFinance(input:any){
    const recipientId=kind==='PAYOUT'?text(input.recipientId,100,true):row.customerId;
    if(kind==='PAYMENT'){
     if(!['PAYMENT_PENDING','READY_TO_CONFIRM','CONFIRMED','IN_PROGRESS','COMPLETED'].includes(row.status)||data.price.needsQuote||!data.customerAccepted)throw new HttpError(409,'الطلب غير جاهز للتحصيل');
-    if(value+data.paid+sum('PAYMENT','PENDING')>data.price.total)throw new HttpError(409,'التحصيل يتجاوز إجمالي الطلب');
+    if(value+data.paid+sum('PAYMENT','PENDING')>data.price.total+(data.rescheduleCharge?.amountDue??0))throw new HttpError(409,'التحصيل يتجاوز إجمالي الطلب');
    }else if(kind==='REFUND'){
     if(row.status!=='CANCELLED'||value+sum('REFUND','PENDING')>Math.max(0,(data.refundEntitlement??0)-data.refunded))throw new HttpError(409,'الاسترداد يتجاوز الاستحقاق المعتمد أو لم يعتمد الإلغاء');
     if(sum('PAYOUT')+sum('PAYOUT','PENDING')>0)throw new HttpError(409,'يلزم استرداد مستحق المورد ومطابقته قبل رد مبلغ العميل');
@@ -39,13 +39,15 @@ export async function recordFinance(input:any){
    const entry=entries.find(e=>e.id===input.entryId);if(!entry||entry.status!=='PENDING')throw new HttpError(409,'السجل غير موجود أو تمت مراجعته');if(entry.makerId===user.id)throw new HttpError(403,'يجب أن يراجع التحويل إداري آخر مستقل');
    const noteAr=text(input.noteAr,2000,true);
    if(action==='VERIFY'){
-    if(entry.kind==='PAYMENT'){if(['CANCELLED','REJECTED','EXPIRED','CLOSED','DISPUTED','CANCELLATION_REQUESTED'].includes(row.status)||data.paid+entry.amount>data.price.total)throw new HttpError(409,'تغيّرت حالة الطلب؛ أوقف العملية وراجع التحصيل');data.paid+=entry.amount;}
+    if(entry.kind==='PAYMENT'){if(['CANCELLED','REJECTED','EXPIRED','CLOSED','DISPUTED','CANCELLATION_REQUESTED'].includes(row.status)||data.paid+entry.amount>data.price.total+(data.rescheduleCharge?.amountDue??0))throw new HttpError(409,'تغيّرت حالة الطلب؛ أوقف العملية وراجع التحصيل');data.paid+=entry.amount;}
     if(entry.kind==='REFUND'){if(row.status!=='CANCELLED'||entry.amount>Math.max(0,(data.refundEntitlement??0)-data.refunded))throw new HttpError(409,'الاسترداد غير مستحق');data.refunded+=entry.amount;}
     if(entry.kind==='PAYOUT'){try{settlement(data,sum('PAYOUT'));}catch(e:any){throw new HttpError(409,e.message);}}
    }
    await tx.$executeRaw`UPDATE "ServiceFinanceEntry" SET "status"=${action==='VERIFY'?'VERIFIED':'VOID'},"checkerId"=${user.id},"updatedAt"=CURRENT_TIMESTAMP,"body"="body" || ${JSON.stringify({reviewNoteAr:noteAr,reviewedAt:new Date().toISOString()})}::jsonb WHERE "id"=${entry.id}`;
   }else throw new HttpError(400,'إجراء مالي غير صالح');
   const status=['PAYMENT_PENDING','READY_TO_CONFIRM','APPROVAL_PENDING'].includes(row.status)?nextState(data):row.status;
-  const before=row.status;row=await saveRequest(tx,row,data,status);await event(tx,row,user.id,'FINANCE_'+action,before,{entryId:input.entryId??null,kind:input.kind??null});return view(row,user);
+  const before=row.status;row=await saveRequest(tx,row,data,status);await event(tx,row,user.id,'FINANCE_'+action,before,{entryId:input.entryId??null,kind:input.kind??null});
+ if(action==='VERIFY'&&data.rescheduleCharge)await (await import('../exceptions/actions')).onPaymentVerified(tx,await requestRow(tx,id));
+ return view(row,user);
  });
 }

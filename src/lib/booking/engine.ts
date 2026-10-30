@@ -49,8 +49,9 @@ export function interval(date:string,time:string,duration:number){
  if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!/^([01]\d|2[0-3]):[0-5]\d$/.test(time)||!Number.isInteger(duration)||duration<1)throw Error('الموعد غير صالح');
  const start=new Date(date+'T'+time+':00+03:00');if(!Number.isFinite(+start)||new Date(+start+10800000).toISOString().slice(0,10)!==date)throw Error('التاريخ غير صالح');return {start,end:new Date(+start+duration*60000)};
 }
-export function checkCalendar(c:Policy['calendar'],start:Date,end:Date,now=Date.now()){
- if(+start<now+c.minNoticeHours*3600000||+start>now+c.maxAdvanceDays*86400000)throw Error('الموعد خارج مهلة الحجز');
+export function checkCalendar(c:Policy['calendar'],start:Date,end:Date,now=Date.now(),waiveNotice=false){
+ // an approved exception waives the minimum notice only: the time must still be in the future and inside the booking horizon
+ if((waiveNotice?+start<=now:+start<now+c.minNoticeHours*3600000)||+start>now+c.maxAdvanceDays*86400000)throw Error('الموعد خارج مهلة الحجز');
  // Check each Riyadh calendar day, including overnight and multi-day services.
  for(let cursor=+start;cursor<+end;){const local=new Date(cursor+10800000),date=local.toISOString().slice(0,10),minute=local.getUTCHours()*60+local.getUTCMinutes(),nextMidnight=Date.parse(date+'T00:00:00+03:00')+86400000,partEnd=Math.min(+end,nextMidnight),lastMinute=minute+(partEnd-cursor)/60000;
  if(!c.workingDays.includes(local.getUTCDay())||c.blackoutDates.includes(date)||minute<c.startMinute||lastMinute>c.endMinute)throw Error('الموعد يتعارض مع أيام أو ساعات العمل أو الإجازات');cursor=partEnd;}

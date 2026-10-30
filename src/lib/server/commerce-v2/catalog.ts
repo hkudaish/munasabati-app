@@ -14,6 +14,7 @@ import { mergePolicy,defaultPolicy } from '@/lib/booking/engine';
 import { serviceKinds,relationshipKinds,offerPrice } from '@/lib/commerce/engine';
 import { readGeo } from '../geo/data';
 import { syncLegacyPolicy } from './pricing-policy';
+import { normalizeAdvanceNotice } from '@/lib/booking/advance-notice';
 export async function serviceRow(tx:Tx,id:string){const rows=await tx.$queryRaw<any[]>`SELECT * FROM "CommerceService" WHERE "id"=${id}`;if(!rows[0])throw new HttpError(404,'الخدمة غير موجودة');return rows[0];}
 export async function offerRow(tx:Tx,id:string){const rows=await tx.$queryRaw<any[]>`SELECT * FROM "CommerceOffer" WHERE "id"=${id}`;if(!rows[0])throw new HttpError(404,'العرض غير موجود');return rows[0];}
 export const owns=(user:any,service:any)=>admin(user)||service.ownerId===user.id;
@@ -62,7 +63,8 @@ export async function saveEntity(input:any){
   if(await tx.user.count({where:{id:{in:managerIds},isActive:true,role:{in:['VENDOR','ADMIN','SUPER_ADMIN']}}})!==managerIds.length||await tx.saudiCity.count({where:{id:{in:cityIds}}})!==cityIds.length)throw new HttpError(400,'جهات الإدارة أو المدن غير صالحة');
   if(!admin(user)&&cityIds.some(c=>c!==user.vendorProfile!.cityId&&!user.vendorProfile!.serviceAreas.includes(c)))throw new HttpError(403,'خارج نطاق المورد');
   for(const resource of resourceIds){const p=(await definitions(tx)).find(p=>p.kind==='PERSON'&&p.id===resource);if(!p?.body.authorized||!p.body.enabled||!p.body.managerIds.some((m:string)=>managerIds.includes(m)))throw new HttpError(400,'مورد تشغيلي غير مفوض');}
-  const normalized={titleAr:text(body.titleAr,200,true),descriptionAr:text(body.descriptionAr,8000,true),titleEn:text(body.titleEn,200),descriptionEn:text(body.descriptionEn,8000),categoryId,subcategoryId:subcategoryId||null,artistId:artistId||null,kind:body.kind,cities:cityIds,managerIds,resourceIds,images:mediaUrls(body.images),videoUrls:mediaUrls(body.videoUrls),previewAudioUrl:mediaUrl(body.previewAudioUrl),requirementsAr:text(body.requirementsAr,8000),published:body.published===true,approved:admin(user)?body.approved===true:prev?.body.approved??false};
+  let advanceNotice;try{advanceNotice=normalizeAdvanceNotice(body.advanceNotice??prev?.body.advanceNotice);}catch(e:any){throw new HttpError(400,e.message);}
+  const normalized={advanceNotice,titleAr:text(body.titleAr,200,true),descriptionAr:text(body.descriptionAr,8000,true),titleEn:text(body.titleEn,200),descriptionEn:text(body.descriptionEn,8000),categoryId,subcategoryId:subcategoryId||null,artistId:artistId||null,kind:body.kind,cities:cityIds,managerIds,resourceIds,images:mediaUrls(body.images),videoUrls:mediaUrls(body.videoUrls),previewAudioUrl:mediaUrl(body.previewAudioUrl),requirementsAr:text(body.requirementsAr,8000),published:body.published===true,approved:admin(user)?body.approved===true:prev?.body.approved??false};
   const ownerId=prev?.ownerId??user.id,vendorId=prev?.vendorId??(user.role==='VENDOR'?user.vendorProfile!.id:null);
   await tx.$executeRaw`INSERT INTO "CommerceService" ("id","ownerId","vendorId","body") VALUES (${id},${ownerId},${vendorId},${JSON.stringify(normalized)}::jsonb) ON CONFLICT ("id") DO UPDATE SET "body"=EXCLUDED."body","version"="CommerceService"."version"+1,"updatedAt"=CURRENT_TIMESTAMP`;
   result=await serviceRow(tx,id);const offers=await tx.$queryRaw<any[]>`SELECT * FROM "CommerceOffer" WHERE "serviceId"=${id}`;for(const offer of offers)await syncOffer(tx,offer,result);
